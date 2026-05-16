@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Dashboard de Usuario - Bustraker">
+    <meta name="theme-color" content="#01315f">
+    <title>Dashboard - Bustraker</title>
+    <link rel="stylesheet" th:href="@{/css/style_dashboard.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="shortcut icon" th:href="@{/images/Bus_icono.png}" type="image/x-icon">
+</head>
+<body>
+        <!-- Header -->
+    <header class="main-header">
+        <div class="header-inner">
+            <div class="logo">
+                <img th:src="@{/images/Bus_icono.png}" alt="Logo Bustraker">
+                <span class="brand">Bustraker</span>
+            </div>
+            <nav class="main-nav">
+                <a th:href="@{/dashboard}" class="nav-link">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+                <a th:href="@{/perfil}" class="nav-link">
+                    <i class="fas fa-user"></i> Perfil
+                </a>
+                <a th:href="@{/rutas}" class="nav-link">
+                    <i class="fas fa-route"></i> Rutas
+                </a>
+                <a th:href="@{/historial}" class="nav-link">
+                    <i class="fas fa-history"></i> Historial
+                </a>
+                <a th:href="@{/viajar}" class="nav-link">
+                    <i class="fas fa-bus"></i> Viajar
+                </a>
+                <a th:href="@{/logout}" class="nav-link nav-link--outline">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="container">
+        <!-- Mensajes de alerta -->
+        <div th:if="${success}" class="alert alert-success">
+            <i class="fas fa-check-circle"></i>
+            <span th:text="${success}">Operación exitosa</span>
+        </div>
+        
+        <div th:if="${error}" class="alert alert-danger">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span th:text="${error}">Ha ocurrido un error</span>
+        </div>
+
+        <!-- Saludo -->
+        <section class="section">
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <h1 class="profile-name" th:text="'¡Hola, ' + ${usuario.nombres} + '!'">¡Hola, Usuario!</h1>
+                <p class="profile-email" th:text="${usuario.email}">usuario@email.com</p>
+            </div>
+        </section>
+
+        <!-- Estadísticas -->
+        <section class="section">
+            <h2 class="mb-3"><i class="fas fa-chart-line"></i> Resumen de tu Actividad</h2>
+            <div class="dashboard-grid">
+                <div class="stat-card">
+                    <div class="stat-icon primary">
+                        <i class="fas fa-route"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h4>Rutas Disponibles</h4>
+                        <div class="stat-value" th:text="${totalRutas}">0</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon success">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h4>Viajes Realizados</h4>
+                        <div class="stat-value" th:text="${viajesRealizados}">0</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon warning">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h4>Próximo Viaje</h4>
+                        <div class="stat-value" th:text="${proximoViaje}">--</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon danger">
+                        <i class="fas fa-bus"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h4>Buses Activos</h4>
+                        <div class="stat-value" th:text="${busesActivos}">0</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Rutas Populares -->
+        <section class="section">
+            <div class="d-flex justify-between align-center mb-3">
+                <h2><i class="fas fa-fire"></i> Rutas Populares</h2>
+                <a th:href="@{/rutas}" class="btn btn-outline btn-sm">
+                    Ver todas <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            
+            <div class="ruta-grid">
+                <!-- Ruta Card 1 -->
+                <div class="ruta-card" th:each="ruta : ${rutasPopulares}">
+                    <div class="ruta-card-header">
+                        <h3 th:text="${ruta.nombre}">Ruta Centro</h3>
+                    </div>
+                    <div class="ruta-card-body">
+                        <div class="ruta-info">
+                            <div class="ruta-info-item">
+                                <i class="fas fa-clock"></i>
+                                <span th:text="${ruta.horaAproximada}">08:00 AM</span>
+                            </div>
+                            <div class="ruta-info-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span th:text="${#strings.listJoin(ruta.barrios, ', ')}">Barrio 1, Barrio 2</span>
+                            </div>
+                            <div class="ruta-info-item">
+                                <i class="fas fa-bus"></i>
+                                <span th:text="${#lists.size(ruta.buses)} + ' buses'">3 buses</span>
+                            </div>
+                            <div class="ruta-info-item">
+                                <i class="fas fa-map-pin"></i>
+                                <span th:text="${#lists.size(ruta.paradas)} + ' paradas'">5 paradas</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ruta-card-footer">
+                        <a th:href="@{/ruta/{id}(id=${ruta.id})}" class="btn btn-primary btn-sm">
+                            Ver Detalle
+                        </a>
+                        <span class="badge badge-success">Activa</span>
+                    </div>
+                </div>
+                
+                <!-- Mensaje si no hay rutas -->
+                <div th:if="${#lists.isEmpty(rutasPopulares)}" class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    No hay rutas disponibles en este momento.
+                </div>
+            </div>
+        </section>
+
+        <!-- Accesos Rápidos -->
+        <section class="section">
+            <h2 class="mb-3"><i class="fas fa-bolt"></i> Accesos Rápidos</h2>
+            <div class="dashboard-grid">
+                <a th:href="@{/consultas}" class="card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-search" style="font-size: 3rem; color: var(--primary); margin-bottom: 1rem;"></i>
+                        <h3>Consultar Rutas</h3>
+                        <p class="text-gray-600">Busca rutas por barrio o destino</p>
+                    </div>
+                </a>
+                
+                <a href="#buses-section" class="card" onclick="document.getElementById('buses-section').scrollIntoView({behavior:'smooth'}); return false;">
+                    <div class="card-body text-center">
+                        <i class="fas fa-bus" style="font-size: 3rem; color: var(--success); margin-bottom: 1rem;"></i>
+                        <h3>Mostrar Buses</h3>
+                        <p class="text-gray-600">Consulta el estado de todos los buses activos</p>
+                    </div>
+                </a>
+                
+                <a th:href="@{/contacto}" class="card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-envelope" style="font-size: 3rem; color: var(--warning); margin-bottom: 1rem;"></i>
+                        <h3>Contáctanos</h3>
+                        <p class="text-gray-600">Envíanos tus comentarios</p>
+                    </div>
+                </a>
+                
+                <a th:href="@{/perfil}" class="card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-user-cog" style="font-size: 3rem; color: var(--danger); margin-bottom: 1rem;"></i>
+                        <h3>Mi Perfil</h3>
+                        <p class="text-gray-600">Actualiza tu información</p>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Buses Activos -->
+        <section class="section" id="buses-section">
+            <div class="d-flex justify-between align-center mb-3">
+                <h2><i class="fas fa-bus"></i> Buses Activos</h2>
+                <span class="badge badge-success" style="font-size: 0.95rem; padding: 0.4rem 1rem;">
+                    <i class="fas fa-circle" style="font-size: 0.6rem;"></i>
+                    &nbsp;<span th:text="${busesActivos}">0</span> en servicio
+                </span>
+            </div>
+
+            <!-- Cards de buses detalladas -->
+            <div class="ruta-grid" th:if="${not #lists.isEmpty(buses)}">
+                <div class="ruta-card" th:each="bus : ${buses}">
+                    <div class="ruta-card-header">
+                        <h3>
+                            <i class="fas fa-bus" style="margin-right: 0.4rem;"></i>
+                            <span th:text="${bus.placa}">ABC-123</span>
+                        </h3>
+                    </div>
+                    <div class="ruta-card-body">
+                        <div class="ruta-info">
+                            <div class="ruta-info-item">
+                                <i class="fas fa-palette"></i>
+                                <span><strong>Color:</strong>&nbsp;<span th:text="${bus.color}">Azul</span></span>
+                            </div>
+                            <div class="ruta-info-item">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span><strong>Modelo:</strong>&nbsp;<span th:text="${bus.modelo}">2022</span></span>
+                            </div>
+                            <div class="ruta-info-item">
+                                <i class="fas fa-user-tie"></i>
+                                <span><strong>Conductor:</strong>&nbsp;<span th:text="${bus.conductor}">Sin asignar</span></span>
+                            </div>
+                            <div class="ruta-info-item">
+                                <i class="fas fa-route"></i>
+                                <span><strong>Ruta:</strong>&nbsp;<span th:text="${bus.rutaNombre != null} ? ${bus.rutaNombre} : 'Sin ruta'">Ruta Centro</span></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ruta-card-footer">
+                        <a th:href="@{/ruta/{id}(id=${bus.rutaId})}" th:if="${bus.rutaId != null}" class="btn btn-primary btn-sm">
+                            Ver Ruta
+                        </a>
+                        <span class="badge badge-success">Activo</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla detallada para pantallas grandes -->
+            <div th:if="${not #lists.isEmpty(buses)}" class="table-container" style="margin-top: 1.5rem;">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-id-badge"></i> Placa</th>
+                            <th><i class="fas fa-calendar-alt"></i> Modelo</th>
+                            <th><i class="fas fa-palette"></i> Color</th>
+                            <th><i class="fas fa-user-tie"></i> Conductor</th>
+                            <th><i class="fas fa-route"></i> Ruta Asignada</th>
+                            <th><i class="fas fa-circle"></i> Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="bus : ${buses}">
+                            <td><strong th:text="${bus.placa}">ABC-123</strong></td>
+                            <td th:text="${bus.modelo}">2022</td>
+                            <td th:text="${bus.color}">Azul</td>
+                            <td th:text="${bus.conductor}">Juan Pérez</td>
+                            <td>
+                                <a th:href="@{/ruta/{id}(id=${bus.rutaId})}" th:if="${bus.rutaId != null}"
+                                   th:text="${bus.rutaNombre}" style="color: var(--primary);">Ruta Centro</a>
+                                <span th:if="${bus.rutaId == null}" style="color: var(--gray-500);">Sin ruta</span>
+                            </td>
+                            <td><span class="badge badge-success">Activo</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Mensaje si no hay buses -->
+            <div th:if="${#lists.isEmpty(buses)}" class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                No hay buses activos en este momento.
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer style="background: var(--gray-800); color: var(--white); padding: 2rem; margin-top: 3rem;">
+        <div class="container text-center">
+            <div class="mb-3">
+                <img th:src="@{/images/Bus_icono.png}" alt="Logo Bustraker" style="width: 48px; height: 48px; margin: 0 auto 1rem; border-radius: var(--radius-md);">
+                <h3 style="color: var(--white); margin-bottom: 0.5rem;">Bustraker</h3>
+                <p style="opacity: 0.8;">Tu herramienta de gestión de rutas universitarias</p>
+            </div>
+            <div class="mb-3">
+                <a href="#" class="nav-link" style="margin: 0 0.5rem;"><i class="fab fa-facebook"></i></a>
+                <a href="#" class="nav-link" style="margin: 0 0.5rem;"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="nav-link" style="margin: 0 0.5rem;"><i class="fab fa-instagram"></i></a>
+            </div>
+            <p style="opacity: 0.6; font-size: 0.875rem;">
+                &copy; 2026 Bustraker. Todos los derechos reservados. | 
+                <a href="#" style="color: var(--accent);">Términos</a> | 
+                <a href="#" style="color: var(--accent);">Privacidad</a>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Auto-ocultar alertas después de 5 segundos
+        document.addEventListener('DOMContentLoaded', function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    alert.style.transition = 'opacity 0.3s ease';
+                    alert.style.opacity = '0';
+                    setTimeout(() => alert.remove(), 300);
+                }, 5000);
+            });
+        });
+    </script>
+</body>
+</html>

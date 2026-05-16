@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil de Usuario - Bustraker</title>
+    <link rel="stylesheet" th:href="@{/css/style_perfil.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-inner">
+            <div class="logo">
+                <img th:src="@{/images/Bus_icono.png}" alt="Logo Bustraker">
+                <span class="brand">Bustraker</span>
+            </div>
+            <nav class="main-nav">
+                <a th:href="@{/dashboard}" class="nav-link">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+                <a th:href="@{/perfil}" class="nav-link">
+                    <i class="fas fa-user"></i> Perfil
+                </a>
+                <a th:href="@{/rutas}" class="nav-link">
+                    <i class="fas fa-route"></i> Rutas
+                </a>
+                <a th:href="@{/historial}" class="nav-link">
+                    <i class="fas fa-history"></i> Historial
+                </a>
+                <a th:href="@{/viajar}" class="nav-link">
+                    <i class="fas fa-bus"></i> Viajar
+                </a>
+                <a th:href="@{/logout}" class="nav-link nav-link--outline">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="container container-md">
+        <div class="content-wrapper-inner">
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-user-edit"></i> Información de Perfil</h3>
+                </div>
+                <div class="card-body">
+                    <!-- BUG CORREGIDO: eliminado th:field duplicado con th:value.
+                         Se usa solo name + th:value para envío limpio sin binding de objeto. -->
+                    <form th:action="@{/perfil/actualizar}" method="post">
+                        <div class="form-row">
+                            <div class="form-col form-col-6">
+                                <div class="form-group">
+                                    <label for="nombres" class="form-label">
+                                        <i class="fas fa-user"></i> Nombres:
+                                    </label>
+                                    <input type="text" id="nombres" name="nombres"
+                                           class="form-control"
+                                           th:value="${usuario?.nombres}" required>
+                                </div>
+                            </div>
+
+                            <div class="form-col form-col-6">
+                                <div class="form-group">
+                                    <label for="apellidos" class="form-label">
+                                        <i class="fas fa-user-tag"></i> Apellidos:
+                                    </label>
+                                    <input type="text" id="apellidos" name="apellidos"
+                                           class="form-control"
+                                           th:value="${usuario?.apellidos}" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="username" class="form-label">
+                                <i class="fas fa-at"></i> Usuario:
+                            </label>
+                            <input type="text" id="username" name="username"
+                                   class="form-control"
+                                   th:value="${usuario?.username}" readonly>
+                            <small class="form-text text-muted">El nombre de usuario no se puede cambiar</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email" class="form-label">
+                                <i class="fas fa-envelope"></i> Correo Electrónico:
+                            </label>
+                            <input type="email" id="email" name="email"
+                                   class="form-control"
+                                   th:value="${usuario?.email}" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="password" class="form-label">
+                                <i class="fas fa-lock"></i> Nueva Contraseña:
+                            </label>
+                            <input type="password" id="password" name="password"
+                                   class="form-control"
+                                   placeholder="Dejar vacío para mantener la actual">
+                            <small class="form-text text-muted">Deja vacío si no deseas cambiar la contraseña</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="confirmPassword" class="form-label">
+                                <i class="fas fa-lock"></i> Confirmar Contraseña:
+                            </label>
+                            <input type="password" id="confirmPassword" name="confirmPassword"
+                                   class="form-control"
+                                   placeholder="Confirma la nueva contraseña">
+                        </div>
+
+                        <div class="btn-group">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Guardar Cambios
+                            </button>
+                            <!-- BUG CORREGIDO: era /index_3 (ruta interna inexistente), corregido a /dashboard -->
+                            <a th:href="@{/dashboard}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Volver
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // BUG CORREGIDO: validación de contraseñas antes de enviar el form
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (password && password !== confirmPassword) {
+                e.preventDefault();
+                alert('❌ Las contraseñas no coinciden. Por favor, verifica e intenta de nuevo.');
+                return false;
+            }
+
+            if (password && password.length < 6) {
+                e.preventDefault();
+                alert('❌ La contraseña debe tener al menos 6 caracteres.');
+                return false;
+            }
+        });
+    </script>
+</body>
+</html>

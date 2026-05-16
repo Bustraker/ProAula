@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="Actualizar buses - Bustraker Admin">
+    <meta name="theme-color" content="#01315f">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Actualizar Buses - Bustraker Admin</title>
+    <link rel="stylesheet" th:href="@{/Css/style_3.css}">
+    <link rel="stylesheet" th:href="@{/Css/Style_Actualizar.css}">
+    <link rel="shortcut icon" th:href="@{/images/Bus_icono.png}" type="image/x-icon">
+</head>
+<body>
+    <header>
+        <img th:src="@{/images/Bus_palmera.png}" alt="Bus palmera" id="logo2">
+        <h1>Bustraker - Panel Admin</h1>
+        <h2>Actualizar Buses</h2>
+        <div id="ingreso">
+            <a id="Volver" th:href="@{/index_2}">Volver al Panel</a>
+        </div>
+    </header>
+    <nav style="position: relative;">
+        <ul>
+            <li><a th:href="@{/index_2}">Panel Admin</a></li>
+            <li><a th:href="@{/registro-buses}">Registrar Buses</a></li>
+            <li><a th:href="@{/actualizarbuses}">Actualizar Buses</a></li>
+            <li><a th:href="@{/eliminarbuses}">Eliminar Buses</a></li>
+        </ul>
+    </nav>
+    <main>
+        <h2>Actualizar Información de Buses</h2>
+        <p>Modifica los datos de los buses en circulación. Los cambios serán visibles para los usuarios en tiempo real.</p>
+        <p>Selecciona un bus para actualizar su información:</p>
+        <ul>
+            <li th:each="bus : ${buses}">Bus <span th:text="${bus.id}"></span>: <span th:text="${bus.placa}"></span> - <a th:href="@{/actualizar-bus/{id}(id=${bus.id})}">Editar</a></li>
+        </ul>
+        <form th:if="${bus}" th:action="@{/actualizar-bus/{id}(id=${bus.id})}" method="post" th:object="${bus}">
+            <h3>Editar Bus <span th:text="${bus.id}"></span></h3>
+            <label>Placa: <input type="text" th:field="*{placa}"></label><br>
+            <label>Modelo: <input type="text" th:field="*{modelo}"></label><br>
+            <button type="submit">Actualizar</button>
+        </form>
+        <p><em>Nota: Los cambios en buses se reflejan inmediatamente en la consulta de buses para los usuarios.</em></p>
+    </main>
+    <footer id="pie">
+        <p>&copy; 2025 Bustraker. Todos los derechos reservados.</p>
+        <p>Panel de Administración</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-AulaApplication<aula>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.proaula.aula.AulaApplication",
+            "projectName": "aula",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="Editar ruta - Bustraker Admin">
+    <meta name="theme-color" content="#01315f">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Editar Ruta</title>
+    <link rel="stylesheet" th:href="@{/css/style_editar_ruta.css}">
+</head>
+<body>
+    <div class="container">
+        <h2>Editar Ruta de Bus</h2>
+        <form th:action="@{'/editar-ruta/' + ${ruta != null ? ruta.id : ''}}" method="post" id="form-editar-ruta">
+            <div class="form-group">
+                <label for="ruta">Selecciona la ruta:</label>
+                <select id="ruta" name="ruta" onchange="location.href='/editar-ruta/' + this.value">
+                    <option value="">-- Selecciona una ruta --</option>
+                    <th:block th:each="r : ${rutas}">
+                        <option th:value="${r.id}" th:text="${r.nombre}" th:selected="${ruta != null and r.id == ruta.id}"></option>
+                    </th:block>
+                </select>
+            </div>
+            <div class="form-group" th:if="${ruta != null}">
+                <label>Barrios por donde pasa:</label>
+                <ul class="barrio-list" id="barrio-list">
+                    <th:block th:each="barrio, iterStat : ${barrios}">
+                        <li>
+                            <input type="text" name="barrios[__${iterStat.index}__]" th:value="${barrio}" />
+                            <button type="button" onclick="eliminarBarrio(this)">Eliminar</button>
+                        </li>
+                    </th:block>
+                </ul>
+                <button type="button" class="add-barrio-btn" onclick="agregarBarrio()">Agregar Barrio</button>
+            </div>
+            <button type="submit" class="save-btn" th:if="${ruta != null}">Guardar Cambios</button>
+        </form>
+    </div>
+    <script>
+        function agregarBarrio() {
+            const ul = document.getElementById('barrio-list');
+            const li = document.createElement('li');
+            li.innerHTML = '<input type="text" name="barrios[]" placeholder="Nuevo barrio"><button type="button" onclick="eliminarBarrio(this)">Eliminar</button>';
+            ul.appendChild(li);
+        }
+        function eliminarBarrio(btn) {
+            btn.parentElement.remove();
+        }
+        // Aquí puedes agregar lógica para cargar rutas y barrios dinámicamente desde el backend si lo deseas
+        // El formulario ahora se envía al backend, no se intercepta con JS
+    </script>
+</body>
+</html>

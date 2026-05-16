@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso Administrativo - Bustraker</title>
+    <link rel="stylesheet" th:href="@{/css/styleAdmin_login.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" th:href="@{/images/escudo.png}">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <i class="fas fa-shield-alt"></i>
+            <h1>Acceso Administrativo</h1>
+            <p>Sistema de Gestión Bustraker</p>
+            <div class="admin-badge">
+                <i class="fas fa-lock"></i> Área Restringida
+            </div>
+        </div>
+
+        <div class="login-form">
+            <!-- Notificación de seguridad -->
+            <div class="security-notice">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p>
+                    <strong>Acceso exclusivo para personal autorizado.</strong>
+                    Todas las actividades son monitoreadas y registradas.
+                </p>
+            </div>
+
+            <!-- Mensajes de error/éxito -->
+            <div th:if="${param.error}" class="alert alert-error">
+                <i class="fas fa-exclamation-circle"></i>
+                <span th:text="${param.error[0]}">Credenciales inválidas</span>
+            </div>
+
+            <div th:if="${param.verified}" class="alert alert-success">
+                <i class="fas fa-check-circle"></i>
+                <span>Código verificado. Ingresa tus credenciales.</span>
+            </div>
+
+            <div th:if="${error}" class="alert alert-error">
+                <i class="fas fa-exclamation-circle"></i>
+                <span th:text="${error}">Error</span>
+            </div>
+
+            <!-- Indicador de pasos -->
+            <div class="step-indicator">
+                <div class="step" id="step1" th:classappend="${verified} ? 'completed' : 'active'">1</div>
+                <div class="step" id="step2" th:classappend="${verified} ? 'active' : ''">2</div>
+            </div>
+
+            <!-- Paso 1: Verificación de código -->
+            <form th:if="${!verified}" th:action="@{/admin/verificar-codigo}" method="post" class="verification-step">
+                <div class="form-group">
+                    <label for="codigoAdmin">
+                        <i class="fas fa-key"></i> Código de Administrador
+                    </label>
+                    <div class="input-wrapper">
+                        <input 
+                            type="password" 
+                            id="codigoAdmin" 
+                            name="codigoAdmin" 
+                            class="code-input"
+                            placeholder="••••••••"
+                            maxlength="15"
+                            required
+                            autofocus
+                        >
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <p style="text-align: center; margin-top: 15px; color: #757575; font-size: 0.9em;">
+                        Ingresa el código de verificación administrativa
+                    </p>
+                </div>
+
+                <button type="submit" class="btn-login">
+                    <i class="fas fa-lock"></i> Verificar Código
+                </button>
+            </form>
+
+            <!-- Paso 2: Login con credenciales -->
+            <form th:if="${verified}" th:action="@{/admin/login}" method="post">
+                <div class="form-group">
+                    <label for="username">
+                        <i class="fas fa-user"></i> Usuario
+                    </label>
+                    <div class="input-wrapper">
+                        <input 
+                            type="text" 
+                            id="username" 
+                            name="username" 
+                            placeholder="admin"
+                            required
+                            autofocus
+                        >
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">
+                        <i class="fas fa-lock"></i> Contraseña
+                    </label>
+                    <div class="input-wrapper">
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            placeholder="••••••••"
+                            required
+                        >
+                        <i class="fas fa-eye password-toggle" onclick="togglePassword()"></i>
+                    </div>
+                </div>
+
+                <input type="hidden" name="codigoVerificado" value="true">
+
+                <button type="submit" class="btn-login">
+                    <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                </button>
+            </form>
+
+            <div class="back-link">
+                <a th:href="@{/}">
+                    <i class="fas fa-arrow-left"></i>
+                    Volver al Inicio
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.querySelector('.password-toggle');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+                toggleIcon.style.opacity = "0.6"; // color más claro al mostrar la contraseña
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+                toggleIcon.style.opacity = "1"; // color normal al ocultar la contraseña
+            }
+        }
+
+        // Auto-focus en el campo de código
+        document.addEventListener('DOMContentLoaded', function() {
+            const codeInput = document.getElementById('codigoAdmin');
+            if (codeInput) {
+                codeInput.focus();
+            }
+        });
+
+        // Animación de pasos        const step1 = document.getElementById('step1');
+        const step2 = document.getElementById('step2');
+        if (step1 && step2) {
+            if (step1.classList.contains('completed')) {
+                step1.classList.add('completed');
+                step2.classList.add('active');
+            } else {
+                step1.classList.add('active');
+            }
+        }
+
+        // verificaion de estado de sesión
+        const inputs = document.querySelectorAll('input');
+
+        inputs.forEach(input => {
+        input.addEventListener('input', () => {
+            const label = document.querySelector(`label[for="${input.id}"]`);
+            const icon = label.querySelector('i');
+
+            if (input.checkValidity()) {
+            icon.style.color = "var(--success-color)"; // verde si cumple
+            } else {
+            icon.style.color = "var(--error-color)";   // rojo si no cumple
+            }
+        });
+        });
+    </script>
+</body>
+</html>

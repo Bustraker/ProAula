@@ -1,0 +1,2180 @@
+[
+  {
+    "codigo": "0150",
+    "nombre": "DANIEL LEMAITRE",
+    "zona": "UCG 3",
+    "ucg": 3,
+    "loc": "LH",
+    "lat": 10.436215,
+    "lng": -75.520392
+  },
+  {
+    "codigo": "0200",
+    "nombre": "SANTA MARIA",
+    "zona": "UCG 3",
+    "ucg": 3,
+    "loc": "LH",
+    "lat": 10.4414,
+    "lng": -75.517288
+  },
+  {
+    "codigo": "0250",
+    "nombre": "CANAPOTE",
+    "zona": "UCG 3",
+    "ucg": 3,
+    "loc": "LH",
+    "lat": 10.438788,
+    "lng": -75.52464
+  },
+  {
+    "codigo": "0300",
+    "nombre": "SAN PEDRO Y LIBERTAD",
+    "zona": "UCG 2",
+    "ucg": 2,
+    "loc": "LH",
+    "lat": 10.438269,
+    "lng": -75.528788
+  },
+  {
+    "codigo": "0350",
+    "nombre": "SIETE DE AGOSTO",
+    "zona": "UCG 3",
+    "ucg": 3,
+    "loc": "LH",
+    "lat": 10.439323,
+    "lng": -75.515056
+  },
+  {
+    "codigo": "0400",
+    "nombre": "TORICES",
+    "zona": "UCG 2",
+    "ucg": 2,
+    "loc": "LH",
+    "lat": 10.431049,
+    "lng": -75.53358
+  },
+  {
+    "codigo": "0450",
+    "nombre": "SAN FRANCISCO",
+    "zona": "UCG 3",
+    "ucg": 3,
+    "loc": "LH",
+    "lat": 10.429674,
+    "lng": -75.517028
+  },
+  {
+    "codigo": "0500",
+    "nombre": "PABLO VI - II",
+    "zona": "UCG 2",
+    "ucg": 2,
+    "loc": "LH",
+    "lat": 10.435493,
+    "lng": -75.52432
+  },
+  {
+    "codigo": "0550",
+    "nombre": "PEDRO SALAZAR",
+    "zona": "UCG 2",
+    "ucg": 2,
+    "loc": "LH",
+    "lat": 10.435945,
+    "lng": -75.525967
+  },
+  {
+    "codigo": "0600",
+    "nombre": "LOS COMUNEROS",
+    "zona": "UCG 2",
+    "ucg": 2,
+    "loc": "LH",
+    "lat": 10.434077,
+    "lng": -75.526475
+  },
+  {
+    "codigo": "0700",
+    "nombre": "PETARE",
+    "zona": "UCG 2",
+    "ucg": 2,
+    "loc": "LH",
+    "lat": 10.43322,
+    "lng": -75.525913
+  },
+  {
+    "codigo": "0750",
+    "nombre": "PALESTINA",
+    "zona": "UCG 2",
+    "ucg": 2,
+    "loc": "LH",
+    "lat": 10.43164,
+    "lng": -75.52325
+  },
+  {
+    "codigo": "0800",
+    "nombre": "REPUBLICA DEL CARIBE",
+    "zona": "UCG 2",
+    "ucg": 2,
+    "loc": "LH",
+    "lat": 10.432356,
+    "lng": -75.525005
+  },
+  {
+    "codigo": "0850",
+    "nombre": "PARAISO II",
+    "zona": "UCG 2",
+    "ucg": 2,
+    "loc": "LH",
+    "lat": 10.430707,
+    "lng": -75.524747
+  },
+  {
+    "codigo": "0900",
+    "nombre": "LA PAZ",
+    "zona": "UCG 2",
+    "ucg": 2,
+    "loc": "LH",
+    "lat": 10.431701,
+    "lng": -75.521428
+  },
+  {
+    "codigo": "0950",
+    "nombre": "LOMA FRESCA",
+    "zona": "UCG 2",
+    "ucg": 2,
+    "loc": "LH",
+    "lat": 10.429825,
+    "lng": -75.527433
+  },
+  {
+    "codigo": "1000",
+    "nombre": "PABLO VI - I",
+    "zona": "UCG 2",
+    "ucg": 2,
+    "loc": "LH",
+    "lat": 10.431298,
+    "lng": -75.527579
+  },
+  {
+    "codigo": "1050",
+    "nombre": "SAN DIEGO",
+    "zona": "UCG 1",
+    "ucg": 1,
+    "loc": "LH",
+    "lat": 10.42882,
+    "lng": -75.547678
+  },
+  {
+    "codigo": "1100",
+    "nombre": "CERRO DE LA POPA",
+    "zona": "UCG 2",
+    "ucg": 2,
+    "loc": "LH",
+    "lat": 10.422381,
+    "lng": -75.525766
+  },
+  {
+    "codigo": "1150",
+    "nombre": "SAN BERNARDO",
+    "zona": "UCG 3",
+    "ucg": 3,
+    "loc": "LH",
+    "lat": 10.42886,
+    "lng": -75.519645
+  },
+  {
+    "codigo": "1250",
+    "nombre": "NARIÑO",
+    "zona": "UCG 2",
+    "ucg": 2,
+    "loc": "LH",
+    "lat": 10.425068,
+    "lng": -75.530444
+  },
+  {
+    "codigo": "1400",
+    "nombre": "ESPINAL",
+    "zona": "UCG 2",
+    "ucg": 2,
+    "loc": "LH",
+    "lat": 10.423329,
+    "lng": -75.538599
+  },
+  {
+    "codigo": "1500",
+    "nombre": "LO AMADOR",
+    "zona": "UCG 2",
+    "ucg": 2,
+    "loc": "LH",
+    "lat": 10.422222,
+    "lng": -75.53097
+  },
+  {
+    "codigo": "1600",
+    "nombre": "EL POZON",
+    "zona": "UCG 6",
+    "ucg": 6,
+    "loc": "LV",
+    "lat": 10.411021,
+    "lng": -75.460134
+  },
+  {
+    "codigo": "1650",
+    "nombre": "PIE DE LA POPA",
+    "zona": "UCG 1",
+    "ucg": 1,
+    "loc": "LH",
+    "lat": 10.415193,
+    "lng": -75.531533
+  },
+  {
+    "codigo": "1800",
+    "nombre": "LA ESPERANZA",
+    "zona": "UCG 4",
+    "ucg": 4,
+    "loc": "LV",
+    "lat": 10.415631,
+    "lng": -75.518395
+  },
+  {
+    "codigo": "1850",
+    "nombre": "LA QUINTA",
+    "zona": "UCG 4",
+    "ucg": 4,
+    "loc": "LV",
+    "lat": 10.417507,
+    "lng": -75.525466
+  },
+  {
+    "codigo": "1900",
+    "nombre": "LA CANDELARIA",
+    "zona": "UCG 4",
+    "ucg": 4,
+    "loc": "LV",
+    "lat": 10.413812,
+    "lng": -75.512908
+  },
+  {
+    "codigo": "2000",
+    "nombre": "BOSTON",
+    "zona": "UCG 4",
+    "ucg": 4,
+    "loc": "LV",
+    "lat": 10.412522,
+    "lng": -75.507916
+  },
+  {
+    "codigo": "2050",
+    "nombre": "BARRIO CHINO",
+    "zona": "UCG 9",
+    "ucg": 9,
+    "loc": "LH",
+    "lat": 10.412493,
+    "lng": -75.526833
+  },
+  {
+    "codigo": "2100",
+    "nombre": "REPUBLICA DEL LIBANO",
+    "zona": "UCG 5",
+    "ucg": 5,
+    "loc": "LV",
+    "lat": 10.413681,
+    "lng": -75.504469
+  },
+  {
+    "codigo": "2150",
+    "nombre": "ALCIBIA",
+    "zona": "UCG 4",
+    "ucg": 4,
+    "loc": "LV",
+    "lat": 10.41053,
+    "lng": -75.516128
+  },
+  {
+    "codigo": "2200",
+    "nombre": "EL PRADO",
+    "zona": "UCG 9",
+    "ucg": 9,
+    "loc": "LH",
+    "lat": 10.409307,
+    "lng": -75.518923
+  },
+  {
+    "codigo": "2250",
+    "nombre": "MARTINEZ MARTELO",
+    "zona": "UCG 9",
+    "ucg": 9,
+    "loc": "LH",
+    "lat": 10.408255,
+    "lng": -75.52376
+  },
+  {
+    "codigo": "2400",
+    "nombre": "TESCA",
+    "zona": "UCG 5",
+    "ucg": 5,
+    "loc": "LV",
+    "lat": 10.407596,
+    "lng": -75.502946
+  },
+  {
+    "codigo": "2450",
+    "nombre": "VILLA ESTRELLA",
+    "zona": "UCG 6",
+    "ucg": 6,
+    "loc": "LV",
+    "lat": 10.405936,
+    "lng": -75.46465
+  },
+  {
+    "codigo": "2500",
+    "nombre": "AMBERES",
+    "zona": "UCG 9",
+    "ucg": 9,
+    "loc": "LH",
+    "lat": 10.40689,
+    "lng": -75.514849
+  },
+  {
+    "codigo": "2550",
+    "nombre": "ESPAÑA",
+    "zona": "UCG 9",
+    "ucg": 9,
+    "loc": "LH",
+    "lat": 10.403871,
+    "lng": -75.512117
+  },
+  {
+    "codigo": "2600",
+    "nombre": "ARMENIA",
+    "zona": "UCG 9",
+    "ucg": 9,
+    "loc": "LH",
+    "lat": 10.405303,
+    "lng": -75.506156
+  },
+  {
+    "codigo": "2650",
+    "nombre": "BRUSELAS",
+    "zona": "UCG 9",
+    "ucg": 9,
+    "loc": "LH",
+    "lat": 10.403861,
+    "lng": -75.517197
+  },
+  {
+    "codigo": "2700",
+    "nombre": "CHIQUINQUIRA",
+    "zona": "UCG 5",
+    "ucg": 5,
+    "loc": "LV",
+    "lat": 10.402457,
+    "lng": -75.492073
+  },
+  {
+    "codigo": "2750",
+    "nombre": "REPUBLICA DE VENEZUELA",
+    "zona": "UCG 7",
+    "ucg": 7,
+    "loc": "LV",
+    "lat": 10.404996,
+    "lng": -75.48919
+  },
+  {
+    "codigo": "2800",
+    "nombre": "ZARAGOCILLA",
+    "zona": "UCG 8",
+    "ucg": 8,
+    "loc": "LH",
+    "lat": 10.399317,
+    "lng": -75.503639
+  },
+  {
+    "codigo": "2900",
+    "nombre": "ESCALLON VILLA",
+    "zona": "UCG 8",
+    "ucg": 8,
+    "loc": "LH",
+    "lat": 10.398337,
+    "lng": -75.498307
+  },
+  {
+    "codigo": "2950",
+    "nombre": "LAS GAVIOTAS",
+    "zona": "UCG 7",
+    "ucg": 7,
+    "loc": "LV",
+    "lat": 10.399898,
+    "lng": -75.489608
+  },
+  {
+    "codigo": "3050",
+    "nombre": "PIEDRA DE BOLIVAR",
+    "zona": "UCG 9",
+    "ucg": 9,
+    "loc": "LH",
+    "lat": 10.400709,
+    "lng": -75.508785
+  },
+  {
+    "codigo": "3100",
+    "nombre": "SAN JOSE OBRERO",
+    "zona": "UCG 7",
+    "ucg": 7,
+    "loc": "LV",
+    "lat": 10.402656,
+    "lng": -75.477689
+  },
+  {
+    "codigo": "3150",
+    "nombre": "PARAGUAY",
+    "zona": "UCG 9",
+    "ucg": 9,
+    "loc": "LH",
+    "lat": 10.399055,
+    "lng": -75.513099
+  },
+  {
+    "codigo": "3200",
+    "nombre": "NUEVO PORVENIR",
+    "zona": "UCG 7",
+    "ucg": 7,
+    "loc": "LV",
+    "lat": 10.401779,
+    "lng": -75.476701
+  },
+  {
+    "codigo": "3250",
+    "nombre": "LAS PALMERAS",
+    "zona": "UCG 7",
+    "ucg": 7,
+    "loc": "LV",
+    "lat": 10.400267,
+    "lng": -75.472231
+  },
+  {
+    "codigo": "3300",
+    "nombre": "JUAN XXIII",
+    "zona": "UCG 9",
+    "ucg": 9,
+    "loc": "LH",
+    "lat": 10.400204,
+    "lng": -75.517882
+  },
+  {
+    "codigo": "3350",
+    "nombre": "JUNIN",
+    "zona": "UCG 9",
+    "ucg": 9,
+    "loc": "LH",
+    "lat": 10.400966,
+    "lng": -75.512328
+  },
+  {
+    "codigo": "3400",
+    "nombre": "LOS ALPES",
+    "zona": "UCG 7",
+    "ucg": 7,
+    "loc": "LV",
+    "lat": 10.397076,
+    "lng": -75.482117
+  },
+  {
+    "codigo": "3500",
+    "nombre": "JOSE ANTONIO GALAN",
+    "zona": "UCG 9",
+    "ucg": 9,
+    "loc": "LH",
+    "lat": 10.399153,
+    "lng": -75.510331
+  },
+  {
+    "codigo": "3550",
+    "nombre": "NUEVE DE ABRIL",
+    "zona": "UCG 9",
+    "ucg": 9,
+    "loc": "LH",
+    "lat": 10.398419,
+    "lng": -75.507822
+  },
+  {
+    "codigo": "3650",
+    "nombre": "LOS EJECUTIVOS",
+    "zona": "UCG 8",
+    "ucg": 8,
+    "loc": "LH",
+    "lat": 10.397722,
+    "lng": -75.494331
+  },
+  {
+    "codigo": "3700",
+    "nombre": "SAN ISIDRO",
+    "zona": "UCG 10",
+    "ucg": 10,
+    "loc": "LH",
+    "lat": 10.387483,
+    "lng": -75.514191
+  },
+  {
+    "codigo": "3800",
+    "nombre": "VILLA ROSITA",
+    "zona": "UCG 13",
+    "ucg": 13,
+    "loc": "LI",
+    "lat": 10.39696,
+    "lng": -75.469258
+  },
+  {
+    "codigo": "3850",
+    "nombre": "REPUBLICA DE CHILE",
+    "zona": "UCG 10",
+    "ucg": 10,
+    "loc": "LH",
+    "lat": 10.396098,
+    "lng": -75.514249
+  },
+  {
+    "codigo": "3950",
+    "nombre": "EL GALLO",
+    "zona": "UCG 7",
+    "ucg": 7,
+    "loc": "LV",
+    "lat": 10.397201,
+    "lng": -75.476284
+  },
+  {
+    "codigo": "4000",
+    "nombre": "CALAMARES",
+    "zona": "UCG 8",
+    "ucg": 8,
+    "loc": "LH",
+    "lat": 10.394251,
+    "lng": -75.498609
+  },
+  {
+    "codigo": "4050",
+    "nombre": "LA CASTELLANA",
+    "zona": "UCG 7",
+    "ucg": 7,
+    "loc": "LV",
+    "lat": 10.396012,
+    "lng": -75.485829
+  },
+  {
+    "codigo": "4100",
+    "nombre": "LA FLORESTA",
+    "zona": "UCG 7",
+    "ucg": 7,
+    "loc": "LV",
+    "lat": 10.397029,
+    "lng": -75.490403
+  },
+  {
+    "codigo": "4150",
+    "nombre": "CHIPRE",
+    "zona": "UCG 7",
+    "ucg": 7,
+    "loc": "LV",
+    "lat": 10.395845,
+    "lng": -75.489206
+  },
+  {
+    "codigo": "4200",
+    "nombre": "LOS ANGELES",
+    "zona": "UCG 8",
+    "ucg": 8,
+    "loc": "LH",
+    "lat": 10.395229,
+    "lng": -75.491468
+  },
+  {
+    "codigo": "4250",
+    "nombre": "ANITA",
+    "zona": "UCG 13",
+    "ucg": 13,
+    "loc": "LI",
+    "lat": 10.39562,
+    "lng": -75.475067
+  },
+  {
+    "codigo": "4300",
+    "nombre": "NUEVA GRANADA",
+    "zona": "UCG 9",
+    "ucg": 9,
+    "loc": "LH",
+    "lat": 10.395495,
+    "lng": -75.507567
+  },
+  {
+    "codigo": "4350",
+    "nombre": "SAN ANTONIO",
+    "zona": "UCG 7",
+    "ucg": 7,
+    "loc": "LV",
+    "lat": 10.395792,
+    "lng": -75.490007
+  },
+  {
+    "codigo": "4400",
+    "nombre": "ALTOS DE SAN ISIDRO",
+    "zona": "UCG 10",
+    "ucg": 10,
+    "loc": "LH",
+    "lat": 10.393634,
+    "lng": -75.510941
+  },
+  {
+    "codigo": "8950",
+    "nombre": "BOSQUECITO",
+    "zona": "UCG 10",
+    "ucg": 10,
+    "loc": "LH",
+    "lat": 10.393185,
+    "lng": -75.509431
+  },
+  {
+    "codigo": "4500",
+    "nombre": "LA CAMPIÑA",
+    "zona": "UCG 8",
+    "ucg": 8,
+    "loc": "LH",
+    "lat": 10.393892,
+    "lng": -75.501651
+  },
+  {
+    "codigo": "4550",
+    "nombre": "CAMAGUEY",
+    "zona": "UCG 8",
+    "ucg": 8,
+    "loc": "LH",
+    "lat": 10.394903,
+    "lng": -75.494075
+  },
+  {
+    "codigo": "4600",
+    "nombre": "LOS CERROS",
+    "zona": "UCG 10",
+    "ucg": 10,
+    "loc": "LH",
+    "lat": 10.393909,
+    "lng": -75.512326
+  },
+  {
+    "codigo": "4650",
+    "nombre": "SANTA LUCIA",
+    "zona": "UCG 13",
+    "ucg": 13,
+    "loc": "LI",
+    "lat": 10.393222,
+    "lng": -75.478841
+  },
+  {
+    "codigo": "4750",
+    "nombre": "LA CONCEPCION",
+    "zona": "UCG 13",
+    "ucg": 13,
+    "loc": "LI",
+    "lat": 10.392531,
+    "lng": -75.476887
+  },
+  {
+    "codigo": "4800",
+    "nombre": "VILLA SANDRA",
+    "zona": "UCG 8",
+    "ucg": 8,
+    "loc": "LH",
+    "lat": 10.393926,
+    "lng": -75.488581
+  },
+  {
+    "codigo": "4850",
+    "nombre": "NUEVO BOSQUE",
+    "zona": "UCG 10",
+    "ucg": 10,
+    "loc": "LH",
+    "lat": 10.391351,
+    "lng": -75.507797
+  },
+  {
+    "codigo": "4900",
+    "nombre": "RUBI",
+    "zona": "UCG 8",
+    "ucg": 8,
+    "loc": "LH",
+    "lat": 10.393306,
+    "lng": -75.485181
+  },
+  {
+    "codigo": "5000",
+    "nombre": "BUENOS AIRES",
+    "zona": "UCG 8",
+    "ucg": 8,
+    "loc": "LH",
+    "lat": 10.393018,
+    "lng": -75.492351
+  },
+  {
+    "codigo": "5050",
+    "nombre": "LAS DELICIAS",
+    "zona": "UCG 8",
+    "ucg": 8,
+    "loc": "LH",
+    "lat": 10.392133,
+    "lng": -75.489805
+  },
+  {
+    "codigo": "5100",
+    "nombre": "EL COUNTRY",
+    "zona": "UCG 8",
+    "ucg": 8,
+    "loc": "LH",
+    "lat": 10.39166,
+    "lng": -75.498393
+  },
+  {
+    "codigo": "5150",
+    "nombre": "SAN PEDRO",
+    "zona": "UCG 12",
+    "ucg": 12,
+    "loc": "LI",
+    "lat": 10.391102,
+    "lng": -75.482526
+  },
+  {
+    "codigo": "5200",
+    "nombre": "EL CARMEN",
+    "zona": "UCG 8",
+    "ucg": 8,
+    "loc": "LH",
+    "lat": 10.391669,
+    "lng": -75.487815
+  },
+  {
+    "codigo": "5250",
+    "nombre": "ALTO BOSQUE",
+    "zona": "UCG 10",
+    "ucg": 10,
+    "loc": "LH",
+    "lat": 10.391344,
+    "lng": -75.518019
+  },
+  {
+    "codigo": "5300",
+    "nombre": "BLAS DE LEZO",
+    "zona": "UCG 12",
+    "ucg": 12,
+    "loc": "LI",
+    "lat": 10.386108,
+    "lng": -75.48656
+  },
+  {
+    "codigo": "5350",
+    "nombre": "SAN JOSE DE LOS CAMPANOS",
+    "zona": "UCG 13",
+    "ucg": 13,
+    "loc": "LI",
+    "lat": 10.383881,
+    "lng": -75.459803
+  },
+  {
+    "codigo": "5400",
+    "nombre": "EL RECREO",
+    "zona": "UCG 13",
+    "ucg": 13,
+    "loc": "LI",
+    "lat": 10.388333,
+    "lng": -75.471237
+  },
+  {
+    "codigo": "5450",
+    "nombre": "SANTA MONICA",
+    "zona": "UCG 12",
+    "ucg": 12,
+    "loc": "LI",
+    "lat": 10.388409,
+    "lng": -75.478085
+  },
+  {
+    "codigo": "5500",
+    "nombre": "LOS CARACOLES",
+    "zona": "UCG 12",
+    "ucg": 12,
+    "loc": "LI",
+    "lat": 10.387674,
+    "lng": -75.492805
+  },
+  {
+    "codigo": "5600",
+    "nombre": "ALMIRANTE COLON",
+    "zona": "UCG 12",
+    "ucg": 12,
+    "loc": "LI",
+    "lat": 10.386444,
+    "lng": -75.495908
+  },
+  {
+    "codigo": "5650",
+    "nombre": "LOS CORALES",
+    "zona": "UCG 12",
+    "ucg": 12,
+    "loc": "LI",
+    "lat": 10.386156,
+    "lng": -75.500758
+  },
+  {
+    "codigo": "5700",
+    "nombre": "ALAMEDA LA VICTORIA",
+    "zona": "UCG 14",
+    "ucg": 14,
+    "loc": "LI",
+    "lat": 10.383588,
+    "lng": -75.475251
+  },
+  {
+    "codigo": "5800",
+    "nombre": "EL SOCORRO",
+    "zona": "UCG 12",
+    "ucg": 12,
+    "loc": "LI",
+    "lat": 10.383349,
+    "lng": -75.48055
+  },
+  {
+    "codigo": "5850",
+    "nombre": "CEBALLOS",
+    "zona": "UCG 11",
+    "ucg": 11,
+    "loc": "LI",
+    "lat": 10.386291,
+    "lng": -75.504427
+  },
+  {
+    "codigo": "5900",
+    "nombre": "LA CENTRAL",
+    "zona": "UCG 12",
+    "ucg": 12,
+    "loc": "LI",
+    "lat": 10.384724,
+    "lng": -75.490476
+  },
+  {
+    "codigo": "5950",
+    "nombre": "SAN FERNANDO",
+    "zona": "UCG 14",
+    "ucg": 14,
+    "loc": "LI",
+    "lat": 10.377958,
+    "lng": -75.472547
+  },
+  {
+    "codigo": "6000",
+    "nombre": "EL MILAGRO",
+    "zona": "UCG 12",
+    "ucg": 12,
+    "loc": "LI",
+    "lat": 10.382611,
+    "lng": -75.492733
+  },
+  {
+    "codigo": "6050",
+    "nombre": "EL CAMPESTRE",
+    "zona": "UCG 12",
+    "ucg": 12,
+    "loc": "LI",
+    "lat": 10.381925,
+    "lng": -75.497153
+  },
+  {
+    "codigo": "6100",
+    "nombre": "SANTA CLARA",
+    "zona": "UCG 11",
+    "ucg": 11,
+    "loc": "LI",
+    "lat": 10.383089,
+    "lng": -75.503626
+  },
+  {
+    "codigo": "6150",
+    "nombre": "EL CARMELO",
+    "zona": "UCG 12",
+    "ucg": 12,
+    "loc": "LI",
+    "lat": 10.38081,
+    "lng": -75.490354
+  },
+  {
+    "codigo": "6200",
+    "nombre": "VISTA HERMOSA",
+    "zona": "UCG 15",
+    "ucg": 15,
+    "loc": "LI",
+    "lat": 10.378049,
+    "lng": -75.494434
+  },
+  {
+    "codigo": "6250",
+    "nombre": "CIUDADELA 11 DE NOVIEMBRE",
+    "zona": "UCG 14",
+    "ucg": 14,
+    "loc": "LI",
+    "lat": 10.379076,
+    "lng": -75.466587
+  },
+  {
+    "codigo": "6300",
+    "nombre": "URBANIZACION SIMON BOLIVAR",
+    "zona": "UCG 14",
+    "ucg": 14,
+    "loc": "LI",
+    "lat": 10.37844,
+    "lng": -75.466706
+  },
+  {
+    "codigo": "6400",
+    "nombre": "LA VICTORIA",
+    "zona": "UCG 15",
+    "ucg": 15,
+    "loc": "LI",
+    "lat": 10.375828,
+    "lng": -75.485971
+  },
+  {
+    "codigo": "6450",
+    "nombre": "LOS JARDINES",
+    "zona": "UCG 15",
+    "ucg": 15,
+    "loc": "LI",
+    "lat": 10.377416,
+    "lng": -75.484241
+  },
+  {
+    "codigo": "6500",
+    "nombre": "LA CONSOLATA",
+    "zona": "UCG 15",
+    "ucg": 15,
+    "loc": "LI",
+    "lat": 10.377016,
+    "lng": -75.480735
+  },
+  {
+    "codigo": "6550",
+    "nombre": "VILLA RUBIA",
+    "zona": "UCG 14",
+    "ucg": 14,
+    "loc": "LI",
+    "lat": 10.376775,
+    "lng": -75.479184
+  },
+  {
+    "codigo": "6600",
+    "nombre": "JORGE ELIECER GAITAN",
+    "zona": "UCG 14",
+    "ucg": 14,
+    "loc": "LI",
+    "lat": 10.377666,
+    "lng": -75.477238
+  },
+  {
+    "codigo": "6650",
+    "nombre": "LA FLORIDA",
+    "zona": "UCG 14",
+    "ucg": 14,
+    "loc": "LI",
+    "lat": 10.374921,
+    "lng": -75.477108
+  },
+  {
+    "codigo": "6700",
+    "nombre": "VEINTE DE JULIO SUR",
+    "zona": "UCG 11",
+    "ucg": 11,
+    "loc": "LI",
+    "lat": 10.372702,
+    "lng": -75.499198
+  },
+  {
+    "codigo": "6750",
+    "nombre": "NELSON MANDELA",
+    "zona": "UCG 14",
+    "ucg": 14,
+    "loc": "LI",
+    "lat": 10.367635,
+    "lng": -75.477385
+  },
+  {
+    "codigo": "6800",
+    "nombre": "CESAR FLOREZ",
+    "zona": "UCG 14",
+    "ucg": 14,
+    "loc": "LI",
+    "lat": 10.375338,
+    "lng": -75.478367
+  },
+  {
+    "codigo": "6850",
+    "nombre": "LUIS CARLOS GALAN",
+    "zona": "UCG 15",
+    "ucg": 15,
+    "loc": "LI",
+    "lat": 10.37406,
+    "lng": -75.493845
+  },
+  {
+    "codigo": "6900",
+    "nombre": "EL REPOSO",
+    "zona": "UCG 15",
+    "ucg": 15,
+    "loc": "LI",
+    "lat": 10.373379,
+    "lng": -75.488007
+  },
+  {
+    "codigo": "6950",
+    "nombre": "EL EDUCADOR",
+    "zona": "UCG 15",
+    "ucg": 15,
+    "loc": "LI",
+    "lat": 10.373183,
+    "lng": -75.483555
+  },
+  {
+    "codigo": "7000",
+    "nombre": "ROSSEDAL",
+    "zona": "UCG 14",
+    "ucg": 14,
+    "loc": "LI",
+    "lat": 10.372958,
+    "lng": -75.481631
+  },
+  {
+    "codigo": "7050",
+    "nombre": "MARIA CANO",
+    "zona": "UCG 14",
+    "ucg": 14,
+    "loc": "LI",
+    "lat": 10.372765,
+    "lng": -75.480642
+  },
+  {
+    "codigo": "7100",
+    "nombre": "CAMILO TORRES",
+    "zona": "UCG 14",
+    "ucg": 14,
+    "loc": "LI",
+    "lat": 10.37274,
+    "lng": -75.479322
+  },
+  {
+    "codigo": "7150",
+    "nombre": "NUEVA DELHI",
+    "zona": "UCG 14",
+    "ucg": 14,
+    "loc": "LI",
+    "lat": 10.372745,
+    "lng": -75.478323
+  },
+  {
+    "codigo": "7350",
+    "nombre": "LA ESMERALDA I",
+    "zona": "UCG 14",
+    "ucg": 14,
+    "loc": "LI",
+    "lat": 10.371215,
+    "lng": -75.482192
+  },
+  {
+    "codigo": "7400",
+    "nombre": "LOS SANTANDERES",
+    "zona": "UCG 14",
+    "ucg": 14,
+    "loc": "LI",
+    "lat": 10.370618,
+    "lng": -75.48076
+  },
+  {
+    "codigo": "7500",
+    "nombre": "SECTORES UNIDOS",
+    "zona": "UCG 14",
+    "ucg": 14,
+    "loc": "LI",
+    "lat": 10.369725,
+    "lng": -75.479417
+  },
+  {
+    "codigo": "7550",
+    "nombre": "NUEVA JERUSALEN",
+    "zona": "UCG 14",
+    "ucg": 14,
+    "loc": "LI",
+    "lat": 10.369079,
+    "lng": -75.478602
+  },
+  {
+    "codigo": "7600",
+    "nombre": "LA SIERRITA",
+    "zona": "UCG 14",
+    "ucg": 14,
+    "loc": "LI",
+    "lat": 10.369351,
+    "lng": -75.474609
+  },
+  {
+    "codigo": "7650",
+    "nombre": "NAZARENO",
+    "zona": "UCG 14",
+    "ucg": 14,
+    "loc": "LI",
+    "lat": 10.369164,
+    "lng": -75.482092
+  },
+  {
+    "codigo": "7700",
+    "nombre": "MANUELA VERGARA DE CURI",
+    "zona": "UCG 15",
+    "ucg": 15,
+    "loc": "LI",
+    "lat": 10.369437,
+    "lng": -75.484858
+  },
+  {
+    "codigo": "7750",
+    "nombre": "JAIME PARDO LEAL",
+    "zona": "UCG 15",
+    "ucg": 15,
+    "loc": "LI",
+    "lat": 10.369551,
+    "lng": -75.485563
+  },
+  {
+    "codigo": "7800",
+    "nombre": "LA ESMERALDA II",
+    "zona": "UCG 14",
+    "ucg": 14,
+    "loc": "LI",
+    "lat": 10.369476,
+    "lng": -75.483919
+  },
+  {
+    "codigo": "7850",
+    "nombre": "VILLA BARRAZA",
+    "zona": "UCG 11",
+    "ucg": 11,
+    "loc": "LI",
+    "lat": 10.369122,
+    "lng": -75.504338
+  },
+  {
+    "codigo": "7900",
+    "nombre": "VILLA FANNY",
+    "zona": "UCG 14",
+    "ucg": 14,
+    "loc": "LI",
+    "lat": 10.367409,
+    "lng": -75.478408
+  },
+  {
+    "codigo": "7950",
+    "nombre": "ARROZ BARATO",
+    "zona": "UCG 11",
+    "ucg": 11,
+    "loc": "LI",
+    "lat": 10.356693,
+    "lng": -75.49099
+  },
+  {
+    "codigo": "8000",
+    "nombre": "PUERTA DE HIERRO",
+    "zona": "UCG 11",
+    "ucg": 11,
+    "loc": "LI",
+    "lat": 10.356355,
+    "lng": -75.501453
+  },
+  {
+    "codigo": "8050",
+    "nombre": "POLICARPA",
+    "zona": "UCG 11",
+    "ucg": 11,
+    "loc": "LI",
+    "lat": 10.345844,
+    "lng": -75.492176
+  },
+  {
+    "codigo": "0100",
+    "nombre": "MARBELLA",
+    "zona": "UCG 1",
+    "ucg": 1,
+    "loc": "LH",
+    "lat": 10.438317,
+    "lng": -75.532523
+  },
+  {
+    "codigo": "1750",
+    "nombre": "BOCAGRANDE",
+    "zona": "UCG 1",
+    "ucg": 1,
+    "loc": "LH",
+    "lat": 10.406858,
+    "lng": -75.553275
+  },
+  {
+    "codigo": "1200",
+    "nombre": "CENTRO",
+    "zona": "UCG 1",
+    "ucg": 1,
+    "loc": "LH",
+    "lat": 10.42494,
+    "lng": -75.551923
+  },
+  {
+    "codigo": "2300",
+    "nombre": "FREDONIA",
+    "zona": "UCG 6",
+    "ucg": 6,
+    "loc": "LV",
+    "lat": 10.409275,
+    "lng": -75.473973
+  },
+  {
+    "codigo": "0050",
+    "nombre": "CRESPO",
+    "zona": "UCG 1",
+    "ucg": 1,
+    "loc": "LH",
+    "lat": 10.444637,
+    "lng": -75.518588
+  },
+  {
+    "codigo": "6350",
+    "nombre": "SAN PEDRO MARTIR",
+    "zona": "UCG 15",
+    "ucg": 15,
+    "loc": "LI",
+    "lat": 10.372657,
+    "lng": -75.488345
+  },
+  {
+    "codigo": "2350",
+    "nombre": "NUEVO PARAISO",
+    "zona": "UCG 6",
+    "ucg": 6,
+    "loc": "LV",
+    "lat": 10.407642,
+    "lng": -75.47008
+  },
+  {
+    "codigo": "3600",
+    "nombre": "EL LAGUITO",
+    "zona": "UCG 1",
+    "ucg": 1,
+    "loc": "LH",
+    "lat": 10.395017,
+    "lng": -75.560924
+  },
+  {
+    "codigo": "3750",
+    "nombre": "LAS BRISAS",
+    "zona": "UCG 9",
+    "ucg": 9,
+    "loc": "LH",
+    "lat": 10.397264,
+    "lng": -75.508648
+  },
+  {
+    "codigo": "1300",
+    "nombre": "LA MATUNA",
+    "zona": "UCG 1",
+    "ucg": 1,
+    "loc": "LH",
+    "lat": 10.42558,
+    "lng": -75.544648
+  },
+  {
+    "codigo": "1450",
+    "nombre": "GETSEMANI",
+    "zona": "UCG 1",
+    "ucg": 1,
+    "loc": "LH",
+    "lat": 10.420516,
+    "lng": -75.546114
+  },
+  {
+    "codigo": "1250",
+    "nombre": "CHAMBACU",
+    "zona": "UCG 1",
+    "ucg": 1,
+    "loc": "LH",
+    "lat": 10.428548,
+    "lng": -75.541279
+  },
+  {
+    "codigo": "0650",
+    "nombre": "EL CABRERO",
+    "zona": "UCG 1",
+    "ucg": 1,
+    "loc": "LH",
+    "lat": 10.432007,
+    "lng": -75.542143
+  },
+  {
+    "codigo": "1350",
+    "nombre": "LA MARIA",
+    "zona": "UCG 4",
+    "ucg": 4,
+    "loc": "LV",
+    "lat": 10.420775,
+    "lng": -75.519068
+  },
+  {
+    "codigo": "2850",
+    "nombre": "TRECE DE JUNIO",
+    "zona": "UCG 7",
+    "ucg": 7,
+    "loc": "LV",
+    "lat": 10.403326,
+    "lng": -75.482974
+  },
+  {
+    "codigo": "2870",
+    "nombre": "CHAPACUA",
+    "zona": "UCG 7",
+    "ucg": 7,
+    "loc": "LV",
+    "lat": 10.401022,
+    "lng": -75.479151
+  },
+  {
+    "codigo": "4950",
+    "nombre": "LA TRONCAL",
+    "zona": "UCG 8",
+    "ucg": 8,
+    "loc": "LH",
+    "lat": 10.391952,
+    "lng": -75.493264
+  },
+  {
+    "codigo": "4700",
+    "nombre": "TACARIGUA",
+    "zona": "UCG 8",
+    "ucg": 8,
+    "loc": "LH",
+    "lat": 10.392305,
+    "lng": -75.490416
+  },
+  {
+    "codigo": "3450",
+    "nombre": "VIEJO PORVENIR",
+    "zona": "UCG 7",
+    "ucg": 7,
+    "loc": "LV",
+    "lat": 10.398597,
+    "lng": -75.477287
+  },
+  {
+    "codigo": "5550",
+    "nombre": "TERNERA",
+    "zona": "UCG 13",
+    "ucg": 13,
+    "loc": "LI",
+    "lat": 10.385078,
+    "lng": -75.464518
+  },
+  {
+    "codigo": "1953",
+    "nombre": "OLAYA ST. RAFAEL NUÑEZ",
+    "zona": "UCG 5",
+    "ucg": 5,
+    "loc": "LV",
+    "lat": 10.414075,
+    "lng": -75.498603
+  },
+  {
+    "codigo": "1962",
+    "nombre": "OLAYA VILLA OLIMPICA",
+    "zona": "UCG 5",
+    "ucg": 5,
+    "loc": "LV",
+    "lat": 10.403418,
+    "lng": -75.4952
+  },
+  {
+    "codigo": "1955",
+    "nombre": "OLAYA ST.11 DE NOVIEMBRE",
+    "zona": "UCG 5",
+    "ucg": 5,
+    "loc": "LV",
+    "lat": 10.412894,
+    "lng": -75.493446
+  },
+  {
+    "codigo": "1956",
+    "nombre": "OLAYA ST. RICAURTE",
+    "zona": "UCG 5",
+    "ucg": 5,
+    "loc": "LV",
+    "lat": 10.413672,
+    "lng": -75.490527
+  },
+  {
+    "codigo": "1954",
+    "nombre": "OLAYA ST. CENTRAL",
+    "zona": "UCG 5",
+    "ucg": 5,
+    "loc": "LV",
+    "lat": 10.414323,
+    "lng": -75.486705
+  },
+  {
+    "codigo": "1957",
+    "nombre": "OLAYA ST. LA MAGDALENA",
+    "zona": "UCG 6",
+    "ucg": 6,
+    "loc": "LV",
+    "lat": 10.405358,
+    "lng": -75.476982
+  },
+  {
+    "codigo": "1959",
+    "nombre": "OLAYA ST. LA PUNTILLA",
+    "zona": "UCG 6",
+    "ucg": 6,
+    "loc": "LV",
+    "lat": 10.409554,
+    "lng": -75.479966
+  },
+  {
+    "codigo": "1958",
+    "nombre": "OLAYA ST. PROGRESO",
+    "zona": "UCG 6",
+    "ucg": 6,
+    "loc": "LV",
+    "lat": 10.410333,
+    "lng": -75.481956
+  },
+  {
+    "codigo": "1970",
+    "nombre": "OLAYA ST. STELLA",
+    "zona": "UCG 6",
+    "ucg": 6,
+    "loc": "LV",
+    "lat": 10.404839,
+    "lng": -75.482256
+  },
+  {
+    "codigo": "1961",
+    "nombre": "OLAYA ST. ZARABANDA",
+    "zona": "UCG 6",
+    "ucg": 6,
+    "loc": "LV",
+    "lat": 10.409662,
+    "lng": -75.476989
+  },
+  {
+    "codigo": "8870",
+    "nombre": "VILLA HERMOSA",
+    "zona": "UCG 14",
+    "ucg": 14,
+    "loc": "LI",
+    "lat": 10.3562,
+    "lng": -75.484481
+  },
+  {
+    "codigo": "5750",
+    "nombre": "MAMONAL",
+    "zona": "UCG 11",
+    "ucg": 11,
+    "loc": "LI",
+    "lat": 10.376941,
+    "lng": -75.509461
+  },
+  {
+    "codigo": "1960",
+    "nombre": "OLAYA ST. PLAYA BLANCA",
+    "zona": "UCG 6",
+    "ucg": 6,
+    "loc": "LV",
+    "lat": 10.407513,
+    "lng": -75.478752
+  },
+  {
+    "codigo": "8960",
+    "nombre": "CIUDADELA 2000",
+    "zona": "UCG 14",
+    "ucg": 14,
+    "loc": "LI",
+    "lat": 10.37215,
+    "lng": -75.47206
+  },
+  {
+    "codigo": "8100",
+    "nombre": "PROVIDENCIA",
+    "zona": "UCG 13",
+    "ucg": 13,
+    "loc": "LI",
+    "lat": 10.394869,
+    "lng": -75.471638
+  },
+  {
+    "codigo": "8110",
+    "nombre": "LA CAROLINA",
+    "zona": "UCG 13",
+    "ucg": 13,
+    "loc": "LI",
+    "lat": 10.397828,
+    "lng": -75.466118
+  },
+  {
+    "codigo": "1700",
+    "nombre": "MANGA",
+    "zona": "UCG 1",
+    "ucg": 1,
+    "loc": "LH",
+    "lat": 10.412361,
+    "lng": -75.536495
+  },
+  {
+    "codigo": "3900",
+    "nombre": "CASTILLOGRANDE",
+    "zona": "UCG 1",
+    "ucg": 1,
+    "loc": "LH",
+    "lat": 10.393826,
+    "lng": -75.550484
+  },
+  {
+    "codigo": "1550",
+    "nombre": "PIE DEL CERRO",
+    "zona": "UCG 2",
+    "ucg": 2,
+    "loc": "LH",
+    "lat": 10.419779,
+    "lng": -75.538396
+  },
+  {
+    "codigo": "3000",
+    "nombre": "EL BOSQUE",
+    "zona": "UCG 10",
+    "ucg": 10,
+    "loc": "LH",
+    "lat": 10.390801,
+    "lng": -75.526477
+  },
+  {
+    "codigo": "7300",
+    "nombre": "ALBORNOZ",
+    "zona": "UCG 11",
+    "ucg": 11,
+    "loc": "LI",
+    "lat": 10.370322,
+    "lng": -75.508756
+  },
+  {
+    "codigo": "7452",
+    "nombre": "VILLA ROSA",
+    "zona": "UCG 11",
+    "ucg": 11,
+    "loc": "LI",
+    "lat": 10.367007,
+    "lng": -75.498872
+  },
+  {
+    "codigo": "8900",
+    "nombre": "HENEQUEN",
+    "zona": "UCG 11",
+    "ucg": 11,
+    "loc": "LI",
+    "lat": 10.365833,
+    "lng": -75.494543
+  },
+  {
+    "codigo": "7250",
+    "nombre": "ANTONIO JOSE DE SUCRE",
+    "zona": "UCG 11",
+    "ucg": 11,
+    "loc": "LI",
+    "lat": 10.370594,
+    "lng": -75.497119
+  },
+  {
+    "codigo": "7450",
+    "nombre": "EL LIBERTADOR",
+    "zona": "UCG 11",
+    "ucg": 11,
+    "loc": "LI",
+    "lat": 10.370307,
+    "lng": -75.501674
+  },
+  {
+    "codigo": "7200",
+    "nombre": "BELLAVISTA",
+    "zona": "UCG 11",
+    "ucg": 11,
+    "loc": "LI",
+    "lat": 10.371685,
+    "lng": -75.501871
+  },
+  {
+    "codigo": "2470",
+    "nombre": "LA INDIA",
+    "zona": "UCG 6",
+    "ucg": 6,
+    "loc": "LV",
+    "lat": 10.412958,
+    "lng": -75.445392
+  },
+  {
+    "codigo": "0060",
+    "nombre": "FLOR DEL CAMPO",
+    "zona": "UCG 6",
+    "ucg": 6,
+    "loc": "LV",
+    "lat": 10.419624,
+    "lng": -75.447488
+  },
+  {
+    "codigo": "0080",
+    "nombre": "CIUDAD BICENTENARIO",
+    "zona": "UCG 6",
+    "ucg": 6,
+    "loc": "LV",
+    "lat": 10.428161,
+    "lng": -75.440821
+  },
+  {
+    "codigo": "0070",
+    "nombre": "URBANIZACION COLOMBIATON",
+    "zona": "UCG 6",
+    "ucg": 6,
+    "loc": "LV",
+    "lat": 10.416845,
+    "lng": -75.444951
+  },
+  {
+    "codigo": "0090",
+    "nombre": "VILLAS DE LA CANDELARIA",
+    "zona": "UCG 6",
+    "ucg": 6,
+    "loc": "LV",
+    "lat": 10.4057,
+    "lng": -75.462172
+  },
+  {
+    "codigo": "8970",
+    "nombre": "ZONA INDUSTRIAL",
+    "zona": "UCG 11",
+    "ucg": 11,
+    "loc": "LI",
+    "lat": 10.324101,
+    "lng": -75.509663
+  },
+  {
+    "codigo": "8557",
+    "nombre": "MEMBRILLAL",
+    "zona": "Pasacaballos",
+    "ucg": 20,
+    "loc": "LI",
+    "lat": 10.334224,
+    "lng": -75.476437
+  },
+  {
+    "codigo": "8550",
+    "nombre": "PASACABALLOS",
+    "zona": "Pasacaballos",
+    "ucg": 20,
+    "loc": "LI",
+    "lat": 10.283342,
+    "lng": -75.518054
+  },
+  {
+    "codigo": "8500",
+    "nombre": "SANTA ANA",
+    "zona": "Santa Ana",
+    "ucg": 20,
+    "loc": "LH",
+    "lat": 10.238622,
+    "lng": -75.556004
+  },
+  {
+    "codigo": "8600",
+    "nombre": "BARU",
+    "zona": "Baru",
+    "ucg": 20,
+    "loc": "LH",
+    "lat": 10.142668,
+    "lng": -75.685
+  },
+  {
+    "codigo": "8501",
+    "nombre": "ARARCA",
+    "zona": "Ararca",
+    "ucg": 20,
+    "loc": "LH",
+    "lat": 10.26094,
+    "lng": -75.555544
+  },
+  {
+    "codigo": "8551",
+    "nombre": "LETICIA",
+    "zona": "Pasacaballos",
+    "ucg": 20,
+    "loc": "LI",
+    "lat": 10.182387,
+    "lng": -75.511885
+  },
+  {
+    "codigo": "8552",
+    "nombre": "RECREO",
+    "zona": "Pasacaballos",
+    "ucg": 20,
+    "loc": "LI",
+    "lat": 10.197904,
+    "lng": -75.515292
+  },
+  {
+    "codigo": "8400",
+    "nombre": "BOCACHICA",
+    "zona": "Bocachica",
+    "ucg": 20,
+    "loc": "LH",
+    "lat": 10.324338,
+    "lng": -75.579449
+  },
+  {
+    "codigo": "8450",
+    "nombre": "CAÑO DEL ORO",
+    "zona": "Caño del Oro",
+    "ucg": 20,
+    "loc": "LH",
+    "lat": 10.341274,
+    "lng": -75.546579
+  },
+  {
+    "codigo": "8350",
+    "nombre": "TIERRA BOMBA",
+    "zona": "Tierra bomba",
+    "ucg": 20,
+    "loc": "LH",
+    "lat": 10.377924,
+    "lng": -75.574527
+  },
+  {
+    "codigo": "8352",
+    "nombre": "PUNTA ARENAS",
+    "zona": "Punta Arenas",
+    "ucg": 20,
+    "loc": "LH",
+    "lat": 10.364873,
+    "lng": -75.549205
+  },
+  {
+    "codigo": "8651",
+    "nombre": "MANZANILLO DEL MAR",
+    "zona": "La Boquilla",
+    "ucg": 20,
+    "loc": "LV",
+    "lat": 10.515209,
+    "lng": -75.49756
+  },
+  {
+    "codigo": "8652",
+    "nombre": "TIERRA BAJA",
+    "zona": "La Boquilla",
+    "ucg": 20,
+    "loc": "LV",
+    "lat": 10.491134,
+    "lng": -75.474863
+  },
+  {
+    "codigo": "8653",
+    "nombre": "PUERTO REY",
+    "zona": "La Boquilla",
+    "ucg": 20,
+    "loc": "LV",
+    "lat": 10.480411,
+    "lng": -75.462082
+  },
+  {
+    "codigo": "8200",
+    "nombre": "PONTEZUELA",
+    "zona": "Pontezuela",
+    "ucg": 20,
+    "loc": "LV",
+    "lat": 10.542928,
+    "lng": -75.439364
+  },
+  {
+    "codigo": "8250",
+    "nombre": "BAYUNCA",
+    "zona": "Bayunca",
+    "ucg": 20,
+    "loc": "LV",
+    "lat": 10.535718,
+    "lng": -75.396206
+  },
+  {
+    "codigo": "8150",
+    "nombre": "ARROYO GRANDE",
+    "zona": "Arroyo Grande",
+    "ucg": 20,
+    "loc": "LV",
+    "lat": 10.655372,
+    "lng": -75.34723
+  },
+  {
+    "codigo": "8700",
+    "nombre": "ARROYO DE PIEDRA",
+    "zona": "Arroyo de Piedra",
+    "ucg": 20,
+    "loc": "LV",
+    "lat": 10.610103,
+    "lng": -75.446432
+  },
+  {
+    "codigo": "8151",
+    "nombre": "ARROYO DE LAS CANOAS",
+    "zona": "Arroyo Grande",
+    "ucg": 20,
+    "loc": "LV",
+    "lat": 10.64044,
+    "lng": -75.406621
+  },
+  {
+    "codigo": "8650",
+    "nombre": "LA BOQUILLA",
+    "zona": "La Boquilla",
+    "ucg": 20,
+    "loc": "LV",
+    "lat": 10.475999,
+    "lng": -75.497533
+  },
+  {
+    "codigo": "8152",
+    "nombre": "LAS EUROPAS",
+    "zona": "Arroyo Grande",
+    "ucg": 20,
+    "loc": "LV",
+    "lat": 10.672791,
+    "lng": -75.323904
+  },
+  {
+    "codigo": "8300",
+    "nombre": "PUNTA CANOA",
+    "zona": "Punta Canoa",
+    "ucg": 20,
+    "loc": "LV",
+    "lat": 10.557138,
+    "lng": -75.500734
+  },
+  {
+    "codigo": "8750",
+    "nombre": "ISLAS DEL ROSARIO",
+    "zona": "Islas del Rosario",
+    "ucg": 20,
+    "loc": "LH",
+    "lat": 10.176931,
+    "lng": -75.74243
+  },
+  {
+    "codigo": "8850",
+    "nombre": "ARCHIPIELAGO SAN BERNARDO",
+    "zona": "Arch. de San Bernardo",
+    "ucg": 20,
+    "loc": "LH",
+    "lat": 9.78218,
+    "lng": -75.872422
+  },
+  {
+    "codigo": "8800",
+    "nombre": "ISLA FUERTE",
+    "zona": "Isla Fuerte",
+    "ucg": 20,
+    "loc": "LH",
+    "lat": 9.38018,
+    "lng": -76.178993
+  },
+  {
+    "codigo": "8654",
+    "nombre": "ZAPATERO",
+    "zona": "La Boquilla",
+    "ucg": 20,
+    "loc": "LV",
+    "lat": 10.460049,
+    "lng": -75.445167
+  },
+  {
+    "codigo": "1959",
+    "nombre": "OLAYA ST. LA PUNTILLA",
+    "zona": "UCG 6",
+    "ucg": 6,
+    "loc": "LV",
+    "lat": 10.409554,
+    "lng": -75.479966
+  },
+  {
+    "codigo": "1960",
+    "nombre": "OLAYA ST. PLAYA BLANCA",
+    "zona": "UCG 6",
+    "ucg": 6,
+    "loc": "LV",
+    "lat": 10.407513,
+    "lng": -75.478752
+  },
+  {
+    "codigo": "3650",
+    "nombre": "los ejecutios",
+    "zona": "UCG 8",
+    "ucg": 8,
+    "loc": "LH",
+    "lat": 10.397722,
+    "lng": -75.494331
+  },
+  {
+    "codigo": "3000",
+    "nombre": "bosque",
+    "zona": "UCG 10",
+    "ucg": 10,
+    "loc": "LH",
+    "lat": 10.390801,
+    "lng": -75.526477
+  },
+  {
+    "codigo": "5700",
+    "nombre": "alameda",
+    "zona": "UCG 14",
+    "ucg": 14,
+    "loc": "LI",
+    "lat": 10.383588,
+    "lng": -75.475251
+  },
+  {
+    "codigo": "6250",
+    "nombre": "ciudadela 11 de nov",
+    "zona": "UCG 14",
+    "ucg": 14,
+    "loc": "LI",
+    "lat": 10.379076,
+    "lng": -75.466587
+  },
+  {
+    "codigo": "6700",
+    "nombre": "20 de julio sur",
+    "zona": "UCG 11",
+    "ucg": 11,
+    "loc": "LI",
+    "lat": 10.372702,
+    "lng": -75.499198
+  },
+  {
+    "codigo": "2850",
+    "nombre": "13 de junio",
+    "zona": "UCG 7",
+    "ucg": 7,
+    "loc": "LV",
+    "lat": 10.403326,
+    "lng": -75.482974
+  },
+  {
+    "codigo": "1955",
+    "nombre": "olaya st. 11 de noviembre",
+    "zona": "UCG 5",
+    "ucg": 5,
+    "loc": "LV",
+    "lat": 10.412894,
+    "lng": -75.493446
+  },
+  {
+    "codigo": "8550",
+    "nombre": "pasacaballo",
+    "zona": "Pasacaballos",
+    "ucg": 20,
+    "loc": "LI",
+    "lat": 10.283342,
+    "lng": -75.518054
+  },
+  {
+    "codigo": "",
+    "nombre": "el centro",
+    "zona": "",
+    "ucg": 0,
+    "loc": "",
+    "lat": 10.42494,
+    "lng": -75.551923
+  },
+  {
+    "codigo": "",
+    "nombre": "la popa",
+    "zona": "",
+    "ucg": 0,
+    "loc": "",
+    "lat": 10.422381,
+    "lng": -75.525766
+  },
+  {
+    "codigo": "",
+    "nombre": "bazurto",
+    "zona": "",
+    "ucg": 0,
+    "loc": "",
+    "lat": 10.4152,
+    "lng": -75.5378
+  },
+  {
+    "codigo": "",
+    "nombre": "mercado",
+    "zona": "",
+    "ucg": 0,
+    "loc": "",
+    "lat": 10.4152,
+    "lng": -75.5378
+  },
+  {
+    "codigo": "",
+    "nombre": "terminal",
+    "zona": "",
+    "ucg": 0,
+    "loc": "",
+    "lat": 10.4018,
+    "lng": -75.513
+  },
+  {
+    "codigo": "",
+    "nombre": "terminal de transporte",
+    "zona": "",
+    "ucg": 0,
+    "loc": "",
+    "lat": 10.4018,
+    "lng": -75.513
+  },
+  {
+    "codigo": "",
+    "nombre": "villa olympica",
+    "zona": "",
+    "ucg": 0,
+    "loc": "",
+    "lat": 10.403418,
+    "lng": -75.4952
+  },
+  {
+    "codigo": "",
+    "nombre": "universidad tecnologia",
+    "zona": "",
+    "ucg": 0,
+    "loc": "",
+    "lat": 10.39594,
+    "lng": -75.51
+  },
+  {
+    "codigo": "",
+    "nombre": "cuatro vientos",
+    "zona": "",
+    "ucg": 0,
+    "loc": "",
+    "lat": 10.43,
+    "lng": -75.54
+  },
+  {
+    "codigo": "",
+    "nombre": "la bodeguita",
+    "zona": "",
+    "ucg": 0,
+    "loc": "",
+    "lat": 10.421,
+    "lng": -75.549
+  },
+  {
+    "codigo": "",
+    "nombre": "maria auxiliadora",
+    "zona": "",
+    "ucg": 0,
+    "loc": "",
+    "lat": 10.4142,
+    "lng": -75.512
+  },
+  {
+    "codigo": "",
+    "nombre": "patio portal",
+    "zona": "",
+    "ucg": 0,
+    "loc": "",
+    "lat": 10.393,
+    "lng": -75.506
+  },
+  {
+    "codigo": "",
+    "nombre": "madre bernarda",
+    "zona": "",
+    "ucg": 0,
+    "loc": "",
+    "lat": 10.443,
+    "lng": -75.52
+  },
+  {
+    "codigo": "",
+    "nombre": "delicias",
+    "zona": "",
+    "ucg": 0,
+    "loc": "",
+    "lat": 10.392133,
+    "lng": -75.489805
+  },
+  {
+    "codigo": "",
+    "nombre": "crisanto luque",
+    "zona": "",
+    "ucg": 0,
+    "loc": "",
+    "lat": 10.416,
+    "lng": -75.537
+  },
+  {
+    "codigo": "",
+    "nombre": "crisantoluque",
+    "zona": "",
+    "ucg": 0,
+    "loc": "",
+    "lat": 10.416,
+    "lng": -75.537
+  },
+  {
+    "codigo": "",
+    "nombre": "cuidad jardin",
+    "zona": "",
+    "ucg": 0,
+    "loc": "",
+    "lat": 10.397,
+    "lng": -75.506
+  },
+  {
+    "codigo": "",
+    "nombre": "barcelona",
+    "zona": "",
+    "ucg": 0,
+    "loc": "",
+    "lat": 10.4489,
+    "lng": -75.5522
+  },
+  {
+    "codigo": "",
+    "nombre": "las americas",
+    "zona": "",
+    "ucg": 0,
+    "loc": "",
+    "lat": 10.4522,
+    "lng": -75.5489
+  },
+  {
+    "codigo": "",
+    "nombre": "palmarito",
+    "zona": "",
+    "ucg": 0,
+    "loc": "",
+    "lat": 10.468,
+    "lng": -75.535
+  },
+  {
+    "codigo": "",
+    "nombre": "el consulado",
+    "zona": "",
+    "ucg": 0,
+    "loc": "",
+    "lat": 10.445,
+    "lng": -75.52
+  }
+]

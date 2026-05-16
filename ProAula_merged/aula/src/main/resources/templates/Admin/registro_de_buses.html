@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="Registro de buses - Bustraker Admin">
+    <meta name="theme-color" content="#01315f">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Registro de Buses - Bustraker Admin</title>
+    <link rel="stylesheet" th:href="@{/css/style_3.css}">
+    <link rel="stylesheet" th:href="@{/css/Style_Registro_bus.css}">
+    <link rel="shortcut icon" th:href="@{/images/Bus_icono.png}" type="image/x-icon">
+</head>
+<body>
+    <header>
+        <img th:src="@{/images/Bus_palmera.png}" alt="Bus palmera" id="logo2">
+        <h1>Bustraker - Panel Admin</h1>
+        <h2>Registrar Buses</h2>
+        <div id="ingreso">
+            <a id="Volver" th:href="@{/index_2}">Volver al Panel</a>
+        </div>
+    </header>
+    <nav style="position: relative;">
+        <ul>
+            <li><a th:href="@{/index_2}">Panel Admin</a></li>
+            <li><a th:href="@{/registro-buses}">Registrar Buses</a></li>
+            <li><a th:href="@{/actualizarbuses}">Actualizar Buses</a></li>
+            <li><a th:href="@{/eliminarbuses}">Eliminar Buses</a></li>
+        </ul>
+    </nav>
+    <main>
+        <h2>Registrar Nuevo Bus</h2>
+        <p>Añade un nuevo bus a la flota. Los usuarios podrán verlo en la sección "Consulta de Buses".</p>
+        <form th:action="@{/registro-buses}" method="post" th:object="${bus}">
+            <label for="placa">Número de Placa:</label>
+            <input type="text" id="placa" th:field="*{placa}" placeholder="Ej. ABC-123" required>
+            <span th:if="${#fields.hasErrors('placa')}" th:errors="*{placa}" style="color: red;"></span><br><br>
+            
+            <label for="modelo">Modelo:</label>
+            <input type="text" id="modelo" th:field="*{modelo}" placeholder="Ej. Volvo 9700" required>
+            <span th:if="${#fields.hasErrors('modelo')}" th:errors="*{modelo}" style="color: red;"></span><br><br>
+            
+            <label for="ruta">Ruta Asignada:</label>
+            <select id="ruta" th:field="*{ruta}">
+                <option value="">Seleccionar Ruta</option>
+                <option th:each="ruta : ${rutas}" th:value="${ruta.id}" th:text="${ruta.nombre}"></option>
+            </select><br><br>
+            
+            <button type="submit">Registrar Bus</button>
+        </form>
+        <p><em>Nota: Los buses registrados aquí serán visibles para todos los usuarios en la consulta de buses.</em></p>
+    </main>
+    <footer id="pie">
+        <p>&copy; 2025 Bustraker. Todos los derechos reservados.</p>
+        <p>Panel de Administración</p>
+    </footer>
+</body>
+</html>

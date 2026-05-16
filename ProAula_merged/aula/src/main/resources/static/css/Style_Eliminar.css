@@ -1,0 +1,60 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #B00020 0%, #000000 100%); /* Rojo más intenso */
+    color: #FFFFFF;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+header {
+    background-color: #000000;
+    padding: clamp(16px, 3vw, 20px);
+    text-align: center;
+}
+
+header h1 {
+    font-size: 2.5em;
+    color: #B00020; /* Rojo más fuerte */
+}
+
+main {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #FFFFFF; /* Tarjeta blanca */
+    color: #000000; /* Texto negro */
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.7);
+}
+
+input, select {
+    background-color: #FFFFFF;
+    color: #000000;
+    border: clamp(1px, 0.5vw, 2px) solid #000000;
+    padding: clamp(8px, 1.5vw, 10px);
+    margin-bottom: clamp(12px, 2vw, 15px);
+}
+
+button {
+    padding: clamp(10px, 2vw, 12px);
+    background: linear-gradient(45deg, #B00020, #000000);
+    color: #FFFFFF;
+    border: none;
+    border-radius: clamp(3px, 1vw, 5px);
+    font-size: clamp(18px, 3vw, 1.2em);
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* Footer centrado */
+footer {
+    background-color: #000000; /* Mantiene el color original */
+    padding: 15px;
+    text-align: center; /* Centra el texto */
+    display: flex;
+    justify-content: center; /* Centra horizontalmente */
+    align-items: center; /* Centra verticalmente */
+    flex-direction: column; /* Por si hay varios elementos */
+}

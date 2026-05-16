@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mensajes de Contacto - Bustraker Admin</title>
+    <link rel="stylesheet" th:href="@{/css/style_2.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-bus"></i> Bustraker Admin</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a th:href="@{/index_2}"><i class="fas fa-home"></i> Inicio</a>
+                <a th:href="@{/gestionar-usuarios}"><i class="fas fa-users"></i> Usuarios</a>
+                <a th:href="@{/reportes}"><i class="fas fa-chart-bar"></i> Reportes</a>
+                <a th:href="@{/mensajes_contacto}" class="active"><i class="fas fa-envelope"></i> Mensajes</a>
+                <a th:href="@{/agregar_rutas}"><i class="fas fa-route"></i> Rutas</a>
+                <a th:href="@{/registro_de_buses}"><i class="fas fa-bus"></i> Buses</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-header">
+                <h1><i class="fas fa-envelope-open-text"></i> Mensajes de Contacto</h1>
+                <div class="header-actions">
+                    <span th:text="${#authentication.name}" class="username"></span>
+                    <a th:href="@{/logout}" class="btn btn-secondary"><i class="fas fa-sign-out-alt"></i> Salir</a>
+                </div>
+            </header>
+
+            <div class="content-wrapper">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-inbox"></i> Todos los Mensajes</h3>
+                        <div class="card-actions">
+                            <span th:text="'Total: ' + ${#lists.size(mensajes)}" class="total-count"></span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${mensaje}" class="alert alert-success" th:text="${mensaje}"></div>
+                        
+                        <div th:if="${#lists.isEmpty(mensajes)}" class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <h4>No hay mensajes de contacto</h4>
+                            <p>No se han recibido mensajes de contacto hasta el momento.</p>
+                        </div>
+                        
+                        <div th:unless="${#lists.isEmpty(mensajes)}" class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nombre</th>
+                                        <th>Apellido</th>
+                                        <th>Teléfono</th>
+                                        <th>Email</th>
+                                        <th>Mensaje</th>
+                                        <th>Fecha</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="mensaje : ${mensajes}">
+                                        <td th:text="${mensaje.id}">ID</td>
+                                        <td th:text="${mensaje.nombre}">Nombre</td>
+                                        <td th:text="${mensaje.apellido}">Apellido</td>
+                                        <td th:text="${mensaje.telefono}">Teléfono</td>
+                                        <td th:text="${mensaje.email}">Email</td>
+                                        <td th:text="${#strings.abbreviate(mensaje.mensaje, 50)}">Mensaje</td>
+                                        <td th:text="${#dates.format(#dates.createNow(), 'dd/MM/yyyy HH:mm')}">Fecha</td>
+                                        <td>
+                                            <form th:action="@{/eliminar_mensaje/{id}(id=${mensaje.id})}" method="post" style="display:inline; margin:0;">
+                                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                                <button type="submit" class="btn btn-danger btn-sm" style="padding:0.4rem 0.7rem;" onclick="return confirm('¿Estás seguro de eliminar este mensaje?')">
+                                                    <i class="fas fa-trash"></i> Eliminar
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Asegurar que el sidebar esté colapsado por defecto en móviles
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.querySelector('.sidebar');
+            const toggleButton = document.querySelector('.sidebar-toggle');
+            
+            // Ajustar sidebar en pantallas pequeñas
+            if (window.innerWidth <= 768) {
+                sidebar.classList.add('collapsed');
+            }
+            
+            // Actualizar sidebar cuando cambie el tamaño de la ventana
+            window.addEventListener('resize', function() {
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.add('collapsed');
+                } else {
+                    sidebar.classList.remove('collapsed');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

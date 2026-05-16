@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Error 404 - Página No Encontrada - Bustraker">
+    <meta name="theme-color" content="#6f42c1">
+    <title>Error 404 - Página No Encontrada - Bustraker</title>
+    <link rel="stylesheet" th:href="@{/css/style_login.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="shortcut icon" th:href="@{/images/Bus_icono.png}" type="image/x-icon">
+    <style>
+        .error-container {
+            text-align: center;
+            padding: 2rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .error-code {
+            font-size: 6rem;
+            font-weight: bold;
+            color: #6f42c1;
+            margin-bottom: 1rem;
+        }
+        .error-title {
+            font-size: 2rem;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+        .error-message {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 2rem;
+        }
+        .error-path {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 2rem;
+            font-family: monospace;
+            color: #495057;
+        }
+        .error-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn-error {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .btn-primary {
+            background: #01315f;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #011d3a;
+            color: white;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #545b62;
+            color: white;
+        }
+        .suggestions {
+            text-align: left;
+            margin-bottom: 2rem;
+        }
+        .suggestions h4 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+        .suggestions ul {
+            list-style: none;
+            padding: 0;
+        }
+        .suggestions li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #eee;
+        }
+        .suggestions a {
+            color: #01315f;
+            text-decoration: none;
+        }
+        .suggestions a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-inner">
+            <div class="header-inner">
+            <div class="logo">
+                <img th:src="@{/images/Bus_icono.png}" alt="Logo Bustraker">
+                <span class="brand">Bustraker</span>
+            </div>
+            <nav class="main-nav">
+                <a th:href="@{/}" class="nav-link">
+                    <i class="fas fa-home"></i> Inicio
+                </a>
+                <a th:href="@{/rutas-lista}" class="nav-link">
+                    <i class="fas fa-route"></i> Rutas
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="hero-section" style="padding: 2rem 0;">
+        <div class="container container-sm">
+            <div class="error-container">
+                <div class="error-code">404</div>
+                <h1 class="error-title">Página No Encontrada</h1>
+                <p class="error-message" th:text="${errorMessage}">La página que buscas no existe o ha sido movida.</p>
+
+                <div th:if="${path}" class="error-path">
+                    <strong>Ruta solicitada:</strong> <span th:text="${path}"></span>
+                </div>
+
+                <!-- Sugerencias -->
+                <div class="suggestions">
+                    <h4><i class="fas fa-lightbulb"></i> ¿Quizás estabas buscando?</h4>
+                    <ul>
+                        <li><a th:href="@{/}"><i class="fas fa-home"></i> Página de inicio</a></li>
+                        <li><a th:href="@{/rutas-lista}"><i class="fas fa-route"></i> Lista de rutas</a></li>
+                        <li><a th:href="@{/viajar}"><i class="fas fa-bus"></i> Planificar viaje</a></li>
+                        <li><a th:href="@{/dashboard}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                        <li><a th:href="@{/perfil}"><i class="fas fa-user"></i> Mi perfil</a></li>
+                    </ul>
+                </div>
+
+                <!-- Acciones -->
+                <div class="error-actions">
+                    <a th:href="@{/}" class="btn-error btn-primary">
+                        <i class="fas fa-home"></i> Ir al Inicio
+                    </a>
+                    <button onclick="history.back()" class="btn-error btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Volver Atrás
+                    </button>
+                    <a th:href="@{/contacto}" class="btn-error btn-secondary">
+                        <i class="fas fa-envelope"></i> Contactar Soporte
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Auto-redireccionamiento después de 15 segundos
+        setTimeout(function() {
+            window.location.href = '/';
+        }, 15000);
+    </script>
+</body>
+</html>

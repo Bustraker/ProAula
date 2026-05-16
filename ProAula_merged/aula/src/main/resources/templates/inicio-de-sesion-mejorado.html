@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Inicio de Sesión - Bustraker">
+    <meta name="theme-color" content="#01315f">
+    <title>Iniciar Sesión - Bustraker</title>
+    <link rel="stylesheet" th:href="@{/css/style_login.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="shortcut icon" th:href="@{/images/Bus_icono.png}" type="image/x-icon">
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-inner">
+            <div class="logo">
+                <img th:src="@{/images/Bus_icono.png}" alt="Logo Bustraker">
+                <span class="brand">Bustraker</span>
+            </div>
+            <nav class="main-nav">
+                <a th:href="@{/}" class="nav-link">
+                    <i class="fas fa-home"></i> Inicio
+                </a>
+                <a th:href="@{/registro-mejorado.html}" class="nav-link nav-link--outline">
+                    <i class="fas fa-user-plus"></i> Registrarse
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="hero-section" style="padding: 1rem 0;">
+        <div class="container container-sm">
+            <div class="card_animate-slideUp">
+                <div class="card-header">
+                    <h3><i class="fas fa-sign-in-alt"></i> Iniciar Sesión</h3>
+                </div>
+                <div class="card-body">
+                    <!-- Mensajes de error -->
+                    <div th:if="${param.error}" class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>Usuario o contraseña incorrectos. Por favor, intenta de nuevo.</span>
+                    </div>
+
+                    <!-- Mensajes de éxito -->
+                    <div th:if="${param.registrado}" class="alert alert-success">
+                        <i class="fas fa-check-circle"></i>
+                        <span>¡Registro completado exitosamente! Ahora puedes iniciar sesión.</span>
+                    </div>
+
+                    <div th:if="${param.logout}" class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Has cerrado sesión correctamente.</span>
+                    </div>
+
+                    <form th:action="@{/login}" method="post" id="loginForm">
+                        <!-- Username -->
+                        <div class="form-group">
+                            <label class="form-label" for="username">
+                                <i class="fas fa-user"></i> Nombre de Usuario
+                            </label>
+                            <input type="text" 
+                                    id="username" 
+                                    name="username"
+                                    class="form-control" 
+                                    placeholder="Ingresa tu nombre de usuario"
+                                    required
+                                    autofocus
+                                    th:value="${param.username}">
+                        </div>
+
+                        <!-- Password -->
+                        <div class="form-group">
+                            <label class="form-label" for="password">
+                                <i class="fas fa-lock"></i> Contraseña
+                            </label>
+                            <input type="password" 
+                                    id="password" 
+                                    name="password"
+                                    class="form-control" 
+                                    placeholder="••••••••"
+                                    required>
+                        </div>
+
+                        <!-- Recordarme y Olvidé contraseña -->
+                        <div class="d-flex justify-between align-center mb-3" style="flex-wrap: wrap; gap: 0.5rem;">
+                            <div class="form-check" style="margin: 0;">
+                                <input type="checkbox" 
+                                        id="recordarme" 
+                                        name="recordarme"
+                                        class="form-check-input">
+                                <label class="form-check-label" for="recordarme" style="font-size: 0.9rem;">
+                                    Recordarme
+                                </label>
+                            </div>
+                            <a href="#" style="font-size: 0.9rem; font-weight: 500;" onclick="alert('Función en desarrollo - Contacta al administrador')">
+                                <i class="fas fa-key"></i> ¿Olvidaste tu contraseña?
+                            </a>
+                        </div>
+
+                        <!-- Botón de Login -->
+                        <button type="submit" class="btn btn-primary btn-block btn-lg">
+                            <i class="fas fa-sign-in-alt"></i> Ingresar
+                        </button>
+
+                        <!-- No tiene cuenta -->
+                        <div class="text-center mt-3">
+                            <p style="color: var(--gray-600);">
+                                ¿No tienes una cuenta? 
+                                <a th:href="@{/registro-mejorado.html}" style="font-weight: 600;">
+                                    Regístrate aquí
+                                </a>
+                            </p>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Divider -->
+                <div style="text-align: center; margin: 1.5rem 0; position: relative;">
+                    <div style="border-top: 1px solid var(--gray-200);"></div>
+                    <span style="background: var(--white); padding: 0 1rem; color: var(--gray-400); font-size: 0.875rem; position: relative; top: -0.7rem;">
+                        O continúa con
+                    </span>
+                </div>
+
+                <!-- Login Social -->
+                <div class="card-body" style="padding-top: 0;">
+                    <div class="d-flex gap-2">
+                        <a th:href="@{/oauth2/authorization/google}" class="btn btn-outline btn-block" style="flex: 1; display: inline-flex; justify-content: center; align-items: center; gap: .5rem; text-decoration: none;">
+                            <i class="fab fa-google" style="color: #DB4437;"></i> Google
+                        </a>
+                        <a th:href="@{/oauth2/authorization/github}" class="btn btn-outline btn-block" style="flex: 1; display: inline-flex; justify-content: center; align-items: center; gap: .5rem; text-decoration: none;">
+                            <i class="fab fa-github" style="color: #333;"></i> GitHub
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Información -->
+            <div class="card_information">
+                <div class="card-body">
+                    <h4 style="text-align: center; margin-bottom: 1.5rem; color: var(--primary);">
+                        <i class="fas fa-info-circle"></i> ¿Por qué iniciar sesión?
+                    </h4>
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <i class="fas fa-check-circle" style="color: var(--success); font-size: 1.25rem;"></i>
+                            <span style="color: var(--gray-700);">Accede a tu historial de viajes</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <i class="fas fa-check-circle" style="color: var(--success); font-size: 1.25rem;"></i>
+                            <span style="color: var(--gray-700);">Recibe notificaciones personalizadas</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <i class="fas fa-check-circle" style="color: var(--success); font-size: 1.25rem;"></i>
+                            <span style="color: var(--gray-700);">Gestiona tu perfil y preferencias</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer style="background: var(--gray-800); color: var(--white); padding: 2rem; margin-top: 1rem;">
+        <div class="container text-center">
+            <div class="mb-3">
+                <h3 style="color: var(--white); margin-bottom: 0.5rem;">Bustraker</h3>
+                <p style="opacity: 0.8;">Tu herramienta de gestión de rutas universitarias</p>
+            </div>
+            <p style="opacity: 0.6; font-size: 0.875rem;">
+                &copy; 2026 Bustraker. Todos los derechos reservados.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Validación del formulario
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            // Validaciones básicas
+            if (!username || username.trim() === '') {
+                e.preventDefault();
+                alert('❌ Por favor, ingresa tu nombre de usuario.');
+                document.getElementById('username').focus();
+                return false;
+            }
+            
+            if (!password || password.trim() === '') {
+                e.preventDefault();
+                alert('❌ Por favor, ingresa tu contraseña.');
+                document.getElementById('password').focus();
+                return false;
+            }
+            
+            // Mostrar mensaje de carga
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Iniciando sesión...';
+        });
+
+        // Animación de entrada
+        document.addEventListener('DOMContentLoaded', function() {
+            const card = document.querySelector('.card');
+            if (card) {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.4s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 100);
+            }
+        });
+
+        // Auto-focus en el campo de username
+        window.addEventListener('load', function() {
+            const usernameField = document.getElementById('username');
+            if (usernameField && !usernameField.value) {
+                usernameField.focus();
+            }
+        });
+
+        // verificacion de estado de sesión        
+        const inputs = document.querySelectorAll('#loginForm input');
+
+        inputs.forEach(input => {
+        input.addEventListener('input', () => {
+            const label = document.querySelector(`label[for="${input.id}"]`);
+            const icon = label.querySelector('i');
+
+            if (input.checkValidity()) {
+                label.style.color = 'var(--success)';
+                if (icon) {
+                    icon.style.color = 'var(--success)';
+                }
+            } else {
+                label.style.color = 'var(--gray-700)';
+                if (icon) {
+                    icon.style.color = 'var(--gray-700)';
+                }
+            }
+        });
+        });
+    </script>
+</body>
+</html>

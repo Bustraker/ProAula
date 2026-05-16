@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="description" content="Pagina principal del usuario">
+    <meta name="theme-color" content="#01315f">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Bustraker Público</title>
+    <link rel="stylesheet" th:href="@{/css/style_3.css}">
+    <link rel="shortcut icon" th:href="@{/images/Bus_icono.png}" type="image/x-icon">
+</head>
+</body>
+<body>
+    <div class="site-grid">
+        <header>
+            <img th:src="@{/images/Bus_palmera.png}" alt="Bus palmera" id="logo2">
+            <h1>Bustraker</h1>
+            <h2>Bienvenido visitante</h2>
+
+            <div id="ingreso">
+                <a id="login" th:href="@{/inicio_de_sesion.html}">Iniciar sesión</a>
+                <a id="Registro" th:href="@{/rejistro_de_persona.html}">Registrar</a>
+            </div>
+
+            <nav>
+                <ul>
+                    <li><a th:href="@{/index_3_public}">Inicio</a></li>
+                    <li><a th:href="@{/viajar_public}">Viajar</a></li>
+                    <li><a th:href="@{/consultas}">Consulta de Buses</a></li>
+                    <li style="position: relative; display: inline-block;">
+                        <details class="perfil-details">
+                            <summary>Perfil</summary>
+                            <ul class="perfil-menu-list">
+                                <li><a th:href="@{/inicio_de_sesion.html}">Iniciar sesión</a></li>
+                                <li><a th:href="@{/rejistro_de_persona.html}">Registrar</a></li>
+                            </ul>
+                        </details>
+                    </li>
+                </ul>
+            </nav>
+        </header>
+
+        <aside class="aside-creator">
+            <h3>Información del Creador</h3>
+            <p><strong>Nombre:</strong> Juan Pérez</p>
+            <p><strong>Email:</strong> juan.perez@bustraker.com</p>
+            <p><strong>Teléfono:</strong> +1 (555) 123-4567</p>
+            <p><strong>Rol:</strong> Desarrollador Principal</p>
+            <p>Si deseas contactarme para colaboraciones, soporte técnico o consultas sobre el proyecto, no dudes en escribirme.</p>
+        </aside>
+
+        <main>
+            <div style="text-align:center;margin:20px 0;">
+                <a th:href="@{/viajar_public}" style="display:inline-block;background:#0d1a3a;color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none;">Ir a la herramienta de viaje (Público)</a>
+            </div>
+
+            <h2>Introduccion</h2>
+            <p>Bienvenido a Bustraker, la plataforma para la gestión de flotas de autobuses. Esta es la versión pública sin acceso a datos privados ni perfiles cargados.</p>
+            <h2>Características Disponibles (Públicas)</h2>
+            <ul>
+                <li>Consulta de Buses: Buscar y ver información pública de los autobuses.</li>
+                <li>Información y contacto: Enviar consultas desde el formulario público.</li>
+                <li>Enlaces para iniciar sesión o registrar una cuenta.</li>
+            </ul>
+
+            <section id="Contacto">
+                <form method="post" th:action="@{/contacto}" th:object="${contactoMensaje}">
+                    <h2 id="contacto">Infomacion de Contacto</h2>
+                    <fieldset>
+                        <legend>Información personal</legend>
+                        <div>
+                            <label>Nombre:
+                                <input type="text" name="name" placeholder="Nombre completo" required>
+                            </label>
+                        </div>
+                        <div>
+                            <label>Email:
+                                <input type="email" name="email" placeholder="ejemplo@gmail.com" required>
+                            </label>
+                        </div>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend>Información adicional</legend>
+                        <div>
+                            <label>Teléfono: 
+                                <input type="tel" name="phone" placeholder="3013639618" required pattern="[0-9]{9,}">
+                            </label>
+                        </div>
+                    </fieldset>
+                    <div>
+                        <label>Mensaje:
+                            <textarea name="message" rows="5" placeholder="Escribe tu mensaje aquí..." required></textarea>
+                        </label>
+                    </div>
+                    <div>
+                        <button type="submit">Enviar</button>
+                    </div>
+                </form>
+            </section>
+        </main>
+
+        <aside class="aside-right">
+            <h3>Nota</h3>
+            <p>Para más información, soporte o consultas, contacta a través del formulario o inicia sesión para acceder a funciones avanzadas: <a th:href="@{/inicio_de_sesion.html}">Iniciar sesión</a></p>
+        </aside>
+
+        <footer id="pie">
+            <p>&copy; 2025 Bustraker. Todos los derechos reservados.</p>
+            <p>Contacto: @bustraker_support</p>
+            <p>Desarrollado por Equipo Bustraker</p>
+        </footer>
+    </div>
+</body>
+</html>

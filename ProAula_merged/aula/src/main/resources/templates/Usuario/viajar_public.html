@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="description" content="Mapa y consulta de rutas - Bustraker Público">
+    <meta name="theme-color" content="#01315f">
+    <title>Consulta de Rutas - Bustraker Público</title>
+    <link rel="shortcut icon" th:href="@{/images/Bus_icono.png}" type="image/x-icon">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        #map { height: 100vh; width: 100%; }
+        .options-panel {
+            position: fixed;
+            top: 24px;
+            right: 32px;
+            width: min(360px, calc(100vw - 52px));
+            background: rgba(255,255,255,0.98);
+            padding: 24px;
+            border-radius: 20px;
+            box-shadow: 0 24px 60px rgba(13,26,58,0.18);
+            z-index: 1000;
+            max-height: 92vh;
+            overflow-y: auto;
+            border: 1px solid rgba(13,26,58,0.08);
+            backdrop-filter: blur(12px);
+        }
+        .options-panel h2 {
+            margin: 0 0 18px 0;
+            color: #0d1a3a;
+            font-size: 1.35rem;
+            border-bottom: 2px solid #0d1a3a;
+            padding-bottom: 10px;
+        }
+        .options-panel label {
+            display: block;
+            margin: 16px 0 8px 0;
+            font-weight: 700;
+            color: #25304a;
+            font-size: 0.95rem;
+        }
+        .options-panel select,
+        .options-panel input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #d4dce8;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            color: #1f334f;
+            background: #ffffff;
+            box-sizing: border-box;
+        }
+        .options-panel select:focus,
+        .options-panel input:focus {
+            outline: none;
+            border-color: #1e3a5f;
+            box-shadow: 0 0 0 4px rgba(30,58,95,0.08);
+        }
+        .options-panel select:disabled,
+        .options-panel input:disabled {
+            background: #f6f8fb;
+            cursor: not-allowed;
+        }
+        .options-panel button {
+            width: 100%;
+            padding: 14px;
+            margin-top: 18px;
+            background: linear-gradient(135deg, #0d1a3a 0%, #1e3a5f 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+        }
+        .options-panel button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 16px 24px rgba(13,26,58,0.18);
+        }
+        .options-panel button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .btn-primary { background: linear-gradient(135deg, #0d1a3a 0%, #1e3a5f 100%); }
+        .ruta-info {
+            background: #ffffff;
+            padding: 16px;
+            border-radius: 14px;
+            margin-top: 16px;
+            border-left: 4px solid #1e3a5f;
+            box-shadow: 0 12px 28px rgba(13,26,58,0.08);
+        }
+        .ruta-info p {
+            margin: 10px 0;
+            color: #4b5b74;
+            line-height: 1.6;
+        }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #0d1a3a;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 0.82rem;
+            margin: 2px 4px 2px 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+
+    <div class="options-panel">
+        <h2><i class="fas fa-route"></i> Consulta de Rutas</h2>
+        
+        <label for="origen"><i class="fas fa-map-marker-alt"></i> 1. ¿En qué barrio estás?</label>
+        <select id="origen" onchange="actualizarDestinosDisponibles()">
+            <option value="">Selecciona tu barrio actual</option>
+        </select>
+        
+        <button id="btnDetectarUbicacion" onclick="usarUbicacionActual()" disabled style="background: #27ae60; margin: 8px 0; opacity: 0.7; cursor: not-allowed;">
+            <i class="fas fa-location-arrow"></i> Detectar Mi Ubicación
+        </button>
+        
+        <label for="destino"><i class="fas fa-map-pin"></i> 2. ¿A qué barrio vas?</label>
+        <select id="destino" onchange="buscarRutasDisponibles()" disabled>
+            <option value="">Primero selecciona tu barrio de origen</option>
+        </select>
+        
+        <label for="ruta"><i class="fas fa-bus"></i> 3. Rutas Disponibles:</label>
+        <select id="ruta" onchange="mostrarRutaEnMapa()" disabled>
+            <option value="">Selecciona una ruta para ver su trazado</option>
+        </select>
+        
+        <div id="rutaInfo" class="ruta-info" style="display: none;">
+            <h4><i class="fas fa-info-circle"></i> Datos de la Ruta</h4>
+            <p><strong>Barrios:</strong> <span id="infoBarrios"></span></p>
+            <p><strong>Hora:</strong> <span id="infoHora"></span></p>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        // Variables globales
+        var map;
+        var rutas = [];
+        var barrios = [];
+        var barriosData = [];
+        var coordenadasCache = {};
+        var origenMarker = null;
+        var destinoMarker = null;
+        var rutaLine = null;
+        var barrioMarkers = [];
+
+        // Inicializar aplicación
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Iniciando Bustraker Público...');
+            
+            // Cargar barrios desde API
+            cargarBarrios();
+            
+            // Cargar rutas desde API
+            cargarRutas();
+            
+            // Inicializar mapa
+            initMap();
+        });
+
+        // Inicializar mapa de Leaflet
+        function initMap() {
+            map = L.map('map').setView([10.4236, -75.5478], 13);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+            
+            console.log('✅ Mapa inicializado');
+        }
+
+        // Cargar lista de barrios desde API
+        async function cargarBarrios() {
+            try {
+                const response = await fetch('/api/barrios/todos');
+                if (response.ok) {
+                    const data = await response.json();
+                    barriosData = data;
+                    barrios = barriosData.map(b => b.nombre);
+                    console.log('✅', barrios.length, 'barrios cargados');
+
+                    barriosData.forEach(barrio => {
+                        const key = normalizarNombre(barrio.nombre);
+                        coordenadasCache[key] = {
+                            lat: parseFloat(barrio.latitud),
+                            lng: parseFloat(barrio.longitud)
+                        };
+                    });
+
+                    const origenSelect = document.getElementById('origen');
+                    origenSelect.innerHTML = '<option value="">Selecciona tu barrio actual</option>';
+                    [...barrios].sort().forEach(barrio => {
+                        const opt = document.createElement('option');
+                        opt.value = barrio;
+                        opt.textContent = barrio.charAt(0).toUpperCase() + barrio.slice(1);
+                        origenSelect.appendChild(opt);
+                    });
+
+                    const detectarBtn = document.getElementById('btnDetectarUbicacion');
+                    if (detectarBtn) {
+                        detectarBtn.disabled = false;
+                        detectarBtn.style.opacity = '1';
+                        detectarBtn.style.cursor = 'pointer';
+                    }
+                }
+            } catch (error) {
+                console.error('❌ Error cargando barrios:', error);
+            }
+        }
+
+        // Cargar rutas desde API
+        async function cargarRutas() {
+            try {
+                const response = await fetch('/api/rutas-con-coordenadas');
+                if (response.ok) {
+                    rutas = await response.json();
+                    console.log('✅', rutas.length, 'rutas cargadas');
+                }
+            } catch (error) {
+                console.error('❌ Error cargando rutas:', error);
+            }
+        }
+
+        function normalizarNombre(nombre) {
+            return nombre.toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .trim();
+        }
+
+        function obtenerCoordenadas(barrio) {
+            return coordenadasCache[normalizarNombre(barrio)] || null;
+        }
+
+        function distanciaHaversine(lat1, lng1, lat2, lng2) {
+            const R = 6371; // radio de la Tierra en km
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLng = (lng2 - lng1) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLng / 2) * Math.sin(dLng / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c;
+        }
+
+        function obtenerBarrioMasCercano(lat, lng) {
+            if (!barriosData.length) return null;
+            let mejorBarrio = null;
+            let distanciaMinima = Infinity;
+            barriosData.forEach(barrio => {
+                const latBarrio = parseFloat(barrio.latitud);
+                const lngBarrio = parseFloat(barrio.longitud);
+                if (Number.isNaN(latBarrio) || Number.isNaN(lngBarrio)) {
+                    return;
+                }
+                const distancia = distanciaHaversine(lat, lng, latBarrio, lngBarrio);
+                if (distancia < distanciaMinima) {
+                    distanciaMinima = distancia;
+                    mejorBarrio = barrio;
+                }
+            });
+            return mejorBarrio;
+        }
+
+        // Cuando se selecciona el origen, habilitar destino
+        function actualizarDestinosDisponibles() {
+            const origen = document.getElementById('origen').value;
+            const destinoSelect = document.getElementById('destino');
+            const rutaSelect = document.getElementById('ruta');
+            
+            if (origen) {
+                destinoSelect.disabled = false;
+                destinoSelect.innerHTML = '<option value="">Selecciona tu barrio de destino</option>';
+                
+                [...barrios].sort().forEach(barrio => {
+                    if (barrio !== origen) {
+                        const opt = document.createElement('option');
+                        opt.value = barrio;
+                        opt.textContent = barrio.charAt(0).toUpperCase() + barrio.slice(1);
+                        destinoSelect.appendChild(opt);
+                    }
+                });
+                
+                rutaSelect.disabled = true;
+                rutaSelect.innerHTML = '<option value="">Primero selecciona origen y destino</option>';
+                document.getElementById('rutaInfo').style.display = 'none';
+                
+                console.log('✅ Origen seleccionado:', origen);
+            } else {
+                destinoSelect.disabled = true;
+                destinoSelect.innerHTML = '<option value="">Primero selecciona tu barrio de origen</option>';
+            }
+        }
+
+        // Cuando se selecciona origen y destino, filtrar rutas
+        function buscarRutasDisponibles() {
+            const origen = document.getElementById('origen').value;
+            const destino = document.getElementById('destino').value;
+            const rutaSelect = document.getElementById('ruta');
+            
+            if (origen && destino) {
+                const rutasFiltradas = rutas.filter(ruta => {
+                    const barriosRuta = ruta.barrios || [];
+                    const tieneOrigen = barriosRuta.some(b => 
+                        normalizarNombre(b) === normalizarNombre(origen)
+                    );
+                    const tieneDestino = barriosRuta.some(b => 
+                        normalizarNombre(b) === normalizarNombre(destino)
+                    );
+                    return tieneOrigen && tieneDestino;
+                });
+                
+                console.log('✅', rutasFiltradas.length, 'rutas encontradas para', origen, '→', destino);
+                
+                if (rutasFiltradas.length === 0) {
+                    const origenCoords = obtenerCoordenadas(origen);
+                    const destinoCoords = obtenerCoordenadas(destino);
+                    if (origenCoords && destinoCoords) {
+                        rutasFiltradas.push({
+                            id: 'directa-' + origen + '-' + destino,
+                            nombre: 'Ruta directa ' + origen + ' → ' + destino,
+                            barrios: [origen, destino],
+                            horaAproximada: 'Directa',
+                            coordenadasBarrios: {
+                                [origen]: [origenCoords.lat, origenCoords.lng],
+                                [destino]: [destinoCoords.lat, destinoCoords.lng]
+                            }
+                        });
+                    }
+                }
+                
+                rutaSelect.disabled = false;
+                rutaSelect.innerHTML = '<option value="">Selecciona una ruta</option>';
+                
+                if (rutasFiltradas.length === 0) {
+                    const opt = document.createElement('option');
+                    opt.value = '';
+                    opt.textContent = 'No hay rutas disponibles entre estos barrios';
+                    opt.disabled = true;
+                    rutaSelect.appendChild(opt);
+                    return;
+                }
+                
+                rutasFiltradas.forEach((ruta, idx) => {
+                    const opt = document.createElement('option');
+                    opt.value = idx;
+                    opt.textContent = `${ruta.nombre} · ${ruta.horaAproximada || 'Horario no disponible'}`;
+                    opt.setAttribute('data-ruta-json', JSON.stringify(ruta));
+                    rutaSelect.appendChild(opt);
+                });
+            } else {
+                rutaSelect.disabled = true;
+                rutaSelect.innerHTML = '<option value="">Primero selecciona origen y destino</option>';
+            }
+        }
+
+        // Mostrar ruta en mapa cuando se selecciona
+        async function mostrarRutaEnMapa() {
+            const rutaSelect = document.getElementById('ruta');
+            const selectedOption = rutaSelect.options[rutaSelect.selectedIndex];
+            const rutaJson = selectedOption ? selectedOption.getAttribute('data-ruta-json') : null;
+
+            if (!rutaJson) return;
+
+            const ruta = JSON.parse(rutaJson);
+            console.log('✅ Ruta seleccionada:', ruta.nombre);
+
+            document.getElementById('infoBarrios').innerHTML = ruta.barrios
+                .map(b => '<span class="badge">' + b + '</span>')
+                .join('');
+            document.getElementById('infoHora').textContent = ruta.horaAproximada || 'No especificada';
+            document.getElementById('rutaInfo').style.display = 'block';
+
+            limpiarMapa();
+            await mostrarRutaEnMapaConCoords(ruta);
+        }
+
+
+
+        // Mostrar ruta con coordenadas en el mapa usando OSRM (carreteras reales)
+        async function mostrarRutaEnMapaConCoords(ruta) {
+            const origen = document.getElementById('origen').value;
+            const destino = document.getElementById('destino').value;
+
+            const coordenadasRuta = ruta.coordenadasBarrios;
+            if (!coordenadasRuta) {
+                alert('Esta ruta no tiene coordenadas disponibles');
+                return;
+            }
+
+            // Construir lista de waypoints en orden de la ruta
+            const waypoints = ruta.barrios
+                .map(barrio => {
+                    const coords = coordenadasRuta[barrio];
+                    return coords ? { lat: parseFloat(coords[0]), lng: parseFloat(coords[1]), nombre: barrio } : null;
+                })
+                .filter(Boolean);
+
+            if (waypoints.length < 2) {
+                alert('Esta ruta no tiene suficientes coordenadas para trazar el recorrido');
+                return;
+            }
+
+            // Marcadores de origen y destino con colores diferenciados
+            waypoints.forEach((wp, i) => {
+                const esOrigen = wp.nombre === origen;
+                const esDestino = wp.nombre === destino;
+                const color = esOrigen ? '#e74c3c' : esDestino ? '#27ae60' : '#3498db';
+                const icono = esOrigen ? '🔴 Origen' : esDestino ? '🟢 Destino' : '🔵 Parada';
+
+                const circleMarker = L.circleMarker([wp.lat, wp.lng], {
+                    radius: 9,
+                    fillColor: color,
+                    color: '#fff',
+                    weight: 2,
+                    fillOpacity: 0.95
+                }).addTo(map).bindPopup(`<strong>${icono}</strong><br>${wp.nombre}`);
+
+                if (esOrigen) {
+                    circleMarker.openPopup();
+                    origenMarker = circleMarker;
+                } else if (esDestino) {
+                    destinoMarker = circleMarker;
+                } else {
+                    barrioMarkers.push(circleMarker);
+                }
+            });
+
+            // Llamar a OSRM para obtener la ruta por carreteras reales
+            const coordStr = waypoints.map(wp => `${wp.lng},${wp.lat}`).join(';');
+            const osrmUrl = `https://router.project-osrm.org/route/v1/driving/${coordStr}?overview=full&geometries=geojson&steps=false`;
+
+            const infoBarriosEl = document.getElementById('infoBarrios');
+            const textoOriginal = infoBarriosEl.innerHTML;
+            infoBarriosEl.innerHTML += ' <em style="color:#888">(calculando ruta…)</em>';
+
+            try {
+                const response = await fetch(osrmUrl);
+                if (!response.ok) throw new Error('OSRM respondió con error ' + response.status);
+                const data = await response.json();
+
+                if (!data.routes || data.routes.length === 0) throw new Error('Sin ruta disponible');
+
+                const routeGeoJSON = data.routes[0].geometry;
+                const distanciaKm = (data.routes[0].distance / 1000).toFixed(1);
+                const tiempoMin = Math.round(data.routes[0].duration / 60);
+
+                // Dibujar ruta por carreteras reales
+                rutaLine = L.geoJSON(routeGeoJSON, {
+                    style: {
+                        color: '#1e3a5f',
+                        weight: 8,
+                        opacity: 0.92,
+                        lineJoin: 'round',
+                        lineCap: 'round'
+                    }
+                }).addTo(map);
+
+                map.fitBounds(rutaLine.getBounds(), { padding: [60, 60] });
+
+                infoBarriosEl.innerHTML = textoOriginal;
+                let statsEl = document.getElementById('rutaStats');
+                if (!statsEl) {
+                    statsEl = document.createElement('p');
+                    statsEl.id = 'rutaStats';
+                    statsEl.style.marginTop = '10px';
+                    statsEl.style.color = '#25304a';
+                    document.getElementById('rutaInfo').appendChild(statsEl);
+                }
+                statsEl.innerHTML = `<strong>📏 Distancia aproximada:</strong> ${distanciaKm} km &nbsp; <strong>⏱️ Tiempo estimado:</strong> ~${tiempoMin} min`;
+
+                console.log('✅ Ruta por carreteras: ' + distanciaKm + ' km, ~' + tiempoMin + ' min');
+
+            } catch (err) {
+                console.error('❌ Error OSRM:', err);
+                const latlngs = waypoints.map(wp => [wp.lat, wp.lng]);
+                rutaLine = L.polyline(latlngs, {
+                    color: '#e67e22',
+                    weight: 5,
+                    dashArray: '12, 8',
+                    opacity: 0.9
+                }).addTo(map);
+                map.fitBounds(rutaLine.getBounds(), { padding: [60, 60] });
+                infoBarriosEl.innerHTML = textoOriginal;
+                let statsEl = document.getElementById('rutaStats');
+                if (!statsEl) {
+                    statsEl = document.createElement('p');
+                    statsEl.id = 'rutaStats';
+                    statsEl.style.marginTop = '10px';
+                    statsEl.style.color = '#25304a';
+                    document.getElementById('rutaInfo').appendChild(statsEl);
+                }
+                statsEl.innerHTML = '<strong>⚠️ Ruta aproximada</strong> — no se pudo cargar el trazado real en este momento.';
+                console.warn('⚠️ Usando línea directa como fallback');
+            }
+        }
+
+        // Limpiar mapa — también resetea referencias para evitar errores en llamadas posteriores
+        function limpiarMapa() {
+            if (origenMarker) { map.removeLayer(origenMarker); origenMarker = null; }
+            if (destinoMarker) { map.removeLayer(destinoMarker); destinoMarker = null; }
+            if (rutaLine) { map.removeLayer(rutaLine); rutaLine = null; }
+            barrioMarkers.forEach(m => map.removeLayer(m));
+            barrioMarkers = [];
+            // Limpiar stats de ruta anterior
+            const statsEl = document.getElementById('rutaStats');
+            if (statsEl) statsEl.remove();
+        }
+
+        // Usar ubicación actual
+        function usarUbicacionActual() {
+            if (!barriosData.length) {
+                alert('⏳ Cargando barrios, por favor espera unos segundos e intenta de nuevo.');
+                return;
+            }
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    
+                    map.setView([lat, lng], 15);
+                    
+                    if (origenMarker) map.removeLayer(origenMarker);
+                    origenMarker = L.marker([lat, lng])
+                        .addTo(map)
+                        .bindPopup('<b>📍 Tu ubicación actual</b>')
+                        .openPopup();
+
+                    const barrioCercano = obtenerBarrioMasCercano(lat, lng);
+                    if (barrioCercano) {
+                        const origenSelect = document.getElementById('origen');
+                        origenSelect.value = barrioCercano.nombre;
+                        actualizarDestinosDisponibles();
+                        origenMarker.bindPopup('<b>📍 Tu ubicación actual</b><br><small>' + barrioCercano.nombre + '</small>').openPopup();
+                        alert('📍 Ubicación detectada en ' + barrioCercano.nombre + '. Origen seleccionado automáticamente.');
+                    } else {
+                        alert('📍 Ubicación detectada. Ahora selecciona tu destino.');
+                    }
+                }, error => {
+                    alert('❌ No se pudo detectar la ubicación: ' + error.message);
+                });
+            } else {
+                alert('❌ Tu navegador no soporta geolocalización');
+            }
+        }
+    </script>
+</body>
+</html>

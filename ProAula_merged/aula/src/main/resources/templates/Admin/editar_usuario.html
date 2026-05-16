@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="theme-color" content="#01315f">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Editar Usuario - Admin</title>
+    <link rel="stylesheet" th:href="@{/css/style_3.css}">
+    <link rel="shortcut icon" th:href="@{/images/Bus_icono.png}" type="image/x-icon">    
+</head>
+<body>
+    <header>
+        <h1>Editar Usuario</h1>
+        <a th:href="@{/gestionar-usuarios}">Volver a Gestión</a>
+    </header>
+
+    <main>
+        <form th:action="@{/actualizar-usuario}" method="post">
+            <input type="hidden" name="id" th:value="${usuario.id}" />
+            <div>
+                <label>Usuario:
+                    <input type="text" name="username" th:value="${usuario.username}" required />
+                </label>
+            </div>
+            <div>
+                <label>Nombres:
+                    <input type="text" name="nombres" th:value="${usuario.nombres}" required />
+                </label>
+            </div>
+            <div>
+                <label>Apellidos:
+                    <input type="text" name="apellidos" th:value="${usuario.apellidos}" required />
+                </label>
+            </div>
+            <div>
+                <label>Email:
+                    <input type="email" name="email" th:value="${usuario.email}" required />
+                </label>
+            </div>
+            <div>
+                <label>Contraseña (dejar en blanco para mantener):
+                    <input type="password" name="password" placeholder="Nueva contraseña" />
+                </label>
+            </div>
+            <div>
+                <label>Rol:
+                    <select name="role" required>
+                        <option th:value="USER" th:selected="${usuario.role == 'USER'}">Usuario</option>
+                        <option th:value="ADMIN" th:selected="${usuario.role == 'ADMIN'}">Administrador</option>
+                    </select>
+                </label>
+            </div>
+            <div style="margin-top: 10px;">
+                <button type="submit">Guardar cambios</button>
+                <a th:href="@{/gestionar-usuarios}" style="margin-left: 10px;">Cancelar</a>
+            </div>
+        </form>
+    </main>
+
+</body>
+</html>

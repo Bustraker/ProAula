@@ -1,0 +1,215 @@
+/* Estilos generales para rutas.html - Sincronizado con estética existente */
+body {
+    font-family: Arial, sans-serif; /* Fuente igual a style.css */
+    background-color: #f5f5dc; /* Beige, como en style.css */
+    color: #333;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+}
+
+img, video {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+main, header, footer {
+    width: 100%;
+    max-width: clamp(600px, 90vw, 800px);
+    margin: 0 auto;
+    padding: clamp(0.8rem, 2vw, 1.2rem);
+    box-sizing: border-box;
+}
+
+@media (max-width: 900px) {
+    main, header, footer {
+        max-width: 98vw;
+        padding: 0.8rem;
+    }
+    header h1 {
+        font-size: 1.5em;
+    }
+}
+
+@media (max-width: 600px) {
+    html {
+        font-size: 15px;
+    }
+    main, header, footer {
+        padding: 0.5rem;
+        border-radius: 6px;
+    }
+    header h1 {
+        font-size: 1.1em;
+    }
+}
+
+@media (max-width: 400px) {
+    html {
+        font-size: 13px;
+    }
+    header h1 {
+        font-size: 1em;
+    }
+}
+
+header {
+    background-color: #8b4513; /* Marrón, similar a headers en style_2.css */
+    color: white;
+    text-align: center;
+    padding: clamp(16px, 3vw, 20px);
+}
+
+header h1 {
+    margin: 0;
+    font-size: clamp(24px, 4vw, 2em);
+}
+
+main {
+    max-width: clamp(600px, 90vw, 800px);
+    margin: clamp(16px, 3vw, 20px) auto;
+    padding: clamp(16px, 3vw, 20px);
+    background-color: white;
+    border-radius: clamp(6px, 1.5vw, 8px);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+section {
+    margin-bottom: clamp(20px, 4vw, 30px);
+}
+
+h2 {
+    color: #8b4513; /* Marrón */
+    border-bottom: clamp(1px, 0.5vw, 2px) solid #f5f5dc; /* Línea beige */
+    padding-bottom: clamp(8px, 1.5vw, 10px);
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+ul li {
+    background-color: #f9f9f9; /* Gris claro, similar a listas en consultas.html */
+    margin: clamp(8px, 1.5vw, 10px) 0;
+    padding: clamp(8px, 1.5vw, 10px);
+    border-radius: clamp(2px, 1vw, 4px);
+    border-left: clamp(3px, 1vw, 5px) solid #8b4513; /* Barra lateral marrón */
+}
+
+ul li a {
+    color: #8b4513;
+    text-decoration: none;
+    margin-left: clamp(8px, 1.5vw, 10px);
+}
+
+ul li a:hover {
+    text-decoration: underline;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    margin-top: clamp(8px, 1.5vw, 10px);
+    font-weight: bold;
+    color: #8b4513; /* Marrón para consistencia */
+}
+
+input {
+    padding: clamp(6px, 1.5vw, 8px);
+    margin-top: clamp(4px, 1vw, 5px);
+    border: 1px solid #ccc;
+    border-radius: clamp(2px, 1vw, 4px);
+    font-size: clamp(14px, 2vw, 1em);
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9; /* Gris claro */
+    color: #333;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+input:focus {
+    border-color: #8b4513; /* Marrón al enfocar */
+    outline: none;
+    background-color: white;
+}
+
+button {
+    margin-top: clamp(16px, 3vw, 20px);
+    padding: clamp(8px, 1.5vw, 10px);
+    background-color: #8b4513; /* Marrón */
+    color: white;
+    border: none;
+    border-radius: clamp(2px, 1vw, 4px);
+    cursor: pointer;
+    font-size: clamp(14px, 2vw, 1em);
+}
+
+button:hover {
+    background-color: #a0522d; /* Marrón más oscuro */
+}
+
+footer {
+    text-align: center;
+    padding: clamp(16px, 3vw, 20px);
+    background-color: #f5f5dc; /* Beige */
+    color: #333;
+}
+
+footer a {
+    color: #8b4513;
+    text-decoration: none;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive, similar a otros CSS */
+@media (max-width: 600px) {
+    main {
+        margin: clamp(8px, 2vw, 10px);
+        padding: clamp(8px, 2vw, 10px);
+    }
+    header h1 {
+        font-size: clamp(20px, 4vw, 1.5em);
+    }
+}
+
+/* Responsivo adicional para rutas.html */
+@media (max-width: 768px) {
+    main {
+        margin: clamp(12px, 2vw, 15px);
+        padding: clamp(12px, 2vw, 15px);
+    }
+    ul li {
+        padding: clamp(10px, 1.5vw, 12px);
+    }
+}
+
+@media (max-width: 480px) {
+    header h1 {
+        font-size: clamp(20px, 4vw, 1.5em);
+    }
+    h2 {
+        font-size: clamp(18px, 3vw, 1.2em);
+    }
+    label, input, button {
+        font-size: clamp(12px, 1.5vw, 0.9em);
+    }
+    input {
+        width: 100%;
+        margin-bottom: clamp(8px, 1.5vw, 10px);
+    }
+    button {
+        width: 100%;
+    }
+    ul li {
+        font-size: clamp(12px, 1.5vw, 0.9em);
+        padding: clamp(8px, 1.5vw, 10px);
+    }
+}

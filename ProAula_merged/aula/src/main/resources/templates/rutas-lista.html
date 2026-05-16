@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Lista de Rutas - Bustraker">
+    <meta name="theme-color" content="#01315f">
+    <title>Rutas Disponibles - Bustraker</title>
+    <link rel="stylesheet" th:href="@{/css/style_rutas.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="shortcut icon" th:href="@{/images/Bus_icono.png}" type="image/x-icon">
+</head>
+<body>
+        <!-- Header -->
+    <header class="main-header">
+        <div class="header-inner">
+            <div class="logo">
+                <img th:src="@{/images/Bus_icono.png}" alt="Logo Bustraker">
+                <span class="brand">Bustraker</span>
+            </div>
+            <nav class="main-nav">
+                <a th:href="@{/dashboard}" class="nav-link">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+                <a th:href="@{/perfil}" class="nav-link">
+                    <i class="fas fa-user"></i> Perfil
+                </a>
+                <a th:href="@{/rutas}" class="nav-link">
+                    <i class="fas fa-route"></i> Rutas
+                </a>
+                <a th:href="@{/historial}" class="nav-link">
+                    <i class="fas fa-history"></i> Historial
+                </a>
+                <a th:href="@{/viajar}" class="nav-link">
+                    <i class="fas fa-bus"></i> Viajar
+                </a>
+                <a th:href="@{/logout}" class="nav-link nav-link--outline">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="container">
+        <!-- Título y Filtros -->
+        <section class="section">
+            <div class="d-flex justify-between align-center mb-3" style="flex-wrap: wrap; gap: 1rem;">
+                <div>
+                    <h1 style="margin-bottom: 0.5rem;">
+                        <i class="fas fa-route"></i> Rutas Disponibles
+                    </h1>
+                    <p style="color: var(--gray-600);" th:text="'Total: ' + ${#lists.size(rutas)} + ' rutas'">
+                        Total: 0 rutas
+                    </p>
+                </div>
+                <div class="d-flex gap-2" style="flex-wrap: wrap;">
+                    <button class="btn btn-outline" onclick="toggleVista()">
+                        <i class="fas fa-th-large"></i> Cambiar Vista
+                    </button>
+                    <a th:href="@{/consultas}" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Buscar Ruta
+                    </a>
+                </div>
+            </div>
+
+            <!-- Filtros -->
+            <div class="card mb-3">
+                <div class="card-body">
+                    <form th:action="@{/rutas}" method="get" class="d-flex gap-2" style="flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 200px;">
+                            <input type="text" 
+                                   name="buscar" 
+                                   class="form-control" 
+                                   placeholder="Buscar por nombre de ruta..."
+                                   th:value="${buscar}">
+                        </div>
+                        <div style="flex: 1; min-width: 200px;">
+                            <select name="barrio" class="form-control">
+                                <option value="">Todos los barrios</option>
+                                <option th:each="barrio : ${barriosDisponibles}" 
+                                        th:value="${barrio}"
+                                        th:text="${barrio}"
+                                        th:selected="${barrioSeleccionado == barrio}">
+                                    Barrio
+                                </option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-filter"></i> Filtrar
+                        </button>
+                        <a th:href="@{/rutas}" class="btn btn-secondary">
+                            <i class="fas fa-undo"></i> Limpiar
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Lista de Rutas -->
+        <section class="section">
+            <div th:if="${not #lists.isEmpty(rutas)}" class="ruta-grid" id="rutasGrid">
+                <!-- Ruta Card -->
+                <div class="ruta-card" th:each="ruta : ${rutas}">
+                    <div class="ruta-card-header">
+                        <h3 th:text="${ruta.nombre}">Ruta Centro</h3>
+                    </div>
+                    <div class="ruta-card-body">
+                        <div class="ruta-info">
+                            <div class="ruta-info-item">
+                                <i class="fas fa-clock"></i>
+                                <span th:text="${ruta.horaAproximada} ?: 'Sin horario'">08:00 AM</span>
+                            </div>
+                            <div class="ruta-info-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span th:if="${not #lists.isEmpty(ruta.barrios)}" 
+                                      th:text="${#strings.listJoin(ruta.barrios, ', ')}">
+                                    Barrio 1, Barrio 2
+                                </span>
+                                <span th:if="${#lists.isEmpty(ruta.barrios)}" style="color: var(--gray-400);">
+                                    Sin barrios asignados
+                                </span>
+                            </div>
+                            <div class="ruta-info-item">
+                                <i class="fas fa-bus"></i>
+                                <span th:text="${#lists.size(ruta.buses)} + ' buses'">3 buses</span>
+                            </div>
+                            <div class="ruta-info-item">
+                                <i class="fas fa-map-pin"></i>
+                                <span th:text="${#lists.size(ruta.paradas)} + ' paradas'">5 paradas</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ruta-card-footer">
+                        <a th:href="@{/ruta/{id}(id=${ruta.id})}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-eye"></i> Ver Detalle
+                        </a>
+                        <span class="badge badge-success">Activa</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mensaje si no hay rutas -->
+            <div th:if="${#lists.isEmpty(rutas)}" class="card">
+                <div class="card-body text-center" style="padding: 3rem;">
+                    <i class="fas fa-route" style="font-size: 4rem; color: var(--gray-300); margin-bottom: 1rem;"></i>
+                    <h3 style="color: var(--gray-600); margin-bottom: 0.5rem;">No hay rutas disponibles</h3>
+                    <p style="color: var(--gray-500); margin-bottom: 1.5rem;">
+                        No se encontraron rutas que coincidan con tu búsqueda.
+                    </p>
+                    <a th:href="@{/rutas}" class="btn btn-primary">
+                        <i class="fas fa-undo"></i> Ver todas las rutas
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Información Adicional -->
+        <section class="section">
+            <div class="card">
+                <div class="card-header">
+                    <h3><i class="fas fa-info-circle"></i> ¿Cómo usar las rutas?</h3>
+                </div>
+                <div class="card-body">
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <div style="display: flex; align-items: flex-start; gap: 1rem;">
+                            <div style="background: var(--primary); color: var(--white); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: 700;">1</div>
+                            <div>
+                                <h4 style="margin-bottom: 0.25rem;">Explora las rutas</h4>
+                                <p style="color: var(--gray-600); font-size: 0.95rem;">Revisa todas las rutas disponibles y encuentra la que mejor se adapte a tus necesidades.</p>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: flex-start; gap: 1rem;">
+                            <div style="background: var(--primary); color: var(--white); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: 700;">2</div>
+                            <div>
+                                <h4 style="margin-bottom: 0.25rem;">Ver detalles</h4>
+                                <p style="color: var(--gray-600); font-size: 0.95rem;">Haz clic en 'Ver Detalle' para conocer más información sobre la ruta, paradas y buses.</p>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: flex-start; gap: 1rem;">
+                            <div style="background: var(--primary); color: var(--white); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: 700;">3</div>
+                            <div>
+                                <h4 style="margin-bottom: 0.25rem;">Consulta los detalles</h4>
+                                <p style="color: var(--gray-600); font-size: 0.95rem;">Desde el detalle de la ruta podrás consultar horarios, paradas y buses disponibles.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer style="background: var(--gray-800); color: var(--white); padding: 2rem; margin-top: 3rem;">
+        <div class="container text-center">
+            <div class="mb-3">
+                <img th:src="@{/images/Bus_icono.png}" alt="Logo Bustraker" style="width: 48px; height: 48px; margin: 0 auto 1rem; border-radius: var(--radius-md);">
+                <h3 style="color: var(--white); margin-bottom: 0.5rem;">Bustraker</h3>
+                <p style="opacity: 0.8;">Tu herramienta de gestión de rutas universitarias</p>
+            </div>
+            <p style="opacity: 0.6; font-size: 0.875rem;">
+                &copy; 2026 Bustraker. Todos los derechos reservados.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Toggle entre vista de grid y lista
+        let vistaGrid = true;
+        function toggleVista() {
+            const grid = document.getElementById('rutasGrid');
+            if (grid) {
+                vistaGrid = !vistaGrid;
+                if (vistaGrid) {
+                    grid.style.display = 'grid';
+                } else {
+                    grid.style.display = 'flex';
+                    grid.style.flexDirection = 'column';
+                }
+            }
+        }
+
+        // Animación de entrada para las cards
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.ruta-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.4s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>

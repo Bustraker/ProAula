@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="theme-color" content="#01315f">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="description" content="Página que muestra la lista de buses disponibles y sus rutas." />
+    <title>Lista de Buses - Bustraker</title>
+</head>
+<body>
+    <h1>Lista de Buses</h1>
+    <ul id="base" role="list">
+        <li th:each="bus : ${buses}" role="listitem" tabindex="0">
+            <div class="bus-head">
+                <span class="bus-short">Bus <span th:text="${bus.id}"></span></span>
+                <span class="bus-title" th:text="${bus.ruta.nombre}"></span>
+                <span class="symbol">🚌</span>
+            </div>
+            <ul class="barrios" aria-hidden="true" th:if="${bus.ruta}">
+                <li th:each="barrio : ${bus.ruta.barrios}" th:text="${barrio}"></li>
+            </ul>
+        </li>
+    </ul>
+    <a th:href="@{/index_2}" class="back">Volver al inicio</a>
+    <script>
+    // accesibilidad: mostrar barrios con teclado (Enter / Space)
+    document.querySelectorAll('#base > li').forEach(li => {
+        li.addEventListener('keydown', e => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                li.classList.toggle('open');
+                e.preventDefault();
+            }
+        });
+        li.addEventListener('click', () => li.classList.toggle('open'));
+    });
+    </script>
+</body>
+</html>

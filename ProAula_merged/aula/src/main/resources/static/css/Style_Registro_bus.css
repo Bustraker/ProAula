@@ -1,0 +1,93 @@
+:root {
+    --fondo: #000000;
+    --superficie: #ffffff;
+    --primario: #B00020; /* Rojo más intenso */
+    --primario-oscuro: #380101;
+    --atenuado: #ffffff;
+    --acento: #ffd600; /* Amarillo */
+    --sombra: rgba(0,0,0,0.3);
+    --peligro: #c0392b;
+    --radio: 12px;
+    --ancho-max: 1100px;
+    font-family: "Inter", Arial, sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, var(--primario) 0%, var(--fondo) 100%);
+    color: var(--atenuado);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+}
+
+header {
+    background-color: var(--fondo);
+    padding: 20px;
+    text-align: center;
+    width: 100%;
+    border-bottom: 4px solid var(--acento); /* ✅ Línea amarilla */
+}
+
+header h1 {
+    font-size: 2.5em;
+    color: var(--primario);
+}
+
+main {
+    background: var(--superficie);
+    color: #000000;
+    border-radius: var(--radio);
+    box-shadow: 0 4px 12px var(--sombra);
+    padding: 20px;
+    max-width: 800px;
+    width: 90%;
+    margin: 20px auto;
+    text-align: center;
+    border: 4px solid var(--acento); /* ✅ Línea amarilla */
+}
+
+form label {
+    color: #000000;
+    font-weight: bold;
+}
+
+form input, form select {
+    background-color: var(--superficie);
+    color: #000000;
+    border: 2px solid var(--fondo);
+    border-radius: var(--radio);
+    padding: 10px;
+    margin-bottom: 15px;
+}
+
+form button {
+    background: linear-gradient(45deg, var(--primario), var(--fondo));
+    color: var(--atenuado);
+    border: none;
+    border-radius: var(--radio);
+    padding: 12px;
+    font-size: 1.2em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+form button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Footer centrado con línea amarilla */
+footer#pie {
+    background-color: var(--fondo);
+    color: var(--atenuado);
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: 15px;
+    width: 100%;
+    border-top: 4px solid var(--acento); /* ✅ Línea amarilla */
+}

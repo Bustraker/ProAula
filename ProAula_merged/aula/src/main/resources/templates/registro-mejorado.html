@@ -1,0 +1,363 @@
++
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Registro de Usuario - Bustraker">
+    <meta name="theme-color" content="#01315f">
+    <title>Registrarse - Bustraker</title>
+    <link rel="stylesheet" th:href="@{/css/style_registro.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="shortcut icon" th:href="@{/images/Bus_icono.png}" type="image/x-icon">
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-inner">
+            <div class="logo">
+                <img th:src="@{/images/Bus_icono.png}" alt="Logo Bustraker">
+                <span class="brand">Bustraker</span>
+            </div>
+            <nav class="main-nav">
+                <a th:href="@{/}" class="nav-link">
+                    <i class="fas fa-home"></i> Inicio
+                </a>
+                <a th:href="@{/inicio_de_sesion}" class="nav-link nav-link--outline">
+                    <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="hero-section" style="min-height: auto; padding: 1rem 0;">
+        <div class="container container-sm">
+            <div class="card_animate-slideUp">
+                <div class="card-header">
+                    <h3><i class="fas fa-user-plus"></i> Crear Cuenta Nueva</h3>
+                </div>
+                <div class="card-body">
+                    <!-- Mensajes de error -->
+                    <div th:if="${error}" class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span th:text="${error}">Error en el registro</span>
+                    </div>
+
+                    <form th:action="@{/registro}" method="post" id="registroForm">
+                        <!-- Nombres y Apellidos -->
+                        <div class="d-flex gap-2" style="flex-wrap: wrap;">
+                            <div class="form-group" style="flex: 1; min-width: 200px;">
+                                <label class="form-label" for="nombres">
+                                    <i class="fas fa-user"></i> Nombres *
+                                </label>
+                                <input type="text" 
+                                        id="nombres" 
+                                        name="nombres"
+                                        class="form-control" 
+                                        placeholder="Tus nombres"
+                                        required
+                                        autofocus>
+                            </div>
+                            
+                            <div class="form-group" style="flex: 1; min-width: 200px;">
+                                <label class="form-label" for="apellidos">
+                                    <i class="fas fa-user"></i> Apellidos *
+                                </label>
+                                <input type="text" 
+                                        id="apellidos" 
+                                        name="apellidos"
+                                        class="form-control" 
+                                        placeholder="Tus apellidos"
+                                        required>
+                            </div>
+                        </div>
+
+                        <!-- Username -->
+                        <div class="form-group">
+                            <label class="form-label" for="username">
+                                <i class="fas fa-at"></i> Nombre de Usuario *
+                            </label>
+                            <input type="text" 
+                                    id="username" 
+                                    name="username"
+                                    class="form-control" 
+                                    placeholder="Elige un nombre de usuario (4-20 caracteres)"
+                                    minlength="4"
+                                    maxlength="20"
+                                    required>
+                            <small class="form-text">
+                                <i class="fas fa-info-circle"></i> Entre 4 y 20 caracteres
+                            </small>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="form-group">
+                            <label class="form-label" for="email">
+                                <i class="fas fa-envelope"></i> Correo Electrónico *
+                            </label>
+                            <input type="email" 
+                                    id="email" 
+                                    name="email"
+                                    class="form-control" 
+                                    placeholder="tu@email.com"
+                                    required>
+                            <small class="form-text">
+                                <i class="fas fa-shield-alt"></i> Usaremos este email para notificaciones importantes
+                            </small>
+                        </div>
+
+                        <!-- Contraseña -->
+                        <div class="form-group">
+                            <label class="form-label" for="password">
+                                <i class="fas fa-lock"></i> Contraseña *
+                            </label>
+                            <input type="password" 
+                                    id="password" 
+                                    name="password"
+                                    class="form-control" 
+                                    placeholder="Mínimo 6 caracteres"
+                                    minlength="6"
+                                    required>
+                            <small class="form-text">
+                                <i class="fas fa-shield-alt"></i> Mínimo 6 caracteres. ¡Elige una contraseña segura!
+                            </small>
+                        </div>
+
+                        <!-- Confirmar Contraseña -->
+                        <div class="form-group">
+                            <label class="form-label" for="passwordConfirm">
+                                <i class="fas fa-lock"></i> Confirmar Contraseña *
+                            </label>
+                            <input type="password" 
+                                    id="passwordConfirm" 
+                                    name="passwordConfirm"
+                                    class="form-control" 
+                                    placeholder ="Repite tu contraseña"
+                                    required>
+                                    <small class="form-text">
+                                        <i class="fas fa-shield-alt"></i> Asegúrate de que ambas contraseñas coincidan
+                                    </small>
+                                </div>
+
+                        <!-- Rol de Usuario -->
+                        <div class="form-group">
+                            <label class="form-label" for="role">
+                                <i class="fas fa-user-tag"></i> Tipo de Cuenta *
+                            </label>
+                            <select id="role" 
+                                    name="role"
+                                    class="form-control" 
+                                    required
+                                    onchange="toggleAdminCode()">
+                                <option value="USER">Usuario Regular</option>
+                                <option value="ADMIN">Administrador</option>
+                            </select>
+                            <small class="form-text">
+                                <i class="fas fa-info-circle"></i> Selecciona el tipo de cuenta que deseas crear
+                            </small>
+                        </div>
+
+                        <!-- Código de Administrador (solo visible si selecciona ADMIN) -->
+                        <div class="form-group" id="adminCodeGroup" style="display: none;">
+                            <label class="form-label" for="adminCode">
+                                <i class="fas fa-key"></i> Código de Administrador *
+                            </label>
+                            <input type="text" 
+                                    id="adminCode" 
+                                    name="adminCode"
+                                    class="form-control" 
+                                    placeholder="Ingresa el código de administrador"
+                                    maxlength="20">
+                            <small class="form-text">
+                                <i class="fas fa-shield-alt"></i> Requerido para crear cuenta de administrador
+                            </small>
+                        </div>
+
+                        <!-- Términos y Condiciones -->
+                        <div class="form-group">
+                            <div class="form-check">
+                                <input type="checkbox" 
+                                        id="terminos" 
+                                        name="terminos"
+                                        class="form-check-input"
+                                        required>
+                                <label class="form-check-label" for="terminos">
+                                    Acepto los 
+                                    <a th:href="@{/terminos}" target="_blank" style="text-decoration: underline;">Términos y Condiciones</a>
+                                    y la 
+                                    <a th:href="@{/privacidad}" target="_blank" style="text-decoration: underline;">Política de Privacidad</a>
+                                    *
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Botón de Registro -->
+                        <button type="submit" class="btn btn-primary btn-block btn-lg">
+                            <i class="fas fa-user-plus"></i> Crear mi Cuenta
+                        </button>
+
+                        <!-- Ya tiene cuenta -->
+                        <div class="text-center mt-3">
+                            <p style="color: var(--gray-600);">
+                                ¿Ya tienes una cuenta? 
+                                <a th:href="@{/inicio_de_sesion}" style="font-weight: 600;">
+                                    Inicia sesión aquí
+                                </a>
+                            </p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Beneficios -->
+            <div class="card_beneficios">
+                <div class="card-body">
+                    <h4 style="text-align: center; margin-bottom: 1.5rem; color: var(--primary);">
+                        <i class="fas fa-gift"></i> Beneficios de Registrarte
+                    </h4>
+                    <div class="d-flex gap-3" style="flex-wrap: wrap; justify-content: center;">
+                        <div style="flex: 1; min-width: 200px; text-align: center;">
+                            <i class="fas fa-route" style="font-size: 2rem; color: var(--primary); margin-bottom: 0.5rem;"></i>
+                            <p style="font-weight: 600; color: var(--gray-700);">Consultar Rutas</p>
+                            <p style="font-size: 0.875rem; color: var(--gray-500);">Acceso a todas las rutas disponibles</p>
+                        </div>
+                        <div style="flex: 1; min-width: 200px; text-align: center;">
+                            <i class="fas fa-history" style="font-size: 2rem; color: var(--success); margin-bottom: 0.5rem;"></i>
+                            <p style="font-weight: 600; color: var(--gray-700);">Historial</p>
+                            <p style="font-size: 0.875rem; color: var(--gray-500);">Revisa tus viajes anteriores</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer style="background: var(--gray-800); color: var(--white); padding: 2rem; margin-top: 1rem;">
+        <div class="container text-center">
+            <div class="mb-3">
+                <img th:src="@{/images/Bus_icono.png}" alt="Logo Bustraker" style="width: 48px; height: 48px; margin: 0 auto 1rem; border-radius: var(--radius-md);">
+                <h3 style="color: var(--white); margin-bottom: 0.5rem;">Bustraker</h3>
+                <p style="opacity: 0.8;">Tu herramienta de gestión de rutas universitarias</p>
+            </div>
+            <p style="opacity: 0.6; font-size: 0.875rem;">
+                &copy; 2026 Bustraker. Todos los derechos reservados.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Función para mostrar/ocultar campo de código admin
+        function toggleAdminCode() {
+            const roleSelect = document.getElementById('role');
+            const adminCodeGroup = document.getElementById('adminCodeGroup');
+            const adminCodeInput = document.getElementById('adminCode');
+            
+            if (roleSelect.value === 'ADMIN') {
+                adminCodeGroup.style.display = 'block';
+                adminCodeInput.required = true;
+                adminCodeInput.focus();
+            } else {
+                adminCodeGroup.style.display = 'none';
+                adminCodeInput.required = false;
+                adminCodeInput.value = '';
+            }
+        }
+
+        // Validación del formulario
+        document.getElementById('registroForm').addEventListener('submit', function(e) {
+            const password = document.getElementById('password').value;
+            const passwordConfirm = document.getElementById('passwordConfirm').value;
+            const terminos = document.getElementById('terminos').checked;
+            const role = document.getElementById('role').value;
+            const adminCode = document.getElementById('adminCode').value;
+            
+            // Validar contraseñas
+            if (password !== passwordConfirm) {
+                e.preventDefault();
+                alert('❌ Las contraseñas no coinciden. Por favor, verifica e intenta de nuevo.');
+                document.getElementById('passwordConfirm').focus();
+                return false;
+            }
+            
+            // Validar longitud de contraseña
+            if (password.length < 6) {
+                e.preventDefault();
+                alert('❌ La contraseña debe tener al menos 6 caracteres.');
+                document.getElementById('password').focus();
+                return false;
+            }
+            
+            // Validar código admin si selecciona ADMIN
+            if (role === 'ADMIN' && adminCode.trim() === '') {
+                e.preventDefault();
+                alert('❌ Debes ingresar el código de administrador para crear una cuenta de administrador.');
+                document.getElementById('adminCode').focus();
+                return false;
+            }
+            
+            // Validar términos
+            if (!terminos) {
+                e.preventDefault();
+                alert('❌ Debes aceptar los Términos y Condiciones para continuar.');
+                document.getElementById('terminos').focus();
+                return false;
+            }
+            
+            // Mostrar mensaje de carga
+            const submitBtn = this.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creando cuenta...';
+        });
+
+        // Validación en tiempo real del username
+        document.getElementById('username').addEventListener('input', function() {
+            const username = this.value;
+            const minLength = 4;
+            const maxLength = 20;
+            
+            if (username.length > 0 && (username.length < minLength || username.length > maxLength)) {
+                this.style.borderColor = 'var(--danger)';
+            } else {
+                this.style.borderColor = 'var(--gray-200)';
+            }
+        });
+
+        // Animación de entrada
+        document.addEventListener('DOMContentLoaded', function() {
+            const card = document.querySelector('.card');
+            if (card) {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.4s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 100);
+            }
+        });
+
+        // Validación visual de campos
+        const inputs = document.querySelectorAll('input');
+
+        inputs.forEach(input => {
+        input.addEventListener('input', () => {
+            const label = input.closest('.form-group').querySelector('.form-label');
+            const icon = label.querySelector('i');
+            if (input.checkValidity()) {
+                label.style.color = 'var(--success)';
+                if (icon) {
+                    icon.style.color = 'var(--success)';
+                }
+            } else {
+                label.style.color = 'var(--gray-700)';
+                if (icon) {
+                    icon.style.color = 'var(--gray-700)';
+                }
+            }
+        });
+        });
+    </script>
+</body>
+</html>

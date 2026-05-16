@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Política de Privacidad - Bustraker</title>
+    <link rel="stylesheet" th:href="@{/css/style_responsive.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <main class="hero-section">
+        <div class="main-header">
+            <div class="header-inner">
+                <div class="logo">
+                    <img th:src="@{/images/Bus_icono.png}" alt="Logo Bustraker">
+                    <span class="brand">Bustraker</span>
+                </div>
+                <nav class="main-nav">
+                    <a th:href="@{/inicio_de_sesion.html}" class="nav-link">Iniciar sesión</a>
+                    <a th:href="@{/rejistro_de_persona.html}" class="nav-link nav-link--outline">Registrarse</a>
+                </nav>
+            </div>
+
+            <div class="auth-section">
+                <div class="auth-item">
+                    <div style="width: 100%;">
+                        <h2><i class="fas fa-shield-alt"></i> Política de Privacidad</h2>
+                        
+                        <div class="card">
+                            <div class="card-body">
+                                <h3>1. Información que Recopilamos</h3>
+                                <p>Recopilamos información personal que usted nos proporciona directamente al registrarse 
+                                    en nuestra plataforma, como nombre, apellido, dirección de correo electrónico y 
+                                    nombre de usuario. También recopilamos información sobre su uso del servicio.</p>
+                                
+                                <h3>2. Cómo Usamos Su Información</h3>
+                                <p>Utilizamos la información recopilada para:</p>
+                                <ul>
+                                    <li>Proporcionar y mejorar nuestros servicios</li>
+                                    <li>Personalizar su experiencia de usuario</li>
+                                    <li>Comunicarnos con usted sobre actualizaciones y servicios</li>
+                                    <li>Gestionar su experiencia de consulta de rutas y uso de la plataforma</li>
+                                    <li>Mantener la seguridad de nuestros servicios</li>
+                                </ul>
+                                
+                                <h3>3. Cómo Compartimos Su Información</h3>
+                                <p>No vendemos, comercializamos ni alquilamos su información personal a terceros. 
+                                   Podemos compartir su información con proveedores de servicios que nos ayudan 
+                                   a operar nuestra plataforma, siempre bajo acuerdos de confidencialidad.</p>
+                                
+                                <h3>4. Seguridad de la Información</h3>
+                                <p>Implementamos medidas de seguridad adecuadas para proteger su información 
+                                   personal contra accesos no autorizados, alteración, divulgación o destrucción.</p>
+                                
+                                <h3>5. Derechos del Usuario</h3>
+                                <p>Usted tiene derecho a:</p>
+                                <ul>
+                                    <li>Acceder a sus datos personales</li>
+                                    <li>Solicitar la corrección de datos inexactos</li>
+                                    <li>Solicitar la eliminación de sus datos personales</li>
+                                    <li>Revocar su consentimiento para el tratamiento de datos</li>
+                                </ul>
+                                
+                                <h3>6. Conservación de Datos</h3>
+                                <p>Mantenemos su información personal durante el tiempo necesario para 
+                                   proporcionar nuestros servicios y cumplir con nuestras obligaciones legales.</p>
+                                
+                                <h3>7. Cambios a Esta Política</h3>
+                                <p>Podemos actualizar esta política de privacidad periódicamente. 
+                                   Los cambios entrarán en vigencia cuando se publique la nueva versión.</p>
+                                
+                                <h3>8. Contacto</h3>
+                                <p>Si tiene preguntas sobre esta política de privacidad, contáctenos a través de 
+                                   nuestro formulario de contacto o al correo electrónico: privacidad@bustraker.edu.co</p>
+                                
+                                <div class="text-center" style="margin-top: 2rem;">
+                                    <a th:href="@{/inicio_de_sesion.html}" class="btn btn-primary">
+                                        <i class="fas fa-arrow-left"></i> Volver al Inicio
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

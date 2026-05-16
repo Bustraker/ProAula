@@ -1,0 +1,272 @@
+* { box-sizing: border-box; }
+
+html, body { height: 100%; }
+
+body{
+    background-color: #000000;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    color: #ffffff;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+main {
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: clamp(12px, 4vw, 25px);
+    box-sizing: border-box;
+}
+
+article {
+    width: 100%;
+    max-width: 600px;
+    box-sizing: border-box;
+}
+
+img, video {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+form, header, footer {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: clamp(0.8rem, 2vw, 1.5rem);
+    box-sizing: border-box;
+}
+
+@media (max-width: 700px) {
+    form, header, footer {
+        max-width: 95%;
+        padding: clamp(0.75rem, 2vw, 1.2rem);
+        margin: clamp(15px, 3vw, 25px) auto;
+    }
+    h1 {
+        font-size: clamp(1.1rem, 3vw, 1.5rem);
+    }
+    input[type="text"],
+    input[type="password"] {
+        font-size: clamp(14px, 2vw, 16px);
+    }
+}
+
+@media (max-width: 480px) {
+    form, header, footer {
+        max-width: 100%;
+        padding: clamp(0.75rem, 2vw, 1rem);
+        margin: clamp(8px, 2vw, 15px) auto;
+        border-radius: clamp(3px, 1vw, 6px);
+    }
+    h1 {
+        font-size: clamp(0.9rem, 2.5vw, 1.2rem);
+        padding: clamp(6px, 1.5vw, 10px);
+        margin-bottom: clamp(12px, 2vw, 18px);
+    }
+    label {
+        font-size: clamp(0.85rem, 2vw, 1rem);
+    }
+    input[type="text"],
+    input[type="password"] {
+        padding: clamp(6px, 1.5vw, 10px);
+        margin-bottom: clamp(10px, 2vw, 15px);
+        font-size: clamp(14px, 2vw, 16px);
+    }
+    button {
+        padding: clamp(8px, 1.5vw, 12px);
+        font-size: clamp(0.85rem, 2vw, 1rem);
+    }
+    p {
+        font-size: clamp(0.8rem, 2vw, 0.95rem);
+    }
+}
+
+form {
+    background-color: #000000;
+    color: #ffffff;
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.46) ;
+    height: auto;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+body > *{
+    box-sizing: border-box;
+}
+
+h1 {
+    text-align: center;
+    color: inherit;
+    margin-bottom: clamp(15px, 3vw, 25px);
+    padding: clamp(8px, 1.5vw, 12px);
+    font-weight: normal;
+    font-size: clamp(1.3rem, 4vw, 1.8em);
+    text-transform: uppercase;
+    letter-spacing: clamp(0.5px, 0.2vw, 1.2px);
+    background-color: #111;
+    border-radius: clamp(3px, 1vw, 6px);
+    box-shadow: 0 0 5px rgba(246, 244, 244, 0.203);
+    font-weight: bold;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+label {
+    display: block;
+    margin-bottom: clamp(6px, 1.5vw, 10px);
+    color: inherit;
+}
+
+input[type="text"],
+input[type="password"] {
+    width: 100%;
+    padding: clamp(8px, 1.5vw, 12px);
+    margin-bottom: clamp(12px, 2vw, 18px);
+    border: 1px solid #cccccc;
+    border-radius: clamp(3px, 0.5vw, 6px);
+    box-sizing: border-box;
+    background-color: #ffffffcb;
+    font-weight: bolder;
+    font-size: clamp(14px, 2vw, 16px);
+}
+
+button {
+    width: 100%;
+    padding: clamp(8px, 1.5vw, 12px);
+    margin-top: clamp(3px, 1vw, 8px);
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: clamp(3px, 0.5vw, 6px);
+    cursor: pointer;
+    font-size: clamp(0.9rem, 2vw, 1rem);
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+p {
+    text-align: center;
+    color: #777777;
+}
+p a {
+    color: #007BFF;
+    text-decoration: none;
+}
+
+p a:hover {
+    text-decoration: underline;
+}
+#logo {
+    display: block;
+    margin: 0 auto 20px auto;
+}
+#ingreso {
+    text-align: center;
+    margin-top: 20px;
+}
+
+#ingreso a {
+    margin: 0 10px;
+    color: #007BFF;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+#ingreso a:hover {
+    text-decoration: underline;
+}
+
+#ingreso span {
+    color: #555;
+}
+
+
+/* Estilos adicionales para el formulario de inicio de sesión */
+#login-form {
+    background-color: #222;
+    padding: 30px;
+    border-radius: 10px;
+}
+
+#login-form h1 {
+    margin-bottom: 20px;
+    color: #fff;
+}
+
+#login-form label {
+    font-weight: bold;
+}
+
+#login-form input[type="text"],
+#login-form input[type="password"] {
+    background-color: #333;
+    border: 1px solid #555;
+    color: #fff;
+}
+
+#login-form input[type="text"]::placeholder,
+#login-form input[type="password"]::placeholder {
+    color: #bbb;
+}
+
+#login-form button {
+    background-color: #28a745;
+}   
+
+#login-form button:hover {
+    background-color: #218838;
+}
+
+#login-form p {
+    margin-top: 15px;
+    color: #bbb;
+}
+
+#login-form p a {
+    color: #17a2b8;
+}
+
+#login-form p a:hover {
+    color: #138496;
+}
+
+@media (max-width: 768px) {
+    main {
+        padding: 20px;
+    }
+    article {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.5em;
+    }
+    form {
+        padding: 15px;
+    }
+    label, input, button {
+        font-size: 0.9em;
+    }
+    input {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    button {
+        width: 100%;
+    }
+}

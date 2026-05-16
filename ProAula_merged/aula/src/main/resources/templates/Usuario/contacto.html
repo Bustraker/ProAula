@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contacto - Bustraker</title>
+    <link rel="stylesheet" th:href="@{/css/style_responsive.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-bus"></i> Bustraker Usuario</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a th:href="@{/index_3}"><i class="fas fa-home"></i> Inicio</a>
+                <a th:href="@{/viajar}"><i class="fas fa-route"></i> Viajar</a>
+                <a th:href="@{/consultas}"><i class="fas fa-search"></i> Consultas</a>
+                <a th:href="@{/historial}"><i class="fas fa-history"></i> Historial</a>
+                <a th:href="@{/perfil}"><i class="fas fa-user"></i> Perfil</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-header">
+                <h1><i class="fas fa-envelope"></i> Contacto</h1>
+                <div class="header-actions">
+                    <span th:text="${usuario?.nombres + ' ' + usuario?.apellidos}" class="username"></span>
+                    <a th:href="@{/logout}" class="btn btn-secondary"><i class="fas fa-sign-out-alt"></i> Salir</a>
+                </div>
+            </header>
+
+            <div class="content-wrapper">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-paper-plane"></i> Envíanos tu mensaje</h3>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${mensaje}" class="alert alert-success" th:text="${mensaje}"></div>
+                        
+                        <form th:action="@{/contacto_usuario}" method="post" th:object="${contactoMensaje}" class="row">
+                            <div class="form-row">
+                                <div class="form-col form-col-6">
+                                    <div class="form-group">
+                                        <label for="nombre" class="form-label">
+                                            <i class="fas fa-user"></i> Nombres:
+                                        </label>
+                                        <input type="text" id="nombre" th:field="*{nombre}" class="form-control" 
+                                               placeholder="Ingresa tus nombres" required>
+                                        <div th:if="${#fields.hasErrors('nombre')}" class="error-message" 
+                                             th:errors="*{nombre}"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-col form-col-6">
+                                    <div class="form-group">
+                                        <label for="apellido" class="form-label">
+                                            <i class="fas fa-user-tag"></i> Apellidos:
+                                        </label>
+                                        <input type="text" th:field="*{apellido}" class="form-control" 
+                                               placeholder="Ingresa tus apellidos" required>
+                                        <div th:if="${#fields.hasErrors('apellido')}" class="error-message" 
+                                             th:errors="*{apellido}"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-col form-col-6">
+                                    <div class="form-group">
+                                        <label for="telefono" class="form-label">
+                                            <i class="fas fa-phone"></i> Teléfono:
+                                        </label>
+                                        <input type="tel" id="telefono" th:field="*{telefono}" class="form-control" 
+                                               placeholder="Número de contacto" required>
+                                        <div th:if="${#fields.hasErrors('telefono')}" class="error-message" 
+                                             th:errors="*{telefono}"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-col form-col-6">
+                                    <div class="form-group">
+                                        <label for="email" class="form-label">
+                                            <i class="fas fa-envelope"></i> Correo Electrónico:
+                                        </label>
+                                        <input type="email" th:field="*{email}" class="form-control" 
+                                               placeholder="tuemail@ejemplo.com" required>
+                                        <div th:if="${#fields.hasErrors('email')}" class="error-message" 
+                                             th:errors="*{email}"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="mensaje" class="form-label">
+                                    <i class="fas fa-comment-dots"></i> Mensaje:
+                                </label>
+                                <textarea id="mensaje" th:field="*{mensaje}" class="form-control" 
+                                          rows="5" placeholder="Escribe tu mensaje aquí..." required></textarea>
+                                <div th:if="${#fields.hasErrors('mensaje')}" class="error-message" 
+                                     th:errors="*{mensaje}"></div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane"></i> Enviar Mensaje
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-info-circle"></i> Información de Contacto</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-row">
+                            <div class="form-col form-col-6">
+                                <div class="info-item">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <strong>Dirección:</strong>
+                                    <p>Av. Universidad #123, Cartagena, Colombia</p>
+                                </div>
+                            </div>
+                            <div class="form-col form-col-6">
+                                <div class="info-item">
+                                    <i class="fas fa-phone"></i>
+                                    <strong>Teléfono:</strong>
+                                    <p>+57 (5) 123 4567</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-col form-col-6">
+                                <div class="info-item">
+                                    <i class="fas fa-envelope"></i>
+                                    <strong>Email:</strong>
+                                    <p>contacto@bustraker.edu.co</p>
+                                </div>
+                            </div>
+                            <div class="form-col form-col-6">
+                                <div class="info-item">
+                                    <i class="fas fa-clock"></i>
+                                    <strong>Horario:</strong>
+                                    <p>Lunes a Viernes: 6:00 AM - 10:00 PM</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

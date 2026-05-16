@@ -1,0 +1,92 @@
+/* Estilos para editar rutas */
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f4f6fb;
+    margin: 0;
+    padding: 0;
+}
+.container {
+    max-width: clamp(500px, 85vw, 600px);
+    margin: clamp(30px, 5vw, 40px) auto;
+    background: #fff;
+    border-radius: clamp(8px, 1.5vw, 10px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    padding: clamp(24px, 4vw, 32px) clamp(30px, 5vw, 40px);
+}
+h2 {
+    text-align: center;
+    color: #2d3e50;
+    margin-bottom: clamp(18px, 3vw, 24px);
+}
+.form-group {
+    margin-bottom: clamp(14px, 2.5vw, 18px);
+}
+label {
+    display: block;
+    margin-bottom: clamp(6px, 1.5vw, 8px);
+    color: #34495e;
+    font-weight: 500;
+}
+select, input[type="text"] {
+    width: 100%;
+    padding: clamp(8px, 1.5vw, 10px);
+    border: 1px solid #dbe2ef;
+    border-radius: clamp(4px, 1vw, 6px);
+    font-size: clamp(14px, 2vw, 16px);
+    background: #f7fafc;
+    margin-bottom: clamp(6px, 1.5vw, 8px);
+}
+.barrio-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 clamp(10px, 2vw, 12px) 0;
+}
+.barrio-list li {
+    display: flex;
+    align-items: center;
+    margin-bottom: clamp(6px, 1.5vw, 8px);
+}
+.barrio-list input {
+    flex: 1;
+    margin-right: clamp(6px, 1.5vw, 8px);
+}
+.barrio-list button {
+    background: #e74c3c;
+    color: #fff;
+    border: none;
+    border-radius: clamp(2px, 1vw, 4px);
+    padding: clamp(4px, 1vw, 6px) clamp(10px, 1.5vw, 12px);
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.barrio-list button:hover {
+    background: #c0392b;
+}
+.add-barrio-btn {
+    background: #2980b9;
+    color: #fff;
+    border: none;
+    border-radius: clamp(2px, 1vw, 4px);
+    padding: clamp(6px, 1.5vw, 8px) clamp(12px, 2vw, 16px);
+    cursor: pointer;
+    margin-bottom: clamp(12px, 2vw, 16px);
+    transition: background 0.2s;
+}
+.add-barrio-btn:hover {
+    background: #1c5a85;
+}
+.save-btn {
+    background: #27ae60;
+    color: #fff;
+    border: none;
+    border-radius: clamp(2px, 1vw, 4px);
+    padding: clamp(8px, 1.5vw, 10px) clamp(18px, 3vw, 24px);
+    font-size: clamp(14px, 2vw, 16px);
+    cursor: pointer;
+    width: 100%;
+    margin-top: clamp(14px, 2.5vw, 18px);
+    transition: background 0.2s;
+}
+.save-btn:hover {
+    background: #219150;
+}

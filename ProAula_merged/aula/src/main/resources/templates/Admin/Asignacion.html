@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="theme-color" content="#01315f">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Asignar Conductor a Ruta</title>
+    <link rel="stylesheet" th:href="@{/Css/style.css}" /> <!-- Usa tu estilo base -->
+</head>
+<body>
+<h1>Asignar Conductor a Ruta</h1>
+
+<form th:action="@{/asignaciones/guardar}" method="post" th:object="${asignacion}">
+    <label for="conductor">Conductor:</label>
+    <select id="conductor" th:field="*{conductor.id}" required>
+        <option value="" disabled selected>Selecciona un conductor</option>
+        <option th:each="cond : ${conductores}" th:value="${cond.id}" th:text="${cond.nombre} + ' ' + ${cond.apellido}"></option>
+    </select>
+
+    <label for="ruta">Ruta:</label>
+    <select id="ruta" th:field="*{ruta.id}" required>
+        <option value="" disabled selected>Selecciona una ruta</option>
+        <option th:each="ruta : ${rutas}" th:value="${ruta.id}" th:text="${ruta.origen} + ' - ' + ${ruta.destino}"></option>
+    </select>
+
+    <label for="fecha">Fecha de Asignación:</label>
+    <input type="date" id="fecha" th:field="*{fecha}" required />
+
+    <label for="hora">Hora de Asignación:</label>
+    <input type="time" id="hora" th:field="*{hora}" required />
+
+    <button type="submit">Guardar Asignación</button>
+</form>
+
+<p><a th:href="@{/asignaciones/listar}">Volver a la lista de asignaciones</a></p>
+</body>
+</html>

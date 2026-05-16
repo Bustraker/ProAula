@@ -1,0 +1,118 @@
+:root {
+--bg-1: #000000;
+--bg-2: #B00020;
+--card-bg: #FFFFFF;
+--glass: rgba(255,255,255,0.03);
+--accent: #B00020;
+--accent-2: #000000;
+--muted: #666666;
+--muted-2: #999999;
+--text: #000000;
+--card-border: rgba(0,0,0,0.1);
+--shadow: 0 4px 12px rgba(0, 0, 0, 0.7);
+--glass-blur: 10px;
+--radius: 10px;
+}
+
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Montserrat:wght@600&display=swap');
+
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+
+
+body {
+font-family: 'Arial', sans-serif;
+background: linear-gradient(135deg, #B00020 0%, #000000 100%);
+color: #FFFFFF;
+min-height: 100vh;
+display: flex;
+flex-direction: column;
+justify-content: space-between;
+margin: 0;
+padding: 0;
+-webkit-font-smoothing: antialiased;
+-moz-osx-font-smoothing: grayscale;
+}
+
+img, video {
+	max-width: 100%;
+	height: auto;
+	display: block;
+}
+
+main, header, footer {
+	width: 100%;
+	max-width: 800px;
+	margin: 0 auto;
+	padding: 1.2rem;
+	box-sizing: border-box;
+}
+
+@media (max-width: 900px) {
+	main, header, footer {
+		max-width: 98vw;
+		padding: 0.8rem;
+	}
+	header h1 {
+		font-size: 2em;
+	}
+}
+
+@media (max-width: 600px) {
+	html {
+		font-size: 15px;
+	}
+	main, header, footer {
+		padding: 0.5rem;
+		border-radius: 6px;
+	}
+	header h1 {
+		font-size: 1.3em;
+	}
+}
+
+@media (max-width: 400px) {
+	html {
+		font-size: 13px;
+	}
+	header h1 {
+		font-size: 1em;
+	}
+}
+}
+
+
+header {
+background-color: #000000;
+    padding: clamp(16px, 3vw, 20px);
+
+
+header h1 {
+font-size: clamp(24px, 5vw, 2.5em);
+color: #B00020;
+margin: 0;
+font-weight: 700;
+font-family: 'Montserrat', sans-serif;
+letter-spacing: 1px;
+text-shadow: 0 4px 12px #000000aa;
+}
+
+
+main {
+max-width: clamp(600px, 90vw, 800px);
+margin: clamp(16px, 3vw, 20px) auto;
+padding: clamp(16px, 3vw, 20px);
+background-color: #FFFFFF;
+color: #000000;
+border-radius: clamp(8px, 1.5vw, 10px);
+box-shadow: 0 4px 12px rgba(0, 0, 0, 0.7);
+flex-grow: 1;
+}
+
+
+ul {
+list-style: none;
+margin: 0;
+}

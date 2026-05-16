@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="description" content="Gestión de rutas - Bustraker">
+    <meta name="theme-color" content="#01315f">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Gestión de Rutas - Bustraker</title>
+    <link rel="stylesheet" th:href="@{/Css/style_agregar_rutas.css}">
+    <link rel="shortcut icon" th:href="@{/images/Bus_icono.png}" type="image/x-icon">
+</head>
+<body>
+    <header>
+        <h1>Gestión de Rutas</h1>
+        <p>Administra las rutas de buses en Cartagena.</p>
+    </header>
+    <main>
+        <section id="formulario-agregar-ruta" style="background:#fff;border-radius:10px;padding:24px;margin-top:32px;box-shadow:0 2px 8px rgba(255,0,0,0.08);max-width:500px;margin-left:auto;margin-right:auto;">
+            <h2 style="color:#c0392b;text-align:center;">Agregar Nueva Ruta</h2>
+            <form th:action="@{/rutas}" method="post" th:object="${newRuta}">
+                <label for="nombre" style="color:#c0392b;font-weight:600;">Nombre de la Ruta:</label>
+                <input type="text" id="nombre" th:field="*{nombre}" placeholder="Ej. Avenida Express" required style="width:100%;padding:10px;margin-bottom:12px;border:1px solid #c0392b;border-radius:6px;">
+                <span th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}" style="color: red;"></span>
+
+                <label for="barrios" style="color:#c0392b;font-weight:600;">Barrios (separados por coma):</label>
+                <input type="text" id="barrios" name="barrios" placeholder="Ej. Zaragoza, Yolanda" required style="width:100%;padding:10px;margin-bottom:12px;border:1px solid #c0392b;border-radius:6px;">
+                <span th:if="${#fields.hasErrors('barrios')}" th:errors="*{barrios}" style="color: red;"></span>
+
+                <label for="horaAproximada" style="color:#c0392b;font-weight:600;">Hora Aproximada:</label>
+                <input type="time" id="horaAproximada" th:field="*{horaAproximada}" style="width:100%;padding:10px;margin-bottom:12px;border:1px solid #c0392b;border-radius:6px;">
+                <span th:if="${#fields.hasErrors('horaAproximada')}" th:errors="*{horaAproximada}" style="color: red;"></span>
+
+                <!-- Si quieres asociar buses, puedes agregar aquí un campo extra -->
+                <!-- <label for="buses" style="color:#c0392b;font-weight:600;">Buses asociados (opcional):</label>
+                <input type="text" id="buses" name="buses" placeholder="Ej. ABC123, DEF456" style="width:100%;padding:10px;margin-bottom:12px;border:1px solid #c0392b;border-radius:6px;"> -->
+
+                <button type="submit" style="background:#c0392b;color:#fff;border:none;border-radius:6px;padding:12px 24px;font-size:16px;cursor:pointer;width:100%;margin-top:12px;">Agregar Ruta</button>
+            </form>
+        </section>
+
+        <section id="lista-rutas">
+            <h2>Rutas Existentes</h2>
+            <ul th:if="${rutas}" th:each="ruta : ${rutas}">
+                <li th:each="hora, iterStat : ${horasFormateadas}">
+                    <strong th:text="${ruta.nombre}"></strong> - Barrios: <span th:each="barrio : ${ruta.barrios}" th:text="${barrio} + ', '"></span>
+                    <span th:if="${hora != ''}">| Hora: <span th:text="${hora}"></span></span>
+                    <a th:href="@{/editar-ruta/{id}(id=${ruta.id})}">Editar</a> | 
+                    <form th:action="@{/eliminar-ruta/{id}(id=${ruta.id})}" method="post" style="display:inline; margin:0;">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        <button type="submit" style="background:none;border:none;color:#c0392b;text-decoration:underline;cursor:pointer;padding:0;font:inherit;" onclick="return confirm('¿Eliminar ruta?');">Eliminar</button>
+                    </form>
+                </li>
+            </ul>
+            <p th:if="${#lists.isEmpty(rutas)}">No hay rutas registradas.</p>
+        </section>
+    </main>
+    <footer>
+        <a th:href="@{/index_2}">Volver al Panel de Administración</a>
+    </footer>
+</body>
+</html>

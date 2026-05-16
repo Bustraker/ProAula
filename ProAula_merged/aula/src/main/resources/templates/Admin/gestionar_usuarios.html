@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="Gestionar usuarios - Bustraker Admin">
+    <meta name="theme-color" content="#01315f">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Gestionar Usuarios - Bustraker Admin</title>
+    <link rel="stylesheet" th:href="@{/css/style_3.css}">
+    <link rel="shortcut icon" th:href="@{/images/Bus_icono.png}" type="image/x-icon">
+</head>
+<body>
+    <header>
+        <img th:src="@{/images/Bus_palmera.png}" alt="Bus palmera" id="logo2">
+        <h1>Bustraker - Panel Admin</h1>
+        <h2>Gestionar Usuarios</h2>
+        <div id="ingreso">
+            <a id="Volver" th:href="@{/index_2}">Volver al Panel</a>
+        </div>
+    </header>
+    <nav style="position: relative;">
+        <ul>
+            <li><a th:href="@{/index_2}">Panel Admin</a></li>
+            <li><a th:href="@{/registro-buses}">Registrar Buses</a></li>
+            <li><a th:href="@{/actualizarbuses}">Actualizar Buses</a></li>
+            <li><a th:href="@{/eliminarbuses}">Eliminar Buses</a></li>
+            <li><a th:href="@{/gestionar-usuarios}">Gestionar Usuarios</a></li>
+        </ul>
+    </nav>
+    <main>
+        <h2>Gestión de Usuarios</h2>
+        <p>Aquí puedes ver, editar y eliminar cuentas de usuario en el sistema.</p>
+
+        <div th:if="${mensaje != null}" style="background:#e6ffe6;padding:10px;border:1px solid #b3ffb3;margin-bottom:10px;">
+            <strong th:text="${mensaje}">Mensaje</strong>
+        </div>
+
+        <form method="get" action="/gestionar-usuarios" style="margin-bottom: 20px; padding: 15px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 5px;">
+            <label for="buscar" style="font-weight: bold;">Buscar por nombre, email o rol:</label>
+            <input type="text" id="buscar" name="buscar" th:value="${buscar}" placeholder="Ingresa nombre, email o username..." style="padding: 8px; width: 300px; margin-right: 10px; border: 1px solid #ccc; border-radius: 3px;">
+            <button type="submit" style="padding: 8px 15px; background-color: #8e0303; color: white; border: none; border-radius: 3px; cursor: pointer;">Buscar</button>
+            <a th:href="@{/gestionar-usuarios}" style="margin-left: 10px; padding: 8px 15px; background-color: #ccc; color: #333; border: none; border-radius: 3px; text-decoration: none; cursor: pointer;">Limpiar</a>
+        </form>
+
+        <section id="ListaAdministradores">
+            <h3>Administradores</h3>
+            <p>Total de administradores: <strong th:text="${administradores != null ? administradores.size() : 0}">0</strong></p>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                <thead>
+                    <tr style="background-color: #8e0303; color: white;">
+                        <th style="border: 1px solid #ccc; padding: 10px; text-align: left;">ID</th>
+                        <th style="border: 1px solid #ccc; padding: 10px; text-align: left;">Nombre</th>
+                        <th style="border: 1px solid #ccc; padding: 10px; text-align: left;">Email</th>
+                        <th style="border: 1px solid #ccc; padding: 10px; text-align: center;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="usuario : ${administradores}" style="border-bottom: 1px solid #ddd;">
+                        <td style="border: 1px solid #ccc; padding: 10px;" th:text="${usuario.id}">1</td>
+                        <td style="border: 1px solid #ccc; padding: 10px;" th:text="${usuario.nombres} + ' ' + ${usuario.apellidos}">Admin Nombre</td>
+                        <td style="border: 1px solid #ccc; padding: 10px;" th:text="${usuario.email}">admin@mail.com</td>
+                        <td style="border: 1px solid #ccc; padding: 10px; text-align: center;">
+                            <a th:href="@{/editar-usuario/{id}(id=${usuario.id})}" style="color: #8e0303; margin-right: 10px; text-decoration: underline;">Editar</a>
+                            <form th:action="@{/eliminar-usuario/{id}(id=${usuario.id})}" method="post" style="display:inline; margin:0;">
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                <button type="submit" style="background:none;border:none;color:red;text-decoration:underline;cursor:pointer;padding:0;font:inherit;" onclick="return confirm('¿Eliminar administrador?');">Eliminar</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr th:if="${administradores == null or administradores.size() == 0}">
+                        <td colspan="4" style="text-align: center; padding: 20px; border: 1px solid #ccc;">No hay administradores registrados</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="ListaUsuarios">
+            <h3>Usuarios Registrados</h3>
+            <p>Total de usuarios: <strong th:text="${usuarios != null ? usuarios.size() : 0}">0</strong></p>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                <thead>
+                    <tr style="background-color: #8e0303; color: white;">
+                        <th style="border: 1px solid #ccc; padding: 10px; text-align: left;">ID</th>
+                        <th style="border: 1px solid #ccc; padding: 10px; text-align: left;">Nombre</th>
+                        <th style="border: 1px solid #ccc; padding: 10px; text-align: left;">Email</th>
+                        <th style="border: 1px solid #ccc; padding: 10px; text-align: center;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="usuario : ${usuarios}" style="border-bottom: 1px solid #ddd;">
+                        <td style="border: 1px solid #ccc; padding: 10px;" th:text="${usuario.id}">1</td>
+                        <td style="border: 1px solid #ccc; padding: 10px;" th:text="${usuario.nombres} + ' ' + ${usuario.apellidos}">Juan Perez</td>
+                        <td style="border: 1px solid #ccc; padding: 10px;" th:text="${usuario.email}">juan@mail.com</td>
+                        <td style="border: 1px solid #ccc; padding: 10px; text-align: center;">
+                            <a th:href="@{/editar-usuario/{id}(id=${usuario.id})}" style="color: #8e0303; margin-right: 10px; text-decoration: underline;">Editar</a>
+                            <form th:action="@{/eliminar-usuario/{id}(id=${usuario.id})}" method="post" style="display:inline; margin:0;">
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                <button type="submit" style="background:none;border:none;color:red;text-decoration:underline;cursor:pointer;padding:0;font:inherit;" onclick="return confirm('¿Eliminar usuario?');">Eliminar</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr th:if="${usuarios == null or usuarios.size() == 0}">
+                        <td colspan="4" style="text-align: center; padding: 20px; border: 1px solid #ccc;">No hay usuarios registrados</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="AgregarUsuario" style="margin-top: 40px;">
+            <h3>Agregar Nuevo Usuario</h3>
+            <form method="post" action="/admin-crear-usuario">
+                <fieldset>
+                    <legend>Información del Usuario</legend>
+                    <div>
+                        <label>Nombres:
+                            <input type="text" name="nombres" placeholder="Nombres completos" required>
+                        </label>
+                    </div>
+                    <div>
+                        <label>Email:
+                            <input type="email" name="email" placeholder="email@example.com" required>
+                        </label>
+                    </div>
+                    <div>
+                        <label>Usuario:
+                            <input type="text" name="username" placeholder="nombre_usuario" required>
+                        </label>
+                    </div>
+                    <div>
+                        <label>Contraseña:
+                            <input type="password" name="password" placeholder="contraseña" required>
+                        </label>
+                    </div>
+                    <div>
+                        <label>Rol:
+                            <select name="role" required>
+                                <option value="">-- Selecciona rol --</option>
+                                <option value="USER">Usuario</option>
+                                <option value="ADMIN">Administrador</option>
+                            </select>
+                        </label>
+                    </div>
+                </fieldset>
+                <div>
+                    <button type="submit">Crear Usuario</button>
+                </div>
+            </form>
+        </section>
+    </main>
+    <footer id="pie">
+        <p>&copy; 2025 Bustraker. Todos los derechos reservados.</p>
+        <p>Panel de Administración</p>
+    </footer>
+</body>
+</html>

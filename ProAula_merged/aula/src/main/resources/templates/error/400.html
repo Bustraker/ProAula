@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Error 400 - Solicitud Incorrecta - Bustraker">
+    <meta name="theme-color" content="#dc3545">
+    <title>Error 400 - Solicitud Incorrecta - Bustraker</title>
+    <link rel="stylesheet" th:href="@{/css/style_login.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="shortcut icon" th:href="@{/images/Bus_icono.png}" type="image/x-icon">
+    <style>
+        .error-container {
+            text-align: center;
+            padding: 2rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .error-code {
+            font-size: 6rem;
+            font-weight: bold;
+            color: #dc3545;
+            margin-bottom: 1rem;
+        }
+        .error-title {
+            font-size: 2rem;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+        .error-message {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 2rem;
+        }
+        .error-details {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+        .error-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn-error {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .btn-primary {
+            background: #01315f;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #011d3a;
+            color: white;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: #545b62;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-inner">
+            <div class="logo">
+                <img th:src="@{/images/Bus_icono.png}" alt="Logo Bustraker">
+                <span class="brand">Bustraker</span>
+            </div>
+            <nav class="main-nav">
+                <a th:href="@{/}" class="nav-link">
+                    <i class="fas fa-home"></i> Inicio
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="hero-section" style="padding: 2rem 0;">
+        <div class="container container-sm">
+            <div class="error-container">
+                <div class="error-code">400</div>
+                <h1 class="error-title">Solicitud Incorrecta</h1>
+                <p class="error-message" th:text="${errorMessage}">Los datos enviados no son válidos o están incompletos.</p>
+
+                <!-- Detalles del error -->
+                <div th:if="${fieldErrors}" class="error-details">
+                    <h4>Errores de validación:</h4>
+                    <ul>
+                        <li th:each="error : ${fieldErrors}" th:text="${error.key + ': ' + error.value}"></li>
+                    </ul>
+                </div>
+
+                <!-- Información adicional para desarrollo -->
+                <div th:if="${errorDetails and #strings.contains(errorDetails, 'dev')}" class="error-details">
+                    <h4>Detalles técnicos (desarrollo):</h4>
+                    <pre th:text="${errorDetails}"></pre>
+                    <pre th:if="${stackTrace}" th:text="${stackTrace}"></pre>
+                </div>
+
+                <!-- Acciones -->
+                <div class="error-actions">
+                    <a th:href="@{/}" class="btn-error btn-primary">
+                        <i class="fas fa-home"></i> Ir al Inicio
+                    </a>
+                    <button onclick="history.back()" class="btn-error btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Volver Atrás
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Auto-redireccionamiento después de 10 segundos
+        setTimeout(function() {
+            window.location.href = '/';
+        }, 10000);
+    </script>
+</body>
+</html>
