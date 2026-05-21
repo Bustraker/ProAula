@@ -87,13 +87,18 @@ function crearMarkerParada(point, index, origen, destino) {
     marker.on('mouseover', () => marker.openPopup());
     marker.on('mouseout', () => marker.closePopup());
 
-    if (mostrarParadas) {
+    if (mostrarParadas || esOrigen || esDestino) {
         marker.addTo(map);
     }
 
-    stopMarkers.push(marker);
-    if (esOrigen) origenMarker = marker;
-    if (esDestino) destinoMarker = marker;
+    if (esOrigen) {
+        origenMarker = marker;
+    } else if (esDestino) {
+        destinoMarker = marker;
+    } else {
+        stopMarkers.push(marker);
+    }
+
     if (esOrigen || esDestino) marker.openPopup();
 }
 
