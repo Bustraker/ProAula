@@ -41,10 +41,10 @@ body {
     min-height: 100vh;
     display: flex !important;
     flex-direction: column !important;
-    align-items: center !important;    /* centra horizontalmente el cuadro */
-    justify-content: flex-start !important; /* Cambiado de center a flex-start para alinear desde arriba y hacer visible el título */
+    align-items: center !important;    /* centra horizontalmente */
+    justify-content: flex-start !important; /* alinea desde arriba */
     gap: clamp(12px, 2vw, 18px);
-    padding: clamp(20px, 4vw, 40px) clamp(15px, 3vw, 20px) clamp(15px, 3vw, 20px) clamp(15px, 3vw, 20px) !important; /* espacio superior reducido para el título */
+    padding: clamp(20px, 4vw, 40px) clamp(15px, 3vw, 20px) clamp(15px, 3vw, 20px) clamp(15px, 3vw, 20px) !important; /* espacio superior reducido */
     background-repeat: no-repeat;
     background-attachment: fixed;
 }

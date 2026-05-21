@@ -6,370 +6,7 @@
     <title>Panel de Administración - Bustraker</title>
     <link rel="stylesheet" th:href="@{/css/style_responsive.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --azul-oscuro: #01315f;
-            --azul-claro: #1e5a96;
-            --gris-claro: #6c757d;
-            --gris-borde: #dee2e6;
-            --negro-oscuro: #212529;
-            --verde-exito: #28a745;
-            --amarillo: #ffc107;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f6f7;
-            color: var(--negro-oscuro);
-        }
-
-        .admin-container {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        .sidebar {
-            width: 250px;
-            background: var(--azul-oscuro);
-            color: white;
-            padding: 2rem 0;
-            position: fixed;
-            height: 100vh;
-            overflow-y: auto;
-        }
-
-        .sidebar-header {
-            padding: 0 1.5rem 2rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 2rem;
-        }
-
-        .sidebar-header h2 {
-            font-size: 1.25rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .sidebar-nav {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .sidebar-nav a {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 1rem 1.5rem;
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-            transition: all 0.3s ease;
-            border-left: 3px solid transparent;
-        }
-
-        .sidebar-nav a:hover,
-        .sidebar-nav a.active {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border-left-color: var(--amarillo);
-        }
-
-        .main-content {
-            margin-left: 250px;
-            flex: 1;
-            padding: 2rem;
-        }
-
-        .top-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            background: white;
-            padding: 1.5rem;
-            border-radius: 0.375rem;
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-        }
-
-        .top-header h1 {
-            font-size: 2rem;
-            color: var(--azul-oscuro);
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .username {
-            font-weight: 600;
-            color: var(--azul-oscuro);
-            padding: 0.5rem 1rem;
-            background: #f8f9fa;
-            border-radius: 0.375rem;
-        }
-
-        .btn {
-            padding: 0.5rem 1rem;
-            border: none;
-            border-radius: 0.375rem;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: all 0.3s ease;
-            font-weight: 500;
-        }
-
-        .btn-secondary {
-            background: #6c757d;
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background: #5a6268;
-        }
-
-        .content-wrapper {
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-        }
-
-        .dashboard-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .stat-card {
-            display: flex;
-            align-items: center;
-            padding: 1.5rem;
-            background: white;
-            border-radius: 0.5rem;
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-            transition: all 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-        }
-
-        .stat-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 1rem;
-            color: white;
-            font-size: 1.5rem;
-        }
-
-        .bg-primary { background: var(--azul-claro); }
-        .bg-success { background: var(--verde-exito); }
-        .bg-info { background: #17a2b8; }
-        .bg-warning { background: var(--amarillo); color: var(--negro-oscuro); }
-
-        .stat-info h3 {
-            margin: 0;
-            font-size: 1.75rem;
-            font-weight: 600;
-            color: var(--azul-oscuro);
-        }
-
-        .stat-info p {
-            margin: 0.25rem 0 0 0;
-            color: var(--gris-claro);
-            font-size: 0.875rem;
-        }
-
-        .card {
-            background: white;
-            border-radius: 0.375rem;
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-            overflow: hidden;
-        }
-
-        .card-header {
-            background: #f8f9fa;
-            padding: 1.5rem;
-            border-bottom: 1px solid var(--gris-borde);
-        }
-
-        .card-header h3 {
-            margin: 0;
-            font-size: 1.1rem;
-            color: var(--azul-oscuro);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .card-body {
-            padding: 1.5rem;
-        }
-
-        .activity-feed {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        .activity-item {
-            display: flex;
-            gap: 1rem;
-            padding: 1rem;
-            border-left: 3px solid var(--azul-claro);
-            background: rgba(30, 90, 150, 0.05);
-            border-radius: 0 0.375rem 0.375rem 0;
-        }
-
-        .activity-icon {
-            font-size: 1.5rem;
-            color: var(--azul-claro);
-            min-width: 30px;
-            text-align: center;
-        }
-
-        .activity-content h4 {
-            margin: 0 0 0.25rem 0;
-            font-size: 0.95rem;
-            color: var(--azul-oscuro);
-            font-weight: 600;
-        }
-
-        .activity-content p {
-            margin: 0 0 0.25rem 0;
-            font-size: 0.875rem;
-            color: var(--negro-oscuro);
-        }
-
-        .text-muted {
-            color: var(--gris-claro);
-            font-size: 0.8rem;
-        }
-
-        .quick-actions {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 1rem;
-        }
-
-        .quick-action {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 1.5rem;
-            background: white;
-            border: 2px solid var(--gris-borde);
-            border-radius: 0.375rem;
-            text-decoration: none;
-            color: var(--azul-oscuro);
-            transition: all 0.2s ease;
-            cursor: pointer;
-        }
-
-        .quick-action:hover {
-            background: var(--azul-claro);
-            color: white;
-            border-color: var(--azul-claro);
-            transform: translateY(-3px);
-        }
-
-        .quick-action i {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .quick-action span {
-            font-weight: 600;
-            text-align: center;
-            font-size: 0.9rem;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 2rem;
-            color: var(--gris-claro);
-        }
-
-        .empty-state i {
-            font-size: 3rem;
-            color: #dee2e6;
-            margin-bottom: 1rem;
-        }
-
-        @media (max-width: 768px) {
-            .sidebar {
-                position: relative;
-                width: 100%;
-                height: auto;
-            }
-
-            .main-content {
-                margin-left: 0;
-            }
-
-            .top-header {
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .dashboard-stats {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        /* Auto-refresh indicator */
-        .refresh-status {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.25rem 0.75rem;
-            background: #d4edda;
-            color: #155724;
-            border-radius: 0.25rem;
-            font-size: 0.8rem;
-            margin-left: 1rem;
-        }
-
-        .refresh-status.loading {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .spinner {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            border: 2px solid currentColor;
-            border-right-color: transparent;
-            border-radius: 50%;
-            animation: spin 0.6s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/admin_index2.css}">
 </head>
 <body>
     <div class="admin-container">
@@ -383,9 +20,9 @@
                 <a th:href="@{/gestionar-usuarios}"><i class="fas fa-users"></i> Gestionar Usuarios</a>
                 <a th:href="@{/reportes}"><i class="fas fa-chart-bar"></i> Reportes</a>
                 <a th:href="@{#}" onclick="alert('Sección en desarrollo')"><i class="fas fa-envelope"></i> Mensajes</a>
-                <a th:href="@{/agregar_rutas}"><i class="fas fa-route"></i> Rutas</a>
-                <a th:href="@{/registro_de_buses}"><i class="fas fa-bus"></i> Buses</a>
-                <a th:href="@{/admin/logout}"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+                <a th:href="@{/rutas/admin}"><i class="fas fa-route"></i> Rutas</a>
+                <a th:href="@{/registro-buses}"><i class="fas fa-bus"></i> Buses</a>
+                <a th:href="@{/logout}"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
             </nav>
         </aside>
 
@@ -398,7 +35,7 @@
                         <i class="fas fa-user-circle"></i>
                         <span th:text="${usuario?.nombres}">Admin</span>
                     </span>
-                    <a th:href="@{/admin/logout}" class="btn btn-secondary"><i class="fas fa-sign-out-alt"></i> Salir</a>
+                    <a th:href="@{/logout}" class="btn btn-secondary"><i class="fas fa-sign-out-alt"></i> Salir</a>
                     <span class="refresh-status" id="refreshStatus">
                         <i class="fas fa-check-circle"></i> Actualizado
                     </span>
@@ -498,7 +135,7 @@
                                     <i class="fas fa-envelope activity-icon"></i>
                                     <div class="activity-content">
                                         <h4 th:text="${mensaje.nombre}">Mensaje recibido</h4>
-                                        <p th:text="'Asunto: ' + ${mensaje.asunto}">Mensaje de contacto</p>
+                                        <p th:text="'Mensaje: ' + ${mensaje.mensaje}">Mensaje de contacto</p>
                                         <small class="text-muted">Pendiente de respuesta</small>
                                     </div>
                                 </div>
@@ -525,12 +162,12 @@
                                 <span>Gestionar Usuarios</span>
                             </a>
                             
-                            <a th:href="@{/registro_de_buses}" class="quick-action">
+                            <a th:href="@{/registro-buses}" class="quick-action">
                                 <i class="fas fa-bus"></i>
                                 <span>Agregar Bus</span>
                             </a>
                             
-                            <a th:href="@{/agregar_rutas}" class="quick-action">
+                            <a th:href="@{/rutas/admin}" class="quick-action">
                                 <i class="fas fa-route"></i>
                                 <span>Agregar Ruta</span>
                             </a>
@@ -546,73 +183,6 @@
         </main>
     </div>
 
-    <script>
-        // Auto-refresh del dashboard cada 30 segundos
-        function refreshDashboard() {
-            const status = document.getElementById('refreshStatus');
-            status.classList.add('loading');
-            status.innerHTML = '<span class="spinner"></span> Actualizando...';
-
-            fetch(window.location.href)
-                .then(response => response.text())
-                .then(html => {
-                    const parser = new DOMParser();
-                    const newDoc = parser.parseFromString(html, 'text/html');
-                    
-                    // Actualizar estadísticas
-                    const newUserCount = newDoc.getElementById('userCount')?.textContent || document.getElementById('userCount').textContent;
-                    const newBusCount = newDoc.getElementById('busCount')?.textContent || document.getElementById('busCount').textContent;
-                    const newRouteCount = newDoc.getElementById('routeCount')?.textContent || document.getElementById('routeCount').textContent;
-                    const newMessageCount = newDoc.getElementById('messageCount')?.textContent || document.getElementById('messageCount').textContent;
-
-                    // Animar cambios
-                    animateUpdate(document.getElementById('userCount'), newUserCount);
-                    animateUpdate(document.getElementById('busCount'), newBusCount);
-                    animateUpdate(document.getElementById('routeCount'), newRouteCount);
-                    animateUpdate(document.getElementById('messageCount'), newMessageCount);
-
-                    // Actualizar actividad
-                    const newActivityFeed = newDoc.getElementById('activityFeed');
-                    if (newActivityFeed) {
-                        document.getElementById('activityFeed').innerHTML = newActivityFeed.innerHTML;
-                    }
-
-                    // Actualizar estado
-                    status.classList.remove('loading');
-                    status.innerHTML = '<i class="fas fa-check-circle"></i> Actualizado';
-                    
-                    setTimeout(() => {
-                        const timestamp = new Date().toLocaleTimeString('es-ES');
-                        status.innerHTML = `<i class="fas fa-sync-alt"></i> Última actualización: ${timestamp}`;
-                    }, 2000);
-                })
-                .catch(error => {
-                    console.error('Error actualizando dashboard:', error);
-                    status.classList.remove('loading');
-                    status.innerHTML = '<i class="fas fa-exclamation-circle"></i> Error al actualizar';
-                });
-        }
-
-        function animateUpdate(element, newValue) {
-            if (element && element.textContent !== newValue) {
-                element.style.transition = 'all 0.3s ease';
-                element.style.transform = 'scale(1.1)';
-                element.textContent = newValue;
-                setTimeout(() => {
-                    element.style.transform = 'scale(1)';
-                }, 300);
-            }
-        }
-
-        // Refrescar cada 30 segundos
-        setInterval(refreshDashboard, 30000);
-
-        // Evento de visibilidad para pausar cuando la pestaña no está visible
-        document.addEventListener('visibilitychange', () => {
-            if (!document.hidden) {
-                refreshDashboard();
-            }
-        });
-    </script>
+    <script th:src="@{/js/admin_index2.js}"></script>
 </body>
 </html>

@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <!-- Header -->
+    <!-- Encabezado -->
     <header class="main-header">
         <div class="header-inner">
             <div class="logo">
@@ -38,7 +38,7 @@
         </div>
     </header>
 
-    <!-- Contenido Principal -->
+    <!-- Contenido principal -->
     <main class="container">
         <div class="content-wrapper-inner">
                 <div class="card">
@@ -49,6 +49,10 @@
                         </div>
                     </div>
                     <div class="card-body">
+                        <div th:if="${detalleId != null}" class="alert alert-info" style="margin-bottom: 1rem; padding: 1rem; background: #e9f7ff; border: 1px solid #b8e1ff; color: #023047; border-radius: 6px;">
+                            <strong>Detalle de viaje #</strong><span th:text="${detalleId}"></span>
+                            <div th:text="${detalleMensaje}"></div>
+                        </div>
                         <!-- Estado vacío: solo se muestra si no hay viajes -->
                         <div th:if="${#lists.isEmpty(viajes)}" class="empty-state">
                             <i class="fas fa-bus"></i>
@@ -80,7 +84,7 @@
                                         <td th:text="${#temporals.format(viaje.hora, 'hh:mm a')}">-</td>
                                         <td>
                                             <span th:text="${viaje.estado}"
-                                                  th:classappend="${viaje.estado == 'Completado'} ? 'badge badge-success' : (${viaje.estado == 'Cancelado'} ? 'badge badge-danger' : 'badge badge-warning')">
+                                                  h:classappend="${viaje.estado == 'Completado'} ? 'badge badge-success' : (${viaje.estado == 'Cancelado'} ? 'badge badge-danger' : 'badge badge-warning')">
                                             </span>
                                         </td>
                                         <td>

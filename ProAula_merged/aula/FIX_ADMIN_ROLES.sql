@@ -1,5 +1,5 @@
--- Script para corregir y normalizar roles de administrador en la base de datos
--- Este script asegura que todos los roles estén normalizados con el prefijo ROLE_
+-- Normaliza roles admin y user
+-- Normaliza roles con prefijo ROLE_
 
 -- 1. Normalizador de roles ADMIN
 -- Convierte "ADMIN" a "ROLE_ADMIN"

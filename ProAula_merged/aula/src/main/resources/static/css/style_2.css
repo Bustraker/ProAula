@@ -250,7 +250,7 @@ section>p{ margin:0; color:var(--atenuado); line-height:1.5; }
 @media (max-width:640px){
     body{ padding:14px; }
     .cuadricula-panel{ grid-template-columns: 1fr; }
-    .nav-lista{ display:none; } /* colapso simple en pantallas pequeñas */
+    .nav-lista{ display:none; } /* colapso en móvil */
     .perfil-resumen{ padding:8px; }
     .contenedor{ padding:18px; }
 }

@@ -20,10 +20,8 @@ public class UsuarioService {
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
-    /**
-     * Registra un usuario nuevo. Solo debe usarse para CREACIÓN, no actualización.
-     * Encripta la contraseña si aún no está hasheada con BCrypt.
-     */
+    // Registra usuario y encripta contraseña no hasheada
+    // Normaliza rol a ROLE_USER o ROLE_ADMIN
     public Usuario register(Usuario usuario) {
         // Normalizar rol
         String role = usuario.getRole();
@@ -38,8 +36,7 @@ public class UsuarioService {
             }
         }
 
-        // FIX: Encriptar solo si la contraseña NO está ya hasheada con BCrypt
-        // Esto previene el doble hash en llamadas accidentales
+        // Prevenir doble hash si la contraseña ya fue encriptada
         String password = usuario.getPassword();
         if (password != null && !password.startsWith("$2a$") && !password.startsWith("$2b$")) {
             usuario.setPassword(passwordEncoder.encode(password));
@@ -98,10 +95,7 @@ public class UsuarioService {
         return usuarioRepository.count();
     }
 
-    /**
-     * Actualiza solo los datos de perfil (nombres, apellidos, email).
-     * NO modifica contraseña ni rol.
-     */
+    // Actualiza perfil básico sin cambiar rol o contraseña
     @Transactional
     public Usuario updateUsuario(Long id, Usuario usuarioDetails) {
         Usuario usuario = usuarioRepository.findById(id)
@@ -114,9 +108,7 @@ public class UsuarioService {
         return usuarioRepository.save(usuario);
     }
 
-    /**
-     * Cambia la contraseña de un usuario. Encripta la nueva contraseña correctamente.
-     */
+    // Cambia y encripta contraseña existente
     @Transactional
     public Usuario changePassword(Long id, String newPassword) {
         Usuario usuario = usuarioRepository.findById(id)

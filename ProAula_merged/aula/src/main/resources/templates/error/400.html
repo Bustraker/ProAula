@@ -9,70 +9,10 @@
     <link rel="stylesheet" th:href="@{/css/style_login.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="shortcut icon" th:href="@{/images/Bus_icono.png}" type="image/x-icon">
-    <style>
-        .error-container {
-            text-align: center;
-            padding: 2rem;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        .error-code {
-            font-size: 6rem;
-            font-weight: bold;
-            color: #dc3545;
-            margin-bottom: 1rem;
-        }
-        .error-title {
-            font-size: 2rem;
-            color: #333;
-            margin-bottom: 1rem;
-        }
-        .error-message {
-            font-size: 1.1rem;
-            color: #666;
-            margin-bottom: 2rem;
-        }
-        .error-details {
-            background: #f8f9fa;
-            padding: 1rem;
-            border-radius: 5px;
-            margin-bottom: 2rem;
-            text-align: left;
-        }
-        .error-actions {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        .btn-error {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 5px;
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-        .btn-primary {
-            background: #01315f;
-            color: white;
-        }
-        .btn-primary:hover {
-            background: #011d3a;
-            color: white;
-        }
-        .btn-secondary {
-            background: #6c757d;
-            color: white;
-        }
-        .btn-secondary:hover {
-            background: #545b62;
-            color: white;
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/error.css}">
 </head>
-<body>
-    <!-- Header -->
+<body data-redirect-url="/" data-redirect-timeout="10000">
+    <!-- Encabezado -->
     <header class="main-header">
         <div class="header-inner">
             <div class="logo">
@@ -87,8 +27,8 @@
         </div>
     </header>
 
-    <!-- Contenido Principal -->
-    <main class="hero-section" style="padding: 2rem 0;">
+    <!-- Contenido principal -->
+    <main class="hero-section">
         <div class="container container-sm">
             <div class="error-container">
                 <div class="error-code">400</div>
@@ -115,7 +55,7 @@
                     <a th:href="@{/}" class="btn-error btn-primary">
                         <i class="fas fa-home"></i> Ir al Inicio
                     </a>
-                    <button onclick="history.back()" class="btn-error btn-secondary">
+                    <button class="btn-error btn-secondary js-go-back">
                         <i class="fas fa-arrow-left"></i> Volver Atrás
                     </button>
                 </div>
@@ -123,11 +63,7 @@
         </div>
     </main>
 
-    <script>
-        // Auto-redireccionamiento después de 10 segundos
-        setTimeout(function() {
-            window.location.href = '/';
-        }, 10000);
-    </script>
+    <script th:src="@{/js/common.js}"></script>
+    <script th:src="@{/js/error.js}"></script>
 </body>
 </html>

@@ -1,0 +1,276 @@
+:root {
+    --bg-primary: #0b1120;
+    --bg-secondary: rgba(15, 23, 42, 0.90);
+    --panel-surface: rgba(15, 23, 42, 0.92);
+    --panel-border: rgba(148, 163, 184, 0.2);
+    --text-primary: #f8fafc;
+    --text-secondary: #cbd5e1;
+    --text-muted: #94a3b8;
+    --accent: #38bdf8;
+    --accent-strong: #7c3aed;
+    --card-bg: rgba(15, 23, 42, 0.98);
+    --shadow: 0 28px 80px rgba(5, 12, 27, 0.35);
+}
+
+html, body {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.12), transparent 24%),
+                radial-gradient(circle at 80% 20%, rgba(124, 58, 237, 0.12), transparent 20%),
+                linear-gradient(180deg, #0f172a 0%, #020617 100%);
+    color: var(--text-primary);
+    overflow: hidden;
+}
+
+#map {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    width: 100%;
+    height: 100vh;
+    background: #020617;
+}
+
+.leaflet-container {
+    height: 100%;
+    width: 100%;
+    background: transparent;
+}
+
+.options-panel {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    width: min(380px, calc(100vw - 32px));
+    background: var(--panel-surface);
+    padding: 24px;
+    border-radius: 28px;
+    box-shadow: var(--shadow);
+    z-index: 1000;
+    max-height: calc(100vh - 48px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    border: 1px solid var(--panel-border);
+    backdrop-filter: blur(18px);
+}
+
+.options-panel h2 {
+    margin: 0 0 20px 0;
+    color: var(--text-primary);
+    font-size: 1.45rem;
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+    padding-bottom: 14px;
+}
+
+.options-panel label {
+    display: block;
+    margin: 20px 0 10px 0;
+    font-weight: 700;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+.options-panel select,
+.options-panel input,
+.options-panel button {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.options-panel select,
+.options-panel input {
+    padding: 14px 16px;
+    border: 1px solid rgba(148, 163, 184, 0.20);
+    border-radius: 14px;
+    font-size: 0.96rem;
+    color: var(--text-primary);
+    background: rgba(15, 23, 42, 0.75);
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.options-panel select:focus,
+.options-panel input:focus {
+    border-color: rgba(56, 189, 248, 0.65);
+    box-shadow: 0 0 0 6px rgba(56, 189, 248, 0.10);
+}
+
+.options-panel button {
+    padding: 14px 18px;
+    margin-top: 18px;
+    background: linear-gradient(135deg, #0ea5e9 0%, #6d28d9 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 14px;
+    font-size: 0.96rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 18px 30px rgba(14, 165, 233, 0.18);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.options-panel button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 22px 36px rgba(14, 165, 233, 0.24);
+}
+
+.options-panel button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.ruta-info {
+    background: rgba(15, 23, 42, 0.95);
+    padding: 20px;
+    border-radius: 22px;
+    margin-top: 24px;
+    border-left: 4px solid #38bdf8;
+    box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.08);
+}
+
+.toggle-control {
+    margin: 18px 0 0 0;
+}
+
+.toggle-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.95rem;
+    color: #cbd5e1;
+    font-weight: 600;
+}
+
+.toggle-label input {
+    width: 1.1rem;
+    height: 1.1rem;
+    accent-color: #38bdf8;
+}
+
+.ruta-info h4 {
+    margin: 0 0 12px 0;
+    color: var(--text-primary);
+    font-size: 1rem;
+}
+
+.ruta-info p {
+    margin: 10px 0;
+    color: var(--text-secondary);
+    line-height: 1.7;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #38bdf8 0%, #7c3aed 100%);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    margin: 4px 4px 4px 0;
+}
+
+.bus-card {
+    background: rgba(15, 23, 42, 0.96);
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    border-radius: 22px;
+    padding: 18px 20px;
+    margin-bottom: 16px;
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+}
+
+.bus-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.22);
+    background: rgba(15, 23, 42, 1);
+}
+
+.bus-card.selected {
+    border-color: rgba(56, 189, 248, 0.85);
+    background: linear-gradient(180deg, rgba(15, 23, 42, 1) 0%, rgba(15, 23, 42, 0.90) 100%);
+}
+
+.bus-card h4 {
+    margin: 0 0 10px 0;
+    color: #f8fafc;
+}
+
+.bus-card p {
+    margin: 6px 0;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+}
+
+.scrollable {
+    max-height: 290px;
+    overflow-y: auto;
+    padding-right: 8px;
+}
+
+.card-divider {
+    border: none;
+    border-top: 1px solid rgba(148, 163, 184, 0.16);
+    margin: 22px 0 0;
+}
+
+.info-note {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    margin-top: 22px;
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+}
+
+.leaflet-control-zoom,
+.leaflet-control-attribution {
+    background: rgba(15, 23, 42, 0.82) !important;
+    color: #e2e8f0 !important;
+    border: 1px solid rgba(148, 163, 184, 0.16) !important;
+}
+
+.leaflet-control-zoom a {
+    color: #e2e8f0 !important;
+}
+
+.leaflet-control-attribution a {
+    color: #94a3b8 !important;
+}
+
+.leaflet-control-attribution,
+.leaflet-control-zoom {
+    border-radius: 14px;
+}
+
+.leaflet-control-attribution {
+    padding: 6px 10px !important;
+}
+
+.leaflet-container a.leaflet-control-zoom-in,
+.leaflet-container a.leaflet-control-zoom-out {
+    background: rgba(15, 23, 42, 0.92) !important;
+    width: 36px;
+    height: 36px;
+    line-height: 34px;
+    text-align: center;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+}
+
+.leaflet-control-zoom a:hover {
+    background: rgba(56, 189, 248, 0.90) !important;
+}
+
+.leaflet-container {
+    font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}

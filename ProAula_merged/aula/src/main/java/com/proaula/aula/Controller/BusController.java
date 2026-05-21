@@ -1,7 +1,5 @@
 package com.proaula.aula.Controller;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -39,6 +37,13 @@ public class BusController {
     @GetMapping("/actualizarbuses")
     public String actualizarBuses(Model model) {
         model.addAttribute("buses", busService.getAllBuses());
+        return "Admin/actualizarbuses";
+    }
+
+    @GetMapping("/actualizar-bus/{id}")
+    public String mostrarBusParaActualizar(@PathVariable Long id, Model model) {
+        model.addAttribute("buses", busService.getAllBuses());
+        model.addAttribute("bus", busService.getBusById(id));
         return "Admin/actualizarbuses";
     }
 

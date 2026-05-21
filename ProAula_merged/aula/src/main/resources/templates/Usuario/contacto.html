@@ -4,36 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contacto - Bustraker</title>
-    <link rel="stylesheet" th:href="@{/css/style_responsive.css}">
+    <link rel="stylesheet" th:href="@{/css/style_perfil.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <div class="admin-container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <h2><i class="fas fa-bus"></i> Bustraker Usuario</h2>
+    <header class="main-header">
+        <div class="header-inner">
+            <div class="logo">
+                <img th:src="@{/images/Bus_icono.png}" alt="Logo Bustraker">
+                <span class="brand">Bustraker</span>
             </div>
-            <nav class="sidebar-nav">
-                <a th:href="@{/index_3}"><i class="fas fa-home"></i> Inicio</a>
-                <a th:href="@{/viajar}"><i class="fas fa-route"></i> Viajar</a>
-                <a th:href="@{/consultas}"><i class="fas fa-search"></i> Consultas</a>
-                <a th:href="@{/historial}"><i class="fas fa-history"></i> Historial</a>
-                <a th:href="@{/perfil}"><i class="fas fa-user"></i> Perfil</a>
+            <nav class="main-nav">
+                <a th:href="@{/dashboard}" class="nav-link"><i class="fas fa-home"></i> Inicio</a>
+                <a th:href="@{/viajar}" class="nav-link"><i class="fas fa-route"></i> Viajar</a>
+                <a th:href="@{/consultas}" class="nav-link"><i class="fas fa-search"></i> Consultas</a>
+                <a th:href="@{/historial}" class="nav-link"><i class="fas fa-history"></i> Historial</a>
+                <a th:href="@{/perfil}" class="nav-link"><i class="fas fa-user"></i> Perfil</a>
+                <a th:href="@{/logout}" class="nav-link btn-outline"><i class="fas fa-sign-out-alt"></i> Salir</a>
             </nav>
-        </aside>
+        </div>
+    </header>
 
-        <!-- Main Content -->
-        <main class="main-content">
-            <header class="top-header">
-                <h1><i class="fas fa-envelope"></i> Contacto</h1>
-                <div class="header-actions">
-                    <span th:text="${usuario?.nombres + ' ' + usuario?.apellidos}" class="username"></span>
-                    <a th:href="@{/logout}" class="btn btn-secondary"><i class="fas fa-sign-out-alt"></i> Salir</a>
-                </div>
-            </header>
-
-            <div class="content-wrapper">
+    <main class="container container-md">
+        <div class="content-wrapper-inner">
                 <div class="card">
                     <div class="card-header">
                         <h3><i class="fas fa-paper-plane"></i> Envíanos tu mensaje</h3>
@@ -42,6 +35,7 @@
                         <div th:if="${mensaje}" class="alert alert-success" th:text="${mensaje}"></div>
                         
                         <form th:action="@{/contacto_usuario}" method="post" th:object="${contactoMensaje}" class="row">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                             <div class="form-row">
                                 <div class="form-col form-col-6">
                                     <div class="form-group">
@@ -152,6 +146,6 @@
                 </div>
             </div>
         </main>
-    </div>
+
 </body>
 </html>

@@ -9,33 +9,89 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="description" content="Página que muestra la lista de buses disponibles y sus rutas." />
     <title>Lista de Buses - Bustraker</title>
+    <link rel="stylesheet" th:href="@{/css/style_consultas.css}">
+    <link rel="stylesheet" th:href="@{/css/style_common.css}">
 </head>
 <body>
-    <h1>Lista de Buses</h1>
-    <ul id="base" role="list">
-        <li th:each="bus : ${buses}" role="listitem" tabindex="0">
-            <div class="bus-head">
-                <span class="bus-short">Bus <span th:text="${bus.id}"></span></span>
-                <span class="bus-title" th:text="${bus.ruta.nombre}"></span>
-                <span class="symbol">🚌</span>
+    <main>
+        <header>
+            <h1>Lista de Buses</h1>
+            <p>Revisa todos los buses activos y despliega sus rutas, conductor y detalles de recorrido.</p>
+        </header>
+
+        <section class="section">
+            <div class="card mb-3">
+                <div class="card-body">
+                    <form id="busFilterForm" class="filter-row" onsubmit="return false;">
+                        <input type="search" id="searchInput" class="form-control" placeholder="Buscar por placa, ruta, conductor o color...">
+                        <select id="routeFilter" class="form-control">
+                            <option value="">Todas las rutas</option>
+                        </select>
+                        <select id="statusFilter" class="form-control">
+                            <option value="">Todos los estados</option>
+                            <option value="Activo">Activo</option>
+                            <option value="Inactivo">Inactivo</option>
+                        </select>
+                        <button type="button" id="searchButton" class="btn btn-primary">
+                            <i class="fas fa-filter"></i> Filtrar
+                        </button>
+                        <button type="button" id="clearButton" class="btn btn-secondary">
+                            <i class="fas fa-undo"></i> Limpiar
+                        </button>
+                    </form>
+                    <div class="toolbar">
+                        <button type="button" id="toggleCards" class="btn btn-outline active">
+                            <i class="fas fa-th-large"></i> Vista Tarjetas
+                        </button>
+                        <button type="button" id="toggleTable" class="btn btn-outline">
+                            <i class="fas fa-table"></i> Vista Tabla
+                        </button>
+                    </div>
+                </div>
             </div>
-            <ul class="barrios" aria-hidden="true" th:if="${bus.ruta}">
-                <li th:each="barrio : ${bus.ruta.barrios}" th:text="${barrio}"></li>
+        </section>
+
+        <section class="section">
+            <ul id="base" role="list">
+                <li th:each="bus : ${buses}" role="listitem" tabindex="0"
+                    th:attr="data-ruta=${bus.ruta != null ? bus.ruta.nombre : ''},data-conductor=${bus.conductor != null ? bus.conductor : ''},data-modelo=${bus.modelo != null ? bus.modelo : ''},data-color=${bus.color != null ? bus.color : ''},data-estado='Activo'">
+                    <div class="bus-head">
+                        <span class="bus-short">Bus <span th:text="${bus.id}"></span></span>
+                        <span class="bus-title" th:text="${bus.placa}">ABC-123</span>
+                        <span class="symbol">🚌</span>
+                    </div>
+                    <div class="meta">
+                        <span><strong>Ruta:</strong> <span th:text="${bus.ruta != null ? bus.ruta.nombre : 'Sin ruta'}">Ruta Centro</span></span>
+                        <span><strong>Conductor:</strong> <span th:text="${bus.conductor != null ? bus.conductor : 'Sin asignar'}">Sin asignar</span></span>
+                        <span><strong>Modelo:</strong> <span th:text="${bus.modelo != null ? bus.modelo : 'N/A'}">2022</span></span>
+                        <span><strong>Color:</strong> <span th:text="${bus.color != null ? bus.color : 'N/A'}">Azul</span></span>
+                    </div>
+                    <ul class="barrios" aria-hidden="true" th:if="${bus.ruta != null}">
+                        <li th:each="barrio : ${bus.ruta.barrios}" th:text="${barrio}"></li>
+                    </ul>
+                </li>
             </ul>
-        </li>
-    </ul>
-    <a th:href="@{/index_2}" class="back">Volver al inicio</a>
-    <script>
-    // accesibilidad: mostrar barrios con teclado (Enter / Space)
-    document.querySelectorAll('#base > li').forEach(li => {
-        li.addEventListener('keydown', e => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                li.classList.toggle('open');
-                e.preventDefault();
-            }
-        });
-        li.addEventListener('click', () => li.classList.toggle('open'));
-    });
-    </script>
+
+            <div id="busTableContainer" class="table-container hidden">
+                <table id="busTable" class="table">
+                    <thead>
+                        <tr>
+                            <th>Placa</th>
+                            <th>Ruta</th>
+                            <th>Conductor</th>
+                            <th>Modelo</th>
+                            <th>Color</th>
+                            <th>Barrios</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+
+        <a th:href="@{/dashboard}" class="back">Volver al dashboard</a>
+        <script th:src="@{/js/common.js}"></script>
+        <script th:src="@{/js/consultas.js}"></script>
+    </main>
 </body>
 </html>

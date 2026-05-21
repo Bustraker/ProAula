@@ -1,5 +1,6 @@
 package com.proaula.aula.Service;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -22,11 +23,13 @@ import com.proaula.aula.Entity.Bus;
 import com.proaula.aula.Entity.Parada;
 import com.proaula.aula.Entity.Ruta;
 import com.proaula.aula.Entity.Usuario;
+import com.proaula.aula.Entity.Viaje;
 import com.proaula.aula.Repository.BarrioRepository;
 import com.proaula.aula.Repository.BusRepository;
 import com.proaula.aula.Repository.ParadaRepository;
 import com.proaula.aula.Repository.RutaRepository;
 import com.proaula.aula.Repository.UsuarioRepository;
+import com.proaula.aula.Repository.ViajeRepository;
 
 @Service
 public class DataSeederService implements CommandLineRunner {
@@ -50,6 +53,9 @@ public class DataSeederService implements CommandLineRunner {
     
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private ViajeRepository viajeRepository;
     
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
@@ -60,8 +66,8 @@ public class DataSeederService implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         try {
-            // PRIMERO: Guardar TODOS los barrios de Localidades.java en la BD
-            log.info("🗺️ Inicializando barrios de Cartagena desde Localidades.java...");
+            // Cargar todos los barrios de Cartagena en la base de datos
+            log.info("Inicializando barrios de Cartagena desde Localidades.java...");
             List<String> allBarrios = Localidades.obtenerTodosLosBarrios();
             Set<String> barriosExistentesNormalizados = barrioRepository.findAll().stream()
                 .map(b -> b.getNombre().toLowerCase()
@@ -70,7 +76,7 @@ public class DataSeederService implements CommandLineRunner {
                 .collect(Collectors.toSet());
 
             // Guardar códigos de administrador en la base de datos
-            log.info("🔐 Verificando códigos de administrador en la base de datos...");
+            log.info("Verificando códigos de administrador en la base de datos...");
             adminCodeService.ensureDefaultAdminCodes(List.of("ADMIN2026"));
 
             int barriosGuardados = 0;
@@ -88,32 +94,32 @@ public class DataSeederService implements CommandLineRunner {
                     barriosGuardados++;
                 }
             }
-            log.info("✅ {} barrios guardados en la base de datos", barriosGuardados);
+            log.info("Completado: {} barrios guardados en la base de datos", barriosGuardados);
             
-            // SEGUNDO: Asignar coordenadas GPS reales
+            // Asignar coordenadas GPS reales
             barrioService.inicializarBarrios();
             
             // Verificar si ya existen datos para evitar duplicados
             boolean existingRoutes = rutaRepository.count() > 0;
-            log.info("📊 Datos actuales: {} rutas, {} buses, {} usuarios, {} barrios", 
+            log.info("Estado actual: {} rutas, {} buses, {} usuarios, {} barrios", 
                 rutaRepository.count(), busRepository.count(), usuarioRepository.count(), barrioRepository.count());
 
             int rutasToCreate = 300;      // 300 rutas
             int busesToCreate = 900;      // 900 buses (3 por ruta en promedio)
             int usuariosToCreate = 3000;  // 3.000 usuarios
-            // Total estimado: 300 + 900 + 3.000 + paradas (~900) = ~5.100 registros
+            // Estima volumen de datos generados
 
             if (existingRoutes) {
-                log.info("⚠️ Se detectaron rutas existentes. Se omite la creación de rutas y buses para evitar duplicados.");
+                log.info("Se detectaron rutas existentes. Se omite la creación de rutas y buses para evitar duplicados.");
             } else {
-                log.info("🚀 Iniciando carga masiva de rutas y buses...");
+                log.info("Iniciando carga masiva de rutas y buses...");
             }
 
             // Insertar rutas con barrios y paradas
             List<Ruta> rutas = new ArrayList<>();
             if (!existingRoutes) {
                 try {
-                    log.info("📍 Creando {} rutas...", rutasToCreate);
+                    log.info("Creando {} rutas...", rutasToCreate);
                     
                     for (int i = 0; i < rutasToCreate; i++) {
                         Ruta ruta = new Ruta();
@@ -162,18 +168,18 @@ public class DataSeederService implements CommandLineRunner {
                         
                         // Progreso cada 100 rutas
                         if ((i + 1) % 100 == 0) {
-                            log.info("   ✅ {} rutas creadas...", (i + 1));
+                            log.info("   Creadas {} rutas...", (i + 1));
                         }
                     }
-                    log.info("✅ {} rutas creadas exitosamente", rutasToCreate);
+                    log.info("Completado: {} rutas creadas exitosamente", rutasToCreate);
 
                     // Agregar rutas predeterminadas para asegurar cobertura
-                    log.info("📍 Agregando rutas predeterminadas...");
+                    log.info("Agregando rutas predeterminadas...");
                     agregarRutasPredeterminadas(rutaRepository, paradaRepository);
-                    log.info("✅ Rutas predeterminadas agregadas");
+                    log.info("Completado: Rutas predeterminadas agregadas");
 
                     // Insertar buses
-                    log.info("🚌 Creando {} buses...", busesToCreate);
+                    log.info("Creando {} buses...", busesToCreate);
                     
                     String[] coloresComunes = {"Blanco", "Azul", "Rojo", "Verde", "Amarillo", "Gris", "Negro", "Plateado"};
                     String[] marcasBus = {"Mercedes Benz", "Volvo", "Scania", "MAN", "Iveco", "Ford", "Chevrolet"};
@@ -198,21 +204,21 @@ public class DataSeederService implements CommandLineRunner {
                         
                         // Progreso cada 500 buses
                         if ((i + 1) % 500 == 0) {
-                            log.info("   ✅ {} buses creados...", (i + 1));
+                            log.info("   Creados {} buses...", (i + 1));
                         }
                     }
-                    log.info("✅ {} buses creados exitosamente", busesToCreate);
+                    log.info("Completado: {} buses creados exitosamente", busesToCreate);
                 } catch (Exception ex) {
-                    log.error("❌ Error al crear rutas y buses: {}", ex.getMessage(), ex);
+                    log.error("Error al crear rutas y buses: {}", ex.getMessage(), ex);
                     log.warn("Se continúa con la creación de usuarios aunque la carga de rutas/buses haya fallado.");
                 }
             } else {
-                log.info("✅ Rutas existentes detectadas. No se crearon rutas ni buses nuevos.");
+                log.info("Rutas existentes detectadas. No se crearon rutas ni buses nuevos.");
             }
 
             // Crear usuario administrador por defecto si no existe
             if (!usuarioRepository.existsByUsername("admin")) {
-                log.info("👤 Creando administrador...");
+                log.info("Creando administrador...");
                 Usuario admin = new Usuario();
                 admin.setUsername("admin");
                 admin.setPassword(passwordEncoder.encode("admin123"));
@@ -221,14 +227,15 @@ public class DataSeederService implements CommandLineRunner {
                 admin.setApellidos("Sistema");
                 admin.setEmail("admin@bustraker.edu.co");
                 usuarioRepository.save(admin);
-                log.info("✅ Administrador creado (user: admin, password: admin123)");
+                log.info("Completado: Administrador creado (user: admin, password: admin123)");
             } else {
-                log.info("✅ El administrador 'admin' ya existe. No se creó un nuevo admin.");
+                log.info("Completado: El administrador 'admin' ya existe. No se creó un nuevo admin.");
             }
 
             seedUsuarios(usuariosToCreate);
+            seedViajesEjemplo();
 
-            // NORMALIZAR ROLES en la BD (corregir inconsistencias)
+            // Normalizar roles en la base de datos
             normalizarRolesEnBaseDatos();
 
             // Resumen final
@@ -238,23 +245,23 @@ public class DataSeederService implements CommandLineRunner {
             long totalParadas = paradaRepository.count();
             long totalRegistros = totalRutas + totalBuses + totalUsuarios + totalParadas;
             
-            log.info("🎉 ================================================");
-            log.info("🎉 CARGA DE DATOS COMPLETADA EXITOSAMENTE");
-            log.info("🎉 ================================================");
-            log.info("📊 RESUMEN:");
-            log.info("   ✅ Rutas: {}", totalRutas);
-            log.info("   ✅ Buses: {}", totalBuses);
-            log.info("   ✅ Usuarios: {}", totalUsuarios);
-            log.info("   ✅ Paradas: {}", totalParadas);
-            log.info("   📈 TOTAL REGISTROS: {}", totalRegistros);
-            log.info("🎉 ================================================");
-            log.info("🔐 CREDENCIALES POR DEFECTO:");
+            log.info("================================================");
+            log.info("CARGA DE DATOS COMPLETADA EXITOSAMENTE");
+            log.info("================================================");
+            log.info("RESUMEN:");
+            log.info("   Rutas: {}", totalRutas);
+            log.info("   Buses: {}", totalBuses);
+            log.info("   Usuarios: {}", totalUsuarios);
+            log.info("   Paradas: {}", totalParadas);
+            log.info("   TOTAL REGISTROS: {}", totalRegistros);
+            log.info("================================================");
+            log.info("CREDENCIALES POR DEFECTO:");
             log.info("   Admin: user=admin, pass=admin123");
             log.info("   Usuario: user=[cualquiera generado], pass=user123");
-            log.info("🎉 ================================================");
+            log.info("================================================");
             
         } catch (Exception ex) {
-            log.error("❌ Error durante la carga de datos: {}", ex.getMessage(), ex);
+            log.error("Error durante la carga de datos: {}", ex.getMessage(), ex);
             log.error("La aplicación continuará sin los datos de prueba.");
         }
     }
@@ -263,10 +270,10 @@ public class DataSeederService implements CommandLineRunner {
         long existingNormalUsers = usuarioRepository.countByRole("ROLE_USER") + (long) usuarioRepository.countByRole("USER");
         int missingUsers = Math.max(0, targetUsuarios - (int) existingNormalUsers);
 
-        log.info("👥 Usuarios normales existentes: {}, objetivo: {}, faltantes: {}", existingNormalUsers, targetUsuarios, missingUsers);
+        log.info("Usuarios normales existentes: {}, objetivo: {}, faltantes: {}", existingNormalUsers, targetUsuarios, missingUsers);
 
         if (missingUsers <= 0) {
-            log.info("✅ Ya existen {} usuarios normales. No se agregaron más.", existingNormalUsers);
+            log.info("Ya existen {} usuarios normales. No se agregaron más.", existingNormalUsers);
             return;
         }
 
@@ -313,6 +320,48 @@ public class DataSeederService implements CommandLineRunner {
         }
 
         log.info("✅ {} usuarios creados exitosamente", missingUsers);
+    }
+
+    private void seedViajesEjemplo() {
+        if (viajeRepository.count() > 0) {
+            log.info("✅ Ya existen viajes en la base de datos. No se crearon viajes de ejemplo.");
+            return;
+        }
+
+        List<Usuario> usuarios = usuarioRepository.findAll();
+        if (usuarios.isEmpty()) {
+            log.info("⚠️ No hay usuarios para asignar viajes de ejemplo.");
+            return;
+        }
+
+        List<Ruta> rutas = rutaRepository.findAll();
+        if (rutas.isEmpty()) {
+            log.info("⚠️ No hay rutas disponibles para asignar viajes de ejemplo.");
+            return;
+        }
+
+        log.info("✈️ Creando viajes de ejemplo para usuarios existentes...");
+        int created = 0;
+        String[] estados = {"Completado", "Pendiente", "Cancelado"};
+
+        for (int i = 0; i < 15 && i < usuarios.size(); i++) {
+            Usuario usuario = usuarios.get(i);
+            Viaje viaje = new Viaje();
+            viaje.setUsuario(usuario);
+            Ruta ruta = rutas.get(random.nextInt(rutas.size()));
+            viaje.setNombreRuta(ruta.getNombre());
+            viaje.setFecha(LocalDate.now().minusDays(random.nextInt(30)));
+            viaje.setHora(LocalTime.of(random.nextInt(16) + 6, random.nextInt(4) * 15));
+            viaje.setEstado(estados[random.nextInt(estados.length)]);
+            viajeRepository.save(viaje);
+            created++;
+        }
+
+        if (created > 0) {
+            log.info("✅ {} viajes de ejemplo creados.", created);
+        } else {
+            log.info("⚠️ No se crearon viajes de ejemplo.");
+        }
     }
 
     private String generateUniqueUsername() {

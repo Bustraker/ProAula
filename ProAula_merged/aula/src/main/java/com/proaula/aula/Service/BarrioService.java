@@ -200,7 +200,7 @@ public class BarrioService {
     }
 
     private static void addCoordenadas(String nombre, double lat, double lng) {
-        // Shapefile coords take priority — only write if no real coord loaded yet
+        // Prioriza coords de shapefile si no hay valor existente
         String key = normalizeStatic(nombre);
         if (!COORDENADAS_CARTAGENA.containsKey(key)) {
             COORDENADAS_CARTAGENA.put(key, new double[]{lat, lng});

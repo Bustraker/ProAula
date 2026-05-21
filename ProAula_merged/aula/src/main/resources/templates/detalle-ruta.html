@@ -7,11 +7,12 @@
     <meta name="theme-color" content="#01315f">
     <title>Detalle de Ruta - Bustraker</title>
     <link rel="stylesheet" th:href="@{/css/style_detalle.css}">
+    <link rel="stylesheet" th:href="@{/css/style_common.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="shortcut icon" th:href="@{/images/Bus_icono.png}" type="image/x-icon">
 </head>
 <body>
-        <!-- Header -->
+        <!-- Encabezado -->
     <header class="main-header">
         <div class="header-inner">
             <div class="logo">
@@ -41,7 +42,7 @@
         </div>
     </header>
 
-    <!-- Contenido Principal -->
+    <!-- Contenido principal -->
     <main class="container">
         <!-- Botón Volver -->
         <div class="mb-3">
@@ -63,26 +64,26 @@
                     <h3 th:text="${ruta.nombre}">Nombre de la Ruta</h3>
                 </div>
                 <div class="card-body">
-                    <div class="d-flex justify-between align-center mb-3" style="flex-wrap: wrap; gap: 1rem;">
+                    <div class="d-flex flex-wrap flex-between mb-3">
                         <div>
                             <span class="badge badge-success">Activa</span>
                         </div>
                         <div class="d-flex gap-2">
-                            <button class="btn btn-primary" onclick="window.print()">
+                            <button class="btn btn-primary js-print">
                                 <i class="fas fa-print"></i> Imprimir
                             </button>
                         </div>
                     </div>
 
                     <!-- Información Principal -->
-                    <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                    <div class="dashboard-grid">
                         <div class="stat-card">
                             <div class="stat-icon primary">
                                 <i class="fas fa-clock"></i>
                             </div>
                             <div class="stat-content">
                                 <h4>Hora Aproximada</h4>
-                                <div class="stat-value" style="font-size: 1.5rem;" th:text="${ruta.horaAproximada}">08:00</div>
+                                <div class="stat-value" th:text="${ruta.horaAproximada}">08:00</div>
                             </div>
                         </div>
                         
@@ -92,7 +93,7 @@
                             </div>
                             <div class="stat-content">
                                 <h4>Total Buses</h4>
-                                <div class="stat-value" style="font-size: 1.5rem;" th:text="${#lists.size(ruta.buses)}">0</div>
+                                <div class="stat-value" th:text="${#lists.size(ruta.buses)}">0</div>
                             </div>
                         </div>
                         
@@ -102,7 +103,7 @@
                             </div>
                             <div class="stat-content">
                                 <h4>Total Paradas</h4>
-                                <div class="stat-value" style="font-size: 1.5rem;" th:text="${#lists.size(ruta.paradas)}">0</div>
+                                <div class="stat-value" th:text="${#lists.size(ruta.paradas)}">0</div>
                             </div>
                         </div>
                         
@@ -112,7 +113,7 @@
                             </div>
                             <div class="stat-content">
                                 <h4>Barrios</h4>
-                                <div class="stat-value" style="font-size: 1.5rem;" th:text="${#lists.size(ruta.barrios)}">0</div>
+                                <div class="stat-value" th:text="${#lists.size(ruta.barrios)}">0</div>
                             </div>
                         </div>
                     </div>
@@ -127,13 +128,9 @@
                     <h3><i class="fas fa-map"></i> Barrios que Cubre</h3>
                 </div>
                 <div class="card-body">
-                    <div th:if="${not #lists.isEmpty(ruta.barrios)}" style="display: flex; flex-wrap: wrap; gap: 0.75rem;">
-                        <span th:each="barrio : ${ruta.barrios}" 
-                              class="badge badge-primary"
-                              style="padding: 0.5rem 1rem; font-size: 0.9rem;"
-                              th:text="${barrio}">
-                            Barrio
-                        </span>
+                                                <div th:if="${not #lists.isEmpty(ruta.barrios)}" class="d-flex flex-wrap">
+                                                <span th:each="barrio : ${ruta.barrios}" class="badge badge-primary badge-sm" th:text="${barrio}">Barrio</span>
+                                                </div>
                     </div>
                     <div th:if="${#lists.isEmpty(ruta.barrios)}" class="alert alert-info">
                         <i class="fas fa-info-circle"></i>
@@ -228,46 +225,29 @@
                     <h3><i class="fas fa-map"></i> Recorrido en el Mapa</h3>
                 </div>
                 <div class="card-body">
-                    <div style="background: var(--gray-200); border-radius: var(--radius-md); padding: 3rem; text-align: center;">
-                        <i class="fas fa-map" style="font-size: 4rem; color: var(--gray-400); margin-bottom: 1rem;"></i>
-                        <h4 style="color: var(--gray-600);">Mapa Interactivo</h4>
-                        <p style="color: var(--gray-500); margin-top: 0.5rem;">
-                            Próximamente: Integración con Google Maps / Leaflet
-                        </p>
+                    <div class="info-card">
+                        <i class="fas fa-map"></i>
+                        <h4 class="info-card-title">Mapa Interactivo</h4>
+                        <p class="info-card-text">Próximamente: Integración con Google Maps / Leaflet</p>
                     </div>
                 </div>
             </div>
         </section>
     </main>
 
-    <!-- Footer -->
-    <footer style="background: var(--gray-800); color: var(--white); padding: 2rem; margin-top: 3rem;">
+    <!-- Pie de página -->
+    <footer class="footer-dark">
         <div class="container text-center">
             <div class="mb-3">
-                <img th:src="@{/images/Bus_icono.png}" alt="Logo Bustraker" style="width: 48px; height: 48px; margin: 0 auto 1rem; border-radius: var(--radius-md);">
-                <h3 style="color: var(--white); margin-bottom: 0.5rem;">Bustraker</h3>
-                <p style="opacity: 0.8;">Tu herramienta de gestión de rutas universitarias</p>
+                <img th:src="@{/images/Bus_icono.png}" alt="Logo Bustraker" class="footer-logo">
+                <h3 class="footer-title">Bustraker</h3>
+                <p class="info-card-text">Tu herramienta de gestión de rutas universitarias</p>
             </div>
-            <p style="opacity: 0.6; font-size: 0.875rem;">
-                &copy; 2026 Bustraker. Todos los derechos reservados.
-            </p>
+            <p class="footer-note">&copy; 2026 Bustraker. Todos los derechos reservados.</p>
         </div>
     </footer>
 
-    <script>
-        // Animación de entrada
-        document.addEventListener('DOMContentLoaded', function() {
-            const cards = document.querySelectorAll('.card');
-            cards.forEach((card, index) => {
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(20px)';
-                setTimeout(() => {
-                    card.style.transition = 'all 0.4s ease';
-                    card.style.opacity = '1';
-                    card.style.transform = 'translateY(0)';
-                }, index * 100);
-            });
-        });
-    </script>
+    <script th:src="@{/js/common.js}"></script>
+    <script th:src="@{/js/detalle_ruta.js}"></script>
 </body>
 </html>

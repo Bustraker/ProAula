@@ -53,7 +53,7 @@ public class PerfilController {
                 return "redirect:/perfil";
             }
 
-            // FIX: usar updateUsuario() en vez de register() para no re-encriptar la contraseña
+            // Usa updateUsuario() para evitar doble hash
             usuarioService.updateUsuario(usuario.getId(), buildUsuarioUpdate(nombres, apellidos, email));
 
             redirectAttributes.addFlashAttribute("success", "✅ Perfil actualizado exitosamente");
@@ -109,7 +109,7 @@ public class PerfilController {
                 return "redirect:/perfil";
             }
 
-            // FIX: usar changePassword() en vez de register() para no re-encriptar doble
+            // Usa changePassword() para no re-encriptar doble
             usuarioService.changePassword(usuario.getId(), passwordNuevo);
 
             redirectAttributes.addFlashAttribute("success", "✅ Contraseña cambiada exitosamente");

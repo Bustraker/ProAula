@@ -67,18 +67,24 @@
             </ul>
 
             <section id="Contacto">
-                <form method="post" th:action="@{/contacto}" th:object="${contactoMensaje}">
-                    <h2 id="contacto">Infomacion de Contacto</h2>
+                <form method="post" th:action="@{/contacto_public}" th:object="${contactoMensaje}">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <h2 id="contacto">Información de Contacto</h2>
                     <fieldset>
                         <legend>Información personal</legend>
                         <div>
                             <label>Nombre:
-                                <input type="text" name="name" placeholder="Nombre completo" required>
+                                <input type="text" th:field="*{nombre}" placeholder="Nombre completo" required>
+                            </label>
+                        </div>
+                        <div>
+                            <label>Apellidos:
+                                <input type="text" th:field="*{apellido}" placeholder="Apellidos" required>
                             </label>
                         </div>
                         <div>
                             <label>Email:
-                                <input type="email" name="email" placeholder="ejemplo@gmail.com" required>
+                                <input type="email" th:field="*{email}" placeholder="ejemplo@gmail.com" required>
                             </label>
                         </div>
                     </fieldset>
@@ -87,13 +93,13 @@
                         <legend>Información adicional</legend>
                         <div>
                             <label>Teléfono: 
-                                <input type="tel" name="phone" placeholder="3013639618" required pattern="[0-9]{9,}">
+                                <input type="tel" th:field="*{telefono}" placeholder="3013639618" required pattern="[0-9]{9,}">
                             </label>
                         </div>
                     </fieldset>
                     <div>
                         <label>Mensaje:
-                            <textarea name="message" rows="5" placeholder="Escribe tu mensaje aquí..." required></textarea>
+                            <textarea th:field="*{mensaje}" rows="5" placeholder="Escribe tu mensaje aquí..." required></textarea>
                         </label>
                     </div>
                     <div>

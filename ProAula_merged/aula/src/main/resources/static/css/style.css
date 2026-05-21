@@ -282,7 +282,7 @@ th {
     }
 }
 
-/* Centrar el header dentro del section y limitar su ancho para que no ocupe todo el espacio */
+/* Centra header y limita ancho */
 .hero-section {
     display: flex;
     justify-content: center;
@@ -567,7 +567,7 @@ th {
     }
 }
 
-/* Estilos para la sección de autenticación (iniciar sesión / registrarse) */
+/* Estilos para sección de autenticación */
 .auth-section {
     display: flex;
     justify-content: center;
@@ -582,7 +582,7 @@ th {
     box-sizing: border-box;
 }
 
-/* Cada item (por si se necesitan espaciados o alineaciones individuales) */
+/* Estilos para cada item */
 .auth-item {
     flex: 1;
     min-width: 150px;
@@ -622,7 +622,7 @@ th {
     opacity: 0.98;
 }
 
-/* Responsive: en móviles apilar botones y ajustar tamaños */
+/* Responsive: apilar botones en móvil */
 @media (max-width: 600px) {
     .auth-section {
         flex-direction: column;

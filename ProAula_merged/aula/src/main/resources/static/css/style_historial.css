@@ -35,7 +35,7 @@
 
 /* Estilos base */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Fuente moderna y legible */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Fuente moderna */
     background:
         radial-gradient(1200px 600px at 10% 10%, rgba(11,61,145,0.06), transparent 8%),
         radial-gradient(1000px 500px at 90% 90%, rgba(198,40,40,0.03), transparent 10%),

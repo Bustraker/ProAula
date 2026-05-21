@@ -1,0 +1,182 @@
+/* Polished public map theme */
+html,
+body {
+    margin: 0;
+    min-height: 100%;
+    font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: #102a43;
+    background: linear-gradient(180deg, #f4f7fb 0%, #e8eef7 100%);
+}
+
+#map {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.options-panel {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    width: min(380px, calc(100vw - 48px));
+    max-height: calc(100vh - 48px);
+    overflow-y: auto;
+    padding: 28px;
+    border-radius: 26px;
+    background: rgba(255, 255, 255, 0.96);
+    border: 1px solid rgba(16, 42, 67, 0.08);
+    box-shadow: 0 28px 70px rgba(16, 42, 67, 0.12);
+    backdrop-filter: blur(18px);
+    z-index: 1000;
+}
+
+.options-panel h2 {
+    margin: 0 0 18px;
+    color: #0f3057;
+    font-size: 1.45rem;
+    letter-spacing: 0.02em;
+    line-height: 1.2;
+}
+
+.options-panel label {
+    display: block;
+    margin: 18px 0 8px;
+    font-weight: 700;
+    color: #24456b;
+    font-size: 0.95rem;
+}
+
+.options-panel select,
+.options-panel input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid #d8e2ef;
+    border-radius: 14px;
+    font-size: 0.98rem;
+    color: #1d3f61;
+    background: #ffffff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    box-sizing: border-box;
+}
+
+.options-panel select:focus,
+.options-panel input:focus {
+    outline: none;
+    border-color: #5f8ccf;
+    box-shadow: 0 0 0 4px rgba(95, 140, 207, 0.16);
+}
+
+.options-panel select:disabled,
+.options-panel input:disabled {
+    background: #f4f8ff;
+    cursor: not-allowed;
+}
+
+.options-panel button {
+    width: 100%;
+    padding: 14px;
+    margin-top: 20px;
+    background: linear-gradient(135deg, #1d4f91 0%, #3f7fc7 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 14px;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+
+.options-panel button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 14px 30px rgba(31, 77, 135, 0.18);
+}
+
+.options-panel button:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.btn-secondary {
+    background: #eef5ff;
+    color: #174a7d;
+}
+
+.ruta-info {
+    margin-top: 22px;
+    padding: 18px;
+    border-radius: 18px;
+    background: #fbfcff;
+    border: 1px solid rgba(34, 87, 148, 0.12);
+    box-shadow: 0 14px 28px rgba(22, 63, 111, 0.08);
+}
+
+.toggle-control {
+    margin: 12px 0 0 0;
+}
+
+.toggle-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.95rem;
+    color: #1d3f61;
+    font-weight: 600;
+}
+
+.toggle-label input {
+    width: 1.1rem;
+    height: 1.1rem;
+    accent-color: #3f7fc7;
+}
+
+.ruta-info h4 {
+    margin: 0 0 12px;
+    font-size: 1rem;
+    color: #15406f;
+}
+
+.ruta-info p {
+    margin: 10px 0;
+    color: #445f7d;
+    line-height: 1.55;
+    font-size: 0.95rem;
+}
+
+#rutaStats {
+    margin-top: 14px;
+    color: #0f3057;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 11px;
+    border-radius: 999px;
+    background: #dbeafe;
+    color: #1d4ed8;
+    font-size: 0.82rem;
+    margin-right: 6px;
+}
+
+.ruta-info strong {
+    color: #1d3c5a;
+}
+
+@media (max-width: 768px) {
+    .options-panel {
+        left: 16px;
+        right: 16px;
+        top: 16px;
+        width: auto;
+        padding: 22px;
+        border-radius: 22px;
+    }
+}

@@ -18,26 +18,26 @@
         <p>Administra las rutas de buses en Cartagena.</p>
     </header>
     <main>
-        <section id="formulario-agregar-ruta" style="background:#fff;border-radius:10px;padding:24px;margin-top:32px;box-shadow:0 2px 8px rgba(255,0,0,0.08);max-width:500px;margin-left:auto;margin-right:auto;">
-            <h2 style="color:#c0392b;text-align:center;">Agregar Nueva Ruta</h2>
+        <section id="formulario-agregar-ruta" class="card p-20 mx-auto">
+            <h2 class="text-primary text-center">Agregar Nueva Ruta</h2>
             <form th:action="@{/rutas}" method="post" th:object="${newRuta}">
-                <label for="nombre" style="color:#c0392b;font-weight:600;">Nombre de la Ruta:</label>
-                <input type="text" id="nombre" th:field="*{nombre}" placeholder="Ej. Avenida Express" required style="width:100%;padding:10px;margin-bottom:12px;border:1px solid #c0392b;border-radius:6px;">
-                <span th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}" style="color: red;"></span>
+                <label for="nombre" class="text-primary fw-600">Nombre de la Ruta:</label>
+                <input type="text" id="nombre" th:field="*{nombre}" placeholder="Ej. Avenida Express" required class="form-control full-width">
+                <span th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}" class="text-danger"></span>
 
-                <label for="barrios" style="color:#c0392b;font-weight:600;">Barrios (separados por coma):</label>
-                <input type="text" id="barrios" name="barrios" placeholder="Ej. Zaragoza, Yolanda" required style="width:100%;padding:10px;margin-bottom:12px;border:1px solid #c0392b;border-radius:6px;">
-                <span th:if="${#fields.hasErrors('barrios')}" th:errors="*{barrios}" style="color: red;"></span>
+                <label for="barrios" class="text-primary fw-600">Barrios (separados por coma):</label>
+                <input type="text" id="barrios" name="barrios" placeholder="Ej. Zaragoza, Yolanda" required class="form-control full-width">
+                <span th:if="${#fields.hasErrors('barrios')}" th:errors="*{barrios}" class="text-danger"></span>
 
-                <label for="horaAproximada" style="color:#c0392b;font-weight:600;">Hora Aproximada:</label>
-                <input type="time" id="horaAproximada" th:field="*{horaAproximada}" style="width:100%;padding:10px;margin-bottom:12px;border:1px solid #c0392b;border-radius:6px;">
-                <span th:if="${#fields.hasErrors('horaAproximada')}" th:errors="*{horaAproximada}" style="color: red;"></span>
+                <label for="horaAproximada" class="text-primary fw-600">Hora Aproximada:</label>
+                <input type="time" id="horaAproximada" th:field="*{horaAproximada}" class="form-control full-width">
+                <span th:if="${#fields.hasErrors('horaAproximada')}" th:errors="*{horaAproximada}" class="text-danger"></span>
 
-                <!-- Si quieres asociar buses, puedes agregar aquí un campo extra -->
+                <!-- Campo opcional de buses -->
                 <!-- <label for="buses" style="color:#c0392b;font-weight:600;">Buses asociados (opcional):</label>
                 <input type="text" id="buses" name="buses" placeholder="Ej. ABC123, DEF456" style="width:100%;padding:10px;margin-bottom:12px;border:1px solid #c0392b;border-radius:6px;"> -->
 
-                <button type="submit" style="background:#c0392b;color:#fff;border:none;border-radius:6px;padding:12px 24px;font-size:16px;cursor:pointer;width:100%;margin-top:12px;">Agregar Ruta</button>
+                <button type="submit" class="btn btn-primary full-width mt-3">Agregar Ruta</button>
             </form>
         </section>
 
@@ -48,9 +48,9 @@
                     <strong th:text="${ruta.nombre}"></strong> - Barrios: <span th:each="barrio : ${ruta.barrios}" th:text="${barrio} + ', '"></span>
                     <span th:if="${hora != ''}">| Hora: <span th:text="${hora}"></span></span>
                     <a th:href="@{/editar-ruta/{id}(id=${ruta.id})}">Editar</a> | 
-                    <form th:action="@{/eliminar-ruta/{id}(id=${ruta.id})}" method="post" style="display:inline; margin:0;">
+                    <form th:action="@{/eliminar-ruta/{id}(id=${ruta.id})}" method="post">
                         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                        <button type="submit" style="background:none;border:none;color:#c0392b;text-decoration:underline;cursor:pointer;padding:0;font:inherit;" onclick="return confirm('¿Eliminar ruta?');">Eliminar</button>
+                        <button type="submit" class="btn-link-clear" data-confirm="¿Eliminar ruta?">Eliminar</button>
                     </form>
                 </li>
             </ul>

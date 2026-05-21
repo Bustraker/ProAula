@@ -104,7 +104,7 @@ footer { grid-area: footer; }
 }
 
 #plan-viaje > div > div:last-child {
-    /* Map column: prefer to take at least half the available width */
+    /* Mapa: al menos la mitad del ancho */
     flex: 2 1 60%;
     min-width: 50%;
     max-width: none;

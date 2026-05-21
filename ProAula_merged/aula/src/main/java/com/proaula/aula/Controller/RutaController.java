@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.proaula.aula.Entity.Ruta;
@@ -92,7 +91,7 @@ public class RutaController {
         return "redirect:/rutas";
     }
 
-    // Páginas de gestión de rutas (apuntan a plantillas en Admin si aplica)
+    // Gestión de rutas para admin
     @GetMapping("/rutas/admin")
     public String gestionarRutas(Model model) {
         List<Ruta> rutas = rutaService.getAllRutas();
@@ -125,10 +124,7 @@ public class RutaController {
         return "redirect:/rutas";
     }
 
-    /**
-     * Método auxiliar para procesar los barrios
-     * Maneja tanto cadenas separadas por coma como listas
-     */
+    // Procesa barrios de ruta desde texto o lista.
     private void procesarBarrios(Ruta ruta) {
         if (ruta.getBarrios() != null && !ruta.getBarrios().isEmpty()) {
             List<String> barriosProcesados = new ArrayList<>();

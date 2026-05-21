@@ -37,10 +37,10 @@ body {
     min-height: 100vh;
     display: flex !important;
     flex-direction: column !important;
-    align-items: center !important;    /* centra horizontalmente el cuadro */
-    justify-content: flex-start !important; /* Cambiado de center a flex-start para alinear desde arriba y hacer visible el título */
+    align-items: center !important;    /* centra horizontalmente */
+    justify-content: flex-start !important; /* alinea desde arriba */
     gap: clamp(12px, 2vw, 18px);
-    padding: clamp(20px, 4vw, 40px) clamp(15px, 3vw, 20px) clamp(15px, 3vw, 20px) clamp(15px, 3vw, 20px) !important; /* espacio superior reducido para el título */
+    padding: clamp(20px, 4vw, 40px) clamp(15px, 3vw, 20px) clamp(15px, 3vw, 20px) clamp(15px, 3vw, 20px) !important; /* espacio superior reducido */
     background-repeat: no-repeat;
     background-attachment: fixed;
 }
@@ -437,4 +437,117 @@ footer {
         font-size: 0.9em;
         padding: 10px;
     }
+}
+
+.filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.95rem 1rem;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.14);
+    color: var(--text);
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.form-control:focus {
+    border-color: rgba(198,40,40,0.9);
+    background: rgba(255,255,255,0.1);
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.9rem 1rem;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.btn-primary {
+    background: var(--accent);
+    color: #02131a;
+    border-color: rgba(198,40,40,0.2);
+}
+
+.btn-secondary {
+    background: rgba(255,255,255,0.08);
+    color: var(--text);
+    border-color: rgba(255,255,255,0.16);
+}
+
+.btn-outline {
+    background: transparent;
+    color: var(--text);
+    border-color: rgba(255,255,255,0.16);
+}
+
+.btn-outline.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(198,40,40,0.08);
+}
+
+.filter-row .form-control {
+    flex: 1 1 200px;
+    min-width: 150px;
+}
+
+.toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+#busTableContainer {
+    margin-top: 1.5rem;
+    overflow-x: auto;
+}
+
+#busTable {
+    width: 100%;
+    border-collapse: collapse;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+#busTable th,
+#busTable td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    color: var(--text);
+    font-size: 0.95rem;
+}
+
+#busTable th {
+    background: rgba(255,255,255,0.05);
+    color: #f1f5f9;
+}
+
+#busTable tbody tr:hover {
+    background: rgba(255,255,255,0.05);
+}
+
+.btn-outline.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(198,40,40,0.08);
 }

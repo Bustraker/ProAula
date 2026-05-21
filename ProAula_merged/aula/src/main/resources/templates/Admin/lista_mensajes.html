@@ -19,8 +19,8 @@
                 <a th:href="@{/gestionar-usuarios}"><i class="fas fa-users"></i> Usuarios</a>
                 <a th:href="@{/reportes}"><i class="fas fa-chart-bar"></i> Reportes</a>
                 <a th:href="@{/mensajes_contacto}" class="active"><i class="fas fa-envelope"></i> Mensajes</a>
-                <a th:href="@{/agregar_rutas}"><i class="fas fa-route"></i> Rutas</a>
-                <a th:href="@{/registro_de_buses}"><i class="fas fa-bus"></i> Buses</a>
+                <a th:href="@{/rutas/admin}"><i class="fas fa-route"></i> Rutas</a>
+                <a th:href="@{/registro-buses}"><i class="fas fa-bus"></i> Buses</a>
             </nav>
         </aside>
 
@@ -92,26 +92,6 @@
         </main>
     </div>
 
-    <script>
-        // Asegurar que el sidebar esté colapsado por defecto en móviles
-        document.addEventListener('DOMContentLoaded', function() {
-            const sidebar = document.querySelector('.sidebar');
-            const toggleButton = document.querySelector('.sidebar-toggle');
-            
-            // Ajustar sidebar en pantallas pequeñas
-            if (window.innerWidth <= 768) {
-                sidebar.classList.add('collapsed');
-            }
-            
-            // Actualizar sidebar cuando cambie el tamaño de la ventana
-            window.addEventListener('resize', function() {
-                if (window.innerWidth <= 768) {
-                    sidebar.classList.add('collapsed');
-                } else {
-                    sidebar.classList.remove('collapsed');
-                }
-            });
-        });
-    </script>
+    <script th:src="@{/js/lista_mensajes.js}"></script>
 </body>
 </html>

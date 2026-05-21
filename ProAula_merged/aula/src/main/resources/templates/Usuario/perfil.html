@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <!-- Header -->
+    <!-- Encabezado -->
     <header class="main-header">
         <div class="header-inner">
             <div class="logo">
@@ -38,7 +38,7 @@
         </div>
     </header>
 
-    <!-- Contenido Principal -->
+    <!-- Contenido principal -->
     <main class="container container-md">
         <div class="content-wrapper-inner">
             <div class="card">
@@ -46,8 +46,7 @@
                     <h3><i class="fas fa-user-edit"></i> Información de Perfil</h3>
                 </div>
                 <div class="card-body">
-                    <!-- BUG CORREGIDO: eliminado th:field duplicado con th:value.
-                         Se usa solo name + th:value para envío limpio sin binding de objeto. -->
+                    <!-- Ajuste de formulario: elimina duplicado de binding -->
                     <form th:action="@{/perfil/actualizar}" method="post">
                         <div class="form-row">
                             <div class="form-col form-col-6">
@@ -115,7 +114,7 @@
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-save"></i> Guardar Cambios
                             </button>
-                            <!-- BUG CORREGIDO: era /index_3 (ruta interna inexistente), corregido a /dashboard -->
+                            <!-- Ajuste de ruta de regreso -->
                             <a th:href="@{/dashboard}" class="btn btn-secondary">
                                 <i class="fas fa-arrow-left"></i> Volver
                             </a>
@@ -126,24 +125,6 @@
         </div>
     </main>
 
-    <script>
-        // BUG CORREGIDO: validación de contraseñas antes de enviar el form
-        document.querySelector('form').addEventListener('submit', function(e) {
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-
-            if (password && password !== confirmPassword) {
-                e.preventDefault();
-                alert('❌ Las contraseñas no coinciden. Por favor, verifica e intenta de nuevo.');
-                return false;
-            }
-
-            if (password && password.length < 6) {
-                e.preventDefault();
-                alert('❌ La contraseña debe tener al menos 6 caracteres.');
-                return false;
-            }
-        });
-    </script>
+    <script th:src="@{/js/perfil.js}"></script>
 </body>
 </html>

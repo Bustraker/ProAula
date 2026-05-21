@@ -42,9 +42,7 @@ public class AdminLoginController {
     @Autowired
     private SecurityContextRepository securityContextRepository;
     
-    /**
-     * Mostrar formulario de login administrativo
-     */
+    // Muestra login admin
     @GetMapping("/admin-login")
     public String mostrarLoginAdmin(
             @RequestParam(required = false) Boolean verified,
@@ -58,9 +56,7 @@ public class AdminLoginController {
         return "admin-login";
     }
     
-    /**
-     * Paso 1: Verificar código de administrador
-     */
+    // Verifica código admin
     @PostMapping("/admin/verificar-codigo")
     public String verificarCodigoAdmin(
             @RequestParam String codigoAdmin,
@@ -78,9 +74,7 @@ public class AdminLoginController {
         }
     }
     
-    /**
-     * Paso 2: Autenticar con credenciales de usuario ADMIN
-     */
+    // Autentica administrador
     @PostMapping("/admin/login")
     public String loginAdmin(
             @RequestParam String username,
@@ -97,66 +91,53 @@ public class AdminLoginController {
         }
         
         try {
-            // Validar primero en la BD que el usuario sea ADMIN
+            // Verifica rol ADMIN
             if (!usuarioService.isAdminUser(username)) {
                 log.warn("Intento de login de admin con usuario no-admin: {}", username);
                 redirectAttributes.addFlashAttribute("error", "❌ Este usuario no tiene permisos de administrador");
                 return "redirect:/admin-login?verified=true";
             }
             
-            // Autenticar con Spring Security
+            // Autentica con Spring Security
             Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(username, password)
             );
             
-            // Doble verificación: validar que el usuario tenga rol ADMIN en authorities
+            // Confirma rol ADMIN en seguridad
             Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
             boolean isAdmin = authorities.stream()
                 .anyMatch(auth -> "ROLE_ADMIN".equals(auth.getAuthority()));
             
             if (!isAdmin) {
-                // Usuario no es administrador
-                log.error("Usuario {} autenticado pero sin rol ADMIN. Roles obtenidos: {}", username, authorities);
-                redirectAttributes.addFlashAttribute("error", "❌ Error de roles: Este usuario no tiene permisos de administrador");
+                log.error("Usuario {} sin rol ADMIN. Roles: {}", username, authorities);
+                redirectAttributes.addFlashAttribute("error", "Este usuario no tiene permisos de administrador");
                 return "redirect:/admin-login?verified=true";
             }
             
-            // ✅ IMPORTANTE: Persistir la autenticación en Spring Security y en sesión HTTP
-            // Crear contexto de seguridad
+            // Guarda auth en contexto de seguridad
             SecurityContext context = SecurityContextHolder.createEmptyContext();
             context.setAuthentication(authentication);
-            
-            // Establecer en SecurityContextHolder
             SecurityContextHolder.setContext(context);
-            
-            // Persistir en la sesión HTTP usando SecurityContextRepository
             securityContextRepository.saveContext(context, request, response);
             
-            // Guardar información adicional en sesión
             session.setAttribute("usuarioAutenticado", username);
             session.setAttribute("rolUsuario", "ADMIN");
-            session.removeAttribute("adminCodeVerified"); // Limpiar código verificado
+            session.removeAttribute("adminCodeVerified");
             
-            log.info("✅ Admin login successful for user: {}, redirecting to /index_2", username);
-            log.info("✅ Authentication persisted in session. Roles: {}", authorities);
-            
-            // Redirigir al dashboard de administrador
             return "redirect:/index_2";
             
         } catch (BadCredentialsException e) {
-            log.warn("Intento de login fallido para usuario: {} - Credenciales inválidas", username);
-            redirectAttributes.addFlashAttribute("error", "❌ Usuario o contraseña incorrectos");
+            log.warn("Login fallido para usuario: {} - Credenciales inválidas", username);
+            redirectAttributes.addFlashAttribute("error", "Usuario o contraseña incorrectos");
             return "redirect:/admin-login?verified=true";
         } catch (Exception e) {
             log.error("Error al iniciar sesión como admin para usuario: {}", username, e);
-            redirectAttributes.addFlashAttribute("error", "❌ Error al iniciar sesión: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Error al iniciar sesión: " + e.getMessage());
             return "redirect:/admin-login?verified=true";
         }
     }
     
-    /**
-     * Logout de administrador
-     */
+    // Cierra sesión admin
     @GetMapping("/admin/logout")
     public String logoutAdmin(HttpSession session, RedirectAttributes redirectAttributes) {
         try {
