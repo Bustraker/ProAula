@@ -46,4 +46,22 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    document.querySelectorAll('[data-password-toggle]').forEach(button => {
+        const passwordInput = document.getElementById(button.getAttribute('aria-controls'));
+        const icon = button.querySelector('i');
+        if (!passwordInput || !icon) return;
+
+        button.addEventListener('click', function() {
+            const shouldShowPassword = passwordInput.type === 'password';
+            const showLabel = button.dataset.showLabel || 'Mostrar contraseña';
+            const hideLabel = button.dataset.hideLabel || 'Ocultar contraseña';
+            passwordInput.type = shouldShowPassword ? 'text' : 'password';
+            button.setAttribute('aria-pressed', String(shouldShowPassword));
+            button.setAttribute('aria-label', shouldShowPassword ? hideLabel : showLabel);
+            button.setAttribute('title', shouldShowPassword ? hideLabel : showLabel);
+            icon.classList.toggle('fa-eye', !shouldShowPassword);
+            icon.classList.toggle('fa-eye-slash', shouldShowPassword);
+        });
+    });
 });

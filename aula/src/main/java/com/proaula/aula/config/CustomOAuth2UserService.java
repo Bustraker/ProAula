@@ -138,6 +138,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         if (PROVIDER_GOOGLE.equals(registrationId)) {
             return user.getAttribute("given_name");
         }
+        if ("discord".equals(registrationId)) {
+            String displayName = user.getAttribute("global_name");
+            if (displayName == null || displayName.isBlank()) {
+                displayName = user.getAttribute("username");
+            }
+            return displayName != null ? displayName : "Usuario";
+        }
         String name = user.getAttribute("name");
         if (name != null && name.contains(" ")) {
             return name.substring(0, name.lastIndexOf(' '));

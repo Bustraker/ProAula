@@ -2,15 +2,58 @@ document.addEventListener('DOMContentLoaded', function() {
     const roleSelect = document.getElementById('role');
     const adminCodeGroup = document.getElementById('adminCodeGroup');
     const adminCodeInput = document.getElementById('adminCode');
+    const passwordInput = document.getElementById('password');
+    const passwordConfirmInput = document.getElementById('passwordConfirm');
+    const passwordStrength = document.querySelector('.auth-strength');
+    const passwordStrengthText = document.getElementById('passwordStrengthText');
+    const passwordConfirmFeedback = document.getElementById('passwordConfirmFeedback');
+
+    function updatePasswordStrength() {
+        if (!passwordInput || !passwordStrength || !passwordStrengthText) return;
+
+        const passwordValue = passwordInput.value;
+        const strengthChecks = [
+            passwordValue.length >= 6,
+            passwordValue.length >= 10,
+            /[a-z]/i.test(passwordValue) && /\d/.test(passwordValue),
+            /[^a-z\d]/i.test(passwordValue)
+        ];
+        const strengthLevel = strengthChecks.filter(Boolean).length;
+        const strengthLabels = ['Mínimo 6 caracteres', 'Básica', 'Aceptable', 'Segura', 'Muy segura'];
+
+        passwordStrength.dataset.level = passwordValue ? String(strengthLevel) : '0';
+        passwordStrengthText.textContent = passwordValue ? strengthLabels[strengthLevel] : strengthLabels[0];
+    }
+
+    function updatePasswordConfirmation() {
+        if (!passwordInput || !passwordConfirmInput || !passwordConfirmFeedback) return;
+
+        const confirmationValue = passwordConfirmInput.value;
+        const passwordsMatch = confirmationValue.length > 0 && confirmationValue === passwordInput.value;
+        const hasMismatch = confirmationValue.length > 0 && !passwordsMatch;
+
+        passwordConfirmInput.classList.toggle('is-valid', passwordsMatch);
+        passwordConfirmInput.classList.toggle('is-invalid', hasMismatch);
+        passwordConfirmInput.setAttribute('aria-invalid', String(hasMismatch));
+        passwordConfirmFeedback.classList.toggle('is-valid', passwordsMatch);
+        passwordConfirmFeedback.classList.toggle('is-invalid', hasMismatch);
+        passwordConfirmFeedback.textContent = passwordsMatch
+            ? 'Las contraseñas coinciden.'
+            : hasMismatch
+                ? 'Las contraseñas todavía no coinciden.'
+                : 'Repite la contraseña para confirmarla.';
+    }
 
     function toggleAdminCode() {
         if (!roleSelect || !adminCodeGroup || !adminCodeInput) return;
 
         if (roleSelect.value === 'ADMIN') {
+            adminCodeGroup.classList.remove('hidden');
             adminCodeGroup.style.display = 'block';
             adminCodeInput.required = true;
             adminCodeInput.focus();
         } else {
+            adminCodeGroup.classList.add('hidden');
             adminCodeGroup.style.display = 'none';
             adminCodeInput.required = false;
             adminCodeInput.value = '';
@@ -19,6 +62,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     roleSelect?.addEventListener('change', toggleAdminCode);
     toggleAdminCode();
+
+    passwordInput?.addEventListener('input', function() {
+        updatePasswordStrength();
+        updatePasswordConfirmation();
+    });
+    passwordConfirmInput?.addEventListener('input', updatePasswordConfirmation);
 
     const registroForm = document.getElementById('registroForm');
     if (registroForm) {
@@ -31,7 +80,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (password !== passwordConfirm) {
                 e.preventDefault();
-                alert('❌ Las contraseñas no coinciden. Por favor, verifica e intenta de nuevo.');
+                updatePasswordConfirmation();
                 document.getElementById('passwordConfirm').focus();
                 return false;
             }
@@ -69,11 +118,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const username = this.value;
         const minLength = 4;
         const maxLength = 20;
-        if (username.length > 0 && (username.length < minLength || username.length > maxLength)) {
-            this.style.borderColor = 'var(--danger)';
-        } else {
-            this.style.borderColor = 'var(--gray-200)';
-        }
+        const hasValue = username.length > 0;
+        const isInvalid = hasValue && (username.length < minLength || username.length > maxLength);
+        this.classList.toggle('is-invalid', isInvalid);
+        this.classList.toggle('is-valid', hasValue && !isInvalid);
+        this.setAttribute('aria-invalid', String(isInvalid));
     });
 
     const card = document.querySelector('.card');

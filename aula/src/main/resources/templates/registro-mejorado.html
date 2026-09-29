@@ -7,12 +7,16 @@
     <meta name="description" content="Registro de Usuario - Bustraker">
     <meta name="theme-color" content="#01315f">
     <title>Registrarse - Bustraker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/style_registro.css}">
     <link rel="stylesheet" th:href="@{/css/style_common.css}">
+    <link rel="stylesheet" th:href="@{/css/style_auth.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="shortcut icon" th:href="@{/images/Bus_icono.png}" type="image/x-icon">
 </head>
-<body>
+<body class="auth-body">
     <!-- Encabezado -->
     <header class="main-header">
         <div class="header-inner">
@@ -20,7 +24,7 @@
                 <img th:src="@{/images/Bus_icono.png}" alt="Logo Bustraker">
                 <span class="brand">Bustraker</span>
             </div>
-            <nav class="main-nav">
+            <nav class="main-nav" aria-label="Navegación principal">
                 <a th:href="@{/}" class="nav-link">
                     <i class="fas fa-home"></i> Inicio
                 </a>
@@ -32,20 +36,35 @@
     </header>
 
     <!-- Contenido principal -->
-    <main class="hero-section">
-        <div class="container container-sm">
+    <main class="hero-section auth-page auth-page--register">
+        <div class="container container-sm auth-layout auth-layout--register">
+            <aside class="auth-story" aria-label="Marca Bustraker">
+                <div class="auth-story__brand">
+                    <img th:src="@{/images/Bus_icono.png}" alt="">
+                    <span>Bustraker</span>
+                </div>
+                <div class="auth-route-art" aria-hidden="true">
+                    <span class="auth-stop auth-stop--start"><i class="fas fa-location-dot"></i></span>
+                    <span class="auth-route-art__line"></span>
+                    <span class="auth-bus"><i class="fas fa-bus"></i></span>
+                    <span class="auth-stop auth-stop--end"><i class="fas fa-location-dot"></i></span>
+                </div>
+            </aside>
+            <section class="auth-content" aria-labelledby="registerTitle">
             <div class="card_animate-slideUp">
                 <div class="card-header">
-                    <h3><i class="fas fa-user-plus"></i> Crear Cuenta Nueva</h3>
+                    <h1 id="registerTitle"><i class="fas fa-user-plus" aria-hidden="true"></i> Crear Cuenta</h1>
                 </div>
                 <div class="card-body">
                     <!-- Estado de error -->
-                    <div th:if="${error}" class="alert alert-danger">
+                    <div th:if="${error}" class="alert alert-danger" role="alert">
                         <i class="fas fa-exclamation-triangle"></i>
                         <span th:text="${error}">Error en el registro</span>
                     </div>
 
-                    <form th:action="@{/registro}" method="post" id="registroForm">
+                    <form th:action="@{/registro}" method="post" id="registroForm" aria-labelledby="registerTitle">
+                        <h2 class="auth-form-heading">Datos personales</h2>
+
                         <!-- Nombres y Apellidos -->
                         <div class="d-flex gap-2 flex-wrap">
                             <div class="form-group flex-1 min-w-200">
@@ -74,6 +93,7 @@
                             </div>
                         </div>
 
+                        <div class="auth-field-grid">
                         <!-- Usuario -->
                         <div class="form-group">
                             <label class="form-label" for="username">
@@ -83,11 +103,13 @@
                                     id="username" 
                                     name="username"
                                     class="form-control" 
-                                    placeholder="Elige un nombre de usuario (4-20 caracteres)"
+                                    placeholder="Elige un nombre de usuario"
+                                    autocomplete="username"
+                                    aria-describedby="usernameHelp"
                                     minlength="4"
                                     maxlength="20"
                                     required>
-                            <small class="form-text">
+                            <small class="form-text" id="usernameHelp">
                                 <i class="fas fa-info-circle"></i> Entre 4 y 20 caracteres
                             </small>
                         </div>
@@ -102,27 +124,40 @@
                                     name="email"
                                     class="form-control" 
                                     placeholder="tu@email.com"
+                                    autocomplete="email"
                                     required>
-                            <small class="form-text">
-                                <i class="fas fa-shield-alt"></i> Usaremos este email para notificaciones importantes
-                            </small>
+                        </div>
                         </div>
 
+                        <h2 class="auth-form-heading">Seguridad de la cuenta</h2>
+
+                        <div class="auth-field-grid auth-field-grid--password">
                         <!-- Contraseña -->
                         <div class="form-group">
                             <label class="form-label" for="password">
                                 <i class="fas fa-lock"></i> Contraseña *
                             </label>
-                            <input type="password" 
-                                    id="password" 
-                                    name="password"
-                                    class="form-control" 
-                                    placeholder="Mínimo 6 caracteres"
-                                    minlength="6"
-                                    required>
-                            <small class="form-text">
-                                <i class="fas fa-shield-alt"></i> Mínimo 6 caracteres. ¡Elige una contraseña segura!
-                            </small>
+                            <div class="auth-password-control">
+                                <input type="password" 
+                                        id="password" 
+                                        name="password"
+                                        class="form-control" 
+                                        placeholder="Crea una contraseña"
+                                        autocomplete="new-password"
+                                        aria-describedby="passwordStrengthText"
+                                        minlength="6"
+                                        required>
+                                <button type="button" class="auth-password-toggle" data-password-toggle data-show-label="Mostrar contraseña" data-hide-label="Ocultar contraseña" aria-controls="password" aria-label="Mostrar contraseña" aria-pressed="false" title="Mostrar contraseña">
+                                    <i class="fas fa-eye" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                            <div class="auth-strength" data-level="0" aria-label="Indicador de seguridad de la contraseña">
+                                <span class="auth-strength__bar"></span>
+                                <span class="auth-strength__bar"></span>
+                                <span class="auth-strength__bar"></span>
+                                <span class="auth-strength__bar"></span>
+                                <small class="auth-strength__label" id="passwordStrengthText" aria-live="polite">Mínimo 6 caracteres</small>
+                            </div>
                         </div>
 
                         <!-- Confirmar Contraseña -->
@@ -130,16 +165,24 @@
                             <label class="form-label" for="passwordConfirm">
                                 <i class="fas fa-lock"></i> Confirmar Contraseña *
                             </label>
-                            <input type="password" 
-                                    id="passwordConfirm" 
-                                    name="passwordConfirm"
-                                    class="form-control" 
-                                    placeholder ="Repite tu contraseña"
-                                    required>
-                                    <small class="form-text">
-                                        <i class="fas fa-shield-alt"></i> Asegúrate de que ambas contraseñas coincidan
-                                    </small>
-                                </div>
+                            <div class="auth-password-control">
+                                <input type="password" 
+                                        id="passwordConfirm" 
+                                        name="passwordConfirm"
+                                        class="form-control" 
+                                        placeholder="Repite tu contraseña"
+                                        autocomplete="new-password"
+                                        aria-describedby="passwordConfirmFeedback"
+                                        required>
+                                <button type="button" class="auth-password-toggle" data-password-toggle data-show-label="Mostrar confirmación de contraseña" data-hide-label="Ocultar confirmación de contraseña" aria-controls="passwordConfirm" aria-label="Mostrar confirmación de contraseña" aria-pressed="false" title="Mostrar confirmación de contraseña">
+                                    <i class="fas fa-eye" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                            <small class="form-text auth-password-feedback" id="passwordConfirmFeedback" aria-live="polite">Repite la contraseña para confirmarla.</small>
+                        </div>
+                        </div>
+
+                        <h2 class="auth-form-heading">Tipo de cuenta</h2>
 
                         <!-- Rol de Usuario -->
                         <div class="form-group">
@@ -153,25 +196,20 @@
                                 <option value="USER">Usuario Regular</option>
                                 <option value="ADMIN">Administrador</option>
                             </select>
-                            <small class="form-text">
-                                <i class="fas fa-info-circle"></i> Selecciona el tipo de cuenta que deseas crear
-                            </small>
                         </div>
 
                         <!-- Código ADMIN visible solo si aplica -->
-                        <div class="form-group hidden" id="adminCodeGroup" style="display: none;">
+                        <div class="form-group hidden" id="adminCodeGroup" style="display: none;" aria-live="polite">
                             <label class="form-label" for="adminCode">
                                 <i class="fas fa-key"></i> Código de Administrador *
                             </label>
-                            <input type="text" 
+                                <input type="text" 
                                     id="adminCode" 
                                     name="adminCode"
                                     class="form-control" 
                                     placeholder="Ingresa el código de administrador"
+                                    autocomplete="off"
                                     maxlength="20">
-                            <small class="form-text">
-                                <i class="fas fa-shield-alt"></i> Requerido para crear cuenta de administrador
-                            </small>
                         </div>
 
                         <!-- Términos y Condiciones -->
@@ -193,8 +231,8 @@
                         </div>
 
                         <!-- Botón de Registro -->
-                        <button type="submit" class="btn btn-primary btn-block btn-lg">
-                            <i class="fas fa-user-plus"></i> Crear mi Cuenta
+                            <button type="submit" class="btn btn-primary btn-block btn-lg">
+                            <i class="fas fa-user-plus" aria-hidden="true"></i> Crear mi Cuenta
                         </button>
 
                         <!-- Ya tiene cuenta -->
@@ -210,26 +248,7 @@
                 </div>
             </div>
 
-            <!-- Beneficios -->
-            <div class="card_beneficios">
-                <div class="card-body">
-                    <h4 class="text-center mb-3 text-primary">
-                        <i class="fas fa-gift"></i> Beneficios de Registrarte
-                    </h4>
-                    <div class="d-flex gap-3 flex-wrap justify-center">
-                        <div class="text-center flex-1 min-w-200">
-                            <i class="fas fa-route icon-large primary"></i>
-                            <p class="fw-600 text-muted">Consultar Rutas</p>
-                            <p class="info-card-text">Acceso a todas las rutas disponibles</p>
-                        </div>
-                        <div class="text-center flex-1 min-w-200">
-                            <i class="fas fa-history icon-large success"></i>
-                            <p class="fw-600 text-muted">Historial</p>
-                            <p class="info-card-text">Revisa tus viajes anteriores</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            </section>
         </div>
     </main>
 
@@ -239,7 +258,6 @@
             <div class="mb-3">
                 <img th:src="@{/images/Bus_icono.png}" alt="Logo Bustraker" class="footer-logo">
                 <h3 class="footer-title">Bustraker</h3>
-                <p class="info-card-text">Tu herramienta de gestión de rutas universitarias</p>
             </div>
             <p class="footer-note">&copy; 2026 Bustraker. Todos los derechos reservados.</p>
         </div>
