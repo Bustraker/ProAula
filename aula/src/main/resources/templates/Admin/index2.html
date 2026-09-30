@@ -4,11 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Administración - Bustraker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/style_responsive.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/admin_index2.css}">
 </head>
-<body>
+<body class="admin-dashboard">
     <div class="admin-container">
         <!-- Sidebar -->
         <aside class="sidebar">
@@ -111,7 +114,7 @@
                                     <i class="fas fa-route activity-icon"></i>
                                     <div class="activity-content">
                                         <h4 th:text="${ruta.nombre}">Ruta creada</h4>
-                                        <p th:text="'De: ' + ${ruta.origen} + ' Hasta: ' + ${ruta.destino}">Detalles de la ruta</p>
+                                        <p th:text="${ruta.horaAproximada != null ? 'Horario aproximado: ' + ruta.horaAproximada : 'Horario no definido'}">Detalles de la ruta</p>
                                         <small class="text-muted">Ruta activa en el sistema</small>
                                     </div>
                                 </div>
@@ -123,7 +126,7 @@
                                     <i class="fas fa-bus activity-icon"></i>
                                     <div class="activity-content">
                                         <h4 th:text="'Bus: ' + ${bus.placa}">Bus agregado</h4>
-                                        <p th:text="'Capacidad: ' + ${bus.capacidad} + ' pasajeros'">Detalles del bus</p>
+                                        <p th:text="'Modelo: ' + ${bus.modelo}">Detalles del bus</p>
                                         <small class="text-muted">Bus en servicio</small>
                                     </div>
                                 </div>

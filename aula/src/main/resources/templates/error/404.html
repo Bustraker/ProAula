@@ -4,23 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Error 404 - Página No Encontrada - Bustraker">
-    <meta name="theme-color" content="#6f42c1">
+    <meta name="theme-color" content="#171418">
     <title>Error 404 - Página No Encontrada - Bustraker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/style_login.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="shortcut icon" th:href="@{/images/Bus_icono.png}" type="image/x-icon">
     <link rel="stylesheet" th:href="@{/css/error.css}">
 </head>
-<body data-redirect-url="/" data-redirect-timeout="5000">
+<body class="error-page error-page--404" data-redirect-url="/" data-redirect-timeout="5000">
     <!-- Encabezado -->
-    <header class="main-header">
+    <header class="main-header error-header">
         <div class="header-inner">
-            <div class="header-inner">
             <div class="logo">
                 <img th:src="@{/images/Bus_icono.png}" alt="Logo Bustraker">
                 <span class="brand">Bustraker</span>
             </div>
-            <nav class="main-nav">
+            <nav class="main-nav" aria-label="Navegación principal">
                 <a th:href="@{/}" class="nav-link">
                     <i class="fas fa-home"></i> Inicio
                 </a>
@@ -32,9 +34,19 @@
     </header>
 
     <!-- Contenido principal -->
-    <main class="hero-section" style="padding: 2rem 0;">
-        <div class="container container-sm">
+    <main class="error-main">
+        <div class="error-layout">
+            <div class="error-scene error-scene--route" aria-hidden="true">
+                <span class="scene-caption">ROUTE / NOT FOUND</span>
+                <span class="scene-route-line"></span>
+                <span class="scene-stop scene-stop--start"><i class="fas fa-location-dot"></i></span>
+                <span class="scene-stop scene-stop--middle"></span>
+                <span class="scene-stop scene-stop--end"><i class="fas fa-question"></i></span>
+                <span class="scene-bus"><i class="fas fa-bus"></i></span>
+                <span class="scene-readout">DESTINATION <i></i> UNKNOWN</span>
+            </div>
             <div class="error-container">
+                <p class="error-eyebrow"><span></span> DESTINO NO ENCONTRADO</p>
                 <div class="error-code">404</div>
                 <h1 class="error-title">Página No Encontrada</h1>
                 <p class="error-message" th:text="${errorMessage}">La página que buscas no existe o ha sido movida.</p>

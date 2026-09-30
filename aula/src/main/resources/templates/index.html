@@ -43,18 +43,32 @@
     </main>
 
     <!-- Modal Admin -->
-    <div id="modalAdmin" class="modal-admin">
+    <dialog id="modalAdmin" class="modal-admin" aria-labelledby="modalAdminTitle" aria-describedby="modalAdminDescription">
         <div class="modal-admin-content">
             <div class="modal-admin-header">
-                <h2>Acceso Admin</h2>
-                <button class="modal-admin-close" id="closeModalAdmin">&times;</button>
+                <div class="modal-admin-title-group">
+                    <span class="modal-admin-icon" aria-hidden="true"><i class="fas fa-shield-halved"></i></span>
+                    <div>
+                        <span class="modal-admin-eyebrow">ÁREA RESTRINGIDA</span>
+                        <h2 id="modalAdminTitle">Acceso Admin</h2>
+                    </div>
+                </div>
+                <button type="button" class="modal-admin-close" id="closeModalAdmin" aria-label="Cerrar ventana">
+                    <i class="fas fa-xmark" aria-hidden="true"></i>
+                </button>
             </div>
             <div class="modal-admin-body">
-                <p>Para ingresar al panel administrativo debes completar las dos medidas de seguridad en la pantalla de acceso.</p>
-                <button id="continueAdmin" class="modal-admin-button">Continuar al login administrativo</button>
+                <p id="modalAdminDescription">Para proteger el panel, el acceso requiere completar dos verificaciones de seguridad.</p>
+                <ol class="modal-admin-steps">
+                    <li><span><i class="fas fa-key" aria-hidden="true"></i></span><div><strong>Código administrativo</strong><small>Confirma tu autorización</small></div></li>
+                    <li><span><i class="fas fa-user-lock" aria-hidden="true"></i></span><div><strong>Usuario y contraseña</strong><small>Valida tus credenciales</small></div></li>
+                </ol>
+                <button type="button" id="continueAdmin" class="modal-admin-button">
+                    Continuar al acceso <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                </button>
             </div>
         </div>
-    </div>
+    </dialog>
 
     <script th:src="@{/js/index.js}"></script>
 </body>

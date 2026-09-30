@@ -42,10 +42,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (icon) {
                     icon.style.color = 'var(--success-color)';
                 }
-            } else {
-                if (icon) {
-                    icon.style.color = 'var(--error-color)';
-                }
+            } else if (icon) {
+                icon.style.color = 'var(--error-color)';
             }
         });
     });
@@ -56,16 +54,21 @@ document.addEventListener('DOMContentLoaded', function() {
             const targetSelector = this.dataset.target || '#password';
             const passwordInput = document.querySelector(targetSelector);
             if (!passwordInput) return;
+            const eyeIcon = this.querySelector('i') || this;
             if (passwordInput.type === 'password') {
                 passwordInput.type = 'text';
-                this.classList.remove('fa-eye');
-                this.classList.add('fa-eye-slash');
-                this.style.opacity = '0.6';
+                eyeIcon.classList.remove('fa-eye');
+                eyeIcon.classList.add('fa-eye-slash');
+                this.setAttribute('aria-label', 'Ocultar contraseña');
+                this.setAttribute('aria-pressed', 'true');
+                this.setAttribute('title', 'Ocultar contraseña');
             } else {
                 passwordInput.type = 'password';
-                this.classList.remove('fa-eye-slash');
-                this.classList.add('fa-eye');
-                this.style.opacity = '1';
+                eyeIcon.classList.remove('fa-eye-slash');
+                eyeIcon.classList.add('fa-eye');
+                this.setAttribute('aria-label', 'Mostrar contraseña');
+                this.setAttribute('aria-pressed', 'false');
+                this.setAttribute('title', 'Mostrar contraseña');
             }
         });
     });

@@ -3,23 +3,47 @@ const openBtn = document.getElementById('LoginAdminBtn');
 const closeBtn = document.getElementById('closeModalAdmin');
 const continueBtn = document.getElementById('continueAdmin');
 
+function setModalOpen(isOpen) {
+    if (!modal) return;
+    if (isOpen && !modal.open) {
+        modal.showModal();
+    } else if (!isOpen && modal.open) {
+        modal.close();
+    }
+    if (isOpen && continueBtn) {
+        continueBtn.focus();
+    }
+}
+
 if (openBtn && modal) {
     openBtn.addEventListener('click', function() {
-        modal.classList.add('active');
+        setModalOpen(true);
     });
 }
 
 if (closeBtn && modal) {
     closeBtn.addEventListener('click', function() {
-        modal.classList.remove('active');
+        setModalOpen(false);
     });
 }
 
 window.addEventListener('click', function(event) {
-    if (event.target === modal) {
-        modal.classList.remove('active');
+    if (event.target === modal && modal.open) {
+        setModalOpen(false);
     }
 });
+
+window.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape' && modal?.open) {
+        setModalOpen(false);
+    }
+});
+
+if (modal && openBtn) {
+    modal.addEventListener('close', function() {
+        openBtn.focus();
+    });
+}
 
 if (continueBtn) {
     continueBtn.addEventListener('click', function() {
