@@ -86,7 +86,7 @@ public class SecurityConfig {
                     "/api/barrios/**",
                     "/rutas", "/rutas/detalle/**", "/ruta/**", "/buses/**"
                 ).permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/buses/**", "/api/rutas-con-coordenadas").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/buses/**", "/api/rutas-con-coordenadas", "/api/map/tiles").permitAll()
                 // Protege rutas de administración
                 .requestMatchers(
                     "/index_2", "/admin/**", "/reportes", "/gestionar-usuarios",

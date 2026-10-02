@@ -15,8 +15,9 @@ var busSeleccionado = null;
 
 function initMap() {
     map = L.map('map').setView([10.4236, -75.5478], 13);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors'
+    L.tileLayer('/api/map/tiles?z={z}&x={x}&y={y}', {
+        attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+        maxZoom: 20
     }).addTo(map);
     // Ensure the map redraws correctly when the container is fully available.
     setTimeout(() => {

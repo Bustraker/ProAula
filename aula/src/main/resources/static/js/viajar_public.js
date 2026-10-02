@@ -25,7 +25,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function initMap() {
     map = L.map('map').setView([10.4236, -75.5478], 13);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap contributors' }).addTo(map);
+    L.tileLayer('/api/map/tiles?z={z}&x={x}&y={y}', {
+        attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+        maxZoom: 20
+    }).addTo(map);
 }
 
 async function cargarBarrios() {
