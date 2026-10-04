@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
 
 import com.proaula.aula.Entity.Bus;
 import com.proaula.aula.Service.BusService;
@@ -31,7 +33,10 @@ public class BusRestController {
     }
 
     @GetMapping("/todos")
-    public List<Map<String, Object>> getAllBusesWithRuta() {
+    public List<Map<String, Object>> getAllBusesWithRuta(Authentication authentication) {
+        boolean autenticado = authentication != null
+                && authentication.isAuthenticated()
+                && !(authentication instanceof AnonymousAuthenticationToken);
         List<Bus> buses = busService.getAllBuses();
         return buses.stream().map(bus -> {
             Map<String, Object> map = new HashMap<>();
@@ -39,7 +44,9 @@ public class BusRestController {
             map.put("placa", bus.getPlaca());
             map.put("modelo", bus.getModelo());
             map.put("color", bus.getColor());
-            map.put("conductor", bus.getConductor());
+            if (autenticado) {
+                map.put("conductor", bus.getConductor());
+            }
             if (bus.getRuta() != null) {
                 map.put("rutaId", bus.getRuta().getId());
                 map.put("rutaNombre", bus.getRuta().getNombre());

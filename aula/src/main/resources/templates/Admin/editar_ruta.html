@@ -24,22 +24,25 @@
                     </th:block>
                 </select>
             </div>
+            <p th:if="${errorBarrios}" class="error" role="alert">Ingresa al menos dos barrios distintos para definir el recorrido.</p>
             <div class="form-group" th:if="${ruta != null}">
                 <label for="verificada">Verificación de la ruta:</label>
                 <input type="checkbox" id="verificada" name="verificada" value="true" th:checked="${ruta.verificada}">
                 <span>Confirmo que esta ruta y el orden de sus barrios fueron verificados</span>
             </div>
             <div class="form-group" th:if="${ruta != null}">
-                <label>Barrios por donde pasa:</label>
-                <ul class="barrio-list" id="barrio-list">
-                    <th:block th:each="barrio, iterStat : ${barrios}">
-                        <li>
-                            <input type="text" name="barrios[__${iterStat.index}__]" th:value="${barrio}" />
-                            <button type="button" data-fn="eliminarBarrio" class="btn btn-outline">Eliminar</button>
-                        </li>
-                    </th:block>
-                </ul>
-                <button type="button" class="add-barrio-btn" data-fn="agregarBarrio">Agregar Barrio</button>
+                <label for="barriosOrdenadosTexto">Barrios en orden de recorrido:</label>
+                <p th:if="${ordenPendiente}" class="error" role="status">
+                    Esta ruta no tiene un orden confiable guardado. Los barrios siguientes son solo referencia y no se cargarán como recorrido; confirma manualmente la secuencia antes de marcarla como verificada.
+                </p>
+                <p th:if="${ordenPendiente and !#lists.isEmpty(barrios)}">
+                    Barrios registrados como referencia:
+                    <span th:each="barrio, iterStat : ${barrios}" th:text="${(iterStat.index > 0 ? ', ' : '') + barrio}"></span>
+                </p>
+                <input type="text" id="barriosOrdenadosTexto" name="barriosOrdenadosTexto"
+                       th:value="${barriosOrdenadosTexto}" placeholder="Ej. Zaragoza, El Bosque, Centro"
+                       required aria-describedby="ayuda-orden-barrios">
+                <small id="ayuda-orden-barrios">Escribe todos los barrios en la secuencia real desde el inicio hasta el final.</small>
             </div>
             <button type="submit" class="save-btn" th:if="${ruta != null}">Guardar Cambios</button>
         </form>

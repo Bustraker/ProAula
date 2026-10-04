@@ -51,6 +51,12 @@
         }
     }
 
+    async function fetchJSON(url, ms) {
+        var respuesta = await fetchConTimeout(url, ms || 15000);
+        if (!respuesta.ok) throw new Error('HTTP ' + respuesta.status);
+        return respuesta.json();
+    }
+
     /* ===================== MAPAS BASE ===================== */
     function gris(variante) {
         // variante: 'Dark' | 'Light'. Base + capa de etiquetas encima.
@@ -181,10 +187,13 @@
         var panel = document.querySelector('.options-panel');
         if (panel) {
             var caja = panel.getBoundingClientRect();
-            if (global.innerWidth > 700) {
-                opciones.paddingBottomRight = [margen + Math.max(0, global.innerWidth - caja.left), margen];
+            var ancho = global.innerWidth, alto = global.innerHeight;
+            if (ancho > 700) {
+                opciones.paddingBottomRight = [margen + Math.max(0, ancho - caja.left), margen];
+            } else if (caja.top > alto / 2) {
+                opciones.paddingBottomRight = [margen, margen + Math.max(0, alto - caja.top)];
             } else {
-                opciones.paddingTopLeft = [margen, Math.min(caja.bottom, global.innerHeight * 0.6) + 16];
+                opciones.paddingTopLeft = [margen, Math.min(caja.bottom, alto * 0.6) + 16];
             }
         }
         mapa.fitBounds(limites, opciones);
@@ -225,6 +234,30 @@
         punto.on('mouseover', function () { punto.setRadius(8); });
         punto.on('mouseout', function () { punto.setRadius(6); });
         return punto;
+    }
+
+    function crearMarcadorParada(lat, lng, numero, datos) {
+        datos = datos || {};
+        var esParada = datos.tipo !== 'barrio';
+        var icono = L.divIcon({
+            className: 'mu-parada-contenedor',
+            html: '<span class="mu-parada' + (esParada ? '' : ' mu-parada--barrio') + '">' +
+                escapeHtml(numero) + '</span>',
+            iconSize: [26, 26],
+            iconAnchor: [13, 13],
+            popupAnchor: [0, -14],
+            tooltipAnchor: [0, -14]
+        });
+        var detalle = [];
+        if (datos.barrio) detalle.push('<span>Barrio: ' + escapeHtml(datos.barrio) + '</span>');
+        if (datos.ubicacion) detalle.push('<span>' + escapeHtml(datos.ubicacion) + '</span>');
+        if (datos.referencia) detalle.push('<span>Ref.: ' + escapeHtml(datos.referencia) + '</span>');
+        if (!esParada) detalle.push('<span class="mu-popup__nota">Referencia al centro del barrio; no hay parada física registrada.</span>');
+        var titulo = (esParada ? 'Parada ' : 'Barrio ') + numero;
+        return L.marker([lat, lng], { icon: icono, keyboard: true, title: titulo + ': ' + (datos.nombre || '') })
+            .bindTooltip(escapeHtml(datos.nombre || titulo), { direction: 'top', className: 'mu-tooltip' })
+            .bindPopup('<div class="mu-popup"><span class="mu-popup__titulo">' + titulo + '</span><strong>' +
+                escapeHtml(datos.nombre || '') + '</strong>' + detalle.join('') + '</div>');
     }
 
     /** Decide qué punto es el origen y cuál el destino (por nombre; si no hay coincidencia, primero y último). */
@@ -345,10 +378,12 @@
     global.BustrakerMap = {
         CENTRO: CENTRO,
         escapeHtml: escapeHtml,
+        fetchJSON: fetchJSON,
         crearMapa: crearMapa,
         ajustarVista: ajustarVista,
         crearPin: crearPin,
         crearPuntoIntermedio: crearPuntoIntermedio,
+        crearMarcadorParada: crearMarcadorParada,
         ubicarExtremos: ubicarExtremos,
         obtenerRutaOSRM: obtenerRutaOSRM,
         crearCapasRuta: crearCapasRuta,

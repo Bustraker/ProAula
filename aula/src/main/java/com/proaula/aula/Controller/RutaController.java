@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,8 +17,13 @@ import com.proaula.aula.Service.RutaService;
 
 @Controller
 public class RutaController {
-    @Autowired
-    private RutaService rutaService;
+    private static final String ERROR_BARRIOS = "barrios";
+
+    private final RutaService rutaService;
+
+    public RutaController(RutaService rutaService) {
+        this.rutaService = rutaService;
+    }
     
     // Vista para editar rutas
     @GetMapping("/editar-ruta")
@@ -29,23 +33,35 @@ public class RutaController {
     }
 
     @GetMapping("/editar-ruta/{id}")
-    public String editarRutaPorId(@PathVariable Long id, Model model) {
+    public String editarRutaPorId(@PathVariable Long id, Model model,
+                                  @RequestParam(required = false) String error) {
         Ruta ruta = rutaService.getRutaById(id);
         model.addAttribute("ruta", ruta);
         model.addAttribute("barrios", ruta != null ? ruta.getBarrios() : new ArrayList<>());
+        model.addAttribute("barriosOrdenadosTexto",
+            ruta != null && ruta.isOrdenBarriosConfirmado()
+                ? String.join(", ", ruta.getBarriosOrdenados())
+                : "");
+        model.addAttribute("ordenPendiente", ruta != null && !ruta.isOrdenBarriosConfirmado());
+        model.addAttribute("errorBarrios", ERROR_BARRIOS.equals(error));
         model.addAttribute("rutas", rutaService.getAllRutas());
         return "Admin/editar_ruta";
     }
 
     @PostMapping("/editar-ruta/{id}")
-    public String guardarEdicionRuta(@PathVariable Long id, @ModelAttribute Ruta ruta) {
+    public String guardarEdicionRuta(@PathVariable Long id, @ModelAttribute Ruta ruta,
+                                     @RequestParam String barriosOrdenadosTexto) {
         Ruta rutaExistente = rutaService.getRutaById(id);
         if (rutaExistente == null) {
             return "redirect:/editar-ruta";
         }
 
-        procesarBarrios(ruta);
-        rutaExistente.setBarrios(ruta.getBarrios());
+        List<String> barriosOrdenados = procesarBarrios(barriosOrdenadosTexto);
+        if (barriosOrdenados.stream().distinct().count() < 2) {
+            return "redirect:/editar-ruta/" + id + "?error=barrios";
+        }
+        rutaExistente.setBarrios(new ArrayList<>(barriosOrdenados));
+        rutaExistente.setBarriosOrdenados(barriosOrdenados);
         rutaExistente.setVerificada(Boolean.TRUE.equals(ruta.getVerificada()));
         rutaService.saveRuta(rutaExistente);
         return "redirect:/editar-ruta";
@@ -99,7 +115,7 @@ public class RutaController {
 
     // Gestión de rutas para admin
     @GetMapping("/rutas/admin")
-    public String gestionarRutas(Model model) {
+    public String gestionarRutas(Model model, @RequestParam(required = false) String error) {
         List<Ruta> rutas = rutaService.getAllRutas();
         // Formatear la hora para cada ruta
         List<String> horasFormateadas = new ArrayList<>();
@@ -113,13 +129,18 @@ public class RutaController {
         model.addAttribute("rutas", rutas);
         model.addAttribute("horasFormateadas", horasFormateadas);
         model.addAttribute("newRuta", new Ruta());
+        model.addAttribute("errorBarrios", ERROR_BARRIOS.equals(error));
         return "Admin/agregar_rutas";
     }
 
     @PostMapping("/rutas")
-    public String agregarRuta(@ModelAttribute Ruta ruta) {
-        // Parsear barrios desde string separado por coma
-        procesarBarrios(ruta);
+    public String agregarRuta(@ModelAttribute Ruta ruta, @RequestParam String barriosOrdenadosTexto) {
+        List<String> barriosOrdenados = procesarBarrios(barriosOrdenadosTexto);
+        if (barriosOrdenados.stream().distinct().count() < 2) {
+            return "redirect:/rutas/admin?error=barrios";
+        }
+        ruta.setBarrios(new ArrayList<>(barriosOrdenados));
+        ruta.setBarriosOrdenados(barriosOrdenados);
         rutaService.saveRuta(ruta);
         return "redirect:/rutas";
     }
@@ -131,26 +152,17 @@ public class RutaController {
     }
 
     // Procesa barrios de ruta desde texto o lista.
-    private void procesarBarrios(Ruta ruta) {
-        if (ruta.getBarrios() != null && !ruta.getBarrios().isEmpty()) {
-            List<String> barriosProcesados = new ArrayList<>();
-            for (String barrio : ruta.getBarrios()) {
-                if (barrio != null && !barrio.trim().isEmpty()) {
-                    // Si contiene comas, dividir; si no, agregar tal cual
-                    if (barrio.contains(",")) {
-                        String[] barrios = barrio.split(",");
-                        for (String b : barrios) {
-                            String barrioLimpio = b.trim();
-                            if (!barrioLimpio.isEmpty()) {
-                                barriosProcesados.add(barrioLimpio);
-                            }
-                        }
-                    } else {
-                        barriosProcesados.add(barrio.trim());
-                    }
-                }
-            }
-            ruta.setBarrios(barriosProcesados.isEmpty() ? null : barriosProcesados);
+    private List<String> procesarBarrios(String texto) {
+        if (texto == null || texto.isBlank()) {
+            return new ArrayList<>();
         }
+        List<String> barriosProcesados = new ArrayList<>();
+        for (String barrio : texto.split(",")) {
+            String barrioLimpio = barrio.trim();
+            if (!barrioLimpio.isEmpty()) {
+                barriosProcesados.add(barrioLimpio);
+            }
+        }
+        return barriosProcesados;
     }
 }

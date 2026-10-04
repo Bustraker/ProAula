@@ -21,13 +21,14 @@
         <section id="formulario-agregar-ruta" class="card p-20 mx-auto">
             <h2 class="text-primary text-center">Agregar Nueva Ruta</h2>
             <form th:action="@{/rutas}" method="post" th:object="${newRuta}">
+                <p th:if="${errorBarrios}" class="text-danger" role="alert">Ingresa al menos dos barrios distintos para definir el recorrido.</p>
                 <label for="nombre" class="text-primary fw-600">Nombre de la Ruta:</label>
                 <input type="text" id="nombre" th:field="*{nombre}" placeholder="Ej. Avenida Express" required class="form-control full-width">
                 <span th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}" class="text-danger"></span>
 
-                <label for="barrios" class="text-primary fw-600">Barrios (separados por coma):</label>
-                <input type="text" id="barrios" name="barrios" placeholder="Ej. Zaragoza, Yolanda" required class="form-control full-width">
-                <span th:if="${#fields.hasErrors('barrios')}" th:errors="*{barrios}" class="text-danger"></span>
+                <label for="barriosOrdenadosTexto" class="text-primary fw-600">Barrios en orden de recorrido:</label>
+                <input type="text" id="barriosOrdenadosTexto" name="barriosOrdenadosTexto" placeholder="Ej. Zaragoza, El Bosque, Centro" required class="form-control full-width" aria-describedby="ayuda-orden-barrios">
+                <small id="ayuda-orden-barrios">Escribe la secuencia real desde el inicio hasta el final; este orden define el sentido de viaje.</small>
 
                 <label for="horaAproximada" class="text-primary fw-600">Hora Aproximada:</label>
                 <input type="time" id="horaAproximada" th:field="*{horaAproximada}" class="form-control full-width">
@@ -48,11 +49,12 @@
 
         <section id="lista-rutas">
             <h2>Rutas Existentes</h2>
-            <ul th:if="${rutas}" th:each="ruta : ${rutas}">
-                <li th:each="hora, iterStat : ${horasFormateadas}">
+            <ul th:if="${rutas}">
+                <li th:each="ruta, iterStat : ${rutas}">
                     <strong th:text="${ruta.nombre}"></strong> - Barrios: <span th:each="barrio : ${ruta.barrios}" th:text="${barrio} + ', '"></span>
                     <span th:text="${ruta.verificada ? 'Verificada' : 'Pendiente de verificación'}"></span>
-                    <span th:if="${hora != ''}">| Hora: <span th:text="${hora}"></span></span>
+                    <span th:text="${ruta.ordenBarriosConfirmado ? ' · Sentido confirmado' : ' · Orden por confirmar'}"></span>
+                    <span th:if="${horasFormateadas[iterStat.index] != ''}">| Hora: <span th:text="${horasFormateadas[iterStat.index]}"></span></span>
                     <a th:href="@{/editar-ruta/{id}(id=${ruta.id})}">Editar</a> | 
                     <form th:action="@{/eliminar-ruta/{id}(id=${ruta.id})}" method="post">
                         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
