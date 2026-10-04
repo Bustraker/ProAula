@@ -23,6 +23,7 @@ public class Ruta {
     @NotBlank
     private String nombre;
     private LocalTime horaAproximada;
+    private Boolean verificada = false;
 
     @ElementCollection
     private List<String> barrios = new java.util.ArrayList<>(); // Agregado para barrios

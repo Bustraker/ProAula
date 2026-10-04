@@ -33,6 +33,11 @@
                 <input type="time" id="horaAproximada" th:field="*{horaAproximada}" class="form-control full-width">
                 <span th:if="${#fields.hasErrors('horaAproximada')}" th:errors="*{horaAproximada}" class="text-danger"></span>
 
+                <label for="verificada" class="text-primary fw-600">
+                    <input type="checkbox" id="verificada" th:field="*{verificada}">
+                    Confirmo que esta ruta y el orden de sus barrios fueron verificados
+                </label>
+
                 <!-- Campo opcional de buses -->
                 <!-- <label for="buses" style="color:#c0392b;font-weight:600;">Buses asociados (opcional):</label>
                 <input type="text" id="buses" name="buses" placeholder="Ej. ABC123, DEF456" style="width:100%;padding:10px;margin-bottom:12px;border:1px solid #c0392b;border-radius:6px;"> -->
@@ -46,6 +51,7 @@
             <ul th:if="${rutas}" th:each="ruta : ${rutas}">
                 <li th:each="hora, iterStat : ${horasFormateadas}">
                     <strong th:text="${ruta.nombre}"></strong> - Barrios: <span th:each="barrio : ${ruta.barrios}" th:text="${barrio} + ', '"></span>
+                    <span th:text="${ruta.verificada ? 'Verificada' : 'Pendiente de verificación'}"></span>
                     <span th:if="${hora != ''}">| Hora: <span th:text="${hora}"></span></span>
                     <a th:href="@{/editar-ruta/{id}(id=${ruta.id})}">Editar</a> | 
                     <form th:action="@{/eliminar-ruta/{id}(id=${ruta.id})}" method="post">

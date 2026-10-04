@@ -22,8 +22,12 @@ public class Parada {
     private String ubicacion; // Ubicación aproximada
     
     private String referencia; // Punto de referencia
+
+    private String barrio;
     
     private Integer orden; // Orden de la parada en la ruta
+    private Double latitud;
+    private Double longitud;
 
     @ManyToOne
     @JoinColumn(name = "ruta_id")

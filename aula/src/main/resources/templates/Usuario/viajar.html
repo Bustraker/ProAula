@@ -12,12 +12,13 @@
     <title>Viajar - Bustraker</title>
     <!-- Use only the page-specific styles for a clean private map page -->
     <link rel="shortcut icon" th:href="@{/images/Bus_icono.png}" type="image/x-icon">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous">
     <link rel="stylesheet" th:href="@{/css/viajar.css}">
+    <link rel="stylesheet" th:href="@{/css/map-ui.css}">
 </head>
 <body>
-    <div id="map"></div>
+    <div id="map" aria-label="Mapa de rutas de Cartagena"></div>
 
     <div class="options-panel">
         <h2><i class="fas fa-route"></i> Consulta de Rutas</h2>
@@ -26,10 +27,18 @@
         <select id="origen">
             <option value="">Selecciona tu barrio actual</option>
         </select>
+
+        <label for="trazadoTranscaribe">Recorridos TransCaribe (referencia 2024)</label>
+        <select id="trazadoTranscaribe" disabled>
+            <option value="">Cargando trazados...</option>
+        </select>
+        <p class="small-text">Geometrías 2024 de <a href="https://www.arcgis.com/home/item.html?id=5f15cce4f923477b8c40ccc4dc2b84d1" target="_blank" rel="noopener noreferrer">Cartagena Cómo Vamos</a>. Pueden no reflejar cambios posteriores.</p>
         
-        <button class="btn-secondary js-detect-location" style="margin: 8px 0;">
-            <i class="fas fa-location-arrow"></i> Detectar Mi Ubicación
+        <button id="btnSeguirUbicacion" class="btn-secondary js-detect-location" type="button" aria-pressed="false" style="margin: 8px 0;">
+            <i class="fas fa-location-arrow" aria-hidden="true"></i> Seguir mi ubicación
         </button>
+        <output id="locationStatus" class="map-status" aria-live="polite">El punto azul será tu ubicación GPS, no la del bus. Solo se muestra en este dispositivo.</output>
+        <p id="barriosTrayecto" class="map-status">Selecciona una ruta para estimar los barrios cercanos al trayecto.</p>
         
         <label for="destino"><i class="fas fa-map-pin"></i> 2. ¿A qué barrio vas?</label>
         <select id="destino" disabled>
@@ -40,9 +49,9 @@
         <div class="toggle-control">
             <label class="toggle-label">
                 <input id="mostrarParadas" type="checkbox" checked>
-                Mostrar paradas en la ruta
+                Mostrar puntos intermedios
             </label>
-            <p class="small-text" style="margin-top:8px; color:#a8b7ce;">Origen y destino siempre se muestran; este botón sólo oculta las paradas intermedias.</p>
+            <p class="small-text" style="margin-top:8px; color:#a8b7ce;">Los puntos son paradas físicas cuando tienen coordenadas; si no, representan centros de barrio.</p>
         </div>
         <div id="busList" class="scrollable">
             <p class="text-muted small-text text-center" style="padding:20px;">
@@ -55,16 +64,19 @@
             <p><strong>Bus:</strong> <span id="infoBus"></span></p>
             <p><strong>Ruta:</strong> <span id="infoRuta"></span></p>
             <p><strong>Barrios:</strong> <span id="infoBarrios"></span></p>
+            <p class="small-text">Los barrios cercanos se estiman a partir de la línea por calles y pueden no coincidir con el recorrido del bus.</p>
         </div>
         
         <hr class="card-divider">
 
         <div class="info-note info-card-text">
-            Selecciona origen y destino, luego elige una ruta para ver su trazado en el mapa.
+            Solo aparecen rutas verificadas. El trazado sobre calles y su tiempo son estimaciones en auto, no el recorrido ni el tiempo real del bus.
+            <a href="https://transcaribe.gov.co/index.php/rutas-sitm/" target="_blank" rel="noopener noreferrer">Consultar mapas oficiales de TransCaribe</a>
         </div>
     </div>
 
-        <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
+        <script th:src="@{/js/map-base.js}"></script>
         <script th:src="@{/js/common.js}"></script>
         <script th:src="@{/js/viajar.js}"></script>
 </body>

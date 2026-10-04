@@ -27,7 +27,7 @@ public class CartoTileController {
     private final String apiKey;
     private final RestTemplate restTemplate = new RestTemplate();
 
-    public CartoTileController(@Value("${CARTO_API_KEY:}") String apiKey) {
+    public CartoTileController(@Value("${carto.api-key:${CARTO_API_KEY:}}") String apiKey) {
         this.apiKey = apiKey;
     }
 

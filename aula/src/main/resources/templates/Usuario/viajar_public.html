@@ -8,24 +8,38 @@
     <meta name="theme-color" content="#01315f">
     <title>Consulta de Rutas - Bustraker Público</title>
     <link rel="shortcut icon" th:href="@{/images/Bus_icono.png}" type="image/x-icon">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous">
+    <link rel="preconnect" href="https://server.arcgisonline.com" crossorigin>
+    <link rel="preconnect" href="https://tile.openstreetmap.org" crossorigin>
     <link rel="stylesheet" href="/css/viajar_public.css">
+    <link rel="stylesheet" href="/css/map-ui.css">
 </head>
 <body>
-    <div id="map"></div>
+    <div id="map" aria-label="Mapa de rutas de Cartagena"></div>
 
     <div class="options-panel">
-        <h2><i class="fas fa-route"></i> Consulta de rutas</h2>
+        <header class="panel-heading">
+            <span class="panel-kicker">BUSTRAKER · CARTAGENA</span>
+            <h2><i class="fas fa-route" aria-hidden="true"></i> Consulta de rutas</h2>
+        </header>
 
         <label for="origen"><i class="fas fa-map-marker-alt"></i> 1. ¿En qué barrio estás?</label>
         <select id="origen" onchange="actualizarDestinosDisponibles()">
             <option value="">Selecciona tu barrio actual</option>
         </select>
 
-        <button id="btnDetectarUbicacion" class="btn-secondary" onclick="usarUbicacionActual()" disabled>
-            <i class="fas fa-location-arrow"></i> Detectar mi ubicación
+        <label for="trazadoTranscaribe">Recorridos TransCaribe (referencia 2024)</label>
+        <select id="trazadoTranscaribe" disabled>
+            <option value="">Cargando trazados...</option>
+        </select>
+        <p class="small-text">Geometrías 2024 de <a href="https://www.arcgis.com/home/item.html?id=5f15cce4f923477b8c40ccc4dc2b84d1" target="_blank" rel="noopener noreferrer">Cartagena Cómo Vamos</a>. Pueden no reflejar cambios posteriores.</p>
+
+        <button id="btnDetectarUbicacion" class="btn-secondary" type="button" onclick="usarUbicacionActual()" aria-pressed="false" disabled>
+            <i class="fas fa-location-arrow" aria-hidden="true"></i> Seguir mi ubicación
         </button>
+        <output id="locationStatus" class="map-status" aria-live="polite">El punto azul será tu ubicación GPS, no la del bus. Solo se muestra en este dispositivo.</output>
+        <p id="barriosTrayecto" class="map-status">Selecciona un recorrido para estimar los barrios cercanos al trayecto.</p>
 
         <label for="destino"><i class="fas fa-map-pin"></i> 2. ¿A qué barrio vas?</label>
         <select id="destino" onchange="buscarRutasDisponibles()" disabled>
@@ -36,23 +50,26 @@
         <select id="ruta" onchange="mostrarRutaEnMapa()" disabled>
             <option value="">Primero selecciona origen y destino</option>
         </select>
-        <div class="toggle-control" style="margin-top: 12px;">
+        <div class="toggle-control">
             <label class="toggle-label">
                 <input id="mostrarParadas" type="checkbox" checked>
-                Mostrar paradas en la ruta
+                Mostrar puntos intermedios
             </label>
-            <p class="small-text" style="margin-top:8px; color:#5775a4; font-size:0.92rem;">Origen y destino se mantienen visibles; el toggle controla sólo las paradas intermedias.</p>
+            <p class="small-text">Los puntos son paradas físicas cuando tienen coordenadas; si no, representan centros de barrio.</p>
         </div>
 
         <div id="rutaInfo" class="ruta-info" style="display:none;">
             <h4><i class="fas fa-info-circle"></i> Datos de la ruta</h4>
             <p><strong>Barrios:</strong> <span id="infoBarrios"></span></p>
             <p><strong>Hora:</strong> <span id="infoHora"></span></p>
+            <p class="small-text">El trazado y el tiempo en auto son estimaciones por calles; no representan el recorrido ni el horario real del bus.</p>
+            <p class="small-text">Los barrios cercanos se estiman a partir de la línea y pueden no coincidir con las paradas del bus.</p>
         </div>
+        <p class="small-text"><a href="https://transcaribe.gov.co/index.php/rutas-sitm/" target="_blank" rel="noopener noreferrer">Consultar mapas oficiales de TransCaribe</a></p>
     </div>
 
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
+    <script src="/js/map-base.js"></script>
     <script src="/js/viajar_public.js"></script>
 </body>
 </html>
-

@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Focused work items for public and private route-map UI quality polish.",
+  "tasks": [
+    {
+      "type": "transform",
+      "id": "001-transform-public-map-javascript-style",
+      "description": "Resolve the reported JavaScript style warnings in the public map UI.",
+      "reason": "The recent public map UI polish introduced or surfaced style warnings that should be cleared without unrelated refactoring.",
+      "requirements": "Use the existing targeted JavaScript lint/style check as the baseline. Fix only warnings in the public map JavaScript path, preserve its behavior, and keep the maintained source and served asset synchronized when both are in active use. Do not refactor unrelated code or change routes, API contracts, or barrio overlay behavior.",
+      "successCriteria": {
+        "passBuild": "true",
+        "generateNewUnitTests": "false",
+        "passUnitTests": "true"
+      }
+    },
+    {
+      "type": "transform",
+      "id": "002-transform-verify-fontawesome-integrity",
+      "description": "Correctly secure the Font Awesome asset reference in the public map template.",
+      "reason": "The current public map template loads Font Awesome from a CDN without an integrity attribute.",
+      "requirements": "Verify the exact CDN resource URL and version used by the public map. Add only an SRI digest obtained from a trustworthy published source or verified against the exact served bytes, with the appropriate crossorigin setup. Never invent or reuse an unverified hash. If the CDN resource cannot be verified reliably, use a project-conventional alternative and confirm all required icons continue to load. Keep the change confined to the asset reference and directly necessary configuration.",
+      "dependencies": [
+        "001-transform-public-map-javascript-style"
+      ],
+      "successCriteria": {
+        "passBuild": "true",
+        "generateNewUnitTests": "false",
+        "passUnitTests": "true"
+      }
+    },
+    {
+      "type": "transform",
+      "id": "003-transform-polish-private-route-map-view",
+      "description": "Polish the private route/map experience to the public view's visual standard.",
+      "reason": "The private route/map view should provide a comparably modern, professional experience while retaining the existing functionality users rely on.",
+      "requirements": "Improve the private map presentation and responsive usability while preserving origin/destination selection, location detection, route results, intermediate-stop visibility control, route details, CSRF metadata, and current navigation and route behavior. Do not change controllers or endpoint contracts. Keep barrio text overlays removed wherever that behavior is shared. Limit edits to the private map template/styles and only directly necessary JavaScript; avoid unrelated refactoring.",
+      "dependencies": [
+        "002-transform-verify-fontawesome-integrity"
+      ],
+      "successCriteria": {
+        "passBuild": "true",
+        "generateNewUnitTests": "false",
+        "passUnitTests": "true"
+      }
+    }
+  ],
+  "metadata": {
+    "planName": "map-ui-quality-polish",
+    "projectName": "ProAula",
+    "language": "java",
+    "createdAt": "2026-10-01T00:00:00Z",
+    "version": "1.0"
+  }
+}

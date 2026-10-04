@@ -39,9 +39,15 @@ public class RutaController {
 
     @PostMapping("/editar-ruta/{id}")
     public String guardarEdicionRuta(@PathVariable Long id, @ModelAttribute Ruta ruta) {
-        ruta.setId(id);
+        Ruta rutaExistente = rutaService.getRutaById(id);
+        if (rutaExistente == null) {
+            return "redirect:/editar-ruta";
+        }
+
         procesarBarrios(ruta);
-        rutaService.saveRuta(ruta);
+        rutaExistente.setBarrios(ruta.getBarrios());
+        rutaExistente.setVerificada(Boolean.TRUE.equals(ruta.getVerificada()));
+        rutaService.saveRuta(rutaExistente);
         return "redirect:/editar-ruta";
     }
 
@@ -50,7 +56,7 @@ public class RutaController {
     public String listarRutas(Model model,
                              @RequestParam(required = false) String buscar,
                              @RequestParam(required = false) String barrio) {
-        List<Ruta> rutas = rutaService.getAllRutas();
+        List<Ruta> rutas = rutaService.getRutasVerificadas();
         
         // Filtros
         if (buscar != null && !buscar.isEmpty()) {
@@ -66,7 +72,7 @@ public class RutaController {
         }
         
         // Obtener barrios únicos
-        List<String> barrios = rutaService.getAllRutas().stream()
+        List<String> barrios = rutaService.getRutasVerificadas().stream()
             .flatMap(r -> r.getBarrios() != null ? r.getBarrios().stream() : new ArrayList<String>().stream())
             .distinct()
             .sorted()
@@ -84,7 +90,7 @@ public class RutaController {
     @GetMapping("/ruta/{id}")
     public String detalleRuta(@PathVariable Long id, Model model) {
         Ruta ruta = rutaService.getRutaById(id);
-        if (ruta != null) {
+        if (ruta != null && Boolean.TRUE.equals(ruta.getVerificada())) {
             model.addAttribute("ruta", ruta);
             return "detalle-ruta";
         }

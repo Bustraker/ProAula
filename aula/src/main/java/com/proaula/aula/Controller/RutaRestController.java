@@ -29,12 +29,29 @@ public class RutaRestController {
     public ResponseEntity<List<Map<String, Object>>> obtenerRutasConCoordenadas() {
         List<Map<String, Object>> rutasConCoords = new ArrayList<>();
         
-        rutaService.getAllRutas().forEach(ruta -> {
+        rutaService.getRutasVerificadas().forEach(ruta -> {
             Map<String, Object> mapa = new HashMap<>();
             mapa.put("id", ruta.getId());
             mapa.put("nombre", ruta.getNombre());
             mapa.put("barrios", ruta.getBarrios());
             mapa.put("horaAproximada", ruta.getHoraAproximada() != null ? ruta.getHoraAproximada().toString() : null);
+            List<Map<String, Object>> paradas = new ArrayList<>();
+            ruta.getParadas().stream()
+                .sorted((primera, segunda) -> Integer.compare(
+                    primera.getOrden() == null ? Integer.MAX_VALUE : primera.getOrden(),
+                    segunda.getOrden() == null ? Integer.MAX_VALUE : segunda.getOrden()))
+                .forEach(parada -> {
+                    Map<String, Object> datosParada = new HashMap<>();
+                    datosParada.put("nombre", parada.getNombre());
+                    datosParada.put("ubicacion", parada.getUbicacion());
+                    datosParada.put("referencia", parada.getReferencia());
+                    datosParada.put("barrio", parada.getBarrio());
+                    datosParada.put("orden", parada.getOrden());
+                    datosParada.put("latitud", parada.getLatitud());
+                    datosParada.put("longitud", parada.getLongitud());
+                    paradas.add(datosParada);
+                });
+            mapa.put("paradas", paradas);
             
             // Obtener coordenadas reales para cada barrio
             Map<String, double[]> coords = barrioService.obtenerCoordenadas(ruta.getBarrios());
@@ -51,7 +68,7 @@ public class RutaRestController {
     public ResponseEntity<List<Map<String, Object>>> getAllRutas() {
         List<Map<String, Object>> rutas = new ArrayList<>();
         
-        rutaService.getAllRutas().forEach(ruta -> {
+        rutaService.getRutasVerificadas().forEach(ruta -> {
             Map<String, Object> mapa = new HashMap<>();
             mapa.put("id", ruta.getId());
             mapa.put("nombre", ruta.getNombre());
