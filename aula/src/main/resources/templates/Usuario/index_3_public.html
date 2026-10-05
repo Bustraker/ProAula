@@ -5,11 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="description" content="Pagina principal del usuario">
-    <meta name="theme-color" content="#01315f">
+    <meta name="theme-color" content="#101715">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Bustraker Público</title>
     <link rel="stylesheet" th:href="@{/css/style_3.css}">
+    <link rel="stylesheet" th:href="@{/css/style_contacto_public.css}">
     <link rel="shortcut icon" th:href="@{/images/Bus_icono.png}" type="image/x-icon">
     <script th:src="@{/js/index_3_public.js}" defer></script>
 </head>
@@ -97,32 +98,72 @@
 
             <section class="contact-section" id="contacto" aria-labelledby="contacto-titulo">
                 <div class="contact-copy" data-reveal>
-                    <p class="section-kicker">Estamos para ayudarte</p>
-                    <h2 id="contacto-titulo">¿Tienes una consulta?</h2>
-                    <p>Déjanos tus datos y cuéntanos cómo podemos ayudarte. Nuestro equipo recibirá tu mensaje.</p>
-                    <div class="contact-note"><span aria-hidden="true">✳</span><span>Todos los campos son necesarios para enviar tu mensaje.</span></div>
+                    <p class="section-kicker"><span class="contact-kicker-mark" aria-hidden="true"></span> Un canal directo con Bustraker</p>
+                    <h2 id="contacto-titulo">Hablemos de tu recorrido.</h2>
+                    <p>¿Encontraste un dato que debemos revisar o tienes una pregunta? Cuéntanos y deja una forma de contactarte.</p>
+
+                    <div class="contact-signal" aria-hidden="true">
+                        <span class="contact-signal-orbit contact-signal-orbit--outer"></span>
+                        <span class="contact-signal-orbit contact-signal-orbit--inner"></span>
+                        <span class="contact-signal-core">✳</span>
+                        <span class="contact-signal-line contact-signal-line--one"></span>
+                        <span class="contact-signal-line contact-signal-line--two"></span>
+                        <span class="contact-signal-node contact-signal-node--one"></span>
+                        <span class="contact-signal-node contact-signal-node--two"></span>
+                        <span class="contact-signal-stamp">MENSAJE<br>EN CAMINO</span>
+                    </div>
+
+                    <div class="contact-guidance">
+                        <span class="contact-guidance-icon" aria-hidden="true">01</span>
+                        <span><strong>Cuéntanos el contexto</strong><small>Incluye la ruta o el detalle que nos ayude a entender tu consulta.</small></span>
+                    </div>
+                    <div class="contact-guidance">
+                        <span class="contact-guidance-icon contact-guidance-icon--coral" aria-hidden="true">02</span>
+                        <span><strong>Protege tus datos</strong><small>No compartas contraseñas ni información personal sensible.</small></span>
+                    </div>
                 </div>
 
                 <form class="contact-form" data-reveal method="post" th:action="@{/contacto_public}" th:object="${contactoMensaje}">
+                    <div class="contact-form-heading">
+                        <span class="contact-form-index">MENSAJE <b>·</b> CARTAGENA</span>
+                        <h3>¿En qué podemos ayudarte?</h3>
+                        <p>Completa tus datos y escribe tu consulta.</p>
+                    </div>
+                    <div class="contact-progress" role="progressbar" aria-label="Progreso del formulario" aria-valuemin="0" aria-valuemax="5" aria-valuenow="0">
+                        <div class="contact-progress-track" aria-hidden="true"><span class="contact-progress-fill"></span></div>
+                        <div class="contact-progress-stages" aria-hidden="true">
+                            <span class="contact-progress-stage is-current"><i>01</i><small>Tus datos</small></span>
+                            <span class="contact-progress-stage"><i>02</i><small>Tu consulta</small></span>
+                            <span class="contact-progress-stage"><i>03</i><small>Enviar</small></span>
+                        </div>
+                        <span class="contact-progress-status" aria-live="polite">Completa tus datos para continuar</span>
+                    </div>
                     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <div th:if="${mensaje}" class="contact-feedback" role="status" aria-live="polite">
+                        <span class="contact-feedback-mark" aria-hidden="true">✓</span>
+                        <span th:text="${mensaje}">Tu mensaje fue recibido.</span>
+                    </div>
                     <div class="form-fields">
-                        <label>Nombre
-                            <input type="text" th:field="*{nombre}" placeholder="Tu nombre" autocomplete="given-name" required>
+                        <label for="contacto-nombre">Nombre
+                            <input id="contacto-nombre" type="text" th:field="*{nombre}" placeholder="Tu nombre" autocomplete="given-name" required>
                         </label>
-                        <label>Apellidos
-                            <input type="text" th:field="*{apellido}" placeholder="Tus apellidos" autocomplete="family-name" required>
+                        <label for="contacto-apellido">Apellidos
+                            <input id="contacto-apellido" type="text" th:field="*{apellido}" placeholder="Tus apellidos" autocomplete="family-name" required>
                         </label>
-                        <label>Correo electrónico
-                            <input type="email" th:field="*{email}" placeholder="nombre@correo.com" autocomplete="email" required>
+                        <label for="contacto-email">Correo electrónico
+                            <input id="contacto-email" type="email" th:field="*{email}" placeholder="nombre@correo.com" autocomplete="email" required>
                         </label>
-                        <label>Teléfono
-                            <input type="tel" th:field="*{telefono}" placeholder="3013639618" autocomplete="tel" pattern="[0-9]{9,}" required>
+                        <label for="contacto-telefono">Teléfono
+                            <input id="contacto-telefono" type="tel" th:field="*{telefono}" placeholder="Tu número de contacto" autocomplete="tel" required>
                         </label>
-                        <label class="message-field">Mensaje
-                            <textarea th:field="*{mensaje}" rows="4" placeholder="Escribe tu mensaje aquí..." required></textarea>
+                        <label class="message-field" for="contacto-mensaje">Mensaje
+                            <textarea id="contacto-mensaje" th:field="*{mensaje}" rows="4" placeholder="Escribe aquí los detalles de tu consulta..." required></textarea>
                         </label>
                     </div>
-                    <button type="submit" class="submit-button">Enviar mensaje <span aria-hidden="true">→</span></button>
+                    <div class="contact-form-footer">
+                        <span><i aria-hidden="true">✳</i> Todos los campos son obligatorios</span>
+                        <button type="submit" class="submit-button">Enviar mensaje <span aria-hidden="true">→</span></button>
+                    </div>
                 </form>
             </section>
         </main>

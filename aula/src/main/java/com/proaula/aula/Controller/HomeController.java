@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 import java.util.Comparator;
 
+import com.proaula.aula.Entity.Bus;
 import com.proaula.aula.Entity.ContactoMensaje;
 import com.proaula.aula.Entity.Usuario;
 import com.proaula.aula.Entity.Viaje;
@@ -356,7 +357,15 @@ public class HomeController {
 
     @GetMapping("/consultas")
     public String consultas(Model model) {
-        model.addAttribute(MODEL_ATTR_BUSES, busService.getAllBuses());
+        List<Bus> buses = busService.getAllBuses();
+        long rutasConBuses = buses.stream()
+                .filter(bus -> bus.getRuta() != null && bus.getRuta().getId() != null)
+                .map(bus -> bus.getRuta().getId())
+                .distinct()
+                .count();
+        model.addAttribute(MODEL_ATTR_BUSES, buses);
+        model.addAttribute("totalBuses", buses.size());
+        model.addAttribute("rutasConBuses", rutasConBuses);
         return "Usuario/consultas";
     }
 
@@ -365,7 +374,7 @@ public class HomeController {
         String username = authentication != null ? authentication.getName() : null;
         Usuario usuario = username != null ? usuarioService.findByUsername(username) : null;
         model.addAttribute(MODEL_ATTR_USUARIO, usuario);
-        model.addAttribute("viajes", username != null ? viajeService.getViajesByUsername(username) : java.util.Collections.emptyList());
+        addHistorySummary(model, username);
         return VIEW_USUARIO_HISTORIAL;
     }
 
@@ -374,17 +383,36 @@ public class HomeController {
         String username = authentication != null ? authentication.getName() : null;
         Usuario usuario = username != null ? usuarioService.findByUsername(username) : null;
         model.addAttribute(MODEL_ATTR_USUARIO, usuario);
-        model.addAttribute("viajes", username != null ? viajeService.getViajesByUsername(username) : java.util.Collections.emptyList());
+        addHistorySummary(model, username);
 
+        model.addAttribute("detalleId", id);
         Viaje viaje = username != null ? viajeService.getViajeDetalle(id, username) : null;
         if (viaje == null) {
+            model.addAttribute("detalleEncontrado", false);
             model.addAttribute("detalleMensaje", "No se encontró el viaje o no tienes permiso para verlo.");
         } else {
-            model.addAttribute("detalleId", id);
+            model.addAttribute("detalleEncontrado", true);
             model.addAttribute("detalleMensaje", "Detalle del viaje '" + viaje.getNombreRuta() + "' cargado correctamente.");
         }
 
         return VIEW_USUARIO_HISTORIAL;
+    }
+
+    private void addHistorySummary(Model model, String username) {
+        List<Viaje> viajes = username != null
+                ? viajeService.getViajesByUsername(username)
+                : java.util.Collections.emptyList();
+        model.addAttribute("viajes", viajes);
+        model.addAttribute("viajesTotal", viajes.size());
+        model.addAttribute("viajesCompletados", countViajesWithStatus(viajes, "Completado"));
+        model.addAttribute("viajesPendientes", countViajesWithStatus(viajes, "Pendiente"));
+        model.addAttribute("viajesCancelados", countViajesWithStatus(viajes, "Cancelado"));
+    }
+
+    private long countViajesWithStatus(List<Viaje> viajes, String estado) {
+        return viajes.stream()
+                .filter(viaje -> viaje.getEstado() != null && estado.equalsIgnoreCase(viaje.getEstado().trim()))
+                .count();
     }
 
     @GetMapping("/mensajes_contacto")
