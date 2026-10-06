@@ -3,135 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Acceso Administrativo - Bustraker</title>
+    <meta name="theme-color" content="#211719">
+    <meta name="description" content="Acceso seguro al centro de operaciones administrativo de Bustraker.">
+    <title>Acceso Administrativo · Bustraker</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/style_login.css}">
-    <link rel="stylesheet" th:href="@{/css/style_common.css}">
-    <link rel="stylesheet" th:href="@{/css/style_auth.css}">
-    <link rel="stylesheet" th:href="@{/css/style_admin_login.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="shortcut icon" th:href="@{/images/Bus_icono.png}" type="image/x-icon">
+    <link rel="stylesheet" th:href="@{/css/style_admin_login.css(v='admin-login-20261005-3')}">
+    <link rel="icon" th:href="@{/images/escudo.png}">
 </head>
-<body class="auth-body admin-auth">
-    <header class="main-header">
-        <div class="header-inner">
-            <a class="logo" th:href="@{/}" aria-label="Bustraker, inicio">
-                <img th:src="@{/images/Bus_icono.png}" alt="">
-                <span class="brand">Bustraker</span>
+<body class="admin-login-page">
+    <main class="admin-login-shell">
+        <aside class="login-visual" aria-label="Centro de operaciones Bustraker">
+            <a class="login-brand" th:href="@{/}" aria-label="Bustraker, volver al inicio">
+                <span class="login-brand__mark"><i class="fas fa-bus" aria-hidden="true"></i></span>
+                <span><strong>Bustraker</strong><small>CENTRO DE OPERACIONES</small></span>
             </a>
-            <nav class="main-nav" aria-label="Navegación principal">
-                <a th:href="@{/}" class="nav-link"><i class="fas fa-arrow-left" aria-hidden="true"></i> Inicio</a>
-            </nav>
-        </div>
-    </header>
 
-    <main class="hero-section auth-page auth-page--login admin-auth-page">
-        <div class="container container-sm auth-layout auth-layout--login">
-            <aside class="auth-story admin-auth-story" aria-label="Acceso administrativo seguro">
-                <div class="auth-story__brand">
-                    <img th:src="@{/images/Bus_icono.png}" alt="">
-                    <span>Bustraker</span>
-                </div>
-                <span class="auth-kicker">PORTAL DE ADMINISTRACIÓN</span>
-                <h1>Gestión segura de la plataforma.</h1>
-                <p>Administra rutas y servicios desde un espacio protegido, reservado para el personal autorizado.</p>
-                <div class="admin-security-art" aria-hidden="true">
-                    <span class="admin-security-art__line"></span>
-                    <span class="admin-security-art__step"><i class="fas fa-key"></i></span>
-                    <span class="admin-security-art__step"><i class="fas fa-user-lock"></i></span>
-                    <span class="admin-security-art__shield"><i class="fas fa-shield-halved"></i></span>
-                </div>
-                <p class="auth-story__footnote"><i class="fas fa-lock" aria-hidden="true"></i> Verificación en dos pasos</p>
-            </aside>
+            <div class="login-visual__copy">
+                <span class="login-visual__eyebrow"><i></i> IDENTIDAD · CONTROL · OPERACIÓN</span>
+                <h2>Tu acceso.<br><em>Bajo control.</em></h2>
+                <p>Dos verificaciones, una sesión protegida. Ingresa al centro de operaciones de Bustraker.</p>
+            </div>
 
-            <section class="auth-content" aria-labelledby="loginTitle">
-                <div class="card_animate-slideUp admin-login-card">
-                    <div class="card-header">
-                        <span class="admin-card-kicker"><i class="fas fa-shield-halved" aria-hidden="true"></i> ÁREA RESTRINGIDA</span>
-                        <h1 id="loginTitle">
-                            <span class="admin-heading-icon"><i class="fas fa-lock" aria-hidden="true"></i></span>
-                            Acceso administrativo
-                        </h1>
-                        <p class="admin-card-intro" th:text="${verified} ? 'Paso 2 de 2 · Confirma tus credenciales' : 'Paso 1 de 2 · Verifica tu código de acceso'">Paso 1 de 2 · Verifica tu código de acceso</p>
+            <div class="login-scan" aria-hidden="true">
+                <div class="login-scan__meta"><span><i></i> SECUENCIA DE ACCESO</span><span>01 <b>/</b> 02</span></div>
+                <div class="login-scan__stage">
+                    <span class="login-scan__orbit login-scan__orbit--outer"></span>
+                    <span class="login-scan__orbit login-scan__orbit--inner"></span>
+                    <span class="login-scan__crosshair login-scan__crosshair--horizontal"></span>
+                    <span class="login-scan__crosshair login-scan__crosshair--vertical"></span>
+                    <span class="login-scan__sweep"></span>
+                    <svg class="login-scan__fingerprint" viewBox="0 0 180 180" fill="none" focusable="false">
+                        <path d="M90 22c-37 0-67 30-67 67m134 0c0-37-30-67-67-67Z"></path>
+                        <path d="M36 89c0-30 24-54 54-54s54 24 54 54"></path>
+                        <path d="M49 90c0-23 18-41 41-41s41 18 41 41c0 34-8 56-21 75"></path>
+                        <path d="M63 90c0-15 12-27 27-27s27 12 27 27c0 29-5 48-15 65"></path>
+                        <path d="M77 90c0-7 6-13 13-13s13 6 13 13c0 23-3 39-10 54"></path>
+                        <path d="M23 101c3 22 10 42 21 58m-5-68c0 12 1 22 4 32m91-8c-2 15-6 28-12 40"></path>
+                    </svg>
+                    <span class="login-scan__core"><i class="fas fa-fingerprint"></i></span>
+                    <span class="login-scan__node login-scan__node--one"></span>
+                    <span class="login-scan__node login-scan__node--two"></span>
+                    <span class="login-scan__node login-scan__node--three"></span>
+                </div>
+                <div class="login-scan__readout">
+                    <span><i></i><b>VERIFICACIÓN EN DOS FASES</b><small>CÓDIGO · CREDENCIALES</small></span>
+                    <span class="login-scan__serial">AUTH <b> / </b> 02</span>
+                </div>
+            </div>
+
+            <div class="login-visual__footer">
+                <span><i class="fas fa-shield-halved" aria-hidden="true"></i> Un sistema de acceso. Dos pasos de verificación.</span>
+                <span>BUSTRAKER <b>·</b> ADMIN</span>
+            </div>
+        </aside>
+
+        <section class="login-panel" aria-labelledby="loginTitle">
+            <div class="login-panel__topline">
+                <a class="login-mobile-brand" th:href="@{/}"><span class="login-brand__mark"><i class="fas fa-bus" aria-hidden="true"></i></span><strong>Bustraker</strong></a>
+                <span class="login-panel__secure"><i class="fas fa-lock" aria-hidden="true"></i> CONEXIÓN PROTEGIDA</span>
+            </div>
+
+            <div class="login-content">
+                <header class="login-heading">
+                    <span class="login-heading__eyebrow"><span></span> ACCESO ADMINISTRATIVO</span>
+                    <h1 id="loginTitle" th:text="${verified} ? 'Identifica tu cuenta' : 'Verifica tu acceso'">Verifica tu acceso</h1>
+                    <p th:text="${verified} ? 'Confirma tus credenciales para ingresar al centro de operaciones.' : 'Completa los dos pasos para ingresar al centro de operaciones.'">Completa los dos pasos para ingresar al centro de operaciones.</p>
+                </header>
+
+                <div class="security-notice">
+                    <span class="security-notice__icon"><i class="fas fa-shield-halved" aria-hidden="true"></i></span>
+                    <p><strong>Área de acceso restringido</strong><span>Solo para personal autorizado de Bustraker.</span></p>
+                </div>
+
+                <div th:if="${param.error}" class="alert alert-error" role="alert">
+                    <i class="fas fa-circle-exclamation" aria-hidden="true"></i>
+                    <span th:text="${param.error[0]}">Credenciales inválidas</span>
+                </div>
+                <div th:if="${param.verified}" class="alert alert-success" role="status">
+                    <i class="fas fa-circle-check" aria-hidden="true"></i>
+                    <span>Código verificado. Ingresa tus credenciales.</span>
+                </div>
+                <div th:if="${error}" class="alert alert-error" role="alert">
+                    <i class="fas fa-circle-exclamation" aria-hidden="true"></i>
+                    <span th:text="${error}">Error</span>
+                </div>
+
+                <div class="step-indicator" aria-label="Progreso del acceso administrativo">
+                    <div class="step" id="step1" th:classappend="${verified} ? 'completed' : 'active'" th:attr="aria-current=${verified} ? null : 'step'">
+                        <span class="step__number">01</span><span class="step__label">Verificar código</span>
                     </div>
+                    <span class="step-connector" th:classappend="${verified} ? 'is-complete' : ''" aria-hidden="true"></span>
+                    <div class="step" id="step2" th:classappend="${verified} ? 'active' : ''" th:attr="aria-current=${verified} ? 'step' : null">
+                        <span class="step__number">02</span><span class="step__label">Iniciar sesión</span>
+                    </div>
+                </div>
 
-                    <div class="card-body">
-                        <div th:if="${param.error}" class="alert alert-danger" role="alert">
-                            <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
-                            <span th:text="${param.error[0]}">Credenciales inválidas</span>
+                <form th:if="${!verified}" th:action="@{/admin/verificar-codigo}" method="post" class="login-form verification-step">
+                    <div class="form-group">
+                        <label for="codigoAdmin">Código de administrador</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon"><i class="fas fa-key" aria-hidden="true"></i></span>
+                            <input type="password" id="codigoAdmin" name="codigoAdmin" class="code-input" placeholder="Ingresa tu código" maxlength="15" autocomplete="one-time-code" required autofocus>
+                            <span class="input-trailing-icon"><i class="fas fa-shield-halved" aria-hidden="true"></i></span>
                         </div>
-                        <output th:if="${param.verified}" class="alert alert-success">
-                            <i class="fas fa-check-circle" aria-hidden="true"></i>
-                            <span>Código verificado. Continúa con tus credenciales.</span>
-                        </output>
-                        <div th:if="${error}" class="alert alert-danger" role="alert">
-                            <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
-                            <span th:text="${error}">Error</span>
+                        <p class="field-hint"><i class="fas fa-circle-info" aria-hidden="true"></i> Usa el código de verificación asignado al personal administrativo.</p>
+                    </div>
+                    <button type="submit" class="btn-login"><span>Continuar</span><i class="fas fa-arrow-right" aria-hidden="true"></i></button>
+                </form>
+
+                <form th:if="${verified}" th:action="@{/admin/login}" method="post" class="login-form credentials-step">
+                    <div class="form-group">
+                        <label for="username">Usuario</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon"><i class="fas fa-user" aria-hidden="true"></i></span>
+                            <input type="text" id="username" name="username" placeholder="Nombre de usuario" autocomplete="username" required autofocus>
                         </div>
-
-                        <ol class="admin-steps" aria-label="Pasos de autenticación">
-                            <li class="admin-step" th:classappend="${verified} ? ' completed' : ' active'">
-                                <span class="admin-step__number"><i class="fas fa-check" aria-hidden="true"></i><span>1</span></span>
-                                <span class="admin-step__label">Código</span>
-                            </li>
-                            <li class="admin-step" th:classappend="${verified} ? ' active' : ''">
-                                <span class="admin-step__number"><i class="fas fa-check" aria-hidden="true"></i><span>2</span></span>
-                                <span class="admin-step__label">Credenciales</span>
-                            </li>
-                        </ol>
-
-                        <div class="admin-security-note">
-                            <i class="fas fa-circle-info" aria-hidden="true"></i>
-                            <span>Acceso exclusivo para personal autorizado. La actividad administrativa queda protegida.</span>
-                        </div>
-
-                        <form th:if="${!verified}" th:action="@{/admin/verificar-codigo}" method="post" class="admin-auth-form verification-step">
-                            <div class="form-group">
-                                <label class="form-label" for="codigoAdmin"><i class="fas fa-key" aria-hidden="true"></i> Código de administrador</label>
-                                <input type="password" id="codigoAdmin" name="codigoAdmin" class="form-control admin-code-input" placeholder="Ingresa tu código" autocomplete="one-time-code" maxlength="15" required autofocus>
-                                <p class="form-text">Tu código habilita el segundo paso de verificación.</p>
-                            </div>
-                            <button type="submit" class="btn btn-primary btn-block admin-submit">
-                                Verificar código <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Contraseña</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon"><i class="fas fa-lock" aria-hidden="true"></i></span>
+                            <input type="password" id="password" name="password" placeholder="Ingresa tu contraseña" autocomplete="current-password" required>
+                            <button type="button" class="password-toggle js-toggle-password" data-target="#password" aria-label="Mostrar contraseña" aria-pressed="false" title="Mostrar contraseña">
+                                <i class="fas fa-eye" aria-hidden="true"></i>
                             </button>
-                        </form>
-
-                        <form th:if="${verified}" th:action="@{/admin/login}" method="post" class="admin-auth-form">
-                            <div class="form-group">
-                                <label class="form-label" for="username"><i class="fas fa-user" aria-hidden="true"></i> Nombre de usuario</label>
-                                <input type="text" id="username" name="username" class="form-control" placeholder="Ingresa tu nombre de usuario" autocomplete="username" required autofocus>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label" for="password"><i class="fas fa-lock" aria-hidden="true"></i> Contraseña</label>
-                                <div class="auth-password-control">
-                                    <input type="password" id="password" name="password" class="form-control" placeholder="Ingresa tu contraseña" autocomplete="current-password" required>
-                                    <button type="button" class="auth-password-toggle js-toggle-password" data-target="#password" aria-controls="password" aria-label="Mostrar contraseña" aria-pressed="false" title="Mostrar contraseña">
-                                        <i class="fas fa-eye" aria-hidden="true"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <input type="hidden" name="codigoVerificado" value="true">
-                            <button type="submit" class="btn btn-primary btn-block admin-submit">
-                                Iniciar sesión <i class="fas fa-arrow-right" aria-hidden="true"></i>
-                            </button>
-                        </form>
+                        </div>
                     </div>
+                    <input type="hidden" name="codigoVerificado" value="true">
+                    <button type="submit" class="btn-login"><span>Ingresar al panel</span><i class="fas fa-arrow-right" aria-hidden="true"></i></button>
+                </form>
 
-                    <div class="admin-back-link">
-                        <a th:href="@{/}"><i class="fas fa-arrow-left" aria-hidden="true"></i> Volver al inicio</a>
-                    </div>
-                </div>
-            </section>
-        </div>
+                <a class="back-link" th:href="@{/}"><i class="fas fa-arrow-left" aria-hidden="true"></i> Volver al inicio</a>
+            </div>
+
+            <footer class="login-panel__footer"><span>BUSTRAKER <b>·</b> SISTEMA DE GESTIÓN</span><span>ACCESO SEGURO</span></footer>
+        </section>
     </main>
-
-    <footer class="admin-auth-footer">
-        <span>Bustraker <span aria-hidden="true">·</span> Panel administrativo</span>
-        <span>© 2026</span>
-    </footer>
-
-    <script th:src="@{/js/admin_login.js}"></script>
+    <script th:src="@{/js/admin_login.js(v='admin-login-20261005-3')}"></script>
 </body>
 </html>

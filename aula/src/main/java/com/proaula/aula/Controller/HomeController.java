@@ -1,6 +1,7 @@
 package com.proaula.aula.Controller;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 import java.util.Comparator;
+import java.util.Locale;
 
 import com.proaula.aula.Entity.Bus;
 import com.proaula.aula.Entity.ContactoMensaje;
@@ -17,6 +19,8 @@ import com.proaula.aula.Entity.Usuario;
 import com.proaula.aula.Entity.Viaje;
 import com.proaula.aula.Repository.UsuarioRepository;
 import com.proaula.aula.dto.ContactoMensajeDto;
+import com.proaula.aula.dto.BusConsultaDto;
+import com.proaula.aula.dto.BusConsultaMapper;
 import com.proaula.aula.dto.UsuarioFormDto;
 import com.proaula.aula.Service.AdminCodeService;
 import com.proaula.aula.Service.BusService;
@@ -228,36 +232,53 @@ public class HomeController {
 
     @GetMapping("/gestionar-usuarios")
     public String gestionarUsuarios(@RequestParam(value = "buscar", defaultValue = "") String buscar, Model model) {
-        List<Usuario> todos = usuarioService.getAllUsuarios();
+        return prepararGestionUsuarios(buscar, model, null);
+    }
 
-        if (buscar != null && !buscar.isEmpty()) {
-            String buscarLower = buscar.toLowerCase();
-            todos = todos.stream()
-                    .filter(u -> (u.getNombres() != null && u.getNombres().toLowerCase().contains(buscarLower))
-                            || (u.getApellidos() != null && u.getApellidos().toLowerCase().contains(buscarLower))
-                            || (u.getEmail() != null && u.getEmail().toLowerCase().contains(buscarLower))
-                            || (u.getUsername() != null && u.getUsername().toLowerCase().contains(buscarLower)))
+    private String prepararGestionUsuarios(String buscar, Model model, UsuarioFormDto nuevoUsuario) {
+        List<Usuario> cuentas = usuarioService.getAllUsuarios();
+        String consulta = buscar == null ? "" : buscar.trim();
+        List<Usuario> coincidencias = cuentas;
+
+        if (!consulta.isEmpty()) {
+            String consultaNormalizada = consulta.toLowerCase(Locale.ROOT);
+            coincidencias = cuentas.stream()
+                    .filter(usuario -> contieneTexto(usuario.getNombres(), consultaNormalizada)
+                            || contieneTexto(usuario.getApellidos(), consultaNormalizada)
+                            || contieneTexto(usuario.getEmail(), consultaNormalizada)
+                            || contieneTexto(usuario.getUsername(), consultaNormalizada)
+                            || contieneTexto(usuario.getRole(), consultaNormalizada))
                     .toList();
         }
 
-        // Dividir usuarios entre admins y usuarios normales
-        List<Usuario> administradores = todos.stream()
-                .filter(u -> u.getRole() != null && u.getRole().equalsIgnoreCase(ROLE_ADMIN))
-                .sorted(Comparator.comparing(Usuario::getNombres, Comparator.nullsLast(String::compareTo))
-                        .thenComparing(Usuario::getApellidos, Comparator.nullsLast(String::compareTo)))
+        Comparator<Usuario> porNombre = Comparator
+                .comparing((Usuario usuario) -> usuario.getNombres(), Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER))
+                .thenComparing(usuario -> usuario.getApellidos(), Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER));
+        List<Usuario> administradores = coincidencias.stream()
+                .filter(usuario -> usuario.getRole() != null && usuario.getRole().equalsIgnoreCase(ROLE_ADMIN))
+                .sorted(porNombre)
                 .toList();
-
-        List<Usuario> usuarios = todos.stream()
-                .filter(u -> u.getRole() == null || !u.getRole().equalsIgnoreCase(ROLE_ADMIN))
-                .sorted(Comparator.comparing(Usuario::getNombres, Comparator.nullsLast(String::compareTo))
-                        .thenComparing(Usuario::getApellidos, Comparator.nullsLast(String::compareTo)))
+        List<Usuario> usuarios = coincidencias.stream()
+                .filter(usuario -> usuario.getRole() == null || !usuario.getRole().equalsIgnoreCase(ROLE_ADMIN))
+                .sorted(porNombre)
                 .toList();
+        long totalAdministradores = cuentas.stream()
+                .filter(usuario -> usuario.getRole() != null && usuario.getRole().equalsIgnoreCase(ROLE_ADMIN))
+                .count();
 
         model.addAttribute("administradores", administradores);
         model.addAttribute("usuarios", usuarios);
-        model.addAttribute("buscar", buscar);
-        model.addAttribute(MODEL_ATTR_MENSAJE, "Gestión de usuarios");
+        model.addAttribute("buscar", consulta);
+        model.addAttribute("totalCuentas", cuentas.size());
+        model.addAttribute("totalCoincidencias", coincidencias.size());
+        model.addAttribute("totalAdministradores", totalAdministradores);
+        model.addAttribute("totalUsuarios", cuentas.size() - totalAdministradores);
+        model.addAttribute("nuevoUsuario", nuevoUsuario == null ? new UsuarioFormDto() : nuevoUsuario);
         return VIEW_ADMIN_GESTIONAR_USUARIOS;
+    }
+
+    private boolean contieneTexto(String valor, String consultaNormalizada) {
+        return valor != null && valor.toLowerCase(Locale.ROOT).contains(consultaNormalizada);
     }
 
     @GetMapping("/editar-usuario/{id}")
@@ -312,14 +333,12 @@ public class HomeController {
     public String crearUsuario(@ModelAttribute UsuarioFormDto usuarioForm, Model model) {
         if (usuarioService.findByUsername(usuarioForm.getUsername()) != null) {
             model.addAttribute(MODEL_ATTR_ERROR, "El nombre de usuario ya está en uso");
-            model.addAttribute(MODEL_ATTR_USUARIO, usuarioForm);
-            return VIEW_ADMIN_GESTIONAR_USUARIOS;
+            return prepararGestionUsuarios("", model, usuarioForm);
         }
 
         if (usuarioRepository.findByEmail(usuarioForm.getEmail()) != null) {
             model.addAttribute(MODEL_ATTR_ERROR, "El email ya está registrado");
-            model.addAttribute(MODEL_ATTR_USUARIO, usuarioForm);
-            return VIEW_ADMIN_GESTIONAR_USUARIOS;
+            return prepararGestionUsuarios("", model, usuarioForm);
         }
 
         Usuario usuario = new Usuario();
@@ -336,36 +355,56 @@ public class HomeController {
 
     @GetMapping("/reportes")
     public String reportes(@RequestParam(value = "buscar", defaultValue = "") String buscar, Model model) {
-        List<com.proaula.aula.Entity.Bus> buses = busService.getAllBuses();
+        List<Bus> todosLosBuses = busService.getAllBuses();
+        List<Bus> buses = todosLosBuses;
+        String termino = buscar == null ? "" : buscar.trim();
 
-        if (buscar != null && !buscar.isEmpty()) {
-            String buscarLower = buscar.toLowerCase();
-            buses = buses.stream()
-                    .filter(b -> (b.getPlaca() != null && b.getPlaca().toLowerCase().contains(buscarLower))
-                            || (b.getModelo() != null && b.getModelo().toLowerCase().contains(buscarLower)))
+        if (!termino.isEmpty()) {
+            String terminoNormalizado = termino.toLowerCase(Locale.ROOT);
+            buses = todosLosBuses.stream()
+                    .filter(bus -> (bus.getPlaca() != null
+                            && bus.getPlaca().toLowerCase(Locale.ROOT).contains(terminoNormalizado))
+                            || (bus.getModelo() != null
+                            && bus.getModelo().toLowerCase(Locale.ROOT).contains(terminoNormalizado)))
                     .toList();
         }
 
-        model.addAttribute("totalBuses", busService.getAllBuses().size());
+        int totalBuses = todosLosBuses.size();
+        int totalUsuarios = usuarioService.getAllUsuarios().size();
+        int totalRutas = rutaService.getAllRutas().size();
+
+        model.addAttribute("totalBuses", totalBuses);
         model.addAttribute(MODEL_ATTR_BUSES, buses);
-        model.addAttribute("totalRutas", rutaService.getAllRutas().size());
-        model.addAttribute("totalUsuarios", usuarioService.getAllUsuarios().size());
-        model.addAttribute("usuariosActivos", usuarioService.getAllUsuarios().size());
-        model.addAttribute("buscar", buscar);
+        model.addAttribute("totalRutas", totalRutas);
+        model.addAttribute("totalUsuarios", totalUsuarios);
+        model.addAttribute("resultadosBuses", buses.size());
+        model.addAttribute("buscar", termino);
         return "Admin/reportes";
     }
 
     @GetMapping("/consultas")
-    public String consultas(Model model) {
-        List<Bus> buses = busService.getAllBuses();
+    public String consultas(Model model, Authentication authentication) {
+        boolean autenticado = authentication != null
+                && authentication.isAuthenticated()
+                && !(authentication instanceof AnonymousAuthenticationToken);
+        List<Bus> todosLosBuses = busService.getAllBuses();
+        List<BusConsultaDto> buses = autenticado
+                ? BusConsultaMapper.authenticatedBuses(todosLosBuses)
+                : BusConsultaMapper.publicRoutes(todosLosBuses);
         long rutasConBuses = buses.stream()
-                .filter(bus -> bus.getRuta() != null && bus.getRuta().getId() != null)
-                .map(bus -> bus.getRuta().getId())
+                .map(bus -> bus.getRutaNombre())
+                .filter(nombre -> nombre != null && !nombre.isBlank())
                 .distinct()
                 .count();
+        long barriosCubiertos = buses.stream()
+                .flatMap(bus -> bus.getBarrios().stream())
+                .distinct()
+                .count();
+        model.addAttribute("autenticado", autenticado);
         model.addAttribute(MODEL_ATTR_BUSES, buses);
         model.addAttribute("totalBuses", buses.size());
         model.addAttribute("rutasConBuses", rutasConBuses);
+        model.addAttribute("barriosCubiertos", barriosCubiertos);
         return "Usuario/consultas";
     }
 

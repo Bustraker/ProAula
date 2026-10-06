@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const visibleCountLabel = document.getElementById('visibleCountLabel');
     const resultsMessage = document.getElementById('resultsMessage');
     const noResults = document.getElementById('noResults');
+    const authenticated = document.body.classList.contains('bus-directory-page--authenticated');
 
     if (!searchInput || !routeFilter || !base || !tableContainer || !tableBody) {
         return;
@@ -43,12 +44,15 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function matchesFilter(item) {
+        const neighborhoods = Array.from(item.querySelectorAll('.barrios li'))
+            .map((neighborhood) => neighborhood.textContent.trim());
         const searchableText = normalize([
             item.dataset.placa,
             item.dataset.ruta,
             item.dataset.conductor,
             item.dataset.modelo,
-            item.dataset.color
+            item.dataset.color,
+            neighborhoods.join(' ')
         ].join(' '));
         const query = normalize(searchInput.value);
         const selectedRoute = routeFilter.value;
@@ -72,13 +76,20 @@ document.addEventListener('DOMContentLoaded', function () {
                 .filter(Boolean)
                 .join(', ');
 
-            appendCell(row, `#${item.dataset.id}`);
-            appendCell(row, item.dataset.placa);
-            appendCell(row, item.dataset.ruta || 'Sin ruta asignada');
-            appendCell(row, item.dataset.conductor || 'Sin asignar');
-            appendCell(row, item.dataset.modelo || 'No registrado');
-            appendCell(row, item.dataset.color || 'No registrado');
-            appendCell(row, neighborhoods || 'Sin barrios registrados');
+            if (authenticated) {
+                appendCell(row, `#${item.dataset.id}`);
+                appendCell(row, item.dataset.placa || 'Placa no registrada');
+                appendCell(row, item.dataset.ruta || 'Sin ruta asignada');
+                appendCell(row, item.dataset.conductor || 'Sin asignar');
+                appendCell(row, item.dataset.modelo || 'No registrado');
+                appendCell(row, item.dataset.color || 'No registrado');
+                appendCell(row, neighborhoods || 'Sin barrios registrados');
+                appendCell(row, item.dataset.hora || 'No registrada');
+                appendCell(row, item.dataset.verificada === 'true' ? 'Verificada' : 'Pendiente');
+            } else {
+                appendCell(row, item.dataset.ruta || 'Ruta sin nombre');
+                appendCell(row, neighborhoods || 'Sin barrios registrados');
+            }
             tableBody.appendChild(row);
         });
     }

@@ -3,89 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mensajes de Contacto - Bustraker</title>
-    <link rel="stylesheet" th:href="@{/css/style_responsive.css}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <meta name="theme-color" content="#24191c">
+    <meta name="description" content="Consulta y filtra los mensajes recibidos por Bustraker.">
+    <title>Mensajes de contacto · Bustraker Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/admin_pantallas_pendientes.css(v='admin-screens-20261005-1')}">
+    <link rel="shortcut icon" th:href="@{/images/Bus_icono.png}" type="image/x-icon">
 </head>
-<body>
-    <div class="admin-container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <h2><i class="fas fa-bus"></i> Bustraker Admin</h2>
-            </div>
-            <nav class="sidebar-nav">
-                <a th:href="@{/index_2}"><i class="fas fa-home"></i> Inicio</a>
-                <a th:href="@{/gestionar-usuarios}"><i class="fas fa-users"></i> Usuarios</a>
-                <a th:href="@{/reportes}"><i class="fas fa-chart-bar"></i> Reportes</a>
-                <a th:href="@{/mensajes_contacto}" class="active"><i class="fas fa-envelope"></i> Mensajes</a>
-                <a th:href="@{/rutas/admin}"><i class="fas fa-route"></i> Rutas</a>
-                <a th:href="@{/registro-buses}"><i class="fas fa-bus"></i> Buses</a>
-                <a th:href="@{/logout}"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
-            </nav>
-        </aside>
+<body class="legacy-admin legacy-admin-messages">
+<div class="legacy-shell">
+    <aside class="legacy-sidebar">
+        <a class="legacy-brand" th:href="@{/index_2}"><span class="legacy-brand__icon"><i class="fas fa-bus" aria-hidden="true"></i></span><span><strong>Bustraker</strong><small>Centro de operaciones</small></span></a>
+        <nav class="legacy-nav" aria-label="Navegación administrativa">
+            <span class="legacy-nav__label">ADMINISTRACIÓN</span>
+            <a th:href="@{/index_2}"><i class="fas fa-house" aria-hidden="true"></i><span>Panel principal</span></a>
+            <a th:href="@{/gestionar-usuarios}"><i class="fas fa-users" aria-hidden="true"></i><span>Gestión de usuarios</span></a>
+            <a th:href="@{/reportes}"><i class="fas fa-chart-column" aria-hidden="true"></i><span>Reportes</span></a>
+            <a th:href="@{/mensajes_contacto}" class="is-active" aria-current="page"><i class="fas fa-envelope" aria-hidden="true"></i><span>Mensajes</span></a>
+            <a th:href="@{/rutas/admin}"><i class="fas fa-route" aria-hidden="true"></i><span>Gestión de rutas</span></a>
+            <a th:href="@{/registro-buses}"><i class="fas fa-bus-simple" aria-hidden="true"></i><span>Gestión de buses</span></a>
+        </nav>
+        <div class="legacy-sidebar__footer"><span class="legacy-status-dot"></span><span>Bandeja administrativa</span></div>
+    </aside>
 
-        <!-- Main Content -->
-        <main class="main-content">
-            <header class="top-header">
-                <h1><i class="fas fa-envelope-open-text"></i> Mensajes de Contacto</h1>
-                <div class="header-actions">
-                    <span th:text="${#authentication.name}" class="username"></span>
-                    <a th:href="@{/logout}" class="btn btn-secondary"><i class="fas fa-sign-out-alt"></i> Salir</a>
+    <main class="legacy-main">
+        <header class="legacy-topbar">
+            <div class="legacy-breadcrumb"><a th:href="@{/index_2}">Administración</a><i class="fas fa-chevron-right" aria-hidden="true"></i><strong>Mensajes</strong></div>
+            <span class="legacy-user"><i class="fas fa-user-shield" aria-hidden="true"></i><span th:text="${#authentication.name}">Administrador</span></span>
+        </header>
+        <div class="legacy-content">
+            <section class="legacy-hero legacy-hero--messages" aria-labelledby="messagesTitle">
+                <div>
+                    <p class="legacy-eyebrow"><span></span> CENTRO DE COMUNICACIONES</p>
+                    <h1 id="messagesTitle">Cada mensaje<br><em>merece respuesta.</em></h1>
+                    <p>Revisa las consultas recibidas y encuentra rápidamente el mensaje que necesitas atender.</p>
+                    <div class="legacy-hero__meta"><span><i class="fas fa-inbox" aria-hidden="true"></i> <b th:text="${#lists.size(mensajes)}">0</b> mensajes encontrados</span><span><i class="fas fa-shield-halved" aria-hidden="true"></i> Bandeja administrativa</span></div>
                 </div>
-            </header>
+                <div class="legacy-hero-art legacy-hero-art--messages" aria-hidden="true">
+                    <span class="legacy-art-grid"></span><span class="legacy-message-orbit legacy-message-orbit--one"></span><span class="legacy-message-orbit legacy-message-orbit--two"></span>
+                    <span class="legacy-message-envelope"><i class="fas fa-envelope"></i></span>
+                    <span class="legacy-art-caption"><i class="fas fa-comment-dots"></i> Canal de contacto</span>
+                </div>
+            </section>
 
-            <div class="content-wrapper">
-                <div class="card">
-                    <div class="card-header">
-                        <h3><i class="fas fa-comments"></i> Lista de mensajes recibidos</h3>
-                        <div class="card-actions">
-                            <form method="get" th:action="@{/contacto/mensajes}" class="search-form">
-                                <input type="text" name="q" th:value="${busqueda}" class="form-control" 
-                                       placeholder="Buscar por nombre, email, teléfono o mensaje...">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-search"></i> Buscar
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th><i class="fas fa-user"></i> Nombre</th>
-                                        <th><i class="fas fa-user-tag"></i> Apellido</th>
-                                        <th><i class="fas fa-envelope"></i> Email</th>
-                                        <th><i class="fas fa-phone"></i> Teléfono</th>
-                                        <th><i class="fas fa-comment"></i> Mensaje</th>
-                                        <th><i class="fas fa-calendar"></i> Fecha</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr th:each="mensaje : ${mensajes}">
-                                        <td th:text="${mensaje.nombre}"></td>
-                                        <td th:text="${mensaje.apellido}"></td>
-                                        <td th:text="${mensaje.email}"></td>
-                                        <td th:text="${mensaje.telefono}"></td>
-                                        <td>
-                                            <div class="mensaje-texto" th:text="${mensaje.mensaje}"></div>
-                                        </td>
-                                        <td th:text="${mensaje.fechaCreacion}?:'N/A'"></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div th:if="${#lists.isEmpty(mensajes)}" class="empty-state">
-                            <i class="fas fa-inbox"></i>
-                            <h4>No hay mensajes</h4>
-                            <p th:if="${busqueda != null and busqueda != ''}">No se encontraron mensajes que coincidan con tu búsqueda.</p>
-                            <p th:unless="${busqueda != null and busqueda != ''}">Aún no se han recibido mensajes de contacto.</p>
-                        </div>
-                    </div>
+            <section class="legacy-card legacy-messages-card" aria-labelledby="messageListTitle">
+                <div class="legacy-section-heading legacy-section-heading--wrap">
+                    <span class="legacy-section-icon"><i class="fas fa-comments" aria-hidden="true"></i></span>
+                    <div><p class="legacy-eyebrow">CONSULTA Y SEGUIMIENTO</p><h2 id="messageListTitle">Mensajes recibidos</h2></div>
+                    <form method="get" th:action="@{/contacto/mensajes}" class="legacy-search">
+                        <label class="visually-hidden" for="messageSearch">Buscar en los mensajes</label>
+                        <i class="fas fa-magnifying-glass" aria-hidden="true"></i>
+                        <input id="messageSearch" type="search" name="q" th:value="${busqueda}" placeholder="Nombre, correo o contenido">
+                        <button type="submit">Buscar</button>
+                    </form>
                 </div>
-            </div>
-        </main>
-    </div>
+                <div class="legacy-table-meta"><span><i class="fas fa-circle-info" aria-hidden="true"></i> <span th:if="${busqueda != null and busqueda != ''}">Resultados para “<strong th:text="${busqueda}"></strong>”</span><span th:unless="${busqueda != null and busqueda != ''}">Listado de consultas de contacto</span></span><strong><span th:text="${#lists.size(mensajes)}">0</span> registros</strong></div>
+                <div class="legacy-table-scroll">
+                    <table class="legacy-table">
+                        <thead><tr><th>Contacto</th><th>Correo electrónico</th><th>Teléfono</th><th>Mensaje</th><th>Fecha</th></tr></thead>
+                        <tbody>
+                        <tr th:each="mensaje : ${mensajes}">
+                            <td><strong th:text="${mensaje.nombre + ' ' + mensaje.apellido}">Nombre Apellido</strong></td>
+                            <td><a class="legacy-email" th:href="|mailto:${mensaje.email}|" th:text="${mensaje.email}">correo@ejemplo.com</a></td>
+                            <td th:text="${mensaje.telefono}">Teléfono</td>
+                            <td><p class="legacy-message-text" th:text="${mensaje.mensaje}">Mensaje recibido</p></td>
+                            <td th:text="${mensaje.fechaCreacion != null ? mensaje.fechaCreacion : 'N/A'}">Fecha</td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(mensajes)}"><td colspan="5">
+                            <div class="legacy-empty legacy-empty--inline"><span><i class="fas fa-inbox" aria-hidden="true"></i></span><strong>No hay mensajes para mostrar</strong><p th:if="${busqueda != null and busqueda != ''}">No se encontraron consultas que coincidan con la búsqueda.</p><p th:unless="${busqueda != null and busqueda != ''}">Aún no se han recibido mensajes de contacto.</p></div>
+                        </td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            <footer class="legacy-page-footer"><span>BUSTRAKER · CENTRO DE COMUNICACIONES</span><a th:href="@{/index_2}">Volver al panel <i class="fas fa-arrow-right" aria-hidden="true"></i></a></footer>
+        </div>
+    </main>
+</div>
 </body>
 </html>

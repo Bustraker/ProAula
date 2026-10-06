@@ -1,9 +1,6 @@
 package com.proaula.aula.Controller;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +17,8 @@ import org.springframework.security.core.Authentication;
 
 import com.proaula.aula.Entity.Bus;
 import com.proaula.aula.Service.BusService;
+import com.proaula.aula.dto.BusConsultaDto;
+import com.proaula.aula.dto.BusConsultaMapper;
 
 @RestController
 @RequestMapping("/api/buses")
@@ -33,26 +32,14 @@ public class BusRestController {
     }
 
     @GetMapping("/todos")
-    public List<Map<String, Object>> getAllBusesWithRuta(Authentication authentication) {
+    public List<BusConsultaDto> getAllBusesWithRuta(Authentication authentication) {
         boolean autenticado = authentication != null
                 && authentication.isAuthenticated()
                 && !(authentication instanceof AnonymousAuthenticationToken);
         List<Bus> buses = busService.getAllBuses();
-        return buses.stream().map(bus -> {
-            Map<String, Object> map = new HashMap<>();
-            map.put("id", bus.getId());
-            map.put("placa", bus.getPlaca());
-            map.put("modelo", bus.getModelo());
-            map.put("color", bus.getColor());
-            if (autenticado) {
-                map.put("conductor", bus.getConductor());
-            }
-            if (bus.getRuta() != null) {
-                map.put("rutaId", bus.getRuta().getId());
-                map.put("rutaNombre", bus.getRuta().getNombre());
-            }
-            return map;
-        }).collect(Collectors.toList());
+        return autenticado
+                ? BusConsultaMapper.authenticatedBuses(buses)
+                : BusConsultaMapper.publicRoutes(buses);
     }
 
     @GetMapping("/{id}")

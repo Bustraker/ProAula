@@ -49,8 +49,10 @@ public class BusController {
 
     @PostMapping("/actualizar-bus/{id}")
     public String actualizarBus(@PathVariable Long id, @ModelAttribute Bus bus) {
-        bus.setId(id);
-        busService.saveBus(bus);
+        Bus busExistente = busService.getBusById(id);
+        busExistente.setPlaca(bus.getPlaca());
+        busExistente.setModelo(bus.getModelo());
+        busService.saveBus(busExistente);
         return "redirect:/index_2";
     }
 

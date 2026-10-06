@@ -3,23 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="description" content="Consulta información pública de buses y sus recorridos en Cartagena.">
-    <meta name="theme-color" content="#101715">
+    <meta name="description" th:content="${autenticado} ? 'Consulta información ampliada de buses y recorridos en Cartagena.' : 'Consulta rutas y barrios de Cartagena.'">
+    <meta name="theme-color" content="#071421">
     <title>Consulta de buses - Bustraker</title>
-    <link rel="stylesheet" th:href="@{/css/style_consultas.css}">
+    <link rel="stylesheet" th:href="@{/css/style_consultas.css(v='bus-directory-20261005-2')}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="shortcut icon" th:href="@{/images/Bus_icono.png}" type="image/x-icon">
 </head>
-<body class="bus-directory-page">
+<body class="bus-directory-page" th:classappend="${autenticado} ? ' bus-directory-page--authenticated' : ' bus-directory-page--public'">
     <header class="directory-header">
         <div class="directory-topbar">
-            <a class="directory-brand" th:href="@{/index_3_public}" aria-label="Bustraker, inicio público">
+            <a class="directory-brand" th:href="${autenticado} ? @{/dashboard} : @{/index_3_public}" aria-label="Bustraker, inicio">
                 <img th:src="@{/images/Bus_palmera.png}" alt="">
                 <span><strong>Bustraker</strong><small>Cartagena se mueve</small></span>
             </a>
-            <nav class="directory-primary-nav" aria-label="Navegación pública">
-                <a th:href="@{/index_3_public}">Inicio</a>
-                <a th:href="@{/viajar_public}">Planear viaje</a>
+            <nav class="directory-primary-nav" aria-label="Navegación principal">
+                <a th:if="${!autenticado}" th:href="@{/index_3_public}">Inicio</a>
+                <a th:if="${!autenticado}" th:href="@{/viajar_public}">Planear viaje</a>
+                <a th:if="${autenticado}" th:href="@{/dashboard}"><i class="fas fa-house" aria-hidden="true"></i> Panel</a>
+                <a th:if="${autenticado}" th:href="@{/rutas}"><i class="fas fa-route" aria-hidden="true"></i> Rutas</a>
+                <a th:if="${autenticado}" th:href="@{/historial}"><i class="fas fa-clock-rotate-left" aria-hidden="true"></i> Historial</a>
+                <a th:if="${autenticado}" th:href="@{/perfil}"><i class="fas fa-user" aria-hidden="true"></i> Perfil</a>
                 <a th:href="@{/consultas}" aria-current="page">Consulta de buses</a>
             </nav>
             <a class="directory-signin" th:href="@{/inicio-de-sesion-mejorado}">
@@ -30,18 +34,27 @@
 
         <section class="directory-hero" aria-labelledby="directoryTitle">
             <div class="directory-hero-copy">
-                <p class="directory-eyebrow"><span class="directory-signal" aria-hidden="true"></span> INFORMACIÓN ABIERTA · CARTAGENA</p>
-                <h1 id="directoryTitle">La ciudad,<br><em>ruta por ruta.</em></h1>
-                <p class="directory-intro">Encuentra los datos disponibles de cada unidad y conoce los barrios vinculados a su recorrido.</p>
+                <p class="directory-eyebrow"><span class="directory-signal" aria-hidden="true"></span>
+                    <span th:text="${autenticado} ? 'CENTRO DE MOVILIDAD · CARTAGENA' : 'INFORMACIÓN PÚBLICA · CARTAGENA'">INFORMACIÓN PÚBLICA · CARTAGENA</span>
+                </p>
+                <h1 id="directoryTitle">
+                    <span th:text="${autenticado} ? 'La movilidad,' : 'La ciudad,'">La ciudad,</span><br>
+                    <em th:text="${autenticado} ? 'con más contexto.' : 'ruta por ruta.'">ruta por ruta.</em>
+                </h1>
+                <p class="directory-intro" th:text="${autenticado} ? 'Consulta los datos de cada bus, su asignación y la información operativa de su recorrido.' : 'Explora las rutas disponibles y los barrios que conectan, sin exponer datos privados de los buses.'">Explora las rutas disponibles y los barrios que conectan.</p>
                 <div class="directory-hero-actions">
                     <a href="#directorio" class="directory-action directory-action--gold">
                         Explorar unidades <i class="fas fa-arrow-down" aria-hidden="true"></i>
                     </a>
-                    <a th:href="@{/viajar_public}" class="directory-action directory-action--quiet">
+                    <a th:if="${!autenticado}" th:href="@{/viajar_public}" class="directory-action directory-action--quiet">
+                        Planear un viaje <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i>
+                    </a>
+                    <a th:if="${autenticado}" th:href="@{/viajar}" class="directory-action directory-action--quiet">
                         Planear un viaje <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i>
                     </a>
                 </div>
-                <p class="directory-caption"><i class="fas fa-globe-americas" aria-hidden="true"></i> Consulta pública, sin necesidad de iniciar sesión.</p>
+                <p class="directory-caption" th:if="${!autenticado}"><i class="fas fa-globe-americas" aria-hidden="true"></i> Consulta abierta: rutas y barrios.</p>
+                <p class="directory-caption" th:if="${autenticado}"><i class="fas fa-shield-halved" aria-hidden="true"></i> Vista personalizada para tu sesión.</p>
             </div>
 
             <div class="directory-route-art" role="img" aria-label="Ilustración de un recorrido urbano con paradas">
@@ -55,12 +68,22 @@
                     <path class="map-street map-street--four" d="M296 2v87l-43 43v163"></path>
                     <path class="map-street map-street--five" d="M2 256h102l48-48h122l63 63h78"></path>
                     <path class="map-route-shadow" d="M54 218c46 0 39-89 103-89s47 54 102 54 42-83 112-83"></path>
-                    <path class="map-route-line" d="M54 218c46 0 39-89 103-89s47 54 102 54 42-83 112-83"></path>
+                    <path id="cityRoutePath" class="map-route-line" d="M54 218c46 0 39-89 103-89s47 54 102 54 42-83 112-83"></path>
+                    <path class="map-route-flow" d="M54 218c46 0 39-89 103-89s47 54 102 54 42-83 112-83"></path>
                     <circle class="map-stop map-stop--start" cx="54" cy="218" r="8"></circle>
                     <circle class="map-stop map-stop--middle" cx="157" cy="129" r="6"></circle>
                     <circle class="map-stop map-stop--middle map-stop--last" cx="259" cy="183" r="6"></circle>
                     <circle class="map-stop map-stop--end" cx="371" cy="100" r="9"></circle>
                     <circle class="map-location-pulse" cx="371" cy="100" r="17"></circle>
+                    <g class="route-bus-runner" aria-hidden="true">
+                        <rect x="-14" y="-8" width="28" height="16" rx="5"></rect>
+                        <path d="M-9 -3h18M-8 2h5m3 0h8"></path>
+                        <circle cx="-8" cy="9" r="2.2"></circle>
+                        <circle cx="8" cy="9" r="2.2"></circle>
+                        <animateMotion dur="7s" repeatCount="indefinite" rotate="auto">
+                            <mpath href="#cityRoutePath"></mpath>
+                        </animateMotion>
+                    </g>
                 </svg>
                 <div class="route-float-card route-float-card--top" aria-hidden="true">
                     <span class="route-float-icon"><i class="fas fa-location-dot"></i></span>
@@ -77,28 +100,40 @@
 
     <nav class="directory-subnav" aria-label="Secciones de consulta">
         <div>
-            <a th:href="@{/index_3_public}">Inicio</a>
+            <a th:href="${autenticado} ? @{/dashboard} : @{/index_3_public}" th:text="${autenticado} ? 'Panel' : 'Inicio'">Inicio</a>
             <span aria-hidden="true">/</span>
             <span aria-current="page">Consulta de buses</span>
         </div>
-        <span class="directory-subnav-note"><i class="fas fa-unlock-keyhole" aria-hidden="true"></i> Datos públicos</span>
+        <span class="directory-subnav-note">
+            <i th:class="${autenticado} ? 'fas fa-shield-halved' : 'fas fa-unlock-keyhole'" aria-hidden="true"></i>
+            <span th:text="${autenticado} ? 'Vista de usuario autenticado' : 'Vista pública limitada'">Vista pública limitada</span>
+        </span>
     </nav>
 
     <main class="directory-main">
         <section class="directory-overview" aria-label="Resumen del directorio">
             <article class="overview-item">
                 <span class="overview-icon" aria-hidden="true"><i class="fas fa-bus-simple"></i></span>
-                <span class="overview-copy"><small>UNIDADES EN DIRECTORIO</small><strong th:text="${totalBuses}">0</strong></span>
+                <span class="overview-copy">
+                    <small th:text="${autenticado} ? 'UNIDADES REGISTRADAS' : 'RUTAS DISPONIBLES'">RUTAS DISPONIBLES</small>
+                    <strong th:text="${totalBuses}">0</strong>
+                </span>
                 <span class="overview-index" aria-hidden="true">01</span>
             </article>
             <article class="overview-item overview-item--route">
                 <span class="overview-icon" aria-hidden="true"><i class="fas fa-route"></i></span>
-                <span class="overview-copy"><small>RUTAS VINCULADAS</small><strong th:text="${rutasConBuses}">0</strong></span>
+                <span class="overview-copy">
+                    <small th:text="${autenticado} ? 'RUTAS VINCULADAS' : 'BARRIOS CONECTADOS'">BARRIOS CONECTADOS</small>
+                    <strong th:text="${autenticado ? rutasConBuses : barriosCubiertos}">0</strong>
+                </span>
                 <span class="overview-index" aria-hidden="true">02</span>
             </article>
             <div class="overview-note">
                 <span class="overview-note-mark" aria-hidden="true"><i class="fas fa-compass"></i></span>
-                <span><strong>Una vista clara de la movilidad</strong><small>Busca por placa, ruta, conductor, modelo o color.</small></span>
+                <span>
+                    <strong th:text="${autenticado} ? 'Información operativa ampliada' : 'Rutas abiertas de la ciudad'">Rutas abiertas de la ciudad</strong>
+                    <small th:text="${autenticado} ? 'Accede a los detalles asociados a cada unidad.' : 'La consulta pública no muestra placas ni datos de conductores.'">La consulta pública no muestra datos privados.</small>
+                </span>
             </div>
         </section>
 
@@ -106,8 +141,8 @@
             <div class="directory-section-heading">
                 <div>
                     <p class="directory-section-kicker">DIRECTORIO DE TRANSPORTE</p>
-                    <h2 id="directorySectionTitle">Buses disponibles</h2>
-                    <p>Filtra la información y abre cada unidad para ver sus barrios asociados.</p>
+                    <h2 id="directorySectionTitle" th:text="${autenticado} ? 'Directorio de buses' : 'Rutas disponibles'">Rutas disponibles</h2>
+                    <p th:text="${autenticado} ? 'Filtra las unidades y consulta su información, ruta y cobertura.' : 'Filtra por nombre de ruta y explora los barrios conectados.'">Filtra por nombre de ruta y explora los barrios conectados.</p>
                 </div>
                 <span class="directory-count" aria-live="polite">
                     <strong id="visibleCount" th:text="${totalBuses}">0</strong>
@@ -119,7 +154,7 @@
                 <form id="busFilterForm" class="filter-form" role="search" onsubmit="return false;">
                     <label class="directory-search" for="searchInput">
                         <i class="fas fa-magnifying-glass" aria-hidden="true"></i>
-                        <input type="search" id="searchInput" placeholder="Buscar placa, ruta, conductor..." autocomplete="off">
+                        <input type="search" id="searchInput" th:placeholder="${autenticado} ? 'Buscar placa, ruta, conductor, modelo...' : 'Buscar ruta o barrio...'" placeholder="Buscar ruta o barrio..." autocomplete="off">
                         <kbd>/</kbd>
                     </label>
                     <label class="directory-select" for="routeFilter">
@@ -146,36 +181,43 @@
 
             <div class="directory-results-meta">
                 <span><span class="results-live-dot" aria-hidden="true"></span><span id="resultsMessage" aria-live="polite">Mostrando todas las unidades</span></span>
-                <span class="results-sort-note"><i class="fas fa-circle-info" aria-hidden="true"></i> Información registrada en Bustraker</span>
+                <span class="results-sort-note"><i class="fas fa-circle-info" aria-hidden="true"></i>
+                    <span th:text="${autenticado} ? 'Datos registrados en Bustraker' : 'Solo rutas y barrios en esta vista'">Solo rutas y barrios en esta vista</span>
+                </span>
             </div>
 
             <ul id="base" class="bus-grid" role="list" aria-label="Unidades de transporte">
                 <li class="bus-card" th:each="bus : ${buses}" role="listitem"
-                    th:attr="data-id=${bus.id},data-placa=${bus.placa != null ? bus.placa : ''},data-ruta=${bus.ruta != null ? bus.ruta.nombre : ''},data-conductor=${bus.conductor != null ? bus.conductor : ''},data-modelo=${bus.modelo != null ? bus.modelo : ''},data-color=${bus.color != null ? bus.color : ''}">
+                    th:attr="data-id=${autenticado ? bus.id : ''},data-placa=${autenticado ? bus.placa : ''},data-ruta=${bus.rutaNombre},data-conductor=${autenticado ? bus.conductor : ''},data-modelo=${autenticado ? bus.modelo : ''},data-color=${autenticado ? bus.color : ''},data-hora=${autenticado ? bus.horaAproximada : ''},data-verificada=${autenticado ? bus.rutaVerificada : ''},data-barrios=${#strings.listJoin(bus.barrios, ' ')}">
                     <button type="button" class="bus-card-trigger" aria-expanded="false">
-                        <span class="bus-card-id"><i class="fas fa-bus-simple" aria-hidden="true"></i> UNIDAD <span th:text="${bus.id}">01</span></span>
-                        <span class="bus-card-plate" th:text="${bus.placa} ?: 'Placa no registrada'">ABC-123</span>
-                        <span class="bus-card-route">
+                        <span class="bus-card-id" th:if="${autenticado}"><i class="fas fa-bus-simple" aria-hidden="true"></i> UNIDAD <span th:text="${bus.id}">01</span></span>
+                        <span class="bus-card-plate" th:if="${autenticado}" th:text="${bus.placa} ?: 'Placa no registrada'">ABC-123</span>
+                        <span class="bus-card-route-title" th:unless="${autenticado}" th:text="${bus.rutaNombre}">Ruta Centro</span>
+                        <span class="bus-card-route" th:if="${autenticado}">
                             <i class="fas fa-route" aria-hidden="true"></i>
-                            <span th:text="${bus.ruta != null ? bus.ruta.nombre : 'Sin ruta asignada'}">Ruta Centro</span>
+                            <span th:text="${bus.rutaNombre} ?: 'Sin ruta asignada'">Ruta Centro</span>
                         </span>
                         <span class="bus-card-toggle" aria-hidden="true"><i class="fas fa-plus"></i></span>
                     </button>
                     <div class="bus-card-details" aria-hidden="true">
-                        <div class="bus-detail-grid">
+                        <div class="bus-detail-grid" th:if="${autenticado}">
                             <span><i class="fas fa-id-card" aria-hidden="true"></i><span><small>Conductor</small><strong th:text="${bus.conductor} ?: 'Sin asignar'">Sin asignar</strong></span></span>
                             <span><i class="fas fa-gears" aria-hidden="true"></i><span><small>Modelo</small><strong th:text="${bus.modelo} ?: 'No registrado'">2022</strong></span></span>
                             <span><i class="fas fa-palette" aria-hidden="true"></i><span><small>Color</small><strong th:text="${bus.color} ?: 'No registrado'">Azul</strong></span></span>
+                            <span><i class="fas fa-clock" aria-hidden="true"></i><span><small>Hora aproximada</small><strong th:text="${bus.horaAproximada} ?: 'No registrada'">08:30</strong></span></span>
+                            <span><i class="fas fa-circle-check" aria-hidden="true"></i><span><small>Estado de ruta</small><strong th:text="${bus.rutaVerificada == true ? 'Verificada' : 'Pendiente de verificación'}">Verificada</strong></span></span>
                         </div>
-                        <div class="bus-neighborhoods" th:if="${bus.ruta != null and bus.ruta.barrios != null and not #lists.isEmpty(bus.ruta.barrios)}">
-                            <span class="bus-neighborhoods-title"><i class="fas fa-map-pin" aria-hidden="true"></i> BARRIOS DEL RECORRIDO</span>
+                        <div class="bus-neighborhoods" th:if="${bus.barrios != null and not #lists.isEmpty(bus.barrios)}">
+                            <span class="bus-neighborhoods-title"><i class="fas fa-map-pin" aria-hidden="true"></i>
+                                <span th:text="${autenticado} ? 'BARRIOS DEL RECORRIDO · EN ORDEN' : 'BARRIOS CONECTADOS'">BARRIOS CONECTADOS</span>
+                            </span>
                             <ul class="barrios" role="list">
-                                <li th:each="barrio : ${bus.ruta.barrios}" th:text="${barrio}">Centro</li>
+                                <li th:each="barrio : ${bus.barrios}" th:text="${barrio}">Centro</li>
                             </ul>
                         </div>
                         <p class="bus-no-neighborhoods"
-                           th:if="${bus.ruta == null or bus.ruta.barrios == null or #lists.isEmpty(bus.ruta.barrios)}">
-                            <i class="fas fa-circle-info" aria-hidden="true"></i> No hay barrios registrados para esta unidad.
+                           th:if="${bus.barrios == null or #lists.isEmpty(bus.barrios)}">
+                            <i class="fas fa-circle-info" aria-hidden="true"></i> No hay barrios registrados para este recorrido.
                         </p>
                     </div>
                 </li>
@@ -194,22 +236,26 @@
                     <span class="empty-bus"><i class="fas fa-bus-simple"></i></span>
                 </div>
                 <span class="empty-kicker">DIRECTORIO EN PREPARACIÓN</span>
-                <h3>Aún no hay unidades para mostrar</h3>
-                <p>Cuando se registren buses, encontrarás aquí sus placas, recorridos y datos disponibles.</p>
-                <a th:href="@{/index_3_public}" class="empty-action">Volver al inicio <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+                <h3 th:text="${autenticado} ? 'Aún no hay unidades para mostrar' : 'Aún no hay rutas disponibles'">Aún no hay rutas disponibles</h3>
+                <p th:text="${autenticado} ? 'Cuando se registren buses, aparecerán aquí sus detalles y los datos asociados a su ruta.' : 'Cuando se publiquen recorridos, encontrarás aquí sus rutas y barrios conectados.'">Cuando se publiquen recorridos, encontrarás aquí sus rutas y barrios conectados.</p>
+                <a th:href="${autenticado} ? @{/dashboard} : @{/index_3_public}" class="empty-action">Volver al inicio <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
             </div>
 
             <div id="noResults" class="directory-no-results" hidden>
                 <span><i class="fas fa-magnifying-glass" aria-hidden="true"></i></span>
-                <div><strong>No encontramos unidades con esos criterios</strong><p>Prueba otra placa, conductor o selecciona una ruta diferente.</p></div>
+                <div>
+                    <strong th:text="${autenticado} ? 'No encontramos unidades con esos criterios' : 'No encontramos rutas con esos criterios'">No encontramos rutas con esos criterios</strong>
+                    <p th:text="${autenticado} ? 'Prueba otra placa, conductor o selecciona una ruta diferente.' : 'Prueba otro nombre de ruta o barrio.'">Prueba otro nombre de ruta o barrio.</p>
+                </div>
                 <button type="button" class="no-results-reset" id="emptyClearButton">Limpiar filtros</button>
             </div>
 
             <div id="busTableContainer" class="bus-table-wrap" hidden>
                 <table id="busTable">
-                    <caption class="visually-hidden">Información detallada de buses registrados</caption>
+                    <caption class="visually-hidden" th:text="${autenticado} ? 'Información detallada de buses registrados' : 'Rutas disponibles y barrios que conectan'">Rutas disponibles y barrios que conectan</caption>
                     <thead>
-                        <tr><th scope="col">Unidad</th><th scope="col">Placa</th><th scope="col">Ruta</th><th scope="col">Conductor</th><th scope="col">Modelo</th><th scope="col">Color</th><th scope="col">Barrios</th></tr>
+                        <tr th:if="${autenticado}"><th scope="col">Unidad</th><th scope="col">Placa</th><th scope="col">Ruta</th><th scope="col">Conductor</th><th scope="col">Modelo</th><th scope="col">Color</th><th scope="col">Barrios</th><th scope="col">Hora aprox.</th><th scope="col">Verificación</th></tr>
+                        <tr th:unless="${autenticado}"><th scope="col">Ruta</th><th scope="col">Barrios conectados</th></tr>
                     </thead>
                     <tbody></tbody>
                 </table>
@@ -219,12 +265,12 @@
 
     <footer class="directory-footer">
         <div class="directory-footer-inner">
-            <a class="directory-footer-brand" th:href="@{/index_3_public}">
+            <a class="directory-footer-brand" th:href="${autenticado} ? @{/dashboard} : @{/index_3_public}">
                 <img th:src="@{/images/Bus_palmera.png}" alt="">
                 <span><strong>Bustraker</strong><small>Cartagena se mueve</small></span>
             </a>
-            <span class="directory-footer-copy">Información pública para una ciudad en movimiento.</span>
-            <a class="directory-footer-home" th:href="@{/index_3_public}">Inicio <i class="fas fa-arrow-up" aria-hidden="true"></i></a>
+            <span class="directory-footer-copy" th:text="${autenticado} ? 'Información de movilidad asociada a tu sesión.' : 'Información pública de rutas para una ciudad en movimiento.'">Información pública de rutas para una ciudad en movimiento.</span>
+            <a class="directory-footer-home" th:href="${autenticado} ? @{/dashboard} : @{/index_3_public}" th:text="${autenticado} ? 'Panel' : 'Inicio'">Inicio</a>
         </div>
     </footer>
 

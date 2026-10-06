@@ -1,51 +1,75 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" >
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="description" content="Eliminar buses - Bustraker Admin">
-    <meta name="theme-color" content="#01315f">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Eliminar Buses - Bustraker Admin</title>
-    <link rel="stylesheet" th:href="@{/css/style_3.css}">
-    <link rel="stylesheet" th:href="@{/css/style_eliminar.css}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#24191c">
+    <meta name="description" content="Administra las unidades registradas en la flota de Bustraker.">
+    <title>Eliminar buses · Bustraker Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/admin_pantallas_pendientes.css(v='admin-screens-20261005-1')}">
     <link rel="shortcut icon" th:href="@{/images/Bus_icono.png}" type="image/x-icon">
 </head>
-<body>
-    <header>
-        <img th:src="@{/images/Bus_palmera.png}" alt="Bus palmera" id="logo2">
-        <h1>Bustraker - Panel Admin</h1>
-        <h2>Eliminar Buses</h2>
-        <div id="ingreso">
-            <a id="Volver" th:href="@{/index_2}">Volver al Panel</a>
+<body class="legacy-admin legacy-admin-buses">
+<div class="legacy-shell">
+    <aside class="legacy-sidebar">
+        <a class="legacy-brand" th:href="@{/index_2}"><span class="legacy-brand__icon"><i class="fas fa-bus" aria-hidden="true"></i></span><span><strong>Bustraker</strong><small>Centro de operaciones</small></span></a>
+        <nav class="legacy-nav" aria-label="Navegación administrativa">
+            <span class="legacy-nav__label">ADMINISTRACIÓN</span>
+            <a th:href="@{/index_2}"><i class="fas fa-house" aria-hidden="true"></i><span>Panel principal</span></a>
+            <a th:href="@{/gestionar-usuarios}"><i class="fas fa-users" aria-hidden="true"></i><span>Gestión de usuarios</span></a>
+            <a th:href="@{/reportes}"><i class="fas fa-chart-column" aria-hidden="true"></i><span>Reportes</span></a>
+            <a th:href="@{/mensajes_contacto}"><i class="fas fa-envelope" aria-hidden="true"></i><span>Mensajes</span></a>
+            <a th:href="@{/rutas/admin}"><i class="fas fa-route" aria-hidden="true"></i><span>Gestión de rutas</span></a>
+            <a th:href="@{/registro-buses}" class="is-active" aria-current="page"><i class="fas fa-bus-simple" aria-hidden="true"></i><span>Gestión de buses</span></a>
+        </nav>
+        <div class="legacy-sidebar__footer"><span class="legacy-status-dot"></span><span>Sistema operativo</span></div>
+    </aside>
+
+    <main class="legacy-main">
+        <header class="legacy-topbar">
+            <div class="legacy-breadcrumb"><a th:href="@{/index_2}">Administración</a><i class="fas fa-chevron-right" aria-hidden="true"></i><strong>Flota</strong><i class="fas fa-chevron-right" aria-hidden="true"></i><span>Retirar unidad</span></div>
+            <a class="legacy-back" th:href="@{/actualizarbuses}"><i class="fas fa-layer-group" aria-hidden="true"></i> Ver unidades</a>
+        </header>
+        <nav class="legacy-context-nav" aria-label="Gestión de flota">
+            <a th:href="@{/registro-buses}"><i class="fas fa-plus" aria-hidden="true"></i> Registrar unidad</a>
+            <a th:href="@{/actualizarbuses}"><i class="fas fa-pen-to-square" aria-hidden="true"></i> Editar flota</a>
+            <a class="is-active" aria-current="page" th:href="@{/eliminarbuses}"><i class="fas fa-trash-can" aria-hidden="true"></i> Retirar unidad</a>
+        </nav>
+        <div class="legacy-content">
+            <section class="legacy-hero legacy-hero--danger" aria-labelledby="removeBusTitle">
+                <div>
+                    <p class="legacy-eyebrow"><span></span> CONTROL DE FLOTA · BUSTRAKER</p>
+                    <h1 id="removeBusTitle">Mantén vigente<br><em>el inventario.</em></h1>
+                    <p>Revisa la unidad seleccionada antes de retirarla. La eliminación no se puede deshacer desde esta pantalla.</p>
+                    <div class="legacy-hero__meta"><span><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Acción permanente</span><span><i class="fas fa-shield-halved" aria-hidden="true"></i> Confirmación requerida</span></div>
+                </div>
+                <div class="legacy-hero-art legacy-hero-art--bus" aria-hidden="true">
+                    <span class="legacy-art-grid"></span><span class="legacy-bus-orbit legacy-bus-orbit--outer"></span><span class="legacy-bus-orbit legacy-bus-orbit--inner"></span>
+                    <i class="fas fa-bus-simple legacy-bus-icon"></i>
+                    <span class="legacy-art-caption"><i class="fas fa-triangle-exclamation"></i> Retiro de unidad</span>
+                </div>
+            </section>
+
+            <section class="legacy-card legacy-form-panel legacy-delete-panel" aria-labelledby="removeBusFormTitle">
+                <div class="legacy-section-heading">
+                    <span class="legacy-section-icon legacy-section-icon--danger"><i class="fas fa-trash-can" aria-hidden="true"></i></span>
+                    <div><p class="legacy-eyebrow">MANTENIMIENTO DE INVENTARIO</p><h2 id="removeBusFormTitle">Retirar bus de la flota</h2></div>
+                </div>
+                <p class="legacy-card-intro">Selecciona la unidad por placa y modelo para revisar el objetivo de la acción.</p>
+                <form th:action="@{/eliminar-buses}" method="post" class="legacy-form legacy-delete-form">
+                    <label for="bus">Unidad que deseas retirar</label>
+                    <div class="legacy-input-wrap"><i class="fas fa-bus" aria-hidden="true"></i><select id="bus" name="busId" required><option value="" selected disabled>Seleccionar bus</option><option th:each="bus : ${buses}" th:value="${bus.id}" th:text="'Bus ' + ${bus.id} + ': ' + ${bus.placa} + ' · ' + ${bus.modelo}"></option></select></div>
+                    <div class="legacy-alert legacy-alert--warning"><i class="fas fa-circle-exclamation" aria-hidden="true"></i><span>La eliminación es permanente y la unidad dejará de aparecer en las consultas de la flota.</span></div>
+                    <button class="legacy-button legacy-button--danger" type="submit" onclick="return confirm('¿Eliminar definitivamente este bus?')"><i class="fas fa-trash-can" aria-hidden="true"></i> Eliminar bus seleccionado</button>
+                </form>
+            </section>
+            <footer class="legacy-page-footer"><span>BUSTRAKER · GESTIÓN DE FLOTA</span><a th:href="@{/index_2}">Volver al panel <i class="fas fa-arrow-right" aria-hidden="true"></i></a></footer>
         </div>
-    </header>
-    <nav style="position: relative;">
-        <ul>
-            <li><a th:href="@{/index_2}">Panel Admin</a></li>
-            <li><a th:href="@{/registro-buses}">Registrar Buses</a></li>
-            <li><a th:href="@{/actualizarbuses}">Actualizar Buses</a></li>
-            <li><a th:href="@{/eliminarbuses}">Eliminar Buses</a></li>
-        </ul>
-    </nav>
-    <main>
-        <h2>Eliminar Buses de la Flota</h2>
-        <p>Selecciona un bus para eliminarlo de la flota. Los usuarios ya no podrán verlo en la consulta.</p>
-        <form th:action="@{/eliminar-buses}" method="post"> 
-            <label for="bus">Elige el Bus a Eliminar:</label>
-            <select id="bus" name="busId">
-                <option value="">Seleccionar Bus</option>
-                <option th:each="bus : ${buses}" th:value="${bus.id}" th:text="'Bus ' + ${bus.id} + ': ' + ${bus.placa} + ' ' + ${bus.modelo}"></option>
-            </select><br><br>
-            <button type="submit" onclick="return confirm('¿Eliminar definitivamente este bus?')">Eliminar Bus</button>
-        </form>
-        <p><em>Nota: La eliminación de un bus lo retira permanentemente de la consulta de buses para los usuarios.</em></p>
     </main>
-    <footer id="pie">
-        <p>&copy; 2025 Bustraker. Todos los derechos reservados.</p>
-        <p>Panel de Administración</p>
-    </footer>
+</div>
 </body>
 </html>

@@ -1,112 +1,300 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" >
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="description" content="Reportes - Bustraker Admin">
-    <meta name="theme-color" content="#01315f">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#24191c">
+    <meta name="description" content="Informes del inventario de flota, cuentas y rutas de Bustraker">
     <title>Reportes - Bustraker Admin</title>
-    <link rel="stylesheet" th:href="@{/css/style_3.css}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="shortcut icon" th:href="@{/images/Bus_icono.png}" type="image/x-icon">
-    <link rel="stylesheet" th:href="@{/css/reportes.css}">
+    <link rel="stylesheet" th:href="@{/css/reportes.css(v='reports-20261005-6')}">
 </head>
-<body>
-    <header>
-        <img th:src="@{/images/Bus_palmera.png}" alt="Bus palmera" id="logo2">
-        <h1>Bustraker - Panel Admin</h1>
-        <h2>Reportes y Estadísticas</h2>
-        <div id="ingreso">
-            <a id="Volver" th:href="@{/index_2}">Volver al Panel</a>
-        </div>
-    </header>
-    <nav style="position: relative;">
-        <ul>
-            <li><a th:href="@{/index_2}">Panel Admin</a></li>
-            <li><a th:href="@{/registro-buses}">Registrar Buses</a></li>
-            <li><a th:href="@{/actualizarbuses}">Actualizar Buses</a></li>
-            <li><a th:href="@{/eliminarbuses}">Eliminar Buses</a></li>
-            <li><a th:href="@{/reportes}">Reportes</a></li>
-        </ul>
-    </nav>
-    <main>
-        <h2>Reportes y Estadísticas del Sistema</h2>
-        <p>Visualiza el estado general de la aplicación Bustraker y el comportamiento de usuarios.</p>
-
-        <form method="get" action="/reportes" style="margin-bottom: 20px; padding: 15px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 5px;">
-            <label for="buscar" style="font-weight: bold;">Buscar buses por placa o modelo:</label>
-            <input type="text" id="buscar" name="buscar" th:value="${buscar}" placeholder="Ingresa placa o modelo..." style="padding: 8px; width: 300px; margin-right: 10px; border: 1px solid #ccc; border-radius: 3px;">
-            <button type="submit" style="padding: 8px 15px; background-color: #8e0303; color: white; border: none; border-radius: 3px; cursor: pointer;">Buscar</button>
-            <a th:href="@{/reportes}" style="margin-left: 10px; padding: 8px 15px; background-color: #ccc; color: #333; border: none; border-radius: 3px; text-decoration: none; cursor: pointer;">Limpiar</a>
-        </form>
-
-        <section class="estadisticas">
-            <div class="tarjeta-stats">
-                <h3>Total de Buses</h3>
-                <div class="numero-grande" th:text="${totalBuses != null ? totalBuses : 0}">0</div>
-                <p>Buses activos en la flota</p>
+<body class="admin-reports">
+    <div class="reports-shell">
+        <aside class="reports-sidebar">
+            <a class="reports-brand" th:href="@{/index_2}">
+                <span class="reports-brand__icon"><i class="fas fa-bus" aria-hidden="true"></i></span>
+                <span><strong>Bustraker</strong><small>Centro de operaciones</small></span>
+            </a>
+            <nav class="reports-nav" aria-label="Navegación administrativa">
+                <a th:href="@{/index_2}"><i class="fas fa-house" aria-hidden="true"></i><span>Panel principal</span></a>
+                <a th:href="@{/gestionar-usuarios}"><i class="fas fa-users" aria-hidden="true"></i><span>Gestión de usuarios</span></a>
+                <a th:href="@{/reportes}" class="active" aria-current="page"><i class="fas fa-chart-column" aria-hidden="true"></i><span>Reportes</span></a>
+                <a th:href="@{/mensajes_contacto}"><i class="fas fa-envelope" aria-hidden="true"></i><span>Mensajes</span></a>
+                <a th:href="@{/rutas/admin}"><i class="fas fa-route" aria-hidden="true"></i><span>Rutas</span></a>
+                <a th:href="@{/registro-buses}"><i class="fas fa-bus-simple" aria-hidden="true"></i><span>Buses</span></a>
+            </nav>
+            <div class="reports-sidebar__footer">
+                <span class="reports-status-dot"></span>
+                <span>Vista de análisis administrativo</span>
             </div>
+        </aside>
 
-            <div class="tarjeta-stats">
-                <h3>Total de Usuarios</h3>
-                <div class="numero-grande" th:text="${totalUsuarios != null ? totalUsuarios : 0}">0</div>
-                <p>Cuentas registradas en el sistema</p>
+        <main class="reports-main">
+            <header class="reports-topbar">
+                <div class="reports-breadcrumb">
+                    <span>Administración</span><i class="fas fa-chevron-right" aria-hidden="true"></i><strong>Reportes</strong>
+                </div>
+                <a class="reports-return" th:href="@{/index_2}"><i class="fas fa-arrow-left" aria-hidden="true"></i> Volver al panel</a>
+            </header>
+
+            <div class="reports-content">
+                <section class="reports-heading" aria-labelledby="reportsTitle">
+                    <div class="reports-heading__copy">
+                        <span class="reports-eyebrow"><span></span> ANÁLISIS DEL SISTEMA</span>
+                        <h1 id="reportsTitle">Reportes</h1>
+                        <p>Consulta el inventario de flota y la composición actual de Bustraker.</p>
+                    </div>
+                    <svg class="reports-analytics-visual" viewBox="0 0 520 270" aria-hidden="true" focusable="false">
+                        <defs>
+                            <linearGradient id="reports-panel-fill" x1="0" y1="0" x2="1" y2="1">
+                                <stop offset="0" stop-color="#fff"></stop>
+                                <stop offset="1" stop-color="#f7f5f1"></stop>
+                            </linearGradient>
+                            <linearGradient id="reports-column-fill" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0" stop-color="#417f75"></stop>
+                                <stop offset="1" stop-color="#b2c9bd"></stop>
+                            </linearGradient>
+                            <linearGradient id="reports-trend-fill" x1="0" y1="0" x2="1" y2="0">
+                                <stop offset="0" stop-color="#c18151"></stop>
+                                <stop offset="1" stop-color="#daa76f"></stop>
+                            </linearGradient>
+                            <pattern id="reports-grid" width="18" height="18" patternUnits="userSpaceOnUse">
+                                <path d="M18 0H0V18" fill="none" stroke="#536e68" stroke-opacity=".04" stroke-width=".7"></path>
+                            </pattern>
+                            <filter id="reports-panel-shadow" x="-15%" y="-15%" width="130%" height="140%">
+                                <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#44332d" flood-opacity=".075"></feDropShadow>
+                            </filter>
+                        </defs>
+                        <rect class="reports-analytics-visual__frame" x="5" y="5" width="510" height="260" rx="15" fill="url(#reports-panel-fill)"></rect>
+                        <rect x="6" y="6" width="508" height="258" rx="14" fill="url(#reports-grid)"></rect>
+                        <path class="reports-analytics-visual__divider" d="M22 53H498"></path>
+                        <g class="reports-analytics-visual__heading">
+                            <rect x="22" y="17" width="23" height="23" rx="7"></rect>
+                            <path d="M28 34v-6m5 6v-10m5 10v-4"></path>
+                            <text x="54" y="27">CENTRO DE ANÁLISIS</text>
+                            <text class="reports-analytics-visual__period" x="54" y="37">INVENTARIO · FLOTA · ACCESOS</text>
+                            <rect class="reports-analytics-visual__status-pill" x="422" y="20" width="76" height="18" rx="9"></rect>
+                            <circle class="reports-analytics-visual__status" cx="434" cy="29" r="2.5"></circle>
+                            <text class="reports-analytics-visual__status-label" x="441" y="31">SISTEMA ACTIVO</text>
+                        </g>
+                        <text class="reports-analytics-visual__section-label" x="25" y="70">DISTRIBUCIÓN DEL INVENTARIO</text>
+                        <text class="reports-analytics-visual__section-note" x="345" y="70">ESQUEMA VISUAL</text>
+                        <g class="reports-analytics-visual__plot">
+                            <path class="reports-analytics-visual__gridline" d="M48 91H348M48 117H348M48 143H348M48 169H348M48 195H348"></path>
+                            <path class="reports-analytics-visual__axis" d="M48 84V195H348"></path>
+                            <path class="reports-analytics-visual__tick" d="M43 91h5m-5 26h5m-5 26h5m-5 26h5m-5 26h5"></path>
+                            <rect class="reports-analytics-visual__bar reports-analytics-visual__bar--one" x="70" y="144" width="22" height="51" rx="4"></rect>
+                            <rect class="reports-analytics-visual__bar reports-analytics-visual__bar--two" x="111" y="128" width="22" height="67" rx="4"></rect>
+                            <rect class="reports-analytics-visual__bar reports-analytics-visual__bar--three" x="152" y="151" width="22" height="44" rx="4"></rect>
+                            <rect class="reports-analytics-visual__bar reports-analytics-visual__bar--four" x="193" y="111" width="22" height="84" rx="4"></rect>
+                            <rect class="reports-analytics-visual__bar reports-analytics-visual__bar--five" x="234" y="133" width="22" height="62" rx="4"></rect>
+                            <rect class="reports-analytics-visual__bar reports-analytics-visual__bar--six" x="275" y="99" width="22" height="96" rx="4"></rect>
+                            <path class="reports-analytics-visual__trend-shadow" d="M81 137C95 130 105 137 122 119s24 19 41 11 22-25 41-25 23 15 41 5 24-11 41-26"></path>
+                            <path class="reports-analytics-visual__trend" d="M81 137C95 130 105 137 122 119s24 19 41 11 22-25 41-25 23 15 41 5 24-11 41-26"></path>
+                            <circle class="reports-analytics-visual__point reports-analytics-visual__point--one" cx="122" cy="119" r="3.2"></circle>
+                            <circle class="reports-analytics-visual__point reports-analytics-visual__point--two" cx="204" cy="105" r="3.2"></circle>
+                            <circle class="reports-analytics-visual__point reports-analytics-visual__point--three" cx="286" cy="84" r="3.2"></circle>
+                            <circle class="reports-analytics-visual__traveler" r="3.2"></circle>
+                            <path class="reports-analytics-visual__scan" d="M48 91H348"></path>
+                        </g>
+                        <path class="reports-analytics-visual__separator" d="M369 62V207"></path>
+                        <text class="reports-analytics-visual__section-label" x="386" y="70">CATEGORÍAS</text>
+                        <circle class="reports-analytics-visual__ring-track" cx="435" cy="132" r="36"></circle>
+                        <circle class="reports-analytics-visual__ring reports-analytics-visual__ring--primary" cx="435" cy="132" r="36"></circle>
+                        <circle class="reports-analytics-visual__ring reports-analytics-visual__ring--secondary" cx="435" cy="132" r="36"></circle>
+                        <circle class="reports-analytics-visual__ring reports-analytics-visual__ring--tertiary" cx="435" cy="132" r="36"></circle>
+                        <text class="reports-analytics-visual__mix-number" x="435" y="131">03</text>
+                        <text class="reports-analytics-visual__mix-caption" x="435" y="142">FUENTES</text>
+                        <g class="reports-analytics-visual__legend">
+                            <circle cx="392" cy="185" r="2.5"></circle>
+                            <text x="400" y="187">Flota</text>
+                            <circle class="reports-analytics-visual__legend-route" cx="447" cy="185" r="2.5"></circle>
+                            <text x="455" y="187">Rutas</text>
+                            <circle class="reports-analytics-visual__legend-account" cx="392" cy="198" r="2.5"></circle>
+                            <text x="400" y="200">Cuentas</text>
+                        </g>
+                        <path class="reports-analytics-visual__footer-rule" d="M22 218H498"></path>
+                        <text class="reports-analytics-visual__footer-label" x="25" y="238">FLUJO DE ANÁLISIS</text>
+                        <path class="reports-analytics-visual__pipeline" d="M145 236H477"></path>
+                        <circle class="reports-analytics-visual__pipeline-node reports-analytics-visual__pipeline-node--one" cx="158" cy="236" r="4"></circle>
+                        <circle class="reports-analytics-visual__pipeline-node reports-analytics-visual__pipeline-node--two" cx="276" cy="236" r="4"></circle>
+                        <circle class="reports-analytics-visual__pipeline-node reports-analytics-visual__pipeline-node--three" cx="394" cy="236" r="4"></circle>
+                        <circle class="reports-analytics-visual__pipeline-pulse" r="3"></circle>
+                        <text class="reports-analytics-visual__pipeline-label" x="158" y="252">CAPTURA</text>
+                        <text class="reports-analytics-visual__pipeline-label" x="276" y="252">CLASIFICACIÓN</text>
+                        <text class="reports-analytics-visual__pipeline-label" x="394" y="252">RESUMEN</text>
+                    </svg>
+                    <div class="reports-heading__context">
+                        <span class="reports-heading__context-icon"><i class="fas fa-layer-group" aria-hidden="true"></i></span>
+                        <span><strong>Corte actual</strong><small>Indicadores del inventario</small></span>
+                    </div>
+                </section>
+
+                <section class="reports-metrics" aria-label="Indicadores principales">
+                    <article class="reports-metric reports-metric--fleet">
+                        <span class="reports-metric__icon"><i class="fas fa-bus-simple" aria-hidden="true"></i></span>
+                        <span class="reports-metric__label">Flota registrada</span>
+                        <strong class="reports-metric__value" th:text="${totalBuses}">0</strong>
+                        <span class="reports-metric__note">Buses en el inventario</span>
+                    </article>
+                    <article class="reports-metric reports-metric--routes">
+                        <span class="reports-metric__icon"><i class="fas fa-route" aria-hidden="true"></i></span>
+                        <span class="reports-metric__label">Rutas disponibles</span>
+                        <strong class="reports-metric__value" th:text="${totalRutas}">0</strong>
+                        <span class="reports-metric__note">Rutas registradas</span>
+                    </article>
+                    <article class="reports-metric reports-metric--accounts">
+                        <span class="reports-metric__icon"><i class="fas fa-users" aria-hidden="true"></i></span>
+                        <span class="reports-metric__label">Cuentas registradas</span>
+                        <strong class="reports-metric__value" th:text="${totalUsuarios}">0</strong>
+                        <span class="reports-metric__note">Usuarios de la plataforma</span>
+                    </article>
+                    <article class="reports-metric reports-metric--matches">
+                        <span class="reports-metric__icon"><i class="fas fa-filter" aria-hidden="true"></i></span>
+                        <span class="reports-metric__label">Buses encontrados</span>
+                        <strong class="reports-metric__value" th:text="${buses != null ? buses.size() : 0}">0</strong>
+                        <span class="reports-metric__note">Coincidencias del filtro actual</span>
+                    </article>
+                </section>
+
+                <div class="reports-layout">
+                    <section class="reports-inventory" aria-labelledby="inventoryTitle">
+                        <div class="reports-section-heading">
+                            <div>
+                                <span class="reports-section-heading__eyebrow">INVENTARIO DE TRANSPORTE</span>
+                                <h2 id="inventoryTitle">Detalle de flota</h2>
+                                <p>Busca buses por placa o modelo para consultar sus registros.</p>
+                            </div>
+                            <span class="reports-total"><strong th:text="${totalBuses}">0</strong><span>en total</span></span>
+                        </div>
+
+                        <form class="reports-search" method="get" th:action="@{/reportes}" role="search">
+                            <label class="reports-search__field" for="buscar">
+                                <i class="fas fa-magnifying-glass" aria-hidden="true"></i>
+                                <input type="search" id="buscar" name="buscar" th:value="${buscar}" placeholder="Buscar por placa o modelo" autocomplete="off">
+                            </label>
+                            <button class="reports-button reports-button--primary" type="submit"><i class="fas fa-search" aria-hidden="true"></i> Buscar buses</button>
+                            <a th:if="${buscar != null and !buscar.isEmpty()}" class="reports-button reports-button--quiet" th:href="@{/reportes}">Limpiar</a>
+                        </form>
+
+                        <div class="reports-table-wrap">
+                            <table class="reports-table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Identificador</th>
+                                        <th scope="col">Placa</th>
+                                        <th scope="col">Modelo</th>
+                                        <th scope="col">Registro</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="bus : ${buses}">
+                                        <td><span class="reports-bus-id" th:text="'BUS-' + ${bus.id}">BUS-001</span></td>
+                                        <td><strong class="reports-plate" th:text="${bus.placa}">ABC-123</strong></td>
+                                        <td th:text="${bus.modelo}">Modelo de bus</td>
+                                        <td><span class="reports-record-state"><i></i> Registrado</span></td>
+                                    </tr>
+                                    <tr th:if="${buses == null or buses.isEmpty()}">
+                                        <td colspan="4">
+                                            <div class="reports-empty">
+                                                <span class="reports-empty__icon"><i class="fas fa-magnifying-glass-chart" aria-hidden="true"></i></span>
+                                                <strong th:if="${buscar != null and !buscar.isEmpty()}">No encontramos buses con ese criterio</strong>
+                                                <strong th:unless="${buscar != null and !buscar.isEmpty()}">Aún no hay buses registrados</strong>
+                                                <p th:if="${buscar != null and !buscar.isEmpty()}">Prueba con otra placa o modelo para consultar el inventario.</p>
+                                                <p th:unless="${buscar != null and !buscar.isEmpty()}">Los buses agregados aparecerán aquí con su información.</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="reports-table-foot">
+                            <span><i class="fas fa-circle-info" aria-hidden="true"></i> La búsqueda considera coincidencias parciales.</span>
+                            <span>                            <strong th:text="${buses != null ? buses.size() : 0}">0</strong> registros en esta vista</span>
+                        </div>
+                    </section>
+
+                    <aside class="reports-comparison" aria-labelledby="comparisonTitle">
+                        <div class="reports-comparison__heading">
+                            <span class="reports-comparison__icon"><i class="fas fa-chart-simple" aria-hidden="true"></i></span>
+                            <span class="reports-section-heading__eyebrow">LECTURA COMPARATIVA</span>
+                            <h2 id="comparisonTitle">Composición del sistema</h2>
+                            <p>Volumen de registros por categoría en el corte actual.</p>
+                        </div>
+
+                        <div class="reports-chart" role="img" aria-label="Comparación relativa de buses, rutas y cuentas registradas">
+                            <div class="reports-chart__row reports-chart__row--fleet">
+                                <div class="reports-chart__meta"><span><i></i> Buses</span><strong th:text="${totalBuses}">0</strong></div>
+                                <div class="reports-chart__track"><span class="reports-chart__bar" data-value="0" th:attr="data-value=${totalBuses}"></span></div>
+                            </div>
+                            <div class="reports-chart__row reports-chart__row--routes">
+                                <div class="reports-chart__meta"><span><i></i> Rutas</span><strong th:text="${totalRutas}">0</strong></div>
+                                <div class="reports-chart__track"><span class="reports-chart__bar" data-value="0" th:attr="data-value=${totalRutas}"></span></div>
+                            </div>
+                            <div class="reports-chart__row reports-chart__row--accounts">
+                                <div class="reports-chart__meta"><span><i></i> Cuentas</span><strong th:text="${totalUsuarios}">0</strong></div>
+                                <div class="reports-chart__track"><span class="reports-chart__bar" data-value="0" th:attr="data-value=${totalUsuarios}"></span></div>
+                            </div>
+                        </div>
+                        <div class="reports-chart-scale"><span>0</span><span>Mayor volumen registrado</span></div>
+                        <div class="reports-comparison__note">
+                            <i class="fas fa-circle-nodes" aria-hidden="true"></i>
+                            <span>Las barras usan una escala común para comparar los totales, no representan porcentajes de actividad.</span>
+                        </div>
+
+                    </aside>
+                </div>
+
+                <footer class="reports-footer">
+                    <span>Bustraker · Informes administrativos</span>
+                    <span>Datos consultados desde el inventario del sistema.</span>
+                </footer>
             </div>
+        </main>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const bars = Array.from(document.querySelectorAll('.reports-chart__bar'));
+            const values = bars.map((bar) => Number(bar.dataset.value));
+            const maximum = Math.max(0, ...values);
 
-            <div class="tarjeta-stats">
-                <h3>Total de Rutas</h3>
-                <div class="numero-grande" th:text="${totalRutas != null ? totalRutas : 0}">0</div>
-                <p>Rutas disponibles</p>
-            </div>
+            bars.forEach((bar, index) => {
+                const scale = maximum === 0 ? 0 : (values[index] / maximum) * 100;
+                bar.style.setProperty('--report-scale', `${scale}%`);
+            });
 
-            <div class="tarjeta-stats">
-                <h3>Usuarios Activos</h3>
-                <div class="numero-grande" th:text="${usuariosActivos != null ? usuariosActivos : 0}">0</div>
-                <p>En los últimos 7 días</p>
-            </div>
-        </section>
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                return;
+            }
 
-        <section id="DetallesBuses" style="margin-top: 40px;">
-            <h3>Detalles de Buses</h3>
-            <p>Estado actual de la flota:</p>
-            <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-                <thead>
-                    <tr style="background-color: #8e0303; color: white;">
-                        <th style="border: 1px solid #ccc; padding: 10px; text-align: left;">ID</th>
-                        <th style="border: 1px solid #ccc; padding: 10px; text-align: left;">Placa</th>
-                        <th style="border: 1px solid #ccc; padding: 10px; text-align: left;">Modelo</th>
-                        <th style="border: 1px solid #ccc; padding: 10px; text-align: left;">Estado</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="bus : ${buses}" style="border-bottom: 1px solid #ddd;">
-                        <td style="border: 1px solid #ccc; padding: 10px;" th:text="${bus.id}">1</td>
-                        <td style="border: 1px solid #ccc; padding: 10px;" th:text="${bus.placa}">ABC-123</td>
-                        <td style="border: 1px solid #ccc; padding: 10px;" th:text="${bus.modelo}">Volvo 9700</td>
-                        <td style="border: 1px solid #ccc; padding: 10px;">Activo</td>
-                    </tr>
-                    <tr th:if="${buses == null or buses.size() == 0}">
-                        <td colspan="4" style="text-align: center; padding: 20px; border: 1px solid #ccc;">No hay buses en el sistema</td>
-                    </tr>
-                </tbody>
-            </table>
-        </section>
+            const counters = Array.from(document.querySelectorAll('.reports-metric__value, .reports-chart__meta strong'));
+            counters.forEach((counter) => {
+                const target = Number(counter.textContent.replace(/[^\d.-]/g, ''));
+                if (!Number.isFinite(target) || target <= 0) {
+                    return;
+                }
 
-        <section id="ActividadReciente" style="margin-top: 40px;">
-            <h3>Actividad Reciente</h3>
-            <ul style="list-style: none; padding: 0;">
-                <li style="padding: 10px; border-bottom: 1px solid #ddd;">✓ Bus registrado: Volvo 9700 - Placa ABC-123</li>
-                <li style="padding: 10px; border-bottom: 1px solid #ddd;">✓ Nuevo usuario registrado: usuario@example.com</li>
-                <li style="padding: 10px; border-bottom: 1px solid #ddd;">✓ Bus actualizado: ABC-123</li>
-                <li style="padding: 10px;">ℹ Sistema funcionando correctamente</li>
-            </ul>
-        </section>
-    </main>
-    <footer id="pie">
-        <p>&copy; 2025 Bustraker. Todos los derechos reservados.</p>
-        <p>Panel de Administración</p>
-    </footer>
+                const startedAt = performance.now();
+                const duration = 1050;
+                const finalText = counter.textContent;
+                const animateCount = (now) => {
+                    const progress = Math.min((now - startedAt) / duration, 1);
+                    const eased = 1 - Math.pow(1 - progress, 3);
+                    counter.textContent = progress === 1 ? finalText : String(Math.floor(target * eased));
+                    if (progress < 1) {
+                        requestAnimationFrame(animateCount);
+                    }
+                };
+
+                counter.textContent = '0';
+                requestAnimationFrame(animateCount);
+            });
+        });
+    </script>
 </body>
 </html>
