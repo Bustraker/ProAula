@@ -1,4 +1,35 @@
 document.addEventListener('DOMContentLoaded', function () {
+    const routeArt = document.querySelector('.directory-route-art');
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (routeArt && !reducedMotion && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+        let pointerFrame = 0;
+
+        routeArt.addEventListener('pointermove', (event) => {
+            if (pointerFrame) {
+                window.cancelAnimationFrame(pointerFrame);
+            }
+
+            pointerFrame = window.requestAnimationFrame(() => {
+                const bounds = routeArt.getBoundingClientRect();
+                const horizontal = (event.clientX - bounds.left) / bounds.width - 0.5;
+                const vertical = (event.clientY - bounds.top) / bounds.height - 0.5;
+
+                routeArt.style.setProperty('--atlas-shift-x', `${horizontal * 8}px`);
+                routeArt.style.setProperty('--atlas-shift-y', `${vertical * 8}px`);
+                routeArt.style.setProperty('--atlas-tilt-x', `${horizontal * 5}deg`);
+                routeArt.style.setProperty('--atlas-tilt-y', `${vertical * -5}deg`);
+            });
+        });
+
+        routeArt.addEventListener('pointerleave', () => {
+            routeArt.style.setProperty('--atlas-shift-x', '0px');
+            routeArt.style.setProperty('--atlas-shift-y', '0px');
+            routeArt.style.setProperty('--atlas-tilt-x', '0deg');
+            routeArt.style.setProperty('--atlas-tilt-y', '0deg');
+        });
+    }
+
     const busItems = Array.from(document.querySelectorAll('#base > .bus-card'));
     const searchInput = document.getElementById('searchInput');
     const routeFilter = document.getElementById('routeFilter');

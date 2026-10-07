@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="description" th:content="${autenticado} ? 'Consulta información ampliada de buses y recorridos en Cartagena.' : 'Consulta rutas y barrios de Cartagena.'">
-    <meta name="theme-color" content="#071421">
+    <meta name="theme-color" th:content="${autenticado} ? '#101715' : '#f5f9fd'">
     <title>Consulta de buses - Bustraker</title>
-    <link rel="stylesheet" th:href="@{/css/style_consultas.css(v='bus-directory-20261005-2')}">
+    <link rel="stylesheet" th:href="@{/css/style_consultas.css(v='bus-directory-20261007-18')}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="shortcut icon" th:href="@{/images/Bus_icono.png}" type="image/x-icon">
 </head>
@@ -57,43 +57,60 @@
                 <p class="directory-caption" th:if="${autenticado}"><i class="fas fa-shield-halved" aria-hidden="true"></i> Vista personalizada para tu sesión.</p>
             </div>
 
-            <div class="directory-route-art" role="img" aria-label="Ilustración de un recorrido urbano con paradas">
+            <div class="directory-route-art" role="img" aria-label="Mapa urbano esquemático con nodos y una conexión conceptual, no a escala">
+                <div class="atlas-heading" aria-hidden="true">
+                    <span class="atlas-index">ATLAS <b>01</b></span>
+                    <span class="atlas-heading-copy"><strong>Cartagena</strong><small>Red urbana · esquema visual</small></span>
+                    <span class="atlas-status"><i></i>REFERENCIAL</span>
+                </div>
                 <div class="route-art-grid" aria-hidden="true"></div>
                 <span class="route-art-ring route-art-ring--outer" aria-hidden="true"></span>
                 <span class="route-art-ring route-art-ring--inner" aria-hidden="true"></span>
                 <svg class="route-art-map" viewBox="0 0 420 300" aria-hidden="true" focusable="false">
+                    <path class="map-block map-block--one" d="M39 75h39v24H39zM86 75h43v24H86zM141 75h25v21h-25zM218 104h28v28h-28zM276 62h35v26h-35zM321 62h34v26h-34z"></path>
+                    <path class="map-block map-block--two" d="M28 164h31v21H28zM69 164h32v21H69zM176 224h37v22h-37zM224 224h36v22h-36zM324 222h34v23h-34zM365 222h29v23h-29z"></path>
                     <path class="map-street map-street--one" d="M24 58h119l40 39h201"></path>
                     <path class="map-street map-street--two" d="M8 204h112l44-47h92l47 48h105"></path>
                     <path class="map-street map-street--three" d="M96 4v70l54 54v155"></path>
                     <path class="map-street map-street--four" d="M296 2v87l-43 43v163"></path>
                     <path class="map-street map-street--five" d="M2 256h102l48-48h122l63 63h78"></path>
+                    <path class="map-survey-line" d="M30 42h360M30 42v214M390 42v214M30 256h360"></path>
+                    <path class="map-contour map-contour--one" d="M17 182c40-30 68-20 99-52s62-53 95-40 48 44 81 31 52-56 111-48"></path>
+                    <path class="map-contour map-contour--two" d="M8 197c42-31 76-17 108-50s61-48 91-36 46 42 79 30 56-54 119-44"></path>
+                    <path class="map-contour map-contour--three" d="M32 166c35-27 56-19 85-49s60-60 97-47 53 48 86 35 51-55 99-51"></path>
                     <path class="map-route-shadow" d="M54 218c46 0 39-89 103-89s47 54 102 54 42-83 112-83"></path>
                     <path id="cityRoutePath" class="map-route-line" d="M54 218c46 0 39-89 103-89s47 54 102 54 42-83 112-83"></path>
-                    <path class="map-route-flow" d="M54 218c46 0 39-89 103-89s47 54 102 54 42-83 112-83"></path>
+                    <g class="map-node-label map-node-label--one">
+                        <path d="M157 121v-25h42"></path>
+                        <circle cx="157" cy="121" r="2"></circle>
+                        <text x="204" y="94">NODO 01</text>
+                    </g>
+                    <g class="map-node-label map-node-label--two">
+                        <path d="M259 190v25h39"></path>
+                        <circle cx="259" cy="190" r="2"></circle>
+                        <text x="303" y="218">NODO 02</text>
+                    </g>
+                    <g class="map-node-label map-node-label--three">
+                        <path d="M371 91V72h-32"></path>
+                        <circle cx="371" cy="91" r="2"></circle>
+                        <text x="291" y="70">CONEXIÓN</text>
+                    </g>
                     <circle class="map-stop map-stop--start" cx="54" cy="218" r="8"></circle>
                     <circle class="map-stop map-stop--middle" cx="157" cy="129" r="6"></circle>
                     <circle class="map-stop map-stop--middle map-stop--last" cx="259" cy="183" r="6"></circle>
                     <circle class="map-stop map-stop--end" cx="371" cy="100" r="9"></circle>
                     <circle class="map-location-pulse" cx="371" cy="100" r="17"></circle>
-                    <g class="route-bus-runner" aria-hidden="true">
-                        <rect x="-14" y="-8" width="28" height="16" rx="5"></rect>
-                        <path d="M-9 -3h18M-8 2h5m3 0h8"></path>
-                        <circle cx="-8" cy="9" r="2.2"></circle>
-                        <circle cx="8" cy="9" r="2.2"></circle>
-                        <animateMotion dur="7s" repeatCount="indefinite" rotate="auto">
-                            <mpath href="#cityRoutePath"></mpath>
-                        </animateMotion>
-                    </g>
                 </svg>
-                <div class="route-float-card route-float-card--top" aria-hidden="true">
-                    <span class="route-float-icon"><i class="fas fa-location-dot"></i></span>
-                    <span><strong>Recorridos urbanos</strong><small>Cartagena de Indias</small></span>
+                <div class="route-survey-sweep" aria-hidden="true"></div>
+                <div class="route-compass" aria-hidden="true">
+                    <span>N</span>
+                    <i class="route-compass-needle"></i>
                 </div>
-                <div class="route-float-card route-float-card--bottom" aria-hidden="true">
-                    <span class="route-float-dot"></span> Conexiones por la ciudad
+                <div class="atlas-legend" aria-hidden="true">
+                    <span class="atlas-legend-route"><i></i>Conexión conceptual</span>
+                    <span class="atlas-legend-nodes">04 <small>NODOS</small></span>
+                    <span class="atlas-legend-note">NO A ESCALA</span>
                 </div>
-                <span class="route-coordinate route-coordinate--one" aria-hidden="true">10°23′ N</span>
-                <span class="route-coordinate route-coordinate--two" aria-hidden="true">75°30′ O</span>
             </div>
         </section>
     </header>

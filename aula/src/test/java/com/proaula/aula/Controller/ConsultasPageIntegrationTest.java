@@ -42,8 +42,10 @@ class ConsultasPageIntegrationTest {
                 .getContentAsString();
 
         assertThat(page)
-                .contains("Ruta Centro", "Centro", "inicio-de-sesion-mejorado")
-                .doesNotContain("ABC123", "Conductora Confidencial", "07:30", "Verificada");
+                .contains("Ruta Centro", "Centro", "inicio-de-sesion-mejorado",
+                        "bus-directory-page--public", "content=\"#f5f9fd\"")
+                .doesNotContain("bus-directory-page--authenticated",
+                        "ABC123", "Conductora Confidencial", "07:30", "Verificada");
     }
 
     @Test
@@ -64,7 +66,9 @@ class ConsultasPageIntegrationTest {
                 .getContentAsString();
 
         assertThat(page)
-                .contains("ABC123", "Conductora Confidencial", "Iniciar sesión", "07:30", "Verificada")
+                .contains("bus-directory-page--authenticated", "content=\"#101715\"",
+                        "ABC123", "Conductora Confidencial", "Iniciar sesión", "07:30", "Verificada")
+                .doesNotContain("bus-directory-page--public")
                 .contains("href=\"/inicio-de-sesion-mejorado\"");
     }
 

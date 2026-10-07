@@ -132,6 +132,13 @@
     height: 2px;
     content: "";
     background: var(--directory-gold);
+    transform: scaleX(0.72);
+    transform-origin: left center;
+    transition: transform 260ms cubic-bezier(0.2, 0.75, 0.25, 1);
+}
+
+.directory-primary-nav a[aria-current="page"]:hover::after {
+    transform: scaleX(1);
 }
 
 .directory-signin {
@@ -270,6 +277,7 @@
 .directory-action--gold:hover {
     color: var(--directory-deep);
     background: #ffdc8b;
+    box-shadow: 0 7px 20px rgba(240, 199, 107, 0.16);
 }
 
 .directory-action--quiet {
@@ -702,6 +710,12 @@
     border: 1px solid rgba(155, 184, 157, 0.15);
     border-radius: 5px;
     box-shadow: 0 13px 32px rgba(0, 0, 0, 0.13), inset 0 1px rgba(255, 255, 255, 0.025);
+    transition: border-color 220ms ease, box-shadow 220ms ease, transform 220ms ease;
+}
+
+.directory-tools:focus-within {
+    border-color: color-mix(in srgb, var(--directory-gold) 36%, transparent);
+    box-shadow: 0 17px 38px rgba(0, 0, 0, 0.17), 0 0 0 3px color-mix(in srgb, var(--directory-gold) 9%, transparent);
 }
 
 .filter-form {
@@ -932,13 +946,6 @@
     transition: transform 190ms ease, border-color 190ms ease, box-shadow 190ms ease, background 190ms ease;
 }
 
-.bus-card:nth-child(2) { animation-delay: 45ms; }
-.bus-card:nth-child(3) { animation-delay: 90ms; }
-.bus-card:nth-child(4) { animation-delay: 135ms; }
-.bus-card:nth-child(5) { animation-delay: 180ms; }
-.bus-card:nth-child(6) { animation-delay: 225ms; }
-.bus-card:nth-child(n + 7) { animation-delay: 260ms; }
-
 .bus-card:hover,
 .bus-card.is-open {
     border-color: rgba(220, 184, 102, 0.3);
@@ -1039,12 +1046,17 @@
     display: grid;
     grid-template-rows: 0fr;
     opacity: 0;
-    transition: grid-template-rows 300ms cubic-bezier(0.2, 0.75, 0.25, 1), opacity 220ms ease;
+    transition:
+        grid-template-rows 420ms cubic-bezier(0.2, 0.75, 0.25, 1),
+        opacity 280ms ease,
+        filter 360ms ease;
+    filter: blur(2px);
 }
 
 .bus-card.is-open .bus-card-details {
     grid-template-rows: 1fr;
     opacity: 1;
+    filter: blur(0);
 }
 
 .bus-card-details > * {
@@ -2035,8 +2047,10 @@
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
     }
+
 }
 
+@scope (.bus-directory-page--authenticated) {
 .bus-directory-page {
     --directory-ink: #153451;
     --directory-muted: #607a94;
@@ -2500,6 +2514,315 @@
 .bus-directory-page :focus-visible {
     outline-color: #348fc8;
 }
+}
+
+.bus-directory-page .directory-route-art {
+--atlas-shift-x: 0px;
+--atlas-shift-y: 0px;
+}
+
+.bus-directory-page .directory-route-art::before {
+position: absolute;
+z-index: 1;
+inset: 11px;
+border: 1px solid rgba(205, 220, 181, 0.12);
+content: "";
+pointer-events: none;
+}
+
+.bus-directory-page .directory-route-art::after {
+position: absolute;
+z-index: 0;
+inset: 0;
+background:
+    linear-gradient(#f0c76b, #f0c76b) left 11px top 11px / 22px 1px no-repeat,
+    linear-gradient(#f0c76b, #f0c76b) left 11px top 11px / 1px 22px no-repeat,
+    linear-gradient(#f0c76b, #f0c76b) right 11px top 11px / 22px 1px no-repeat,
+    linear-gradient(#f0c76b, #f0c76b) right 11px top 11px / 1px 22px no-repeat,
+    linear-gradient(#f0c76b, #f0c76b) left 11px bottom 11px / 22px 1px no-repeat,
+    linear-gradient(#f0c76b, #f0c76b) left 11px bottom 11px / 1px 22px no-repeat,
+    linear-gradient(#f0c76b, #f0c76b) right 11px bottom 11px / 22px 1px no-repeat,
+    linear-gradient(#f0c76b, #f0c76b) right 11px bottom 11px / 1px 22px no-repeat;
+content: "";
+opacity: 0.52;
+pointer-events: none;
+}
+
+.bus-directory-page .atlas-heading,
+.bus-directory-page .atlas-legend {
+position: absolute;
+z-index: 3;
+right: 44px;
+left: 44px;
+display: flex;
+align-items: center;
+background: rgba(12, 22, 17, 0.88);
+border: 1px solid rgba(205, 220, 181, 0.18);
+box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+-webkit-backdrop-filter: blur(10px);
+backdrop-filter: blur(10px);
+}
+
+.bus-directory-page .atlas-heading {
+top: 24px;
+min-height: 48px;
+gap: 11px;
+padding: 7px 10px;
+border-left: 2px solid #f0c76b;
+}
+
+.bus-directory-page .atlas-index {
+display: grid;
+min-width: 39px;
+min-height: 31px;
+place-items: center;
+color: #f0c76b;
+border-right: 1px solid rgba(205, 220, 181, 0.16);
+font: 700 8px/1 "Courier New", monospace;
+letter-spacing: 0.08em;
+}
+
+.bus-directory-page .atlas-index b {
+font-size: 12px;
+}
+
+.bus-directory-page .atlas-heading-copy {
+display: grid;
+flex: 1;
+gap: 3px;
+}
+
+.bus-directory-page .atlas-heading-copy strong {
+color: #f1f3ec;
+font: 600 11px/1.1 "Trebuchet MS", sans-serif;
+letter-spacing: 0.02em;
+}
+
+.bus-directory-page .atlas-heading-copy small {
+color: #9fac9f;
+font: 8px/1.2 "Trebuchet MS", sans-serif;
+letter-spacing: 0.05em;
+}
+
+.bus-directory-page .atlas-status {
+display: inline-flex;
+align-items: center;
+gap: 5px;
+padding: 5px 6px;
+color: #c4cfbf;
+border: 1px solid rgba(205, 220, 181, 0.15);
+font: 700 6px/1 "Courier New", monospace;
+letter-spacing: 0.08em;
+}
+
+.bus-directory-page .atlas-status i {
+width: 5px;
+height: 5px;
+background: #f0c76b;
+border-radius: 50%;
+}
+
+.bus-directory-page .atlas-legend {
+bottom: 23px;
+min-height: 37px;
+justify-content: space-between;
+gap: 8px;
+padding: 7px 10px;
+color: #d1d9cc;
+font: 8px/1 "Trebuchet MS", sans-serif;
+}
+
+.bus-directory-page .atlas-legend > span {
+white-space: nowrap;
+}
+
+.bus-directory-page .atlas-legend-route {
+display: inline-flex;
+align-items: center;
+gap: 7px;
+}
+
+.bus-directory-page .atlas-legend-route i {
+width: 19px;
+height: 2px;
+background: #f0c76b;
+box-shadow: 0 0 6px rgba(240, 199, 107, 0.5);
+}
+
+.bus-directory-page .atlas-legend-nodes {
+color: #f0c76b;
+font: 700 10px/1 "Courier New", monospace;
+}
+
+.bus-directory-page .atlas-legend-nodes small {
+margin-left: 2px;
+color: #9fac9f;
+font: 7px/1 "Trebuchet MS", sans-serif;
+}
+
+.bus-directory-page .atlas-legend-note {
+padding-left: 8px;
+color: #9fac9f;
+border-left: 1px solid rgba(205, 220, 181, 0.2);
+font: 7px/1 "Courier New", monospace;
+letter-spacing: 0.06em;
+}
+
+.bus-directory-page .route-art-map {
+width: min(100%, 420px);
+transform: translate3d(var(--atlas-shift-x), calc(var(--atlas-shift-y) + 7px), 24px)
+    rotateX(var(--atlas-tilt-y)) rotateY(var(--atlas-tilt-x));
+}
+
+.bus-directory-page .route-art-map .map-block {
+fill: rgba(161, 190, 153, 0.055);
+stroke: rgba(205, 220, 181, 0.11);
+stroke-width: 1;
+}
+
+.bus-directory-page .route-art-map .map-block--two {
+fill: rgba(240, 199, 107, 0.035);
+}
+
+.bus-directory-page .route-art-map .map-survey-line {
+fill: none;
+stroke: rgba(205, 220, 181, 0.16);
+stroke-width: 0.8;
+stroke-dasharray: 2 5;
+}
+
+.bus-directory-page .route-art-map .map-node-label {
+fill: none;
+stroke: rgba(240, 199, 107, 0.55);
+stroke-width: 1;
+}
+
+.bus-directory-page .route-art-map .map-node-label circle {
+fill: #f0c76b;
+stroke: #20352a;
+stroke-width: 1;
+}
+
+.bus-directory-page .route-art-map .map-node-label text {
+fill: rgba(240, 231, 199, 0.9);
+stroke: none;
+font: 7.5px "Courier New", monospace;
+letter-spacing: 0.08em;
+}
+
+.bus-directory-page .route-art-map .map-node-label--one,
+.bus-directory-page .route-art-map .map-node-label--two,
+.bus-directory-page .route-art-map .map-node-label--three {
+opacity: 0;
+animation: atlas-annotation-arrive 500ms 3.1s ease-out forwards;
+}
+
+.bus-directory-page .route-art-map .map-node-label--two {
+animation-delay: 3.3s;
+}
+
+.bus-directory-page .route-art-map .map-node-label--three {
+animation-delay: 3.55s;
+}
+
+.bus-directory-page .atlas-heading {
+transform: translate3d(calc(var(--atlas-shift-x) * -0.45), calc(var(--atlas-shift-y) * -0.45), 30px);
+transition: transform 420ms ease-out;
+}
+
+.bus-directory-page .atlas-legend {
+transform: translate3d(calc(var(--atlas-shift-x) * -0.3), calc(var(--atlas-shift-y) * -0.3), 18px);
+transition: transform 420ms ease-out;
+}
+
+@keyframes atlas-annotation-arrive {
+to { opacity: 1; }
+}
+
+@media (max-width: 650px) {
+.bus-directory-page .atlas-heading {
+    top: 10px;
+    right: 30px;
+    left: 30px;
+    min-height: 38px;
+    gap: 6px;
+    padding: 5px 6px;
+}
+
+.bus-directory-page .atlas-index {
+    min-width: 30px;
+    min-height: 25px;
+    font-size: 6px;
+}
+
+.bus-directory-page .atlas-index b {
+    font-size: 9px;
+}
+
+.bus-directory-page .atlas-heading-copy strong {
+    font-size: 8px;
+}
+
+.bus-directory-page .atlas-heading-copy small {
+    font-size: 6px;
+}
+
+.bus-directory-page .atlas-status {
+    gap: 3px;
+    padding: 4px;
+    font-size: 5px;
+}
+
+.bus-directory-page .atlas-legend {
+    right: 30px;
+    bottom: 10px;
+    left: 30px;
+    min-height: 28px;
+    gap: 5px;
+    padding: 5px 6px;
+    font-size: 6px;
+}
+
+.bus-directory-page .atlas-legend-route {
+    gap: 4px;
+}
+
+.bus-directory-page .atlas-legend-route i {
+    width: 12px;
+}
+
+.bus-directory-page .atlas-legend-nodes {
+    font-size: 8px;
+}
+
+.bus-directory-page .atlas-legend-nodes small,
+.bus-directory-page .atlas-legend-note {
+    font-size: 5px;
+}
+
+.bus-directory-page .route-art-map .map-node-label {
+    display: none;
+}
+
+.bus-directory-page .atlas-heading,
+.bus-directory-page .atlas-legend,
+.bus-directory-page .route-compass {
+    display: none;
+}
+}
+
+@media (prefers-reduced-motion: reduce) {
+.bus-directory-page .atlas-heading,
+.bus-directory-page .atlas-legend,
+.bus-directory-page .route-art-map .map-node-label {
+    animation: none !important;
+    transition: none !important;
+}
+
+.bus-directory-page .route-art-map .map-node-label {
+    opacity: 1;
+}
+}
 
 .bus-directory-page--public .bus-table-wrap table {
     min-width: 440px;
@@ -2514,169 +2837,174 @@
     grid-column: 1;
 }
 
-.bus-directory-page {
-    --directory-ink: #e8f2fc;
-    --directory-muted: #b5c8da;
-    --directory-forest: #1885c5;
-    --directory-deep: #071421;
-    --directory-coral: #55b9f2;
-    --directory-gold: #83d0ff;
-    --directory-panel: #0c1d30;
-    --directory-line: rgba(132, 182, 220, 0.18);
-    color: var(--directory-ink);
-    background:
-        radial-gradient(ellipse at 12% 8%, rgba(21, 91, 145, 0.2), transparent 570px),
-        radial-gradient(ellipse at 96% 54%, rgba(17, 67, 111, 0.12), transparent 540px),
-        linear-gradient(155deg, #06111d 0%, #091a2b 48%, #071421 100%);
-}
+@scope (.bus-directory-page--authenticated) {
+    :scope {
+        --directory-ink: #f0f3ed;
+        --directory-muted: #b4c0b8;
+        --directory-forest: #315a4b;
+        --directory-deep: #101715;
+        --directory-coral: #f08a68;
+        --directory-gold: #f0c76b;
+        --directory-panel: #17211c;
+        --directory-line: rgba(155, 184, 157, 0.18);
+        color: var(--directory-ink);
+        background:
+            radial-gradient(ellipse at 12% 8%, rgba(64, 106, 79, 0.2), transparent 570px),
+            radial-gradient(ellipse at 96% 54%, rgba(54, 93, 62, 0.12), transparent 540px),
+            linear-gradient(155deg, #101715 0%, #17211c 48%, #111916 100%);
+    }
 
 .directory-header {
-    background-color: #071421;
+    background-color: #101715;
     background-image:
         repeating-linear-gradient(90deg, transparent 0 89px, rgba(255, 255, 255, 0.027) 90px),
         repeating-linear-gradient(0deg, transparent 0 89px, rgba(255, 255, 255, 0.02) 90px),
-        radial-gradient(ellipse at 78% 34%, rgba(36, 125, 189, 0.22), transparent 390px),
-        linear-gradient(112deg, #07182c 0%, #0b2a49 58%, #10466f 100%);
+        radial-gradient(ellipse at 78% 34%, rgba(75, 125, 85, 0.22), transparent 390px),
+        linear-gradient(112deg, #101715 0%, #1b3026 58%, #315a4b 100%);
 }
 
 .directory-brand strong,
 .directory-footer-brand strong {
-    color: #f1f8ff;
+    color: #f0f3ed;
 }
 
 .directory-brand small,
 .directory-footer-brand small {
-    color: #b5c8da;
+    color: #b4c0b8;
 }
 
 .directory-primary-nav a[aria-current="page"]::after {
-    background: #83d0ff;
+    background: #f0c76b;
 }
 
 .directory-signin {
-    color: #e8f2fc;
-    border-color: rgba(170, 201, 229, 0.4);
+    color: #f0f3ed;
+    border-color: rgba(190, 207, 189, 0.4);
 }
 
 .directory-signin i,
 .directory-signin:hover i {
-    color: #83d0ff;
+    color: #f0c76b;
 }
 
 .directory-signin:hover {
-    color: #071421;
-    background: #dff3ff;
-    border-color: #dff3ff;
+    color: #101715;
+    background: #f8e7b2;
+    border-color: #f8e7b2;
 }
 
 .directory-hero h1 em {
-    color: #83d0ff;
+    color: #f0c76b;
 }
 
 .directory-action--gold {
-    color: #061a2d;
-    background: #83d0ff;
+    color: #101715;
+    background: #f0c76b;
+}
+
+:scope .directory-action--gold {
+    color: #101715;
 }
 
 .directory-action--gold:hover {
-    background: #b5e5ff;
+    background: #ffdc8b;
 }
 
 .directory-action--quiet:hover {
-    color: #071421;
-    background: #e8f5ff;
+    color: #101715;
+    background: #f0f3ed;
 }
 
 .directory-caption i,
 .directory-section-kicker,
 .directory-count strong,
 .directory-subnav-note i {
-    color: #83d0ff;
+    color: #f0c76b;
 }
 
 .directory-route-art {
     background:
-        radial-gradient(circle at 54% 48%, rgba(65, 156, 215, 0.18), transparent 43%),
-        linear-gradient(135deg, rgba(11, 43, 72, 0.55), rgba(7, 20, 33, 0.3));
-    border-color: rgba(132, 182, 220, 0.2);
+        radial-gradient(circle at 54% 48%, rgba(121, 157, 99, 0.18), transparent 43%),
+        linear-gradient(135deg, rgba(34, 65, 45, 0.55), rgba(16, 23, 21, 0.3));
+    border-color: rgba(155, 184, 157, 0.2);
 }
 
 .route-art-grid {
     background-image:
-        linear-gradient(rgba(151, 207, 239, 0.07) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(151, 207, 239, 0.07) 1px, transparent 1px);
+        linear-gradient(rgba(190, 207, 189, 0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(190, 207, 189, 0.07) 1px, transparent 1px);
 }
 
 .route-art-ring {
-    border-color: rgba(141, 207, 245, 0.19);
+    border-color: rgba(240, 199, 107, 0.19);
 }
 
 .route-float-card {
-    color: #e8f2fc;
-    background: rgba(7, 20, 33, 0.94);
-    border-color: rgba(132, 182, 220, 0.23);
+    color: #f0f3ed;
+    background: rgba(16, 23, 21, 0.94);
+    border-color: rgba(155, 184, 157, 0.23);
 }
 
 .route-float-card small,
 .route-coordinate {
-    color: #b5c8da;
+    color: #b4c0b8;
 }
 
 .directory-subnav {
-    color: #b5c8da;
-    border-bottom-color: rgba(132, 182, 220, 0.18);
+    color: #b4c0b8;
+    border-bottom-color: rgba(155, 184, 157, 0.18);
 }
 
 .directory-subnav a,
 .directory-footer-home {
-    color: #c5d8e9;
+    color: #c8d5c8;
 }
 
 .directory-subnav a:hover,
 .directory-footer-home:hover {
-    color: #83d0ff;
+    color: #f0c76b;
 }
 
 .directory-main {
-    color: #e8f2fc;
+    color: #f0f3ed;
 }
 
 .overview-item,
 .overview-note {
-    background: linear-gradient(145deg, #102741 0%, #0b1c30 100%);
-    border-color: rgba(132, 182, 220, 0.18);
-    box-shadow: 0 16px 38px rgba(0, 0, 0, 0.22), inset 0 1px rgba(211, 234, 255, 0.035);
+    background: linear-gradient(145deg, #1b3026 0%, #14221a 100%);
+    border-color: rgba(155, 184, 157, 0.18);
+    box-shadow: 0 16px 38px rgba(0, 0, 0, 0.22), inset 0 1px rgba(220, 235, 218, 0.035);
 }
 
 .overview-icon,
 .overview-note-mark {
-    color: #83d0ff;
-    background: rgba(46, 126, 190, 0.16);
-    border-color: rgba(98, 170, 225, 0.28);
+    color: #f0c76b;
+    background: rgba(240, 199, 107, 0.1);
+    border-color: rgba(240, 199, 107, 0.24);
 }
 
 .overview-copy small,
 .overview-note small {
-    color: #b5c8da;
+    color: #b4c0b8;
 }
 
 .overview-copy strong,
 .overview-note strong {
-    color: #f1f8ff;
+    color: #f0f3ed;
 }
 
 .overview-index {
-    color: rgba(186, 218, 243, 0.28);
+    color: rgba(190, 207, 189, 0.28);
 }
 
 .overview-note {
     background:
-        radial-gradient(ellipse at 100% 0%, rgba(36, 125, 189, 0.2), transparent 220px),
-        linear-gradient(130deg, #102741, #0b1c30);
+        radial-gradient(ellipse at 100% 0%, rgba(75, 125, 85, 0.2), transparent 220px),
+        linear-gradient(130deg, #1b3026, #14221a);
 }
 
 .directory-section-heading h2 {
-    color: #f1f8ff;
+    color: #f0f3ed;
     font-family: "Segoe UI", Arial, sans-serif;
     font-weight: 700;
     letter-spacing: -0.04em;
@@ -2686,223 +3014,223 @@
 .directory-count,
 .directory-toolbar > span,
 .directory-results-meta {
-    color: #b5c8da;
+    color: #b4c0b8;
 }
 
 .directory-count {
-    background: #0c1d30;
-    border-color: rgba(132, 182, 220, 0.2);
+    background: #17211c;
+    border-color: rgba(155, 184, 157, 0.2);
 }
 
 .directory-tools {
-    background: linear-gradient(145deg, #102741 0%, #0b1c30 100%);
-    border-color: rgba(132, 182, 220, 0.18);
-    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.2), inset 0 1px rgba(211, 234, 255, 0.035);
+    background: linear-gradient(145deg, #1b3026 0%, #14221a 100%);
+    border-color: rgba(155, 184, 157, 0.18);
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.2), inset 0 1px rgba(220, 235, 218, 0.035);
 }
 
 .directory-search,
 .directory-select {
-    color: #83d0ff;
-    background: #071a2d;
-    border-color: rgba(132, 182, 220, 0.24);
+    color: #f0c76b;
+    background: #0d1711;
+    border-color: rgba(155, 184, 157, 0.24);
 }
 
 .directory-search:focus-within,
 .directory-select:focus-within {
-    background: #091f35;
-    border-color: #55b9f2;
-    box-shadow: 0 0 0 3px rgba(46, 126, 190, 0.2);
+    background: #14231a;
+    border-color: #f0c76b;
+    box-shadow: 0 0 0 3px rgba(240, 199, 107, 0.16);
 }
 
 .directory-search > i,
 .directory-select > i:first-child,
 .directory-select .select-chevron {
-    color: #83d0ff;
+    color: #f0c76b;
 }
 
 .directory-search input,
 .directory-select select {
-    color: #f1f8ff;
+    color: #f0f3ed;
 }
 
 .directory-search input::placeholder {
-    color: #b5c8da;
+    color: #b4c0b8;
 }
 
 .directory-search kbd {
-    color: #c5d8e9;
-    background: #102741;
-    border-color: rgba(132, 182, 220, 0.22);
+    color: #c8d5c8;
+    background: #1b3026;
+    border-color: rgba(155, 184, 157, 0.22);
 }
 
 .directory-select select option {
-    color: #e8f2fc;
-    background: #0c1d30;
+    color: #f0f3ed;
+    background: #17211c;
 }
 
 .filter-clear {
-    color: #d2e2f0;
-    background: #0c1d30;
-    border-color: rgba(132, 182, 220, 0.22);
+    color: #d2ddd2;
+    background: #17211c;
+    border-color: rgba(155, 184, 157, 0.22);
 }
 
 .filter-clear i {
-    color: #83d0ff;
+    color: #f0c76b;
 }
 
 .filter-clear:hover {
     color: #ffffff;
-    background: #153553;
-    border-color: #398cc2;
+    background: #254535;
+    border-color: #7fa36d;
 }
 
 .directory-toolbar {
-    border-top-color: rgba(132, 182, 220, 0.16);
+    border-top-color: rgba(155, 184, 157, 0.16);
 }
 
 .view-toggle,
 .view-toggle i {
-    color: #b5c8da;
+    color: #b4c0b8;
 }
 
 .view-toggle:hover,
 .view-toggle.is-active {
-    color: #eff8ff;
-    background: rgba(46, 126, 190, 0.2);
-    border-color: rgba(98, 170, 225, 0.28);
+    color: #f0f3ed;
+    background: rgba(240, 199, 107, 0.1);
+    border-color: rgba(240, 199, 107, 0.25);
 }
 
 .view-toggle.is-active i,
 .results-sort-note i {
-    color: #83d0ff;
+    color: #f0c76b;
 }
 
 .results-live-dot {
-    background: #63c5f5;
-    box-shadow: 0 0 8px rgba(99, 197, 245, 0.48);
+    background: #a8cf94;
+    box-shadow: 0 0 8px rgba(168, 207, 148, 0.48);
 }
 
 .results-sort-note {
-    color: #b5c8da;
+    color: #b4c0b8;
 }
 
 .bus-card {
     background:
-        radial-gradient(ellipse at 100% 0%, rgba(36, 125, 189, 0.14), transparent 235px),
-        linear-gradient(145deg, #102741 0%, #0b1c30 100%);
-    border-color: rgba(132, 182, 220, 0.2);
-    box-shadow: 0 16px 38px rgba(0, 0, 0, 0.2), inset 0 1px rgba(211, 234, 255, 0.035);
+        radial-gradient(ellipse at 100% 0%, rgba(75, 125, 85, 0.16), transparent 235px),
+        linear-gradient(145deg, #1b3026 0%, #14221a 100%);
+    border-color: rgba(155, 184, 157, 0.2);
+    box-shadow: 0 16px 38px rgba(0, 0, 0, 0.2), inset 0 1px rgba(220, 235, 218, 0.035);
 }
 
 .bus-card:hover,
 .bus-card.is-open {
-    border-color: rgba(99, 183, 235, 0.55);
-    box-shadow: 0 20px 42px rgba(0, 0, 0, 0.28), inset 0 1px rgba(211, 234, 255, 0.06);
+    border-color: rgba(240, 199, 107, 0.48);
+    box-shadow: 0 20px 42px rgba(0, 0, 0, 0.28), inset 0 1px rgba(240, 199, 107, 0.07);
 }
 
 .bus-card-trigger:focus-visible {
-    outline-color: #83d0ff;
+    outline-color: #f0c76b;
 }
 
 .bus-card-id,
 .bus-card-route {
-    color: #c3d4e3;
+    color: #c8d5c8;
 }
 
 .bus-card-id i,
 .bus-card-route i,
 .bus-detail-grid > span > i,
 .bus-neighborhoods-title i {
-    color: #83d0ff;
+    color: #f0c76b;
 }
 
 .bus-card-id > span {
-    color: #83d0ff;
+    color: #f0c76b;
 }
 
 .bus-card-plate,
 .bus-card-route-title,
 .bus-detail-grid strong {
-    color: #f1f8ff;
+    color: #f0f3ed;
 }
 
 .bus-card-toggle {
-    color: #83d0ff;
-    background: rgba(46, 126, 190, 0.19);
-    border-color: rgba(98, 170, 225, 0.31);
+    color: #f0c76b;
+    background: rgba(240, 199, 107, 0.1);
+    border-color: rgba(240, 199, 107, 0.26);
 }
 
 .bus-card.is-open .bus-card-toggle {
-    color: #061a2d;
-    background: #83d0ff;
+    color: #101715;
+    background: #f0c76b;
 }
 
 .bus-detail-grid {
-    border-top-color: rgba(132, 182, 220, 0.17);
+    border-top-color: rgba(155, 184, 157, 0.17);
 }
 
 .bus-detail-grid small,
 .bus-no-neighborhoods {
-    color: #b5c8da;
+    color: #b4c0b8;
 }
 
 .bus-neighborhoods-title {
-    color: #b9e5ff;
+    color: #f4d784;
 }
 
 .bus-card .barrios li {
-    color: #dbeaf6;
-    background: #0b2037;
-    border-color: rgba(132, 182, 220, 0.19);
+    color: #d9e2d8;
+    background: #20362b;
+    border-color: rgba(155, 184, 157, 0.19);
 }
 
 .directory-empty {
     background:
-        radial-gradient(ellipse at 50% 24%, rgba(36, 125, 189, 0.2), transparent 255px),
-        linear-gradient(145deg, #102741 0%, #0b1c30 100%);
-    border-color: rgba(132, 182, 220, 0.2);
+        radial-gradient(ellipse at 50% 24%, rgba(75, 125, 85, 0.2), transparent 255px),
+        linear-gradient(145deg, #1b3026 0%, #14221a 100%);
+    border-color: rgba(155, 184, 157, 0.2);
 }
 
 .empty-map-ring {
-    border-color: rgba(99, 183, 235, 0.28);
+    border-color: rgba(240, 199, 107, 0.28);
 }
 
 .empty-map-ring--inner {
-    border-color: rgba(99, 183, 235, 0.34);
+    border-color: rgba(240, 199, 107, 0.34);
 }
 
 .empty-map-art svg circle {
-    fill: #102741;
+    fill: #1b3026;
 }
 
 .empty-bus {
-    color: #071421;
-    background: #83d0ff;
-    border-color: rgba(182, 228, 255, 0.55);
+    color: #101715;
+    background: #f0c76b;
+    border-color: rgba(255, 231, 166, 0.55);
     box-shadow: 0 7px 20px rgba(0, 0, 0, 0.28);
 }
 
 .empty-kicker {
-    color: #83d0ff;
+    color: #f0c76b;
 }
 
 .directory-empty h3,
 .directory-no-results strong {
-    color: #f1f8ff;
+    color: #f0f3ed;
 }
 
 .directory-empty > p,
 .directory-no-results p {
-    color: #c0d1e0;
+    color: #c0cbc0;
 }
 
 .empty-action {
-    color: #061a2d !important;
-    background: #83d0ff;
+    color: #101715 !important;
+    background: #f0c76b;
 }
 
 .empty-action:hover {
-    background: #b5e5ff;
+    background: #ffdc8b;
 }
 
 .directory-no-results {
@@ -2917,137 +3245,270 @@
 }
 
 .no-results-reset {
-    color: #b9e5ff;
-    border-color: rgba(98, 170, 225, 0.36);
+    color: #f4d784;
+    border-color: rgba(240, 199, 107, 0.36);
 }
 
 .no-results-reset:hover {
-    background: rgba(46, 126, 190, 0.2);
+    background: rgba(240, 199, 107, 0.1);
 }
 
 .bus-table-wrap {
-    background: #0b1c30;
-    border-color: rgba(132, 182, 220, 0.2);
+    background: #14221a;
+    border-color: rgba(155, 184, 157, 0.2);
     box-shadow: 0 16px 38px rgba(0, 0, 0, 0.22);
 }
 
 .bus-table-wrap th,
 .bus-table-wrap td {
-    color: #d3e0ed;
-    border-bottom-color: rgba(132, 182, 220, 0.15);
+    color: #d9e2d8;
+    border-bottom-color: rgba(155, 184, 157, 0.15);
 }
 
 .bus-table-wrap th {
-    color: #b9e5ff;
-    background: #102741;
+    color: #f4d784;
+    background: #1b3026;
 }
 
 .bus-table-wrap tbody tr:hover {
-    background: rgba(46, 126, 190, 0.12);
+    background: rgba(240, 199, 107, 0.07);
 }
 
 .bus-table-wrap td:first-child,
 .bus-table-wrap td:nth-child(2) {
-    color: #83d0ff;
+    color: #f0c76b;
 }
 
 .directory-footer {
-    background: rgba(5, 17, 30, 0.84);
-    border-top-color: rgba(132, 182, 220, 0.17);
+    background: rgba(10, 16, 12, 0.84);
+    border-top-color: rgba(155, 184, 157, 0.17);
 }
 
 .directory-footer-copy {
-    color: #b5c8da;
+    color: #b4c0b8;
 }
 
 .bus-directory-page :focus-visible {
-    outline-color: #83d0ff;
+    outline-color: #f0c76b;
 }
 
 .map-route-line {
-    stroke: #68c8fb;
+    stroke: #f0c76b;
     stroke-width: 3.5;
-    filter: drop-shadow(0 0 4px rgba(104, 200, 251, 0.45));
+    filter: drop-shadow(0 0 4px rgba(240, 199, 107, 0.45));
+}
 }
 
-.map-route-flow {
+.bus-directory-page .directory-route-art {
+    perspective: 1000px;
+    transform-style: preserve-3d;
+    --atlas-shift-x: 0px;
+    --atlas-shift-y: 0px;
+    --atlas-tilt-x: 0deg;
+    --atlas-tilt-y: 0deg;
+}
+
+.bus-directory-page .route-art-map {
+    transform: translate3d(var(--atlas-shift-x), var(--atlas-shift-y), 24px)
+        rotateX(var(--atlas-tilt-y)) rotateY(var(--atlas-tilt-x));
+    transform-style: preserve-3d;
+    transition: transform 320ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.bus-directory-page .route-art-grid {
+    animation: none;
+    transform: translate3d(calc(var(--atlas-shift-x) * -0.35), calc(var(--atlas-shift-y) * -0.35), -18px);
+    transition: transform 420ms ease-out;
+}
+
+.bus-directory-page .route-art-ring--outer,
+.bus-directory-page .route-art-ring--inner {
+    animation: none;
+    transform: translate3d(calc(var(--atlas-shift-x) * -0.55), calc(var(--atlas-shift-y) * -0.55), -8px);
+    transition: transform 380ms ease-out;
+}
+
+.bus-directory-page .route-art-map .map-contour {
     fill: none;
-    stroke: #d2f1ff;
-    stroke-width: 2;
-    stroke-linecap: round;
-    stroke-dasharray: 2 22;
-    animation: route-flow-travel 1.25s linear infinite;
-}
-
-.map-stop {
-    fill: #0b2037;
-    stroke: #83d0ff;
-}
-
-.map-stop--start {
-    animation: stop-arrive 420ms both, route-stop-pulse 2s 1.2s ease-in-out infinite;
-}
-
-.map-stop--middle {
-    animation: stop-arrive 420ms both, route-stop-pulse 2s 1.5s ease-in-out infinite;
-}
-
-.map-stop--last {
-    animation-delay: 1330ms, 1.8s;
-}
-
-.map-stop--end {
-    fill: #b9e8ff;
-    stroke: #ffffff;
-    animation: stop-arrive 420ms 1570ms both, route-stop-pulse 2s 2s ease-in-out infinite;
-}
-
-.map-location-pulse {
-    stroke: #b9e8ff;
-    stroke-width: 1.6;
-}
-
-.route-bus-runner {
-    fill: #b9e8ff;
-    stroke: #061a2d;
-    stroke-width: 1.2;
-    paint-order: stroke fill;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.65));
-}
-
-.route-bus-runner path {
-    fill: none;
-    stroke: #0b4168;
-    stroke-width: 1.7;
-    stroke-linecap: round;
-}
-
-.route-bus-runner circle {
-    fill: #061a2d;
-    stroke: #b9e8ff;
+    stroke: rgba(205, 220, 181, 0.23);
     stroke-width: 1;
+    stroke-dasharray: 520;
+    stroke-dashoffset: 520;
+    animation: contour-etch 2.2s 700ms cubic-bezier(0.2, 0.65, 0.3, 1) forwards;
 }
 
-@keyframes route-flow-travel {
-    to { stroke-dashoffset: -48; }
+.bus-directory-page .route-art-map .map-contour--two {
+    stroke: rgba(240, 199, 107, 0.2);
+    animation-delay: 950ms;
 }
 
-@keyframes route-stop-pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.58; }
+.bus-directory-page .route-art-map .map-contour--three {
+    stroke: rgba(205, 220, 181, 0.16);
+    animation-delay: 1.2s;
+}
+
+.bus-directory-page .route-art-map .map-route-flow {
+    display: none;
+}
+
+.bus-directory-page .route-art-map .map-route-line {
+    stroke-dasharray: 580;
+    stroke-dashoffset: 580;
+    animation: route-trace 2.8s 1.1s cubic-bezier(0.3, 0.65, 0.2, 1) forwards;
+}
+
+.bus-directory-page .route-art-map .map-stop {
+    opacity: 0;
+    animation: atlas-stop-set 520ms 2.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.bus-directory-page .route-art-map .map-stop--middle {
+    animation-delay: 3.05s;
+}
+
+.bus-directory-page .route-art-map .map-stop--last {
+    animation-delay: 3.25s;
+}
+
+.bus-directory-page .route-art-map .map-stop--end {
+    animation-delay: 3.5s;
+}
+
+.bus-directory-page .route-art-map .map-location-pulse {
+    animation: none;
+    opacity: 0;
+}
+
+.bus-directory-page .route-survey-sweep {
+    position: absolute;
+    z-index: 1;
+    inset: -25% -10%;
+    overflow: hidden;
+    pointer-events: none;
+    transform: translateZ(32px);
+    -webkit-mask-image: radial-gradient(ellipse at center, #000 30%, transparent 78%);
+    mask-image: radial-gradient(ellipse at center, #000 30%, transparent 78%);
+}
+
+.bus-directory-page .route-survey-sweep::before {
+    position: absolute;
+    top: -20%;
+    bottom: -20%;
+    left: 0;
+    width: 34%;
+    background: linear-gradient(90deg, transparent, rgba(240, 199, 107, 0.025) 30%, rgba(255, 240, 188, 0.23) 48%, rgba(240, 199, 107, 0.08) 54%, transparent);
+    content: "";
+    transform: translateX(-140%) skewX(-18deg);
+    animation: atlas-survey-pass 2.4s 650ms cubic-bezier(0.2, 0.65, 0.25, 1) both;
+}
+
+.bus-directory-page .route-compass {
+    position: absolute;
+    z-index: 2;
+    top: 18%;
+    right: 11%;
+    display: grid;
+    width: 38px;
+    height: 48px;
+    justify-items: center;
+    color: rgba(240, 199, 107, 0.75);
+    font: 700 8px/1 "Trebuchet MS", sans-serif;
+    opacity: 0;
+    animation: compass-mark-arrive 500ms 3.8s ease-out forwards;
+}
+
+.bus-directory-page .route-compass-needle {
+    width: 16px;
+    height: 28px;
+    background: linear-gradient(180deg, #f0c76b 0 50%, rgba(205, 220, 181, 0.62) 50%);
+    clip-path: polygon(50% 0, 100% 100%, 50% 77%, 0 100%);
+    filter: drop-shadow(0 0 4px rgba(240, 199, 107, 0.45));
+    transform: rotate(-135deg);
+    transform-origin: 50% 80%;
+    animation: compass-orient 900ms 3.85s cubic-bezier(0.2, 0.8, 0.25, 1) forwards;
+}
+
+.bus-directory-page .route-float-card {
+    animation: none;
+    transform: translate3d(calc(var(--atlas-shift-x) * -0.75), calc(var(--atlas-shift-y) * -0.75), 16px);
+    transition: transform 420ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.bus-directory-page .route-float-card--bottom {
+    transform: translate3d(calc(var(--atlas-shift-x) * -0.5), calc(var(--atlas-shift-y) * -0.5), 8px);
+}
+
+@keyframes contour-etch {
+    to { stroke-dashoffset: 0; }
+}
+
+@keyframes atlas-stop-set {
+    0% { opacity: 0; transform: scale(0.5); }
+    72% { opacity: 1; transform: scale(1.18); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes atlas-survey-pass {
+    to { transform: translateX(430%) skewX(-18deg); }
+}
+
+@keyframes compass-mark-arrive {
+    to { opacity: 1; }
+}
+
+@keyframes compass-orient {
+    to { transform: rotate(0); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .route-bus-runner {
-        display: none;
+    .bus-directory-page .route-art-map,
+    .bus-directory-page .route-art-grid,
+    .bus-directory-page .route-art-ring--outer,
+    .bus-directory-page .route-art-ring--inner,
+    .bus-directory-page .route-art-map .map-contour,
+    .bus-directory-page .route-art-map .map-route-line,
+    .bus-directory-page .route-art-map .map-stop,
+    .bus-directory-page .route-survey-sweep::before,
+    .bus-directory-page .route-compass,
+    .bus-directory-page .route-compass-needle,
+    .bus-directory-page .route-float-card {
+        animation: none !important;
+        transition: none !important;
     }
 
-    .map-route-flow {
-        animation: none;
+    .bus-directory-page .route-art-map .map-contour,
+    .bus-directory-page .route-art-map .map-route-line {
+        stroke-dashoffset: 0;
     }
 
-    .map-stop {
-        animation-name: none;
+    .bus-directory-page .route-art-map .map-stop,
+    .bus-directory-page .route-art-map .map-location-pulse,
+    .bus-directory-page .route-compass {
         opacity: 1;
     }
+
+    .bus-directory-page .route-art-map,
+    .bus-directory-page .route-art-grid,
+    .bus-directory-page .route-art-ring--outer,
+    .bus-directory-page .route-art-ring--inner,
+    .bus-directory-page .route-float-card,
+    .bus-directory-page .route-float-card--bottom {
+        transform: none;
+    }
+}
+
+@media (max-width: 650px) {
+    .bus-directory-page .atlas-heading,
+    .bus-directory-page .atlas-legend,
+    .bus-directory-page .route-compass {
+        display: none !important;
+    }
+}
+
+.bus-directory-page .directory-route-art {
+    border-radius: 26px 26px 4px 26px;
+}
+
+.bus-directory-page .route-art-map {
+    width: min(88%, 360px);
 }
