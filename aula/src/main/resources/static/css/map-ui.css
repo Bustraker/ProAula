@@ -317,6 +317,8 @@
     box-shadow: var(--mu-sombra) !important;
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
+}
+
 /* theme palette variables - chosen to pair with the existing dark/teal UI and map aesthetic */
 :root {
     --mu-acento: #16a085; /* teal accent for active */
@@ -347,7 +349,7 @@
 }
 .mu-control a, .leaflet-container .mu-control a { width: 38px; height: 38px; }
 
-.mu-estilos { position: relative; overflow: visible !important; }
+.mu-estilos { position: relative; z-index: 1300; overflow: visible !important; }
 .mu-estilos__boton { border-radius: 12px; }
 
 .mu-estilos__menu {
@@ -365,11 +367,11 @@
     -webkit-backdrop-filter: blur(16px);
     backdrop-filter: blur(16px);
     transform-origin: top left;
-    transition: transform 200ms cubic-bezier(.2,.9,.3,1), opacity 160ms ease, box-shadow 180ms;
-    opacity: 0; transform: translateY(-8px) scale(0.99);
+    transition: transform 200ms cubic-bezier(.2,.9,.3,1), opacity 160ms ease, box-shadow 180ms, visibility 160ms;
+    opacity: 0; visibility: hidden; pointer-events: none; transform: translateY(-8px) scale(0.99);
 }
 .mu-estilos__menu[hidden] { display: none; }
-.mu-estilos__menu[aria-visible="true"] { opacity: 1; transform: translateY(0) scale(1); }
+.mu-estilos__menu[aria-visible="true"] { opacity: 1; visibility: visible; pointer-events: auto; transform: translateY(0) scale(1); }
 /* When the control button is expanded, visually indicate it */
 .mu-estilos__boton[aria-expanded="true"] { background: rgba(22,160,133,0.08); box-shadow: 0 10px 30px rgba(14,36,34,0.28); border: 1px solid rgba(22,160,133,0.12); }
 
@@ -413,22 +415,25 @@
 .mu-estilo__texto { color: #d9f3ef; font-size: 0.74rem; }
 /* Per-style miniature animations — SVG-focused and CSS-enhanced. Respect reduced-motion */
 @media (prefers-reduced-motion: no-preference) {
-    .mu-mini-calles path { stroke-dasharray: 120; stroke-dashoffset: 120; animation: mu-mini-line 2.2s linear infinite; stroke: rgba(255,255,255,0.92); }
+    .mu-mini-calles path { stroke-dasharray: 120; stroke-dashoffset: 120; animation: mu-mini-line 2.2s linear infinite; stroke: #245b61; }
+    .mu-mini-calles .mu-mini-calles__borde { stroke: rgba(255,255,255,0.92); stroke-width: 4; }
     @keyframes mu-mini-line { 0% { stroke-dashoffset: 120 } 100% { stroke-dashoffset: 0 } }
 
-    .mu-mini-oscuro circle { transform-origin: 96px 10px; animation: mu-mini-moon 3s ease-in-out infinite; fill: rgba(255,255,255,0.95); }
+    .mu-mini-oscuro circle:first-child { transform-origin: 96px 10px; animation: mu-mini-moon 3s ease-in-out infinite; fill: #f3efd5; }
     @keyframes mu-mini-moon { 0% { transform: translateY(0) scale(0.9); opacity:0.75 } 50% { transform: translateY(-2px) scale(1.05); opacity:1 } 100% { transform: translateY(0) scale(0.9); opacity:0.75 } }
 
-    .mu-mini-claro circle { transform-origin: 12px 10px; animation: mu-mini-sun 2.2s ease-in-out infinite; fill: #fff8e6; filter: drop-shadow(0 2px 6px rgba(255,200,90,0.18)); }
+    .mu-mini-claro circle { transform-origin: 12px 10px; animation: mu-mini-sun 2.2s ease-in-out infinite; fill: #f2b84b; filter: drop-shadow(0 2px 6px rgba(255,200,90,0.18)); }
     @keyframes mu-mini-sun { 0% { transform: scale(0.9) } 50% { transform: scale(1.06) } 100% { transform: scale(0.9) } }
 
-    .mu-mini-sat rect { transform-origin: center; animation: mu-mini-sat 2.6s linear infinite; fill: rgba(255,255,255,0.06); }
-    @keyframes mu-mini-sat { 0% { transform: translateX(-4px) } 50% { transform: translateX(2px) } 100% { transform: translateX(-4px) } }
+    .mu-mini-sat rect { animation: mu-mini-sat 2.6s ease-in-out infinite; }
+    @keyframes mu-mini-sat { 0% { transform: translateX(0) } 100% { transform: translateX(240px) } }
 
-    .mu-mini-osm path { stroke-dasharray: 140; stroke-dashoffset: 140; stroke: rgba(255,255,255,0.9); animation: mu-mini-line 2.6s linear infinite; }
+    .mu-mini-osm path { stroke-dasharray: 140; stroke-dashoffset: 140; animation: mu-mini-line 2.6s linear infinite; stroke: #4c6c50; }
+    .mu-mini-osm .mu-mini-osm__borde { stroke: #fff; stroke-width: 4; }
 }
 @media (prefers-reduced-motion: reduce) {
     .mu-mini-calles path, .mu-mini-oscuro circle, .mu-mini-claro circle, .mu-mini-sat rect, .mu-mini-osm path { animation: none !important; }
+    .mu-estilos__menu, .mu-estilo { transition: none !important; }
 }
 /* ensure SVGs and icons are above decorative layers */
 .mu-estilo__muestra svg { position: relative; z-index: 2; width: 100%; height: 100%; }
@@ -482,7 +487,7 @@
 @media (max-width: 700px) {
     .leaflet-bar a { width: 42px !important; height: 42px !important; line-height: 42px !important; }
     .mu-control a, .leaflet-container .mu-control a { width: 42px; height: 42px; }
-    .mu-estilos__menu { top: calc(100% + 8px); left: 0; width: min(248px, calc(100vw - 32px)); }
+    .mu-estilos__menu { top: calc(100% + 8px); left: 0; width: min(268px, calc(100vw - 32px)); }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -28,11 +28,11 @@
     var CACHE_RUTAS_MAX = 40;
     var cacheRutas = new Map();
     var ESTILOS_MAPA = [
-        { id: 'Calles', etiqueta: 'Calles', icono: 'fa-road', muestra: 'linear-gradient(135deg,#e8eef2,#c9d8e2)' },
-        { id: 'Oscuro', etiqueta: 'Oscuro', icono: 'fa-moon', muestra: 'linear-gradient(135deg,#2b3a42,#0f1b21)' },
-        { id: 'Claro', etiqueta: 'Claro', icono: 'fa-sun', muestra: 'linear-gradient(135deg,#f4f6f7,#d5dbdf)' },
-        { id: 'Satélite', etiqueta: 'Satélite', icono: 'fa-earth-americas', muestra: 'linear-gradient(135deg,#3f6b4f,#1d3f52)' },
-        { id: 'OpenStreetMap', etiqueta: 'OSM', icono: 'fa-map', muestra: 'linear-gradient(135deg,#d9e8c8,#b7cfe0)' }
+        { id: 'Calles', etiqueta: 'Calles', icono: 'fa-road', muestra: '#c7d8df' },
+        { id: 'Oscuro', etiqueta: 'Oscuro', icono: 'fa-moon', muestra: '#14252b' },
+        { id: 'Claro', etiqueta: 'Claro', icono: 'fa-sun', muestra: '#e8eef0' },
+        { id: 'Satélite', etiqueta: 'Satélite', icono: 'fa-earth-americas', muestra: '#254638' },
+        { id: 'OpenStreetMap', etiqueta: 'Calles ESRI', icono: 'fa-map', muestra: '#d6e4c4' }
     ];
 
     var ATRIB_OSM = '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>';
@@ -90,8 +90,8 @@
             Calles: L.tileLayer('/api/map/tiles?z={z}&x={x}&y={y}', {
                 maxZoom: 20, keepBuffer: 4, updateWhenIdle: false, attribution: ATRIB_CARTO
             }),
-            OpenStreetMap: L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19, keepBuffer: 4, attribution: ATRIB_OSM
+            OpenStreetMap: L.tileLayer(ESRI + 'World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+                maxNativeZoom: 19, maxZoom: 19, keepBuffer: 4, attribution: ATRIB_ESRI
             })
         };
         bases['Satélite'] = L.tileLayer(ESRI + 'World_Imagery/MapServer/tile/{z}/{y}/{x}', {
@@ -148,10 +148,12 @@
             menu.hidden = true;
             menu.setAttribute('role', 'menu');
             menu.setAttribute('aria-label', 'Estilo del mapa');
-                        menu.setAttribute('aria-visible', 'false');
+            menu.setAttribute('aria-visible', 'false');
+            menu.setAttribute('aria-hidden', 'true');
             var titulo = L.DomUtil.create('span', 'mu-estilos__titulo', menu);
             titulo.textContent = 'Estilo del mapa';
             var rejilla = L.DomUtil.create('div', 'mu-estilos__rejilla', menu);
+            var temporizadorCierre = null;
 
             ESTILOS_MAPA.forEach(function (estilo) {
                 if (!self.options.bases[estilo.id]) return;
@@ -168,35 +170,45 @@
                     case 'calles':
                         svg = '<svg width="120" height="38" viewBox="0 0 120 38" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
                             + '<rect width="120" height="38" rx="6" fill="' + (estilo.muestra || '#e8eef2') + '" />'
-                            + '<g class="mu-mini-calles" fill="none" stroke="#ffffff" stroke-opacity="0.9" stroke-width="1.6">'
+                            + '<g class="mu-mini-calles" fill="none" stroke-width="2.4">'
+                            + '<path class="mu-mini-calles__borde" d="M6 28 L28 12 L52 26 L76 10 L112 26" />'
                             + '<path d="M6 28 L28 12 L52 26 L76 10 L112 26" stroke-linecap="round" stroke-linejoin="round" />'
                             + '</g></svg>';
                         break;
                     case 'oscuro':
                         svg = '<svg width="120" height="38" viewBox="0 0 120 38" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
                             + '<rect width="120" height="38" rx="6" fill="' + (estilo.muestra || '#0f1b21') + '" />'
-                            + '<g class="mu-mini-oscuro" fill="#fff" fill-opacity="0.9">'
-                            + '<circle cx="96" cy="10" r="5" />'
+                            + '<path d="M0 29 L25 22 L47 27 L71 18 L94 25 L120 15 V38 H0Z" fill="#20373d" />'
+                            + '<g fill="#d4e6df"><circle cx="20" cy="10" r="1" /><circle cx="43" cy="16" r="1" /><circle cx="78" cy="8" r="1" /></g>'
+                            + '<g class="mu-mini-oscuro"><circle cx="96" cy="10" r="5" />'
+                            + '<circle cx="94" cy="8" r="5" fill="' + (estilo.muestra || '#0f1b21') + '" />'
                             + '</g></svg>';
                         break;
                     case 'claro':
                         svg = '<svg width="120" height="38" viewBox="0 0 120 38" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
                             + '<rect width="120" height="38" rx="6" fill="' + (estilo.muestra || '#f4f6f7') + '" />'
-                            + '<g class="mu-mini-claro" fill="#fff">'
+                            + '<path d="M0 30 L24 23 L46 28 L70 17 L95 24 L120 13" fill="none" stroke="#a8b7bb" stroke-width="2" />'
+                            + '<path d="M0 34 L25 29 L50 33 L74 25 L100 30 L120 23" fill="none" stroke="#c2ced0" stroke-width="1.5" />'
+                            + '<g class="mu-mini-claro">'
                             + '<circle cx="12" cy="10" r="5" />'
                             + '</g></svg>';
                         break;
                     case 'satelite':
                         svg = '<svg width="120" height="38" viewBox="0 0 120 38" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
                             + '<rect width="120" height="38" rx="6" fill="' + (estilo.muestra || '#1d3f52') + '" />'
-                            + '<g class="mu-mini-sat" fill-opacity="0.06">'
-                            + '<rect x="6" y="6" width="40" height="26" rx="4" fill="#fff" />'
+                            + '<path d="M0 0 H45 L57 14 L38 23 L18 20 L0 29Z" fill="#41694d" />'
+                            + '<path d="M72 0 H120 V20 L99 18 L87 29 L65 19Z" fill="#58724b" />'
+                            + '<path d="M0 35 L40 17 L83 25 L120 7" fill="none" stroke="#c7b98a" stroke-width="2" />'
+                            + '<g class="mu-mini-sat">'
+                            + '<rect x="-120" y="0" width="120" height="38" fill="#fff" opacity=".2" />'
                             + '</g></svg>';
                         break;
                     case 'openstreetmap':
                         svg = '<svg width="120" height="38" viewBox="0 0 120 38" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
                             + '<rect width="120" height="38" rx="6" fill="' + (estilo.muestra || '#d9e8c8') + '" />'
-                            + '<g class="mu-mini-osm" fill="none" stroke="#ffffff" stroke-opacity="0.85">'
+                            + '<path d="M4 5 H37 V17 H4Z M83 4 H116 V15 H83Z M47 24 H74 V35 H47Z" fill="#b8d3ad" />'
+                            + '<g class="mu-mini-osm" fill="none" stroke-width="2">'
+                            + '<path class="mu-mini-osm__borde" d="M10 26 L30 12 L50 26 L70 14 L110 26" />'
                             + '<path d="M10 26 L30 12 L50 26 L70 14 L110 26" stroke-linecap="round" stroke-width="1.2" />'
                             + '</g></svg>';
                         break;
@@ -213,32 +225,59 @@
             });
 
             function abrir() {
+                if (temporizadorCierre) {
+                    clearTimeout(temporizadorCierre);
+                    temporizadorCierre = null;
+                }
                 menu.hidden = false;
-                            menu.setAttribute('aria-visible', 'true');
-                            boton.setAttribute('aria-expanded', 'true');
-                            var activo = menu.querySelector('.mu-estilo[aria-checked="true"]') || menu.querySelector('.mu-estilo');
-                            if (activo) activo.focus();
-                        }
-                        function cerrar() {
-                            if (menu.hidden) return;
-                            menu.hidden = true;
-                            menu.setAttribute('aria-visible', 'false');
-                            boton.setAttribute('aria-expanded', 'false');
-                        }
+                menu.setAttribute('aria-hidden', 'false');
+                boton.setAttribute('aria-expanded', 'true');
+                var mostrar = function () {
+                    if (boton.getAttribute('aria-expanded') !== 'true') return;
+                    menu.setAttribute('aria-visible', 'true');
+                    var activo = menu.querySelector('.mu-estilo[aria-checked="true"]') || menu.querySelector('.mu-estilo');
+                    if (activo) activo.focus();
+                };
+                if (global.requestAnimationFrame) global.requestAnimationFrame(mostrar);
+                else setTimeout(mostrar, 0);
+            }
+            function cerrar() {
+                if (boton.getAttribute('aria-expanded') !== 'true') return;
+                menu.setAttribute('aria-visible', 'false');
+                menu.setAttribute('aria-hidden', 'true');
+                boton.setAttribute('aria-expanded', 'false');
+                if (temporizadorCierre) clearTimeout(temporizadorCierre);
+                temporizadorCierre = setTimeout(function () {
+                    menu.hidden = true;
+                    temporizadorCierre = null;
+                }, 200);
+            }
 
             L.DomEvent.disableClickPropagation(contenedor);
             L.DomEvent.disableScrollPropagation(contenedor);
             L.DomEvent.on(boton, 'click', function (e) {
                 L.DomEvent.preventDefault(e);
-                if (menu.hidden) abrir(); else cerrar();
+                if (boton.getAttribute('aria-expanded') !== 'true') abrir(); else cerrar();
             });
             L.DomEvent.on(document, 'click', function (e) {
                 if (!contenedor.contains(e.target)) cerrar();
             });
             L.DomEvent.on(document, 'keydown', function (e) {
-                if (e.key === 'Escape' && !menu.hidden) {
+                if (boton.getAttribute('aria-expanded') !== 'true') return;
+                if (e.key === 'Escape') {
                     cerrar();
                     boton.focus();
+                    return;
+                }
+                if (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'Home' || e.key === 'End') {
+                    var opciones = Array.prototype.slice.call(menu.querySelectorAll('.mu-estilo'));
+                    if (!opciones.length) return;
+                    var indice = opciones.indexOf(document.activeElement);
+                    if (e.key === 'Home') indice = 0;
+                    else if (e.key === 'End') indice = opciones.length - 1;
+                    else indice = (indice + (e.key === 'ArrowDown' ? 1 : -1) + opciones.length) % opciones.length;
+                    e.preventDefault();
+                    opciones[indice].focus();
                 }
             });
             this._menu = menu;
@@ -321,7 +360,7 @@
                 activa = bases.OpenStreetMap;
                 guardarPreferencia('OpenStreetMap');
                 selector.marcar('OpenStreetMap');
-                mostrarAviso('El mapa «' + clave + '» no respondió. Se cambió a OpenStreetMap.', 'warn', 7000);
+                mostrarAviso('El mapa «' + clave + '» no respondió. Se cambió a Calles ESRI.', 'warn', 7000);
             });
         });
 
