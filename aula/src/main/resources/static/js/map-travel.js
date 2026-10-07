@@ -6,10 +6,8 @@
  *     BustrakerTravel.iniciar({ privado: true | false });
  *
  * Qué resuelve:
- *   - Origen / destino con búsqueda por escritura. El origen solo ofrece barrios con servicio y el
- *     destino solo barrios alcanzables desde el origen en el sentido de la ruta (no se ofrecen
- *     combinaciones que luego dan "sin resultados").
- *   - Tramos disponibles ordenados (más corto primero) con hora aproximada, paradas y buses.
+ *   - Origen / destino por barrio y búsqueda explícita con validación.
+ *   - Itinerarios con transbordos, ordenados primero por cantidad de transbordos.
  *   - Detalle del tramo: paradas en orden (línea de tiempo), buses asignados e información.
  *   - Mapa: pines A/B, paradas numeradas, trazado por calles (OSRM) y recorridos TransCaribe.
  *   - Ubicación en vivo: barrio, parada más cercana a pie y siguiente barrio del trazado.
@@ -127,13 +125,15 @@
             tramos: [], activo: null, pestana: 'paradas',
             items: [],              // paradas/puntos del tramo activo
             solicitud: 0,
+            controlador: null,
             trayecto: null, barriosTrayecto: [],
             ubicacion: null, seguimiento: null,
             transcaribe: []
         };
         var capas = {
             paradas: L.layerGroup(), pinOrigen: null, pinDestino: null,
-            base: null, linea: null, flujo: null, transcaribe: null, usuario: null, precision: null
+            base: null, linea: null, flujo: null, caminatas: null,
+            transcaribe: null, usuario: null, precision: null
         };
         var el = {};
 
@@ -155,7 +155,8 @@
         function arrancar() {
             if (arrancado) return;
             arrancado = true;
-            ['origen', 'destino', 'listaOrigen', 'listaDestino', 'btnInvertir', 'btnSeguirUbicacion', 'locationStatus',
+            ['origen', 'destino', 'listaOrigen', 'listaDestino', 'btnInvertir', 'btnPlanificar', 'plannerStatus',
+                'btnSeguirUbicacion', 'locationStatus',
                 'resultados', 'resumenBusqueda', 'rutaDetalle', 'detalleTitulo', 'detalleTramo', 'rutaStats', 'detalleHora',
                 'panelParadas', 'panelBuses', 'panelInfo', 'mostrarParadas', 'trazadoTranscaribe', 'barriosTrayecto',
                 'btnPanel', 'btnCompartir', 'btnLimpiar', 'contadorParadas', 'contadorBuses'
@@ -166,6 +167,7 @@
             el.destino.addEventListener('input', alCambiarDestino);
             el.destino.addEventListener('change', alCambiarDestino);
             el.btnInvertir.addEventListener('click', invertir);
+            el.btnPlanificar.addEventListener('click', planificar);
             el.btnSeguirUbicacion.addEventListener('click', alternarSeguimiento);
             el.btnLimpiar.addEventListener('click', reiniciarConsulta);
             el.btnCompartir.addEventListener('click', compartirEnlace);
@@ -231,14 +233,16 @@
                 var barriosN = barrios.map(normalizar);
                 barrios.forEach(function (nombre, i) { if (!estado.servidos.has(barriosN[i])) estado.servidos.set(barriosN[i], nombre); });
                 var paradas = (r.paradas || [])
-                    .filter(function (p) { return p.latitud != null && p.longitud != null
-                        && Number.isFinite(Number(p.latitud)) && Number.isFinite(Number(p.longitud)); })
+                    .filter(function (p) { return p.nombre && normalizar(p.barrio); })
                     .map(function (p) {
+                        var tieneCoordenadas = p.latitud != null && p.longitud != null
+                            && Number.isFinite(Number(p.latitud)) && Number.isFinite(Number(p.longitud));
                         return {
                             nombre: p.nombre, barrio: p.barrio, barrioN: normalizar(p.barrio),
                             referencia: p.referencia, ubicacion: p.ubicacion,
                             orden: p.orden == null ? Number.MAX_SAFE_INTEGER : p.orden,
-                            lat: Number(p.latitud), lng: Number(p.longitud)
+                            lat: tieneCoordenadas ? Number(p.latitud) : null,
+                            lng: tieneCoordenadas ? Number(p.longitud) : null
                         };
                     })
                     .sort(function (a, b) { return a.orden - b.orden; });
@@ -286,24 +290,8 @@
             llenarLista(el.listaOrigen, ordenarNombres(Array.from(mapaBarriosDisponibles().values())));
         }
 
-        /** Barrios alcanzables desde "origenN" siguiendo el sentido de alguna ruta verificada. */
-        function destinosDesde(origenN) {
-            var destinos = new Map();
-            estado.rutas.forEach(function (ruta) {
-                var i = ruta.barriosN.indexOf(origenN);
-                if (i < 0) return;
-                for (var k = i + 1; k < ruta.barriosN.length; k++) {
-                    if (!destinos.has(ruta.barriosN[k])) destinos.set(ruta.barriosN[k], ruta.barrios[k]);
-                }
-            });
-            return destinos;
-        }
-
         function destinosPermitidos(origenN) {
-            var destinos = destinosDesde(origenN);
-            if (destinos.size) return destinos;
-
-            destinos = mapaBarriosDisponibles();
+            var destinos = mapaBarriosDisponibles();
             destinos.delete(origenN);
             return destinos;
         }
@@ -317,9 +305,7 @@
             }
             var destinos = Array.from(destinosPermitidos(estado.origen).values());
             el.destino.disabled = false;
-            el.destino.placeholder = destinosDesde(estado.origen).size
-                ? 'Escribe o elige el barrio de destino'
-                : 'No hay rutas confirmadas; elige un barrio para consultar';
+            el.destino.placeholder = 'Escribe o elige el barrio de destino';
             llenarLista(el.listaDestino, ordenarNombres(destinos));
         }
 
@@ -338,6 +324,7 @@
             estado.destino = '';
             el.destino.value = '';
             poblarDestino();
+            limpiarMensajePlanificador();
             limpiarRuta();
             estado.tramos = [];
             estado.activo = null;
@@ -353,6 +340,57 @@
             if (n) el.destino.value = permitidos.get(n);
             if (n === estado.destino) return;
             estado.destino = n;
+            limpiarMensajePlanificador();
+            limpiarRuta();
+            estado.tramos = [];
+            estado.activo = null;
+            ocultarDetalle();
+            pintarResultados();
+            actualizarURL();
+        }
+
+        function limpiarMensajePlanificador() {
+            el.plannerStatus.textContent = '';
+            el.plannerStatus.classList.remove('estado--error');
+            el.origen.removeAttribute('aria-invalid');
+            el.destino.removeAttribute('aria-invalid');
+        }
+
+        function mostrarErrorPlanificador(mensaje, campo) {
+            el.plannerStatus.textContent = mensaje;
+            el.plannerStatus.classList.add('estado--error');
+            if (campo) {
+                campo.setAttribute('aria-invalid', 'true');
+                campo.focus();
+            }
+        }
+
+        function planificar() {
+            limpiarMensajePlanificador();
+            var barrios = mapaBarriosDisponibles();
+            var origen = resolver(el.origen.value, barrios);
+            if (!el.origen.value.trim()) {
+                mostrarErrorPlanificador('Completa el barrio de origen para planificar el viaje.', el.origen);
+                return;
+            }
+            if (!origen) {
+                mostrarErrorPlanificador('Elige un barrio de origen de la lista.', el.origen);
+                return;
+            }
+            var destinos = destinosPermitidos(origen);
+            var destino = resolver(el.destino.value, destinos);
+            if (!el.destino.value.trim()) {
+                mostrarErrorPlanificador('Completa el barrio de destino para planificar el viaje.', el.destino);
+                return;
+            }
+            if (!destino) {
+                mostrarErrorPlanificador('Elige un barrio de destino distinto del origen.', el.destino);
+                return;
+            }
+            estado.origen = origen;
+            estado.destino = destino;
+            el.origen.value = barrios.get(origen);
+            el.destino.value = destinos.get(destino);
             buscar();
         }
 
@@ -365,9 +403,9 @@
             if (o) {
                 el.destino.value = o;
                 alCambiarDestino();
-                if (!estado.destino && estado.origen) {
-                    el.destino.value = '';
-                    pintarResultados();
+                if (estado.origen && estado.destino) {
+                    planificar();
+                } else if (!estado.destino && estado.origen) {
                     M.mostrarAviso('No hay rutas verificadas en el sentido contrario. Las rutas tienen un solo sentido de recorrido.', 'warn', 6500);
                 }
             }
@@ -394,25 +432,153 @@
             return ps.filter(function (p) { return p.barrioN && tramoN.has(p.barrioN); });
         }
 
-        function buscarTramos(origenN, destinoN) {
-            var tramos = [];
-            estado.rutas.forEach(function (ruta) {
-                var inicio = ruta.barriosN.indexOf(origenN);
-                if (inicio < 0) return;
-                var fin = ruta.barriosN.indexOf(destinoN, inicio + 1);
-                if (fin < 0) return;
-                tramos.push({
-                    ruta: ruta,
-                    barrios: ruta.barrios.slice(inicio, fin + 1),
-                    barriosN: ruta.barriosN.slice(inicio, fin + 1),
-                    paradas: paradasDelTramo(ruta, origenN, destinoN)
+        function crearTramo(ruta, inicio, fin) {
+            var origenN = ruta.barriosN[inicio], destinoN = ruta.barriosN[fin];
+            return {
+                ruta: ruta,
+                barrios: ruta.barrios.slice(inicio, fin + 1),
+                barriosN: ruta.barriosN.slice(inicio, fin + 1),
+                paradas: paradasDelTramo(ruta, origenN, destinoN)
+            };
+        }
+
+        function crearItinerario(tramos) {
+            var barrios = [], barriosN = [];
+            tramos.forEach(function (tramo) {
+                tramo.barrios.forEach(function (barrio, indice) {
+                    if (barriosN.length && indice === 0 && barriosN[barriosN.length - 1] === tramo.barriosN[indice]) return;
+                    barrios.push(barrio);
+                    barriosN.push(tramo.barriosN[indice]);
                 });
             });
-            tramos.sort(function (a, b) {
-                return a.barrios.length - b.barrios.length || b.paradas.length - a.paradas.length
-                    || a.ruta.nombre.localeCompare(b.ruta.nombre, 'es');
+            var puntosTransbordo = tramos.slice(0, -1).map(function (tramo, indice) {
+                var siguiente = tramos[indice + 1];
+                var barrioN = tramo.barriosN[tramo.barriosN.length - 1];
+                var bajar = tramo.paradas.filter(function (parada) { return parada.barrioN === barrioN; }).pop();
+                var subir = siguiente.paradas.find(function (parada) { return parada.barrioN === barrioN; });
+                var barrio = tramo.barrios[tramo.barrios.length - 1];
+                var ubicacionesConocidas = bajar && subir
+                    && Number.isFinite(bajar.lat) && Number.isFinite(bajar.lng)
+                    && Number.isFinite(subir.lat) && Number.isFinite(subir.lng);
+                var distanciaKm = ubicacionesConocidas
+                    ? haversineKm(bajar.lat, bajar.lng, subir.lat, subir.lng)
+                    : null;
+                var mismoPunto = ubicacionesConocidas && distanciaKm <= 0.02;
+                var mismaParada = ubicacionesConocidas
+                    && normalizar(bajar.nombre) === normalizar(subir.nombre)
+                    && mismoPunto;
+                var detalle;
+                if (mismaParada) {
+                    detalle = 'Baja en ' + bajar.nombre + ' y aborda ' + siguiente.ruta.nombre +
+                        ' en esa misma parada (' + mayuscula(barrio) + ').';
+                } else if (mismoPunto) {
+                    detalle = 'Las paradas registradas para bajar (' + bajar.nombre + ') y abordar (' +
+                        subir.nombre + ') están a menos de 20 m según sus coordenadas. Confirma en el lugar ' +
+                        'que sea el punto correcto para tomar ' + siguiente.ruta.nombre + '.';
+                } else if (ubicacionesConocidas) {
+                    detalle = 'Baja en ' + bajar.nombre + ' y camina hasta ' + subir.nombre +
+                        ' para abordar ' + siguiente.ruta.nombre + ' (' + mayuscula(barrio) +
+                        '). Distancia directa estimada: ' + formatearDistancia(distanciaKm * 1000) +
+                        '; no es una ruta peatonal.';
+                } else if (bajar || subir) {
+                    detalle = 'Transbordo en ' + mayuscula(barrio) + ': ' +
+                        (bajar ? 'baja en ' + bajar.nombre : 'no hay parada de bajada registrada') + '; ' +
+                        (subir ? 'la parada de abordaje es ' + subir.nombre : 'no hay parada de abordaje registrada') +
+                        '. No se puede confirmar la caminata porque faltan coordenadas de paradas.';
+                } else {
+                    detalle = 'No hay paradas registradas para confirmar el transbordo en ' +
+                        mayuscula(barrio) + ' hacia ' + siguiente.ruta.nombre + '.';
+                }
+                return {
+                    barrio: barrio, barrioN: barrioN, bajar: bajar, subir: subir,
+                    distanciaKm: distanciaKm, mismaParada: mismaParada, mismoPunto: mismoPunto,
+                    ubicacionesConocidas: !!ubicacionesConocidas,
+                    caminataLarga: ubicacionesConocidas && distanciaKm >= 0.5,
+                    detalle: detalle
+                };
             });
-            return tramos;
+            return {
+                ruta: tramos[0].ruta,
+                tramos: tramos,
+                barrios: barrios,
+                barriosN: barriosN,
+                transbordos: Math.max(0, tramos.length - 1),
+                puntosTransbordo: puntosTransbordo,
+                paradas: tramos.reduce(function (total, tramo) { return total + tramo.paradas.length; }, 0)
+            };
+        }
+
+        function buscarTramos(origenN, destinoN) {
+            var MAX_TRAMOS = estado.rutas.length, MAX_ESTADOS = 10000;
+            var pendientes = [{ ubicacion: origenN, tramos: [], rutasUsadas: [], visitados: [origenN] }];
+            var resultados = [], vistos = new Set(), procesados = 0;
+
+            while (pendientes.length && procesados < MAX_ESTADOS) {
+                var estadoBusqueda = pendientes.shift();
+                procesados++;
+                if (estadoBusqueda.tramos.length >= MAX_TRAMOS) continue;
+
+                estado.rutas.forEach(function (ruta) {
+                    if (estadoBusqueda.rutasUsadas.indexOf(String(ruta.id)) >= 0) return;
+                    var indicesInicio = [];
+                    ruta.barriosN.forEach(function (barrioN, indice) {
+                        if (barrioN === estadoBusqueda.ubicacion) indicesInicio.push(indice);
+                    });
+                    indicesInicio.forEach(function (inicio) {
+                        for (var fin = inicio + 1; fin < ruta.barriosN.length; fin++) {
+                            var siguiente = ruta.barriosN[fin];
+                            if (estadoBusqueda.visitados.indexOf(siguiente) >= 0 && siguiente !== destinoN) continue;
+                            var tramos = estadoBusqueda.tramos.concat(crearTramo(ruta, inicio, fin));
+                            if (siguiente === destinoN) {
+                                var clave = tramos.map(function (tramo) { return tramo.ruta.id; }).join(',')
+                                    + ':' + tramos.slice(0, -1).map(function (tramo) {
+                                        return tramo.barriosN[tramo.barriosN.length - 1];
+                                    }).join(',');
+                                if (!vistos.has(clave)) {
+                                    vistos.add(clave);
+                                    resultados.push(crearItinerario(tramos));
+                                }
+                                continue;
+                            }
+                            if (tramos.length >= MAX_TRAMOS) continue;
+                            var hayContinuacion = estado.rutas.some(function (otraRuta) {
+                                return String(otraRuta.id) !== String(ruta.id)
+                                    && estadoBusqueda.rutasUsadas.indexOf(String(otraRuta.id)) < 0
+                                    && otraRuta.barriosN.some(function (barrioN, indice) {
+                                        return barrioN === siguiente && indice < otraRuta.barriosN.length - 1;
+                                    });
+                            });
+                            if (!hayContinuacion) continue;
+                            var nuevosUsados = estadoBusqueda.rutasUsadas.concat(String(ruta.id));
+                            var claveEstado = nuevosUsados.join(',') + ':' + siguiente + ':'
+                                + tramos.slice(0, -1).map(function (tramo) {
+                                    return tramo.barriosN[tramo.barriosN.length - 1];
+                                }).join(',');
+                            if (vistos.has(claveEstado)) continue;
+                            vistos.add(claveEstado);
+                            pendientes.push({
+                                ubicacion: siguiente,
+                                tramos: tramos,
+                                rutasUsadas: nuevosUsados,
+                                visitados: estadoBusqueda.visitados.concat(siguiente)
+                            });
+                        }
+                    });
+                });
+            }
+
+            resultados.sort(function (a, b) {
+                var rutasA = a.tramos.map(function (tramo) { return tramo.ruta.nombre; }).join(' → ');
+                var rutasB = b.tramos.map(function (tramo) { return tramo.ruta.nombre; }).join(' → ');
+                return a.transbordos - b.transbordos
+                    || a.barrios.length - b.barrios.length
+                    || rutasA.localeCompare(rutasB, 'es');
+            });
+            var directos = resultados.filter(function (itinerario) {
+                return itinerario.transbordos === 0;
+            });
+            var candidatas = directos.length ? directos : resultados;
+            return candidatas.length ? [candidatas[0]] : [];
         }
 
         function buscar() {
@@ -463,15 +629,14 @@
                 return;
             }
             if (!estado.destino) {
-                var cantidad = destinosDesde(estado.origen).size;
                 el.resultados.appendChild(estadoVacio('fas fa-location-dot', 'Ahora elige el destino',
-                    cantidad ? 'Desde ' + mayuscula(nombreVisible(estado.origen)) + ' hay ' + cantidad + ' barrios con servicio directo.'
-                        : 'No hay rutas verificadas que salgan de este barrio.'));
+                    'Te mostraremos una sola recomendación: primero una ruta directa; si no existe, la opción con menos transbordos y menos barrios intermedios.'));
                 return;
             }
             if (!estado.tramos.length) {
-                var vacio = estadoVacio('fas fa-circle-xmark', 'Sin rutas verificadas en este sentido',
-                    'Las rutas tienen un sentido de recorrido. Prueba con otro destino o revisa el trayecto contrario.');
+                var vacio = estadoVacio('fas fa-circle-xmark', 'No hay combinación de rutas',
+                    'No existe una combinación de rutas verificadas desde ' + mayuscula(nombreVisible(estado.origen)) +
+                    ' hasta ' + mayuscula(nombreVisible(estado.destino)) + '. Prueba con otros barrios o revisa el sentido del recorrido.');
                 if (buscarTramos(estado.destino, estado.origen).length) {
                     var inverso = h('button', 'btn btn--secundario', 'Ver el sentido contrario');
                     inverso.type = 'button';
@@ -482,9 +647,18 @@
                 return;
             }
 
-            var total = estado.tramos.length;
-            el.resumenBusqueda.textContent = total + (total === 1 ? ' ruta disponible' : ' rutas disponibles') +
-                ' de ' + mayuscula(nombreVisible(estado.origen)) + ' a ' + mayuscula(nombreVisible(estado.destino));
+            var recomendada = estado.tramos[0];
+            var barriosIntermedios = Math.max(0, recomendada.barrios.length - 2);
+            var nombreRutas = recomendada.tramos.map(function (parte) {
+                return parte.ruta.nombre;
+            }).join(' → ');
+            el.resumenBusqueda.textContent = 'Mejor opción: ' + nombreRutas + ' · ' +
+                barriosIntermedios + (barriosIntermedios === 1 ? ' barrio intermedio' : ' barrios intermedios') +
+                (recomendada.transbordos
+                    ? ' · ' + recomendada.transbordos +
+                        (recomendada.transbordos === 1 ? ' transbordo' : ' transbordos')
+                    : ' · directa') +
+                '. Se muestra una sola opción: primero se prioriza una ruta directa; si no existe, menos transbordos y luego menos barrios. El tiempo del mapa no es el tiempo real del bus.';
             el.resultados.appendChild(h('p', 'resultados__resumen', el.resumenBusqueda.textContent));
 
             estado.tramos.forEach(function (tramo, indice) {
@@ -493,7 +667,6 @@
         }
 
         function crearTarjetaTramo(tramo, indice) {
-            var ruta = tramo.ruta;
             var activa = estado.activo === tramo;
             var tarjeta = h('button', 'tramo' + (activa ? ' tramo--activo' : ''));
             tarjeta.type = 'button';
@@ -501,27 +674,31 @@
             tarjeta.addEventListener('click', function () { seleccionarTramo(tramo); });
 
             var cabecera = h('div', 'tramo__cabecera');
-            cabecera.appendChild(h('span', 'tramo__nombre', ruta.nombre));
-            if (indice === 0 && estado.tramos.length > 1) cabecera.appendChild(h('span', 'chip chip--ok', 'Más corta'));
+            cabecera.appendChild(h('span', 'tramo__nombre',
+                tramo.transbordos ? tramo.transbordos + (tramo.transbordos === 1 ? ' transbordo' : ' transbordos') : 'Directa'));
+            if (indice === 0) cabecera.appendChild(h('span', 'chip chip--ok', 'Recomendada'));
             tarjeta.appendChild(cabecera);
 
-            var intermedios = Math.max(0, tramo.barrios.length - 2);
+            tarjeta.appendChild(h('span', 'tramo__rutas', tramo.tramos.map(function (parte) {
+                return parte.ruta.nombre;
+            }).join(' → ')));
             var cadena = h('div', 'tramo__cadena');
             cadena.appendChild(h('span', null, mayuscula(tramo.barrios[0])));
-            cadena.appendChild(icono('fas fa-arrow-right'));
-            if (intermedios) {
-                cadena.appendChild(h('span', 'tramo__mas', intermedios + (intermedios === 1 ? ' barrio' : ' barrios')));
+            tramo.tramos.forEach(function (parte, indiceParte) {
                 cadena.appendChild(icono('fas fa-arrow-right'));
-            }
-            cadena.appendChild(h('span', null, mayuscula(tramo.barrios[tramo.barrios.length - 1])));
+                cadena.appendChild(h('span', null, mayuscula(parte.barrios[parte.barrios.length - 1])));
+                if (indiceParte < tramo.tramos.length - 1) {
+                    cadena.appendChild(h('span', 'chip chip--transbordo', tramo.puntosTransbordo[indiceParte].detalle));
+                }
+            });
             tarjeta.appendChild(cadena);
 
             var meta = h('div', 'tramo__meta');
-            var hora = formatearHora(ruta.hora);
+            var buses = tramo.tramos.reduce(function (totalBuses, parte) { return totalBuses + parte.ruta.buses.length; }, 0);
             var datos = [
-                ['far fa-clock', hora ? 'Hora aprox. ' + hora : 'Horario no disponible'],
-                ['fas fa-location-dot', tramo.paradas.length ? tramo.paradas.length + ' paradas' : 'Sin paradas registradas'],
-                ['fas fa-bus', ruta.buses.length ? ruta.buses.length + (ruta.buses.length === 1 ? ' bus' : ' buses') : 'Sin buses asignados']
+                ['fas fa-right-left', tramo.transbordos ? tramo.transbordos + (tramo.transbordos === 1 ? ' transbordo' : ' transbordos') : 'Sin transbordos'],
+                ['fas fa-location-dot', tramo.paradas ? tramo.paradas + ' paradas' : 'Sin paradas registradas'],
+                ['fas fa-bus', buses ? buses + (buses === 1 ? ' bus asignado' : ' buses asignados') : 'Sin buses asignados']
             ];
             datos.forEach(function (d) {
                 var item = h('span', 'tramo__dato');
@@ -534,28 +711,66 @@
         }
 
         /* ===================== SELECCIÓN Y DIBUJO ===================== */
-        function construirItems(tramo) {
-            var ruta = tramo.ruta, items = [];
-            if (tramo.paradas.length >= 2) {
-                tramo.paradas.forEach(function (p) {
-                    items.push({ nombre: p.nombre, barrio: p.barrio, referencia: p.referencia, ubicacion: p.ubicacion,
-                        lat: p.lat, lng: p.lng, tipo: 'parada' });
+        function construirItemsDeTramo(tramo) {
+            var items = [];
+            var paradasConCoordenadas = tramo.paradas.filter(function (parada) {
+                return Number.isFinite(parada.lat) && Number.isFinite(parada.lng);
+            });
+            if (paradasConCoordenadas.length >= 2) {
+                paradasConCoordenadas.forEach(function (parada) {
+                    items.push({ nombre: parada.nombre, barrio: parada.barrio, referencia: parada.referencia,
+                        ubicacion: parada.ubicacion, lat: parada.lat, lng: parada.lng, tipo: 'parada' });
                 });
-            } else {
-                tramo.barrios.forEach(function (barrio, i) {
-                    var c = ruta.coordenadas[barrio];
-                    var lat, lng;
-                    if (Array.isArray(c) && c.length === 2) { lat = Number(c[0]); lng = Number(c[1]); }
-                    else {
-                        var respaldo = estado.coordenadas[tramo.barriosN[i]];
-                        if (respaldo) { lat = respaldo.lat; lng = respaldo.lng; }
-                    }
-                    if (Number.isFinite(lat) && Number.isFinite(lng)) {
-                        items.push({ nombre: mayuscula(barrio), barrio: barrio, lat: lat, lng: lng, tipo: 'barrio' });
-                    }
-                });
+                return items;
             }
-            items.forEach(function (it, i) { it.numero = i + 1; });
+            tramo.barrios.forEach(function (barrio, indice) {
+                var coordenadas = tramo.ruta.coordenadas[barrio];
+                var latitud, longitud;
+                if (Array.isArray(coordenadas) && coordenadas.length === 2) {
+                    latitud = Number(coordenadas[0]);
+                    longitud = Number(coordenadas[1]);
+                } else {
+                    var respaldo = estado.coordenadas[tramo.barriosN[indice]];
+                    if (respaldo) { latitud = respaldo.lat; longitud = respaldo.lng; }
+                }
+                if (Number.isFinite(latitud) && Number.isFinite(longitud)) {
+                    items.push({ nombre: mayuscula(barrio), barrio: barrio, lat: latitud, lng: longitud, tipo: 'barrio' });
+                }
+            });
+            return items;
+        }
+
+        function construirItems(itinerario) {
+            var items = [];
+            itinerario.tramos.forEach(function (tramo, indiceTramo) {
+                var puntos = construirItemsDeTramo(tramo);
+                if (!puntos.length) return;
+                puntos.forEach(function (punto) { punto.rutaNombre = tramo.ruta.nombre; });
+                if (indiceTramo > 0 && items.length) {
+                    var anterior = items[items.length - 1];
+                    var primero = puntos[0];
+                    if (anterior.tipo === 'parada') {
+                        anterior.transbordo = true;
+                        anterior.rutaSiguiente = tramo.ruta.nombre;
+                    }
+                    if (primero.tipo === 'parada') {
+                        primero.transbordo = true;
+                        primero.rutaSiguiente = tramo.ruta.nombre;
+                    }
+                    if (anterior.barrio && primero.barrio
+                        && normalizar(anterior.barrio) === normalizar(primero.barrio)) {
+                        primero.nombre = anterior.nombre;
+                    }
+                    if (anterior.tipo === 'parada' && primero.tipo === 'parada'
+                        && anterior.lat === primero.lat && anterior.lng === primero.lng
+                        && normalizar(anterior.nombre) === normalizar(primero.nombre)) {
+                        items[items.length - 1] = Object.assign(anterior, primero);
+                        puntos.shift();
+                    }
+                }
+                Array.prototype.push.apply(items, puntos);
+            });
+            items.forEach(function (item, indice) { item.numero = indice + 1; });
             return items;
         }
 
@@ -592,6 +807,7 @@
                     capas.paradas.addLayer(it.marcador);
                 }
             });
+            dibujarCaminatasTransbordo(tramo);
             if (!el.mostrarParadas.checked) mapa.removeLayer(capas.paradas);
 
             var limites = L.latLngBounds(items.map(function (p) { return [p.lat, p.lng]; }));
@@ -600,9 +816,12 @@
             pintarStats({ cargando: true, paradas: items.length });
 
             var solicitud = ++estado.solicitud;
+            if (estado.controlador) estado.controlador.abort();
+            var controlador = new AbortController();
+            estado.controlador = controlador;
             M.mostrarCargando('Calculando ruta por calles…');
             try {
-                var resultado = await M.obtenerRutaOSRM(muestrear(items, MAX_PUNTOS_OSRM));
+                var resultado = await M.obtenerRutaOSRM(muestrear(items, MAX_PUNTOS_OSRM), controlador.signal);
                 if (solicitud !== estado.solicitud) return;
                 var c = M.crearCapasRuta(resultado.geometry);
                 capas.base = c.base.addTo(mapa);
@@ -621,6 +840,7 @@
                     ? 'El servicio de rutas tardó demasiado. Las paradas siguen disponibles en la lista.'
                     : 'No se pudo calcular el trazado por calles. Las paradas siguen disponibles en la lista.', 'error');
             } finally {
+                if (estado.controlador === controlador) estado.controlador = null;
                 M.ocultarCargando();
             }
         }
@@ -633,12 +853,30 @@
             }).addTo(mapa);
         }
 
+        function dibujarCaminatasTransbordo(itinerario) {
+            if (capas.caminatas) mapa.removeLayer(capas.caminatas);
+            capas.caminatas = L.layerGroup();
+            itinerario.puntosTransbordo.forEach(function (punto) {
+                if (!punto.ubicacionesConocidas || punto.mismoPunto) return;
+                var linea = L.polyline(
+                    [[punto.bajar.lat, punto.bajar.lng], [punto.subir.lat, punto.subir.lng]],
+                    { color: '#f59e0b', weight: 4, opacity: 0.95, dashArray: '6 8', lineCap: 'round' }
+                );
+                linea.bindTooltip('Conexión a pie: ' + formatearDistancia(punto.distanciaKm * 1000) +
+                    ' en línea recta (estimación, no es una ruta peatonal).');
+                capas.caminatas.addLayer(linea);
+            });
+            if (capas.caminatas.getLayers().length) capas.caminatas.addTo(mapa);
+            else capas.caminatas = null;
+        }
+
         function limpiarRuta() {
             estado.solicitud++;
-            [capas.pinOrigen, capas.pinDestino, capas.base, capas.linea, capas.flujo].forEach(function (capa) {
+            if (estado.controlador) { estado.controlador.abort(); estado.controlador = null; }
+            [capas.pinOrigen, capas.pinDestino, capas.base, capas.linea, capas.flujo, capas.caminatas].forEach(function (capa) {
                 if (capa) mapa.removeLayer(capa);
             });
-            capas.pinOrigen = capas.pinDestino = capas.base = capas.linea = capas.flujo = null;
+            capas.pinOrigen = capas.pinDestino = capas.base = capas.linea = capas.flujo = capas.caminatas = null;
             capas.paradas.clearLayers();
             estado.items = [];
             establecerTrayecto(null);
@@ -648,16 +886,22 @@
         function ocultarDetalle() { el.rutaDetalle.hidden = true; }
 
         function pintarDetalle(tramo) {
-            var ruta = tramo.ruta;
+            var rutas = tramo.tramos.map(function (parte) { return parte.ruta; });
             el.rutaDetalle.hidden = false;
-            el.detalleTitulo.textContent = ruta.nombre;
-            el.detalleTramo.textContent = mayuscula(tramo.barrios[0]) + ' → ' + mayuscula(tramo.barrios[tramo.barrios.length - 1]);
-            var hora = formatearHora(ruta.hora);
-            el.detalleHora.textContent = hora ? 'Hora aproximada: ' + hora : 'Horario no disponible';
+            el.detalleTitulo.textContent = rutas.map(function (ruta) { return ruta.nombre; }).join(' → ');
+            el.detalleTramo.textContent = mayuscula(tramo.barrios[0]) + ' → ' +
+                mayuscula(tramo.barrios[tramo.barrios.length - 1]) +
+                (tramo.puntosTransbordo.length
+                    ? ' · ' + tramo.puntosTransbordo.map(function (punto) { return punto.detalle; }).join(' · ')
+                    : ' · Viaje directo');
+            var horas = rutas.map(function (ruta) { return formatearHora(ruta.hora); }).filter(Boolean);
+            el.detalleHora.textContent = horas.length
+                ? 'Horas aproximadas por ruta: ' + horas.join(' · ')
+                : 'Horarios no disponibles';
             el.contadorParadas.textContent = String(estado.items.length);
-            el.contadorBuses.textContent = String(ruta.buses.length);
+            el.contadorBuses.textContent = String(rutas.reduce(function (total, ruta) { return total + ruta.buses.length; }, 0));
             pintarParadas();
-            pintarBuses(ruta);
+            pintarBuses(tramo);
             pintarInfo(tramo);
             cambiarPestana(estado.pestana);
         }
@@ -733,6 +977,29 @@
                 if (detalle.length) texto.appendChild(h('small', null, detalle.join(' · ')));
                 if (rol === 'origen') texto.appendChild(h('span', 'chip chip--origen', 'Origen'));
                 if (rol === 'destino') texto.appendChild(h('span', 'chip chip--destino', 'Destino'));
+                if (it.transbordo) {
+                    texto.appendChild(h('span', 'chip chip--transbordo',
+                        'Transbordo · cambiar a ' + it.rutaSiguiente));
+                    var paso = estado.activo && estado.activo.puntosTransbordo.find(function (punto) {
+                        return punto.barrioN === it.barrioN;
+                    });
+                    if (paso && paso.ubicacionesConocidas && paso.mismoPunto && !paso.mismaParada) {
+                        texto.appendChild(h('small', 'paso-caminata',
+                            'Las coordenadas ubican ambas paradas a menos de 20 m; confirma en el lugar cuál punto corresponde al bus.'));
+                    } else if (paso && paso.ubicacionesConocidas && !paso.mismoPunto) {
+                        texto.appendChild(h('small', 'paso-caminata',
+                            'Camina hasta ' + paso.subir.nombre + ' (' +
+                            formatearDistancia(paso.distanciaKm * 1000) +
+                            ' en línea recta; distancia estimada, no ruta peatonal).'));
+                        if (paso.caminataLarga) {
+                            texto.appendChild(h('span', 'chip chip--transbordo-larga',
+                                'Caminata larga: revisa el mapa antes de continuar.'));
+                        }
+                    } else if (paso && !paso.ubicacionesConocidas) {
+                        texto.appendChild(h('span', 'chip chip--transbordo-incompleto',
+                            'No se puede confirmar la caminata: faltan coordenadas verificadas de las paradas.'));
+                    }
+                }
                 boton.appendChild(punto);
                 boton.appendChild(texto);
                 boton.addEventListener('click', function () { enfocarPunto(it); });
@@ -748,15 +1015,21 @@
             if (it.marcador) setTimeout(function () { it.marcador.openPopup(); }, 650);
         }
 
-        function pintarBuses(ruta) {
+        function pintarBuses(itinerario) {
             var panel = el.panelBuses;
             vaciar(panel);
-            if (!ruta.buses.length) {
+            var rutas = itinerario.tramos.map(function (tramo) { return tramo.ruta; });
+            var buses = [];
+            rutas.forEach(function (ruta) {
+                ruta.buses.forEach(function (bus) { buses.push({ ruta: ruta, bus: bus }); });
+            });
+            if (!buses.length) {
                 panel.appendChild(estadoVacio('fas fa-bus-simple', 'Sin buses asignados',
-                    'Esta ruta todavía no tiene buses registrados.'));
+                    'Las rutas de este viaje todavía no tienen buses registrados.'));
             } else {
                 var lista = h('ul', 'buses');
-                ruta.buses.forEach(function (bus) {
+                buses.forEach(function (asignacion) {
+                    var bus = asignacion.bus;
                     var li = h('li', 'bus');
                     var color = COLORES_BUS[normalizar(bus.color)];
                     var avatar = h('span', 'bus__icono');
@@ -774,21 +1047,55 @@
                         cuerpo.appendChild(c);
                     }
                     li.appendChild(cuerpo);
+                    cuerpo.insertBefore(h('small', null, asignacion.ruta.nombre), cuerpo.firstChild);
                     lista.appendChild(li);
                 });
                 panel.appendChild(lista);
             }
-            panel.appendChild(h('p', 'nota', 'Se muestran los buses asignados a la ruta. Bustraker no rastrea la posición de los buses en tiempo real.'));
+            panel.appendChild(h('p', 'nota', 'Se muestran los buses asignados a cada ruta del viaje. Bustraker no rastrea su posición en tiempo real.'));
         }
 
         function pintarInfo(tramo) {
             var panel = el.panelInfo;
             vaciar(panel);
-            panel.appendChild(h('h5', 'subtitulo', 'Barrios del tramo'));
+            panel.appendChild(h('h5', 'subtitulo', 'Rutas y transbordos'));
+            var pasos = h('ol', 'itinerario-pasos');
+            tramo.tramos.forEach(function (parte, indice) {
+                var li = h('li');
+                var texto = h('span', 'parada__texto');
+                if (indice > 0) {
+                    var transbordo = tramo.puntosTransbordo[indice - 1];
+                    texto.appendChild(h('span', 'chip chip--transbordo', 'Transbordo en ' + mayuscula(transbordo.barrio)));
+                    texto.appendChild(h('strong', null, transbordo.detalle));
+                    if (transbordo.caminataLarga) {
+                        texto.appendChild(h('span', 'chip chip--transbordo-larga',
+                            'La distancia supera 500 m; verifica el recorrido antes de iniciar.'));
+                    }
+                }
+                texto.appendChild(h('strong', null, 'Toma ' + parte.ruta.nombre));
+                var paradaInicial = parte.paradas.find(function (parada) {
+                    return parada.barrioN === parte.barriosN[0];
+                });
+                var paradaFinal = parte.paradas.slice().reverse().find(function (parada) {
+                    return parada.barrioN === parte.barriosN[parte.barriosN.length - 1];
+                });
+                texto.appendChild(h('small', null, paradaInicial
+                    ? 'Aborda en ' + paradaInicial.nombre + ' (' + mayuscula(parte.barrios[0]) + ').'
+                    : 'No hay parada de abordaje registrada en ' + mayuscula(parte.barrios[0]) + '.'));
+                texto.appendChild(h('small', null, paradaFinal
+                    ? 'Baja en ' + paradaFinal.nombre + ' (' +
+                        mayuscula(parte.barrios[parte.barrios.length - 1]) + ').'
+                    : 'No hay parada de bajada registrada en ' +
+                        mayuscula(parte.barrios[parte.barrios.length - 1]) + '.'));
+                li.appendChild(texto);
+                pasos.appendChild(li);
+            });
+            panel.appendChild(pasos);
+            panel.appendChild(h('h5', 'subtitulo', 'Barrios del viaje'));
             var chips = h('div', 'chips');
             tramo.barrios.forEach(function (b) { chips.appendChild(h('span', 'chip', mayuscula(b))); });
             panel.appendChild(chips);
-            panel.appendChild(h('p', 'nota', 'El trazado sobre calles y su tiempo son estimaciones en auto, no el recorrido ni el tiempo real del bus. Solo aparecen rutas verificadas.'));
+            panel.appendChild(h('p', 'nota', 'La línea de cada ruta y su tiempo son estimaciones en auto, no el recorrido ni el tiempo real de la buseta. Las conexiones a pie solo se estiman entre paradas registradas con coordenadas: la distancia mostrada es en línea recta y no representa una ruta peatonal. Verifica el trayecto antes de iniciar.'));
             var enlace = h('a', 'enlace', 'Consultar mapas oficiales de TransCaribe');
             enlace.href = 'https://transcaribe.gov.co/index.php/rutas-sitm/';
             enlace.target = '_blank';
@@ -1010,7 +1317,9 @@
                 var p = new URLSearchParams();
                 if (estado.origen) p.set('o', nombreVisible(estado.origen));
                 if (estado.destino) p.set('d', nombreVisible(estado.destino));
-                if (estado.activo) p.set('r', estado.activo.ruta.id);
+                if (estado.activo) p.set('r', estado.activo.tramos.map(function (tramo) {
+                    return tramo.ruta.id;
+                }).join('-'));
                 var texto = p.toString();
                 global.history.replaceState(null, '', global.location.pathname + (texto ? '?' + texto : ''));
             } catch (e) { /* entornos sin History API */ }
@@ -1025,8 +1334,12 @@
             if (!estado.origen || !d) return;
             el.destino.value = d;
             alCambiarDestino();
+            if (estado.destino) planificar();
             if (estado.destino && r) {
-                var tramo = estado.tramos.find(function (t) { return String(t.ruta.id) === r; });
+                var tramo = estado.tramos.find(function (itinerario) {
+                    var ids = itinerario.tramos.map(function (parte) { return parte.ruta.id; }).join('-');
+                    return ids === r || (itinerario.tramos.length === 1 && String(itinerario.tramos[0].ruta.id) === r);
+                });
                 if (tramo) seleccionarTramo(tramo);
             }
         }
@@ -1058,6 +1371,8 @@
                         '<span><i class="mu-leyenda__a">A</i> Origen</span>' +
                         '<span><i class="mu-leyenda__b">B</i> Destino</span>' +
                         '<span><i class="mu-leyenda__n">1</i> Parada</span>' +
+                        '<span><i class="mu-leyenda__t">T</i> Transbordo</span>' +
+                        '<span><i class="mu-leyenda__caminar"></i> Caminata estimada</span>' +
                         '<span><i class="mu-leyenda__u"></i> Tú</span>';
                     L.DomEvent.disableClickPropagation(c);
                     return c;

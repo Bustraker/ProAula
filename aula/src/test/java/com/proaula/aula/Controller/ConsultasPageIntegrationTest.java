@@ -72,6 +72,45 @@ class ConsultasPageIntegrationTest {
                 .contains("href=\"/inicio-de-sesion-mejorado\"");
     }
 
+    @Test
+    void travelPlannerIsAvailableOnPublicAndAuthenticatedMaps() throws Exception {
+        String publicPage = mockMvc.perform(
+                        org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/viajar_public"))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        assertThat(publicPage)
+                .contains("id=\"btnPlanificar\"", "id=\"plannerStatus\"", "Mejor ruta para llegar",
+                        "Se recomienda una sola ruta: primero se prioriza una ruta directa",
+                        "/css/travel.css?v=map-polish-2",
+                        "/css/map-ui.css?v=map-polish-2",
+                        "/js/map-base.js?v=map-polish-2",
+                        "/js/map-travel.js?v=map-polish-2");
+
+        MockHttpSession session = new MockHttpSession();
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+        securityContext.setAuthentication(new UsernamePasswordAuthenticationToken(
+                "usuario", "N/A", List.of(() -> "ROLE_USER")));
+        session.setAttribute(
+                HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, securityContext);
+
+        String authenticatedPage = mockMvc.perform(
+                        org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/viajar")
+                                .session(session))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        assertThat(authenticatedPage)
+                .contains("id=\"btnPlanificar\"", "id=\"plannerStatus\"", "Mejor ruta para llegar",
+                        "Se recomienda una sola ruta: primero se prioriza una ruta directa",
+                        "/css/travel.css?v=map-polish-2",
+                        "/css/map-ui.css?v=map-polish-2",
+                        "/js/map-base.js?v=map-polish-2",
+                        "/js/map-travel.js?v=map-polish-2");
+    }
+
     private Bus bus() {
         Ruta ruta = new Ruta();
         ruta.setId(21L);

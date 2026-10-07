@@ -20,6 +20,20 @@
     var ZOOM_INICIAL = 13;
     var MAPA_BASE_PREDETERMINADO = 'Calles';
     var CLAVE_PREFERENCIA = 'bustraker.mapaBase';
+    var LIMITES_MAPA = [[9.9, -76.0], [10.9, -75.1]];
+    var SERVIDORES_RUTA = [
+        'https://router.project-osrm.org/route/v1/driving/',
+        'https://routing.openstreetmap.de/routed-car/route/v1/driving/'
+    ];
+    var CACHE_RUTAS_MAX = 40;
+    var cacheRutas = new Map();
+    var ESTILOS_MAPA = [
+        { id: 'Calles', etiqueta: 'Calles', icono: 'fa-road', muestra: 'linear-gradient(135deg,#e8eef2,#c9d8e2)' },
+        { id: 'Oscuro', etiqueta: 'Oscuro', icono: 'fa-moon', muestra: 'linear-gradient(135deg,#2b3a42,#0f1b21)' },
+        { id: 'Claro', etiqueta: 'Claro', icono: 'fa-sun', muestra: 'linear-gradient(135deg,#f4f6f7,#d5dbdf)' },
+        { id: 'Satélite', etiqueta: 'Satélite', icono: 'fa-earth-americas', muestra: 'linear-gradient(135deg,#3f6b4f,#1d3f52)' },
+        { id: 'OpenStreetMap', etiqueta: 'OSM', icono: 'fa-map', muestra: 'linear-gradient(135deg,#d9e8c8,#b7cfe0)' }
+    ];
 
     var ATRIB_OSM = '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>';
     var ATRIB_CARTO = ATRIB_OSM + ' &copy; <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>';
@@ -60,7 +74,7 @@
     /* ===================== MAPAS BASE ===================== */
     function gris(variante) {
         // variante: 'Dark' | 'Light'. Base + capa de etiquetas encima.
-        var opc = { maxNativeZoom: 16, maxZoom: 18 };
+        var opc = { maxNativeZoom: 16, maxZoom: 18, keepBuffer: 4, updateWhenIdle: false };
         return L.layerGroup([
             L.tileLayer(ESRI + 'Canvas/World_' + variante + '_Gray_Base/MapServer/tile/{z}/{y}/{x}',
                 Object.assign({ zIndex: 1, attribution: ATRIB_ESRI }, opc)),
@@ -74,14 +88,14 @@
             Oscuro: gris('Dark'),
             Claro: gris('Light'),
             Calles: L.tileLayer('/api/map/tiles?z={z}&x={x}&y={y}', {
-                maxZoom: 20, attribution: ATRIB_CARTO
+                maxZoom: 20, keepBuffer: 4, updateWhenIdle: false, attribution: ATRIB_CARTO
             }),
             OpenStreetMap: L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19, attribution: ATRIB_OSM
+                maxZoom: 19, keepBuffer: 4, attribution: ATRIB_OSM
             })
         };
         bases['Satélite'] = L.tileLayer(ESRI + 'World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-            maxNativeZoom: 18, maxZoom: 19, attribution: ATRIB_ESRI
+            maxNativeZoom: 18, maxZoom: 19, keepBuffer: 4, attribution: ATRIB_ESRI
         });
         return bases;
     }
@@ -116,6 +130,131 @@
         }
     });
 
+    var ControlEstilo = L.Control.extend({
+        options: { position: 'topleft', bases: null, activa: null, alElegir: null },
+        onAdd: function () {
+            var self = this;
+            var contenedor = L.DomUtil.create('div', 'leaflet-bar leaflet-control mu-control mu-estilos');
+            var boton = L.DomUtil.create('a', 'mu-estilos__boton', contenedor);
+            boton.href = '#';
+            boton.title = 'Estilo del mapa';
+            boton.setAttribute('role', 'button');
+            boton.setAttribute('aria-label', 'Cambiar el estilo del mapa');
+            boton.setAttribute('aria-haspopup', 'true');
+            boton.setAttribute('aria-expanded', 'false');
+            boton.innerHTML = '<i class="fas fa-layer-group" aria-hidden="true"></i>';
+
+            var menu = L.DomUtil.create('div', 'mu-estilos__menu', contenedor);
+            menu.hidden = true;
+            menu.setAttribute('role', 'menu');
+            menu.setAttribute('aria-label', 'Estilo del mapa');
+                        menu.setAttribute('aria-visible', 'false');
+            var titulo = L.DomUtil.create('span', 'mu-estilos__titulo', menu);
+            titulo.textContent = 'Estilo del mapa';
+            var rejilla = L.DomUtil.create('div', 'mu-estilos__rejilla', menu);
+
+            ESTILOS_MAPA.forEach(function (estilo) {
+                if (!self.options.bases[estilo.id]) return;
+                var normalized = String(estilo.id || '')
+                    .normalize ? String(estilo.id).normalize('NFD').replace(/\p{Diacritic}/gu, '') : String(estilo.id);
+                normalized = normalized.toLowerCase().replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+                var opcion = L.DomUtil.create('button', 'mu-estilo mu-estilo--' + normalized, rejilla);
+                opcion.type = 'button';
+                opcion.setAttribute('role', 'menuitemradio');
+                opcion.setAttribute('data-estilo', estilo.id);
+                // Build a compact inline SVG miniature per style for richer, brandable previews
+                var svg = '';
+                switch (normalized) {
+                    case 'calles':
+                        svg = '<svg width="120" height="38" viewBox="0 0 120 38" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
+                            + '<rect width="120" height="38" rx="6" fill="' + (estilo.muestra || '#e8eef2') + '" />'
+                            + '<g class="mu-mini-calles" fill="none" stroke="#ffffff" stroke-opacity="0.9" stroke-width="1.6">'
+                            + '<path d="M6 28 L28 12 L52 26 L76 10 L112 26" stroke-linecap="round" stroke-linejoin="round" />'
+                            + '</g></svg>';
+                        break;
+                    case 'oscuro':
+                        svg = '<svg width="120" height="38" viewBox="0 0 120 38" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
+                            + '<rect width="120" height="38" rx="6" fill="' + (estilo.muestra || '#0f1b21') + '" />'
+                            + '<g class="mu-mini-oscuro" fill="#fff" fill-opacity="0.9">'
+                            + '<circle cx="96" cy="10" r="5" />'
+                            + '</g></svg>';
+                        break;
+                    case 'claro':
+                        svg = '<svg width="120" height="38" viewBox="0 0 120 38" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
+                            + '<rect width="120" height="38" rx="6" fill="' + (estilo.muestra || '#f4f6f7') + '" />'
+                            + '<g class="mu-mini-claro" fill="#fff">'
+                            + '<circle cx="12" cy="10" r="5" />'
+                            + '</g></svg>';
+                        break;
+                    case 'satelite':
+                        svg = '<svg width="120" height="38" viewBox="0 0 120 38" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
+                            + '<rect width="120" height="38" rx="6" fill="' + (estilo.muestra || '#1d3f52') + '" />'
+                            + '<g class="mu-mini-sat" fill-opacity="0.06">'
+                            + '<rect x="6" y="6" width="40" height="26" rx="4" fill="#fff" />'
+                            + '</g></svg>';
+                        break;
+                    case 'openstreetmap':
+                        svg = '<svg width="120" height="38" viewBox="0 0 120 38" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
+                            + '<rect width="120" height="38" rx="6" fill="' + (estilo.muestra || '#d9e8c8') + '" />'
+                            + '<g class="mu-mini-osm" fill="none" stroke="#ffffff" stroke-opacity="0.85">'
+                            + '<path d="M10 26 L30 12 L50 26 L70 14 L110 26" stroke-linecap="round" stroke-width="1.2" />'
+                            + '</g></svg>';
+                        break;
+                    default:
+                        svg = '<i class="fas ' + estilo.icono + '" aria-hidden="true"></i>';
+                }
+                opcion.innerHTML = '<span class="mu-estilo__muestra" role="img" aria-label="' + escapeHtml(estilo.etiqueta) + '">' + svg + '</span>' +
+                    '<span class="mu-estilo__texto">' + escapeHtml(estilo.etiqueta) + '</span>';
+                L.DomEvent.on(opcion, 'click', function () {
+                    self.options.alElegir(estilo.id);
+                    cerrar();
+                    boton.focus();
+                });
+            });
+
+            function abrir() {
+                menu.hidden = false;
+                            menu.setAttribute('aria-visible', 'true');
+                            boton.setAttribute('aria-expanded', 'true');
+                            var activo = menu.querySelector('.mu-estilo[aria-checked="true"]') || menu.querySelector('.mu-estilo');
+                            if (activo) activo.focus();
+                        }
+                        function cerrar() {
+                            if (menu.hidden) return;
+                            menu.hidden = true;
+                            menu.setAttribute('aria-visible', 'false');
+                            boton.setAttribute('aria-expanded', 'false');
+                        }
+
+            L.DomEvent.disableClickPropagation(contenedor);
+            L.DomEvent.disableScrollPropagation(contenedor);
+            L.DomEvent.on(boton, 'click', function (e) {
+                L.DomEvent.preventDefault(e);
+                if (menu.hidden) abrir(); else cerrar();
+            });
+            L.DomEvent.on(document, 'click', function (e) {
+                if (!contenedor.contains(e.target)) cerrar();
+            });
+            L.DomEvent.on(document, 'keydown', function (e) {
+                if (e.key === 'Escape' && !menu.hidden) {
+                    cerrar();
+                    boton.focus();
+                }
+            });
+            this._menu = menu;
+            this.marcar(this.options.activa);
+            return contenedor;
+        },
+        marcar: function (id) {
+            if (!this._menu) return;
+            Array.prototype.forEach.call(this._menu.querySelectorAll('.mu-estilo'), function (boton) {
+                var activo = boton.getAttribute('data-estilo') === id;
+                boton.setAttribute('aria-checked', String(activo));
+                boton.classList.toggle('mu-estilo--activo', activo);
+            });
+        }
+    });
+
     /**
      * Crea el mapa con todos los controles.
      * opciones.obtenerLimites: función que devuelve L.LatLngBounds de lo que se está
@@ -129,7 +268,10 @@
             minZoom: 10,
             zoomControl: false,
             zoomSnap: 0.5,
-            zoomDelta: 1
+            zoomDelta: 1,
+            maxBounds: LIMITES_MAPA,
+            maxBoundsViscosity: 0.7,
+            wheelPxPerZoomLevel: 90
         });
         mapa.attributionControl.setPrefix('<a href="https://leafletjs.com" target="_blank" rel="noopener">Leaflet</a>');
 
@@ -142,12 +284,25 @@
         var activa = bases[nombre];
         activa.addTo(mapa);
 
-        L.control.layers(bases, null, { position: 'topleft', collapsed: true }).addTo(mapa);
+        var selector = new ControlEstilo({
+            bases: bases,
+            activa: nombre,
+            alElegir: function (id) {
+                if (!bases[id] || bases[id] === activa) return;
+                mapa.removeLayer(activa);
+                bases[id].addTo(mapa);
+            }
+        }).addTo(mapa);
         L.control.scale({ imperial: false, position: 'bottomleft', maxWidth: 110 }).addTo(mapa);
 
-        mapa.on('baselayerchange', function (e) {
-            activa = e.layer;
-            guardarPreferencia(e.name);
+        mapa.on('layeradd', function (e) {
+            Object.keys(bases).forEach(function (clave) {
+                if (bases[clave] === e.layer) {
+                    activa = e.layer;
+                    guardarPreferencia(clave);
+                    selector.marcar(clave);
+                }
+            });
         });
 
         // Si el proveedor activo no responde (sin internet, bloqueo, caída), pasamos a OpenStreetMap.
@@ -165,6 +320,7 @@
                 bases.OpenStreetMap.addTo(mapa);
                 activa = bases.OpenStreetMap;
                 guardarPreferencia('OpenStreetMap');
+                selector.marcar('OpenStreetMap');
                 mostrarAviso('El mapa «' + clave + '» no respondió. Se cambió a OpenStreetMap.', 'warn', 7000);
             });
         });
@@ -185,7 +341,7 @@
         var margen = 56;
         var opciones = { paddingTopLeft: [margen, margen], paddingBottomRight: [margen, margen], maxZoom: 17 };
         var panel = document.querySelector('.options-panel');
-        if (panel) {
+        if (panel && !panel.classList.contains('options-panel--min')) {
             var caja = panel.getBoundingClientRect();
             var ancho = global.innerWidth, alto = global.innerHeight;
             if (ancho > 700) {
@@ -239,9 +395,11 @@
     function crearMarcadorParada(lat, lng, numero, datos) {
         datos = datos || {};
         var esParada = datos.tipo !== 'barrio';
+        var esTransbordo = datos.transbordo === true;
         var icono = L.divIcon({
             className: 'mu-parada-contenedor',
-            html: '<span class="mu-parada' + (esParada ? '' : ' mu-parada--barrio') + '">' +
+            html: '<span class="mu-parada' + (esParada ? '' : ' mu-parada--barrio') +
+                (esTransbordo ? ' mu-parada--transbordo' : '') + '">' +
                 escapeHtml(numero) + '</span>',
             iconSize: [26, 26],
             iconAnchor: [13, 13],
@@ -253,7 +411,10 @@
         if (datos.ubicacion) detalle.push('<span>' + escapeHtml(datos.ubicacion) + '</span>');
         if (datos.referencia) detalle.push('<span>Ref.: ' + escapeHtml(datos.referencia) + '</span>');
         if (!esParada) detalle.push('<span class="mu-popup__nota">Referencia al centro del barrio; no hay parada física registrada.</span>');
-        var titulo = (esParada ? 'Parada ' : 'Barrio ') + numero;
+        if (esTransbordo && datos.rutaSiguiente) {
+            detalle.push('<span class="mu-popup__nota">Transbordo: cambiar a ' + escapeHtml(datos.rutaSiguiente) + ' aquí.</span>');
+        }
+        var titulo = esTransbordo ? 'Transbordo ' + numero : (esParada ? 'Parada ' : 'Barrio ') + numero;
         return L.marker([lat, lng], { icon: icono, keyboard: true, title: titulo + ': ' + (datos.nombre || '') })
             .bindTooltip(escapeHtml(datos.nombre || titulo), { direction: 'top', className: 'mu-tooltip' })
             .bindPopup('<div class="mu-popup"><span class="mu-popup__titulo">' + titulo + '</span><strong>' +
@@ -274,16 +435,71 @@
     }
 
     /* ===================== RUTA POR CALLES (OSRM) ===================== */
-    async function obtenerRutaOSRM(waypoints) {
+    function claveRuta(waypoints) {
+        return waypoints.map(function (punto) { return punto.lat + ',' + punto.lng; }).join('|');
+    }
+
+    async function consultarServidorRuta(base, coords, senal) {
+        var controlador = new AbortController();
+        var temporizador = setTimeout(function () { controlador.abort(); }, 12000);
+        var abortar = function () { controlador.abort(); };
+        if (senal) {
+            if (senal.aborted) controlador.abort();
+            else senal.addEventListener('abort', abortar, { once: true });
+        }
+        try {
+            var respuesta = await fetch(base + coords + '?overview=full&geometries=geojson&steps=false',
+                { signal: controlador.signal });
+            if (!respuesta.ok) throw new Error('El servidor de rutas respondió ' + respuesta.status);
+            var datos = await respuesta.json();
+            if (!datos.routes || datos.routes.length === 0) throw new Error('Sin ruta disponible');
+            return datos.routes[0];
+        } finally {
+            clearTimeout(temporizador);
+            if (senal) senal.removeEventListener('abort', abortar);
+        }
+    }
+
+    async function obtenerRutaOSRM(waypoints, senal) {
+        if (senal && senal.aborted) {
+            var cancelado = new Error('Consulta de ruta cancelada');
+            cancelado.name = 'AbortError';
+            throw cancelado;
+        }
+        var clave = claveRuta(waypoints);
+        if (cacheRutas.has(clave)) {
+            var guardada = cacheRutas.get(clave);
+            cacheRutas.delete(clave);
+            cacheRutas.set(clave, guardada);
+            return guardada;
+        }
         var coords = waypoints.map(function (p) { return p.lng + ',' + p.lat; }).join(';');
-        var url = 'https://router.project-osrm.org/route/v1/driving/' + coords +
-            '?overview=full&geometries=geojson&steps=false';
-        var respuesta = await fetchConTimeout(url, 15000);
-        if (!respuesta.ok) throw new Error('OSRM respondió con error ' + respuesta.status);
-        var datos = await respuesta.json();
-        if (!datos.routes || datos.routes.length === 0) throw new Error('Sin ruta disponible');
-        var ruta = datos.routes[0];
-        return { geometry: ruta.geometry, distanciaKm: ruta.distance / 1000, tiempoMin: Math.round(ruta.duration / 60) };
+        var ultimoError = null;
+        for (var i = 0; i < SERVIDORES_RUTA.length; i++) {
+            if (senal && senal.aborted) {
+                var abortError = new Error('Consulta de ruta cancelada');
+                abortError.name = 'AbortError';
+                throw abortError;
+            }
+            try {
+                var ruta = await consultarServidorRuta(SERVIDORES_RUTA[i], coords, senal);
+                if (!ruta.geometry || !Number.isFinite(ruta.distance) || !Number.isFinite(ruta.duration)) {
+                    throw new Error('El servidor de rutas devolvió información incompleta');
+                }
+                var resultado = {
+                    geometry: ruta.geometry,
+                    distanciaKm: ruta.distance / 1000,
+                    tiempoMin: Math.max(1, Math.round(ruta.duration / 60))
+                };
+                cacheRutas.set(clave, resultado);
+                if (cacheRutas.size > CACHE_RUTAS_MAX) cacheRutas.delete(cacheRutas.keys().next().value);
+                return resultado;
+            } catch (error) {
+                if (senal && senal.aborted) throw error;
+                ultimoError = error;
+            }
+        }
+        throw ultimoError || new Error('Sin ruta disponible');
     }
 
     /** Devuelve { base, linea }: borde+resplandor y línea principal de la ruta. */

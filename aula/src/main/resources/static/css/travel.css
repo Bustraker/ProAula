@@ -128,6 +128,7 @@ html, body {
     transition: filter 0.15s, opacity 0.15s;
 }
 .btn--secundario { background: linear-gradient(135deg, #176d73, #1f918f); }
+.btn--principal { width: 100%; margin-top: 10px; background: linear-gradient(135deg, #0f766e, #14b8a6); }
 .btn--texto { color: var(--texto-2); background: transparent; }
 .btn--texto:hover { color: var(--texto); background: rgba(255, 255, 255, 0.05); }
 .btn:hover { filter: brightness(1.1); }
@@ -183,6 +184,8 @@ html, body {
 
 .estado { display: block; margin: 8px 0 0; color: var(--texto-3); font-size: 0.8rem; line-height: 1.5; }
 .estado[hidden] { display: none; }
+.estado:empty { display: none; }
+.estado--error { color: #fecaca; }
 
 /* ---------- Resultados ---------- */
 .resultados { display: grid; gap: 10px; }
@@ -231,6 +234,7 @@ html, body {
 .tramo--activo { border-color: var(--acento); background: linear-gradient(180deg, rgba(13, 39, 42, 0.98), rgba(9, 27, 30, 0.98)); }
 .tramo__cabecera { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .tramo__nombre { font-weight: 750; font-size: 0.98rem; }
+.tramo__rutas { color: var(--acento); font-size: 0.8rem; font-weight: 700; }
 .tramo__cadena { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; color: var(--texto-2); font-size: 0.84rem; }
 .tramo__cadena i { color: var(--texto-3); font-size: 0.65rem; }
 .tramo__mas { color: var(--texto-3); }
@@ -251,6 +255,10 @@ html, body {
 .chip--ok { color: #b4f1d2; background: rgba(22, 163, 74, 0.2); border-color: rgba(98, 214, 165, 0.35); }
 .chip--origen { color: #b4f1d2; background: rgba(22, 163, 74, 0.2); border-color: rgba(98, 214, 165, 0.35); }
 .chip--destino { color: #fecaca; background: rgba(220, 38, 38, 0.2); border-color: rgba(248, 113, 113, 0.4); }
+.chip--transbordo { color: #fde68a; background: rgba(217, 119, 6, 0.16); border-color: rgba(251, 191, 36, 0.38); }
+.chip--transbordo-larga { color: #fed7aa; background: rgba(194, 65, 12, 0.2); border-color: rgba(251, 146, 60, 0.42); }
+.chip--transbordo-incompleto { color: #fecaca; background: rgba(185, 28, 28, 0.16); border-color: rgba(248, 113, 113, 0.4); }
+.paso-caminata { color: #fcd34d !important; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; }
 
 /* ---------- Detalle de la ruta ---------- */
@@ -344,6 +352,9 @@ html, body {
 .parada__texto strong { font-size: 0.9rem; transition: color 0.15s; }
 .parada__texto small { color: var(--texto-3); font-size: 0.76rem; line-height: 1.4; }
 .parada__texto .chip { justify-self: start; margin-top: 3px; }
+.itinerario-pasos { display: grid; gap: 8px; margin: 0 0 14px; padding: 0; list-style: none; }
+.itinerario-pasos li { padding: 10px 12px; border: 1px solid var(--borde-suave); border-radius: 10px; background: rgba(11, 28, 32, 0.9); }
+.itinerario-pasos .parada__texto { padding: 0; }
 
 /* Buses */
 .buses { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
