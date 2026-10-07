@@ -3,103 +3,233 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Historial de Viajes - Bustraker</title>
+    <meta name="description" content="Consulta el historial de tus viajes universitarios en Bustraker.">
+    <meta name="theme-color" content="#071421">
+    <title>Mi historial de viajes - Bustraker</title>
     <link rel="stylesheet" th:href="@{/css/style_dashboard.css}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/style_historial.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="shortcut icon" th:href="@{/images/Bus_icono.png}" type="image/x-icon">
 </head>
-<body>
-    <!-- Encabezado -->
+<body class="history-page">
     <header class="main-header">
         <div class="header-inner">
-            <div class="logo">
-                <img th:src="@{/images/Bus_icono.png}" alt="Logo Bustraker">
+            <a class="logo" th:href="@{/dashboard}" aria-label="Bustraker, ir al panel">
+                <img th:src="@{/images/Bus_icono.png}" alt="">
                 <span class="brand">Bustraker</span>
-            </div>
-            <nav class="main-nav">
+            </a>
+            <nav class="main-nav" aria-label="Navegación principal">
                 <a th:href="@{/dashboard}" class="nav-link">
-                    <i class="fas fa-home"></i> Dashboard
+                    <i class="fas fa-home" aria-hidden="true"></i> Dashboard
                 </a>
                 <a th:href="@{/perfil}" class="nav-link">
-                    <i class="fas fa-user"></i> Perfil
+                    <i class="fas fa-user" aria-hidden="true"></i> Perfil
                 </a>
                 <a th:href="@{/rutas}" class="nav-link">
-                    <i class="fas fa-route"></i> Rutas
+                    <i class="fas fa-route" aria-hidden="true"></i> Rutas
                 </a>
-                <a th:href="@{/historial}" class="nav-link">
-                    <i class="fas fa-history"></i> Historial
+                <a th:href="@{/historial}" class="nav-link" aria-current="page">
+                    <i class="fas fa-clock-rotate-left" aria-hidden="true"></i> Historial
                 </a>
                 <a th:href="@{/viajar}" class="nav-link">
-                    <i class="fas fa-bus"></i> Viajar
+                    <i class="fas fa-bus" aria-hidden="true"></i> Viajar
                 </a>
                 <a th:href="@{/logout}" class="nav-link nav-link--outline">
-                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    <i class="fas fa-arrow-right-from-bracket" aria-hidden="true"></i> Cerrar sesión
                 </a>
             </nav>
         </div>
     </header>
 
-    <!-- Contenido principal -->
-    <main class="container">
-        <div class="content-wrapper-inner">
-                <div class="card">
-                    <div class="card-header">
-                        <h3><i class="fas fa-list"></i> Mis Viajes Recientes</h3>
-                        <div class="card-actions">
-                            <span class="total-count" th:text="'Mostrando ' + ${#lists.size(viajes)} + ' viaje(s)'">Mostrando 0 viajes</span>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div th:if="${detalleId != null}" class="alert alert-info" style="margin-bottom: 1rem; padding: 1rem; background: #e9f7ff; border: 1px solid #b8e1ff; color: #023047; border-radius: 6px;">
-                            <strong>Detalle de viaje #</strong><span th:text="${detalleId}"></span>
-                            <div th:text="${detalleMensaje}"></div>
-                        </div>
-                        <!-- Estado vacío: solo se muestra si no hay viajes -->
-                        <div th:if="${#lists.isEmpty(viajes)}" class="empty-state">
-                            <i class="fas fa-bus"></i>
-                            <h4>Aún no has realizado ningún viaje</h4>
-                            <p>Explora nuestras rutas disponibles usando la opción "Viajar" en el menú.</p>
-                            <a th:href="@{/viajar}" class="btn btn-primary">
-                                <i class="fas fa-route"></i> Consultar rutas
-                            </a>
-                        </div>
-
-                        <!-- Tabla de viajes: se muestra cuando hay datos -->
-                        <div th:if="${not #lists.isEmpty(viajes)}" class="table-responsive">
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Ruta</th>
-                                        <th>Fecha</th>
-                                        <th>Hora</th>
-                                        <th>Estado</th>
-                                        <th>Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr th:each="viaje : ${viajes}">
-                                        <td th:text="'#' + ${viaje.id}">-</td>
-                                        <td th:text="${viaje.nombreRuta}">-</td>
-                                        <td th:text="${#temporals.format(viaje.fecha, 'dd/MM/yyyy')}">-</td>
-                                        <td th:text="${#temporals.format(viaje.hora, 'hh:mm a')}">-</td>
-                                        <td>
-                                            <span th:text="${viaje.estado}"
-                                                  h:classappend="${viaje.estado == 'Completado'} ? 'badge badge-success' : (${viaje.estado == 'Cancelado'} ? 'badge badge-danger' : 'badge badge-warning')">
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <a th:href="@{/historial/{id}(id=${viaje.id})}" class="btn btn-sm btn-primary">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+    <main class="container history-main">
+        <section class="history-hero" aria-labelledby="historyTitle">
+            <div class="history-hero-copy">
+                <span class="history-eyebrow">
+                    <i class="fas fa-bookmark" aria-hidden="true"></i>
+                    Tu actividad, en un solo lugar
+                </span>
+                <h1 id="historyTitle">Bitácora de viajes</h1>
+                <p>Un registro claro de tus recorridos, con sus fechas, horarios y estado.</p>
+                <div class="history-hero-meta">
+                    <span class="history-private-label">
+                        <i class="fas fa-lock" aria-hidden="true"></i>
+                        Registro personal
+                    </span>
                 </div>
             </div>
-        </div>
+
+            <div class="history-hero-art" aria-hidden="true">
+                <svg viewBox="0 0 270 220" focusable="false">
+                    <path class="ledger-shadow" d="M74 37h111l32 32v117H74z"></path>
+                    <path class="ledger-page" d="M59 24h111l32 32v117H59z"></path>
+                    <path class="ledger-fold" d="M170 24v33h32"></path>
+                    <path class="ledger-rule ledger-rule--one" d="M83 79h83"></path>
+                    <path class="ledger-rule ledger-rule--two" d="M83 96h65"></path>
+                    <path class="ledger-rule ledger-rule--three" d="M83 113h76"></path>
+                    <path class="ledger-rule ledger-rule--four" d="M83 130h52"></path>
+                    <path class="ledger-journey-line" d="M83 157h22l13-12 14 8 18-21 17 4"></path>
+                    <circle class="ledger-stop ledger-stop--one" cx="105" cy="157" r="3"></circle>
+                    <circle class="ledger-stop ledger-stop--two" cx="132" cy="153" r="3"></circle>
+                    <circle class="ledger-stop ledger-stop--three" cx="150" cy="132" r="3"></circle>
+                    <circle class="ledger-stamp" cx="184" cy="148" r="19"></circle>
+                    <path class="ledger-stamp-check" d="m175 148 6 6 12-13"></path>
+                </svg>
+                <span class="history-art-caption">REGISTRO DE RECORRIDOS</span>
+            </div>
+        </section>
+
+        <section class="history-summary" aria-labelledby="historySummaryTitle">
+            <div class="history-summary-heading">
+                <div>
+                    <span class="history-section-kicker">REGISTRO EN CIFRAS</span>
+                    <h2 id="historySummaryTitle">Resumen de actividad</h2>
+                </div>
+                <span class="history-summary-caption">
+                    <i class="fas fa-chart-simple" aria-hidden="true"></i>
+                    Vista general
+                </span>
+            </div>
+            <div class="history-summary-grid">
+                <article class="history-stat history-stat--total">
+                    <span class="history-stat-icon" aria-hidden="true">
+                        <i class="fas fa-route"></i>
+                    </span>
+                    <div class="history-stat-copy">
+                        <span class="history-stat-label">Viajes registrados</span>
+                        <strong th:text="${viajesTotal}">0</strong>
+                    </div>
+                    <span class="history-stat-index" aria-hidden="true">01</span>
+                </article>
+                <article class="history-stat history-stat--complete">
+                    <span class="history-stat-icon" aria-hidden="true">
+                        <i class="fas fa-circle-check"></i>
+                    </span>
+                    <div class="history-stat-copy">
+                        <span class="history-stat-label">Completados</span>
+                        <strong th:text="${viajesCompletados}">0</strong>
+                    </div>
+                    <span class="history-stat-index" aria-hidden="true">02</span>
+                </article>
+                <article class="history-stat history-stat--pending">
+                    <span class="history-stat-icon" aria-hidden="true">
+                        <i class="fas fa-hourglass-half"></i>
+                    </span>
+                    <div class="history-stat-copy">
+                        <span class="history-stat-label">Pendientes</span>
+                        <strong th:text="${viajesPendientes}">0</strong>
+                    </div>
+                    <span class="history-stat-index" aria-hidden="true">03</span>
+                </article>
+                <article class="history-stat history-stat--cancelled">
+                    <span class="history-stat-icon" aria-hidden="true">
+                        <i class="fas fa-ban"></i>
+                    </span>
+                    <div class="history-stat-copy">
+                        <span class="history-stat-label">Cancelados</span>
+                        <strong th:text="${viajesCancelados}">0</strong>
+                    </div>
+                    <span class="history-stat-index" aria-hidden="true">04</span>
+                </article>
+            </div>
+        </section>
+
+        <section class="history-content" aria-labelledby="journeysTitle">
+            <div class="history-section-heading">
+                <div>
+                    <span class="history-section-kicker">ARCHIVO PERSONAL</span>
+                    <h2 id="journeysTitle">Tus viajes</h2>
+                </div>
+                <span class="history-section-count" th:text="${#lists.size(viajes)} + ' en total'">0 en total</span>
+            </div>
+
+            <div th:if="${detalleId != null}"
+                 class="history-detail"
+                 th:classappend="${detalleEncontrado} ? 'history-detail--success' : 'history-detail--warning'"
+                 role="status"
+                 aria-live="polite">
+                <span class="history-detail-icon" aria-hidden="true">
+                    <i th:class="${detalleEncontrado} ? 'fas fa-circle-check' : 'fas fa-triangle-exclamation'"></i>
+                </span>
+                <div>
+                    <strong th:text="'Consulta del viaje #' + ${detalleId}">Consulta del viaje</strong>
+                    <p th:text="${detalleMensaje}">Detalle del viaje.</p>
+                </div>
+            </div>
+
+            <div th:if="${#lists.isEmpty(viajes)}" class="history-empty" role="status">
+                <div class="history-empty-art" aria-hidden="true">
+                    <span class="empty-orbit empty-orbit--outer"></span>
+                    <span class="empty-orbit empty-orbit--inner"></span>
+                    <span class="empty-ticket">
+                        <i class="fas fa-ticket" aria-hidden="true"></i>
+                        <i class="fas fa-minus empty-ticket-line" aria-hidden="true"></i>
+                    </span>
+                    <span class="empty-spark empty-spark--one"></span>
+                    <span class="empty-spark empty-spark--two"></span>
+                </div>
+                <span class="history-empty-kicker">AÚN NO HAY REGISTROS</span>
+                <h3>Tu primera historia empieza aquí</h3>
+                <p>Cuando realices un viaje, encontrarás en esta bitácora su recorrido, fecha y estado.</p>
+                <a th:href="@{/viajar}" class="history-primary-action">
+                    <i class="fas fa-compass" aria-hidden="true"></i>
+                    Explorar opciones para viajar
+                    <i class="fas fa-arrow-right history-action-arrow" aria-hidden="true"></i>
+                </a>
+            </div>
+
+            <ol th:if="${not #lists.isEmpty(viajes)}" class="history-timeline">
+                <li class="history-timeline-item" th:each="viaje : ${viajes}">
+                    <span class="history-timeline-node" aria-hidden="true"></span>
+                    <article class="history-entry">
+                        <div class="history-entry-index">
+                            <span class="history-entry-index-label">VIAJE</span>
+                            <span class="history-entry-index-value" th:text="'#' + ${viaje.id}">#01</span>
+                        </div>
+                        <div class="history-entry-main">
+                            <span class="history-entry-kicker">RECORRIDO REGISTRADO</span>
+                            <h3 th:text="${viaje.nombreRuta} ?: 'Ruta sin nombre'">Ruta Centro</h3>
+                            <div class="history-entry-details">
+                                <span>
+                                    <i class="fas fa-calendar-day" aria-hidden="true"></i>
+                                    <span th:text="${viaje.fecha != null ? #temporals.format(viaje.fecha, 'dd/MM/yyyy') : 'Fecha no registrada'}">05/10/2026</span>
+                                </span>
+                                <span class="history-detail-separator" aria-hidden="true"></span>
+                                <span>
+                                    <i class="fas fa-clock" aria-hidden="true"></i>
+                                    <span th:text="${viaje.hora != null ? #temporals.format(viaje.hora, 'HH:mm') : 'Hora no registrada'}">08:30</span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="history-entry-status">
+                            <span class="history-status"
+                                  th:classappend="${viaje.estado == 'Completado'} ? 'history-status--complete' : (${viaje.estado == 'Cancelado'} ? 'history-status--cancelled' : 'history-status--pending')">
+                                <span class="history-status-dot" aria-hidden="true"></span>
+                                <span th:text="${viaje.estado} ?: 'Sin estado'">Completado</span>
+                            </span>
+                            <a th:href="@{/historial/{id}(id=${viaje.id})}"
+                               class="history-detail-action"
+                               th:attr="aria-label=${'Consultar detalle del viaje #' + viaje.id}">
+                                <span>Ver detalle</span>
+                                <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                            </a>
+                        </div>
+                    </article>
+                </li>
+            </ol>
+        </section>
     </main>
+
+    <footer class="history-footer">
+        <div class="history-footer-inner">
+            <div class="history-footer-brand">
+                <img th:src="@{/images/Bus_icono.png}" alt="">
+                <div>
+                    <strong>Bustraker</strong>
+                    <span>Movilidad universitaria, mejor organizada.</span>
+                </div>
+            </div>
+            <span class="history-footer-note">&copy; 2026 Bustraker. Todos los derechos reservados.</span>
+        </div>
+    </footer>
 </body>
 </html>

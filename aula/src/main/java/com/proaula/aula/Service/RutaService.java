@@ -21,6 +21,10 @@ public class RutaService {
         return rutaRepository.findAll();
     }
 
+    public List<Ruta> getRutasVerificadas() {
+        return rutaRepository.findAllByVerificadaTrue();
+    }
+
     public Ruta getRutaById(Long id) {
         return rutaRepository.findById(id).orElse(null);
     }

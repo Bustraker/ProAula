@@ -4,40 +4,106 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <meta name="description" content="Pagina principal de trabajo">
-    <meta name="theme-color" content="#01315f">
+    <meta name="description" content="Bustraker conecta tus recorridos por Cartagena con herramientas para consultar y planear tu movilidad.">
+    <meta name="theme-color" content="#071421">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Bustraker</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
     <link rel="shortcut icon" th:href="@{/images/Bus_icono.png}" type="image/x-icon">
     <link rel="stylesheet" th:href="@{/css/index.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/style-index-landing.css}">
 </head>
-<body>
-    <main>
-        <section class="hero-section">
-            <header class="main-header">
-                <div class="header-inner">
-                    <div class="logo">
-                        <img th:src="@{/images/Bus_icono.png}" alt="Logo Bustraker">
-                        <span class="brand">Bustraker</span>
-                    </div>
-                    <nav class="main-nav" aria-label="Principal">
-                        <a th:href="@{/inicio-de-sesion-mejorado}" class="nav-link">Iniciar sesión</a>
-                        <a th:href="@{/registro-mejorado}" class="nav-link nav-link--outline">Registrarse</a>
-                    </nav>
-                </div>
-
-                <div class="hero">
-                    <h1>Bustraker</h1>
-                    <p class="hero-subtitle">Tu herramienta definitiva para rastrear y gestionar tus rutas de autobús de manera eficiente y sencilla.</p>
-                    <a th:href="@{/index_3_public}" class="main-button">Ingresar a la aplicación</a>
-                </div>
+<body class="landing-page">
+    <main class="landing-main">
+        <div class="landing-frame">
+            <header class="landing-header">
+                <a class="landing-brand" th:href="@{/}" aria-label="Bustraker, inicio">
+                    <img th:src="@{/images/Bus_icono.png}" alt="">
+                    <span><strong>Bustraker</strong><small>Movilidad en Cartagena</small></span>
+                </a>
+                <nav class="landing-nav" aria-label="Acceso a la cuenta">
+                    <a th:href="@{/inicio-de-sesion-mejorado}">Iniciar sesión</a>
+                    <a class="landing-nav-register" th:href="@{/registro-mejorado}">Crear cuenta</a>
+                </nav>
             </header>
-        </section>
-        <aside>
-            <button class="admin-btn" id="LoginAdminBtn" title="Panel de administrador">
-                <img th:src="@{/images/Admin.png}" alt="Administrador">
+
+            <section class="landing-hero" aria-labelledby="landingTitle">
+                <div class="landing-copy">
+                    <p class="landing-eyebrow"><span aria-hidden="true"></span> MOVILIDAD PARA CARTAGENA</p>
+                    <h1 id="landingTitle">Tu ciudad,<br><em>más cerca.</em></h1>
+                    <p class="landing-description">Encuentra información de buses y recorridos para moverte por Cartagena con más claridad.</p>
+                    <div class="landing-actions">
+                        <a th:href="@{/index_3_public}" class="landing-primary-action">Entrar al menú público <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+                    </div>
+                </div>
+                <div class="landing-route-art" role="img" aria-label="Animación de un bus recorriendo una ruta entre paradas de la ciudad">
+                    <span class="route-art-coordinate route-art-coordinate--top">CTG <i>·</i> 10.39° N</span>
+                    <span class="route-art-scan" aria-hidden="true"></span>
+                    <span class="route-art-beacon route-art-beacon--one" aria-hidden="true"></span>
+                    <span class="route-art-beacon route-art-beacon--two" aria-hidden="true"></span>
+                    <span class="route-art-ring route-art-ring--outer" aria-hidden="true"></span>
+                    <span class="route-art-ring route-art-ring--inner" aria-hidden="true"></span>
+                    <svg viewBox="0 0 360 240" aria-hidden="true" focusable="false">
+                        <defs>
+                            <linearGradient id="route-art-gradient" x1="0" y1="1" x2="1" y2="0">
+                                <stop offset="0" stop-color="#f2a183"></stop>
+                                <stop offset="0.46" stop-color="#83dfd3"></stop>
+                                <stop offset="1" stop-color="#ffc375"></stop>
+                            </linearGradient>
+                        </defs>
+                        <path class="route-art-street route-art-street--one" d="M-15 64H78l38 35h72l41-42h146"></path>
+                        <path class="route-art-street route-art-street--two" d="M-10 190h97l42-39h77l52-49h115"></path>
+                        <path class="route-art-street route-art-street--three" d="M88 -12v74l47 47v143"></path>
+                        <path class="route-art-street route-art-street--four" d="M283 -10v64l-55 54v145"></path>
+                        <path class="route-art-path route-art-path--halo" d="M35 177c44 0 35-102 91-102 45 0 35 65 83 65s38-82 111-82"></path>
+                        <path class="route-art-path route-art-path--line" pathLength="1" d="M35 177c44 0 35-102 91-102 45 0 35 65 83 65s38-82 111-82"></path>
+                        <path class="route-art-path route-art-path--current" pathLength="1" d="M35 177c44 0 35-102 91-102 45 0 35 65 83 65s38-82 111-82"></path>
+                        <path class="route-art-secondary" pathLength="1" d="M21 205h66l42-39h77l52-49h82"></path>
+                        <circle class="route-art-stop" cx="35" cy="177" r="6"></circle>
+                        <circle class="route-art-stop route-art-stop--middle" cx="126" cy="75" r="5"></circle>
+                        <circle class="route-art-stop route-art-stop--middle" cx="209" cy="140" r="5"></circle>
+                        <circle class="route-art-stop-wave" cx="126" cy="75" r="11"></circle>
+                        <circle class="route-art-stop-wave route-art-stop-wave--second" cx="209" cy="140" r="11"></circle>
+                        <circle class="route-art-destination-pulse" cx="320" cy="58" r="13"></circle>
+                        <circle class="route-art-destination-pulse route-art-destination-pulse--second" cx="320" cy="58" r="13"></circle>
+                        <circle class="route-art-stop route-art-stop--destination" cx="320" cy="58" r="7"></circle>
+                        <circle class="route-art-runner route-art-runner--one" r="3.1">
+                            <animateMotion dur="5.8s" repeatCount="indefinite" path="M35 177c44 0 35-102 91-102 45 0 35 65 83 65s38-82 111-82"></animateMotion>
+                        </circle>
+                        <circle class="route-art-runner route-art-runner--two" r="2">
+                            <animateMotion dur="5.8s" begin="-2.9s" repeatCount="indefinite" path="M35 177c44 0 35-102 91-102 45 0 35 65 83 65s38-82 111-82"></animateMotion>
+                        </circle>
+                        <circle class="route-art-runner route-art-runner--three" r="1.6">
+                            <animateMotion dur="7.4s" begin="-4.2s" repeatCount="indefinite" path="M35 177c44 0 35-102 91-102 45 0 35 65 83 65s38-82 111-82"></animateMotion>
+                        </circle>
+                        <g class="route-art-bus">
+                            <path class="route-art-headlight" d="M11-3l9-4v8l-9-1z"></path>
+                            <rect x="-13" y="-8" width="26" height="16" rx="4"></rect>
+                            <path class="route-art-windows" d="M-9-5h18v5H-9z"></path>
+                            <path class="route-art-bus-stripe" d="M-9 3h18"></path>
+                            <circle class="route-art-wheel" cx="-7" cy="8" r="2"></circle>
+                            <circle class="route-art-wheel" cx="7" cy="8" r="2"></circle>
+                            <animateMotion dur="9s" repeatCount="indefinite" rotate="auto" path="M35 177c44 0 35-102 91-102 45 0 35 65 83 65s38-82 111-82"></animateMotion>
+                        </g>
+                    </svg>
+                    <span class="route-art-label route-art-label--start"><i aria-hidden="true"></i> CENTRO</span>
+                    <span class="route-art-label route-art-label--end"><i aria-hidden="true"></i> TU DESTINO</span>
+                    <span class="route-art-status"><i aria-hidden="true"></i> RUTA EN MOVIMIENTO</span>
+                    <span class="route-art-coordinate route-art-coordinate--bottom">75°30′ O <i>·</i> CARTAGENA</span>
+                </div>
+            </section>
+
+            <footer class="landing-footer">
+                <small>Cartagena de Indias, Colombia</small>
+            </footer>
+        </div>
+
+        <aside class="landing-admin-access">
+            <button class="admin-btn" id="LoginAdminBtn" type="button" aria-label="Abrir acceso administrativo" title="Panel de administrador">
+                <img th:src="@{/images/Admin.png}" alt="">
+                <span>Acceso administrativo</span>
             </button>
         </aside>
     </main>

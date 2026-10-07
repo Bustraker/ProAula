@@ -78,7 +78,7 @@ public class SecurityConfig {
                     "/admin-login", "/admin/verificar-codigo", "/admin/login",
                     "/css/**", "/js/**", "/images/**",
                     "/public_index_3", "/viajar_public", "/index_3_public",
-                    "/contacto", "/contacto_public", "/contacto_usuario",
+                    "/contacto", "/contacto_public", "/contacto_usuario", "/consultas",
                     "/terminos", "/terminos.html", "/privacidad", "/privacidad.html",
                     "/oauth2/**", "/login/oauth2/**", "/oauth2/authorization/**",
                     "/api/usuarios/login", "/api/usuarios/register",
@@ -86,7 +86,7 @@ public class SecurityConfig {
                     "/api/barrios/**",
                     "/rutas", "/rutas/detalle/**", "/ruta/**", "/buses/**"
                 ).permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/buses/**", "/api/rutas-con-coordenadas").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/buses/todos", "/api/rutas-con-coordenadas", "/api/map/tiles").permitAll()
                 // Protege rutas de administración
                 .requestMatchers(
                     "/index_2", "/admin/**", "/reportes", "/gestionar-usuarios",
@@ -100,7 +100,7 @@ public class SecurityConfig {
                 // Rutas para usuarios y administradores autenticados
                 .requestMatchers(
                     "/dashboard", "/perfil", "/perfil/actualizar", "/perfil/cambiar-password",
-                    "/viajar", "/consultas", "/historial", "/usuario/**", "/index_3"
+                    "/viajar", "/historial", "/usuario/**", "/index_3"
                 ).hasAnyRole("USER", "ADMIN")
                 .anyRequest().authenticated()
             )

@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="shortcut icon" th:href="@{/images/Bus_icono.png}" type="image/x-icon">
 </head>
-<body>
+<body class="dashboard-page">
     <!-- Encabezado -->
     <header class="main-header">
         <div class="header-inner">
@@ -23,7 +23,7 @@
             </div>
             <nav class="main-nav">
                 <div class="nav-links">
-                    <a th:href="@{/dashboard}" class="nav-link">
+                    <a th:href="@{/dashboard}" class="nav-link" aria-current="page">
                         <i class="fas fa-home"></i> Dashboard
                     </a>
                     <a th:href="@{/rutas}" class="nav-link">
@@ -62,18 +62,37 @@
 
         <section class="section">
             <div class="profile-header">
+                <div class="hero-route-art" aria-hidden="true">
+                    <svg viewBox="0 0 640 220" focusable="false">
+                        <path class="route-track route-track--base" d="M18 164 C108 164 93 58 205 58 S315 176 405 130 490 42 622 42"></path>
+                        <path class="route-track route-track--glow" d="M18 164 C108 164 93 58 205 58 S315 176 405 130 490 42 622 42"></path>
+                        <circle class="route-stop route-stop--one" cx="205" cy="58" r="8"></circle>
+                        <circle class="route-stop route-stop--two" cx="405" cy="130" r="8"></circle>
+                        <circle class="route-stop route-stop--three" cx="622" cy="42" r="8"></circle>
+                        <g class="route-bus" transform="translate(24 139)">
+                            <rect x="0" y="0" width="40" height="24" rx="8"></rect>
+                            <path d="M8 7h24M9 13h8m5 0h9"></path>
+                            <circle cx="10" cy="26" r="3"></circle>
+                            <circle cx="30" cy="26" r="3"></circle>
+                        </g>
+                    </svg>
+                </div>
                 <div class="profile-avatar">
                     <i class="fas fa-user"></i>
                 </div>
-                <div>
+                <div class="profile-copy">
+                    <span class="profile-eyebrow"><i class="fas fa-sparkles"></i> Panel personal</span>
                     <h1 class="profile-name" th:text="'¡Hola, ' + ${usuario.nombres} + '!'">¡Hola, Usuario!</h1>
                     <p class="profile-email" th:text="${usuario.email}">usuario@email.com</p>
                 </div>
+                <button type="button" class="btn btn-contact" id="openContactModalHero">
+                    <i class="fas fa-headset"></i> Contactar soporte
+                </button>
             </div>
         </section>
 
         <section class="section">
-            <h2 class="mb-3"><i class="fas fa-chart-line"></i> Resumen de tu Actividad</h2>
+            <h2 class="mb-3"><i class="fas fa-chart-line"></i> Tu movilidad</h2>
             <div class="dashboard-grid">
                 <div class="stat-card">
                     <div class="stat-icon primary">
@@ -86,7 +105,7 @@
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon success">
-                        <i class="fas fa-check-circle"></i>
+                        <i class="fas fa-ticket"></i>
                     </div>
                     <div class="stat-content">
                         <h4>Viajes Realizados</h4>
@@ -116,7 +135,7 @@
 
         <section class="section">
             <div class="d-flex justify-between align-center mb-3">
-                <h2><i class="fas fa-fire"></i> Rutas Populares</h2>
+                <h2><i class="fas fa-map-location-dot"></i> Rutas disponibles</h2>
                 <a th:href="@{/rutas}" class="btn btn-outline btn-sm">
                     Ver todas <i class="fas fa-arrow-right"></i>
                 </a>
@@ -153,42 +172,38 @@
                         <span class="badge badge-success">Activa</span>
                     </div>
                 </div>
-                <div th:if="${#lists.isEmpty(rutasPopulares)}" class="alert alert-info">
-                    <i class="fas fa-info-circle"></i>
-                    No hay rutas disponibles en este momento.
+                <div th:if="${#lists.isEmpty(rutasPopulares)}" class="dashboard-empty-state">
+                    <span class="empty-state-icon"><i class="fas fa-route"></i></span>
+                    <div>
+                        <h3>Aún no hay rutas disponibles</h3>
+                        <p>El listado se actualizará cuando se publiquen nuevas rutas.</p>
+                    </div>
                 </div>
             </div>
         </section>
 
         <section class="section">
-            <h2 class="mb-3"><i class="fas fa-bolt"></i> Accesos Rápidos</h2>
+            <h2 class="mb-3"><i class="fas fa-bolt"></i> Atajos</h2>
             <div class="dashboard-grid">
                 <a th:href="@{/consultas}" class="card">
                     <div class="card-body text-center">
                         <i class="fas fa-search dashboard-card-icon dashboard-card-icon--primary"></i>
                         <h3>Consultar Rutas</h3>
-                        <p class="text-gray-600">Busca rutas por barrio o destino</p>
+                        <p class="text-gray-600">Encuentra un trayecto por barrio o destino.</p>
                     </div>
                 </a>
                 <a href="#buses-section" class="card scroll-to-section" data-target="buses-section">
                     <div class="card-body text-center">
                         <i class="fas fa-bus dashboard-card-icon dashboard-card-icon--success"></i>
-                        <h3>Mostrar Buses</h3>
-                        <p class="text-gray-600">Consulta el estado de todos los buses activos</p>
+                        <h3>Ver buses</h3>
+                        <p class="text-gray-600">Unidades en servicio y rutas asignadas.</p>
                     </div>
                 </a>
-                <button type="button" class="card card-action" id="openContactModalCard">
-                    <div class="card-body text-center">
-                        <i class="fas fa-envelope dashboard-card-icon dashboard-card-icon--warning"></i>
-                        <h3>Contáctanos</h3>
-                        <p class="text-gray-600">Envíanos tus comentarios</p>
-                    </div>
-                </button>
                 <a th:href="@{/perfil}" class="card">
                     <div class="card-body text-center">
                         <i class="fas fa-user-cog dashboard-card-icon dashboard-card-icon--danger"></i>
                         <h3>Mi Perfil</h3>
-                        <p class="text-gray-600">Actualiza tu información</p>
+                        <p class="text-gray-600">Gestiona tus datos personales.</p>
                     </div>
                 </a>
             </div>
@@ -198,12 +213,8 @@
             <div class="d-flex justify-between align-center mb-3">
                 <h2><i class="fas fa-bus"></i> Buses Activos</h2>
                 <div class="d-flex align-center gap-2">
-                    <span class="badge badge-success bus-count-badge">
-                        <i class="fas fa-circle status-dot"></i>
-                        <span th:text="${busesActivos}">0</span> en servicio
-                    </span>
                     <a th:href="@{/consultas}" class="btn btn-outline btn-sm">
-                        Ver todas
+                        Consultar
                     </a>
                 </div>
             </div>
@@ -251,14 +262,17 @@
                 </div>
             </div>
 
-            <div th:if="${#lists.isEmpty(buses)}" class="alert alert-info">
-                <i class="fas fa-info-circle"></i>
-                No hay buses activos en este momento.
+            <div th:if="${#lists.isEmpty(buses)}" class="dashboard-empty-state">
+                <span class="empty-state-icon"><i class="fas fa-bus"></i></span>
+                <div>
+                    <h3>Sin unidades en servicio</h3>
+                    <p>Los buses activos aparecerán aquí cuando estén disponibles.</p>
+                </div>
             </div>
         </section>
     </main>
 
-    <div id="contactModal" class="modal-overlay hidden">
+    <div id="contactModal" class="modal-overlay" aria-hidden="true" hidden>
         <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="contactModalTitle">
             <div class="modal-header">
                 <div>

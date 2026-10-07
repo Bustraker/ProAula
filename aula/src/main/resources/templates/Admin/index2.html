@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/style_responsive.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" th:href="@{/css/admin_index2.css}">
+    <link rel="stylesheet" th:href="@{/css/admin_index2.css(v='admin-20261005-4')}">
 </head>
 <body class="admin-dashboard">
     <div class="admin-container">
@@ -17,35 +17,81 @@
         <aside class="sidebar">
             <div class="sidebar-header">
                 <h2><i class="fas fa-bus"></i> Bustraker Admin</h2>
+                <p>Centro de operaciones</p>
             </div>
             <nav class="sidebar-nav">
                 <a th:href="@{/index_2}" class="active"><i class="fas fa-home"></i> Inicio</a>
                 <a th:href="@{/gestionar-usuarios}"><i class="fas fa-users"></i> Gestionar Usuarios</a>
                 <a th:href="@{/reportes}"><i class="fas fa-chart-bar"></i> Reportes</a>
-                <a th:href="@{#}" onclick="alert('Sección en desarrollo')"><i class="fas fa-envelope"></i> Mensajes</a>
+                <a th:href="@{/mensajes_contacto}"><i class="fas fa-envelope"></i> Mensajes</a>
                 <a th:href="@{/rutas/admin}"><i class="fas fa-route"></i> Rutas</a>
                 <a th:href="@{/registro-buses}"><i class="fas fa-bus"></i> Buses</a>
                 <a th:href="@{/logout}"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
             </nav>
+            <div class="sidebar-footer">
+                <span class="system-status-dot"></span>
+                <span>Sistema operativo</span>
+            </div>
         </aside>
 
         <!-- Main Content -->
         <main class="main-content">
             <header class="top-header">
-                <h1><i class="fas fa-tachometer-alt"></i> Panel de Administración</h1>
+                <div class="page-heading">
+                    <h1>Panel de administración</h1>
+                    <p>Monitorea usuarios, flota y rutas desde un solo lugar.</p>
+                </div>
                 <div class="header-actions">
                     <span class="username">
                         <i class="fas fa-user-circle"></i>
                         <span th:text="${usuario?.nombres}">Admin</span>
                     </span>
-                    <a th:href="@{/logout}" class="btn btn-secondary"><i class="fas fa-sign-out-alt"></i> Salir</a>
-                    <span class="refresh-status" id="refreshStatus">
-                        <i class="fas fa-check-circle"></i> Actualizado
+                    <button type="button" class="refresh-button" id="refreshDashboardBtn">
+                        <i class="fas fa-sync-alt" aria-hidden="true"></i>
+                        <span>Actualizar</span>
+                    </button>
+                    <span class="refresh-status" id="refreshStatus" role="status" aria-live="polite">
+                        <i class="fas fa-check-circle" aria-hidden="true"></i>
+                        <span class="refresh-status-label">Al día</span>
                     </span>
                 </div>
             </header>
 
             <div class="content-wrapper">
+                <section class="dashboard-welcome" aria-labelledby="welcomeTitle">
+                    <div class="welcome-copy">
+                        <span class="welcome-eyebrow"><span class="welcome-status-dot"></span> OPERACIÓN EN VIVO · CARTAGENA</span>
+                        <h2 id="welcomeTitle">Bienvenido, <span th:text="${usuario?.nombres}">Admin</span></h2>
+                        <p>Todo lo importante de Bustraker, en una sola vista. Revisa la actividad y continúa con la gestión.</p>
+                    </div>
+                    <div class="welcome-meta">
+                        <time id="dashboardDate" class="welcome-date">Resumen operativo</time>
+                        <a th:href="@{/reportes}" class="welcome-link">
+                            Ver reportes <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                    <div class="welcome-visual" aria-hidden="true">
+                        <span class="route-label route-label-origin">CENTRO</span>
+                        <span class="route-label route-label-destination">TERMINAL</span>
+                        <svg class="route-illustration" viewBox="0 0 440 190" fill="none">
+                            <path class="route-track route-track-secondary" d="M24 142C94 142 91 53 163 53S241 142 308 142s64-87 108-87" />
+                            <path class="route-track route-track-primary" pathLength="1" d="M24 142C94 142 91 53 163 53S241 142 308 142s64-87 108-87" />
+                            <circle class="route-node route-node-origin" cx="24" cy="142" r="7" />
+                            <circle class="route-node route-node-transfer" cx="163" cy="53" r="7" />
+                            <circle class="route-node route-node-transfer" cx="308" cy="142" r="7" />
+                            <circle class="route-node route-node-destination" cx="416" cy="55" r="7" />
+                            <circle class="route-pulse" cx="24" cy="142" r="7" />
+                            <g class="route-vehicle-marker">
+                                <circle class="route-vehicle-halo" r="9" />
+                                <circle class="route-vehicle" r="4.5" />
+                                <animateMotion dur="8s" repeatCount="indefinite" rotate="auto"
+                                    path="M24 142C94 142 91 53 163 53S241 142 308 142s64-87 108-87" />
+                            </g>
+                        </svg>
+                        <span class="route-visual-caption"><i class="fas fa-location-dot"></i> Red de movilidad</span>
+                    </div>
+                </section>
+
                 <!-- Estadísticas -->
                 <div class="dashboard-stats">
                     <div class="stat-card">
@@ -90,9 +136,13 @@
                 </div>
 
                 <!-- Actividad Reciente -->
-                <div class="card">
+                <div class="dashboard-lower-grid">
+                <div class="card activity-panel" role="region" aria-labelledby="activityTitle">
                     <div class="card-header">
-                        <h3><i class="fas fa-history"></i> Actividad Reciente del Sistema</h3>
+                        <div class="card-heading-copy">
+                            <h3 id="activityTitle"><i class="fas fa-history"></i> Actividad reciente</h3>
+                            <p>Últimos cambios registrados en la plataforma.</p>
+                        </div>
                     </div>
                     <div class="card-body">
                         <div class="activity-feed" id="activityFeed">
@@ -145,7 +195,7 @@
                             </div>
 
                             <!-- Sin actividad -->
-                            <div th:if="${usuariosRecientes == null or usuariosRecientes.isEmpty()}" class="empty-state">
+                            <div th:if="${(usuariosRecientes == null or usuariosRecientes.isEmpty()) and (rutasRecientes == null or rutasRecientes.isEmpty()) and (busesRecientes == null or busesRecientes.isEmpty()) and (mensajesRecientes == null or mensajesRecientes.isEmpty())}" class="empty-state">
                                 <i class="fas fa-inbox"></i>
                                 <p>No hay actividad reciente en el sistema</p>
                             </div>
@@ -154,9 +204,12 @@
                 </div>
 
                 <!-- Acciones Rápidas -->
-                <div class="card">
+                <div class="card quick-actions-panel" role="region" aria-labelledby="quickActionsTitle">
                     <div class="card-header">
-                        <h3><i class="fas fa-bolt"></i> Acciones Rápidas</h3>
+                        <div class="card-heading-copy">
+                            <h3 id="quickActionsTitle"><i class="fas fa-bolt"></i> Accesos rápidos</h3>
+                            <p>Atajos para las tareas más frecuentes.</p>
+                        </div>
                     </div>
                     <div class="card-body">
                         <div class="quick-actions">
@@ -182,10 +235,11 @@
                         </div>
                     </div>
                 </div>
+                </div>
             </div>
         </main>
     </div>
 
-    <script th:src="@{/js/admin_index2.js}"></script>
+    <script th:src="@{/js/admin_index2.js(v='admin-20261005-3')}"></script>
 </body>
 </html>

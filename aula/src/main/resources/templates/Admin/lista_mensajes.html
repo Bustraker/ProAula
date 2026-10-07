@@ -3,95 +3,222 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mensajes de Contacto - Bustraker Admin</title>
-    <link rel="stylesheet" th:href="@{/css/style_2.css}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <meta name="theme-color" content="#24191c">
+    <meta name="description" content="Bandeja de mensajes de contacto de Bustraker">
+    <title>Mensajes de contacto - Bustraker Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="shortcut icon" th:href="@{/images/Bus_icono.png}" type="image/x-icon">
+    <link rel="stylesheet" th:href="@{/css/admin_mensajes.css(v='messages-20261005-2')}">
 </head>
-<body>
-    <div class="admin-container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <h2><i class="fas fa-bus"></i> Bustraker Admin</h2>
-            </div>
-            <nav class="sidebar-nav">
-                <a th:href="@{/index_2}"><i class="fas fa-home"></i> Inicio</a>
-                <a th:href="@{/gestionar-usuarios}"><i class="fas fa-users"></i> Usuarios</a>
-                <a th:href="@{/reportes}"><i class="fas fa-chart-bar"></i> Reportes</a>
-                <a th:href="@{/mensajes_contacto}" class="active"><i class="fas fa-envelope"></i> Mensajes</a>
-                <a th:href="@{/rutas/admin}"><i class="fas fa-route"></i> Rutas</a>
-                <a th:href="@{/registro-buses}"><i class="fas fa-bus"></i> Buses</a>
+<body class="admin-messages">
+    <div class="messages-shell">
+        <aside class="messages-sidebar">
+            <a class="messages-brand" th:href="@{/index_2}">
+                <span class="messages-brand__icon"><i class="fas fa-bus" aria-hidden="true"></i></span>
+                <span><strong>Bustraker</strong><small>Centro de operaciones</small></span>
+            </a>
+            <nav class="messages-nav" aria-label="Navegación administrativa">
+                <a th:href="@{/index_2}"><i class="fas fa-house" aria-hidden="true"></i><span>Panel principal</span></a>
+                <a th:href="@{/gestionar-usuarios}"><i class="fas fa-users" aria-hidden="true"></i><span>Gestión de usuarios</span></a>
+                <a th:href="@{/reportes}"><i class="fas fa-chart-column" aria-hidden="true"></i><span>Reportes</span></a>
+                <a th:href="@{/mensajes_contacto}" class="active" aria-current="page"><i class="fas fa-envelope" aria-hidden="true"></i><span>Mensajes</span></a>
+                <a th:href="@{/rutas/admin}"><i class="fas fa-route" aria-hidden="true"></i><span>Rutas</span></a>
+                <a th:href="@{/registro-buses}"><i class="fas fa-bus-simple" aria-hidden="true"></i><span>Buses</span></a>
             </nav>
+            <div class="messages-sidebar__footer">
+                <span class="messages-status-dot"></span>
+                <span>Bandeja de contacto administrativa</span>
+            </div>
         </aside>
 
-        <!-- Main Content -->
-        <main class="main-content">
-            <header class="top-header">
-                <h1><i class="fas fa-envelope-open-text"></i> Mensajes de Contacto</h1>
-                <div class="header-actions">
-                    <span th:text="${#authentication.name}" class="username"></span>
-                    <a th:href="@{/logout}" class="btn btn-secondary"><i class="fas fa-sign-out-alt"></i> Salir</a>
+        <main class="messages-main">
+            <header class="messages-topbar">
+                <div class="messages-breadcrumb">
+                    <span>Administración</span><i class="fas fa-chevron-right" aria-hidden="true"></i><strong>Mensajes</strong>
+                </div>
+                <div class="messages-topbar__actions">
+                    <span class="messages-user"><i class="fas fa-user-shield" aria-hidden="true"></i><span th:text="${#authentication.name}">Administrador</span></span>
+                    <a th:href="@{/logout}" class="messages-logout"><i class="fas fa-arrow-right-from-bracket" aria-hidden="true"></i><span>Salir</span></a>
                 </div>
             </header>
 
-            <div class="content-wrapper">
-                <div class="card">
-                    <div class="card-header">
-                        <h3><i class="fas fa-inbox"></i> Todos los Mensajes</h3>
-                        <div class="card-actions">
-                            <span th:text="'Total: ' + ${#lists.size(mensajes)}" class="total-count"></span>
+            <div class="messages-content">
+                <section class="messages-heading" aria-labelledby="messagesTitle">
+                    <div class="messages-heading__copy">
+                        <span class="messages-eyebrow"><span></span> CENTRO DE COMUNICACIONES</span>
+                        <h1 id="messagesTitle">Mensajes de contacto</h1>
+                        <p>Un espacio de trabajo para revisar cada consulta y mantener abierto el diálogo con la comunidad.</p>
+                        <div class="messages-heading__meta">
+                            <span><i class="fas fa-shield-halved" aria-hidden="true"></i> Canal privado de atención</span>
+                            <span class="messages-heading__separator"></span>
+                            <span><i class="fas fa-inbox" aria-hidden="true"></i> <strong th:text="${#lists.size(mensajes)}">0</strong> conversaciones recibidas</span>
                         </div>
                     </div>
-                    <div class="card-body">
-                        <div th:if="${mensaje}" class="alert alert-success" th:text="${mensaje}"></div>
-                        
-                        <div th:if="${#lists.isEmpty(mensajes)}" class="empty-state">
-                            <i class="fas fa-inbox"></i>
-                            <h4>No hay mensajes de contacto</h4>
-                            <p>No se han recibido mensajes de contacto hasta el momento.</p>
-                        </div>
-                        
-                        <div th:unless="${#lists.isEmpty(mensajes)}" class="table-responsive">
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Nombre</th>
-                                        <th>Apellido</th>
-                                        <th>Teléfono</th>
-                                        <th>Email</th>
-                                        <th>Mensaje</th>
-                                        <th>Fecha</th>
-                                        <th>Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr th:each="mensaje : ${mensajes}">
-                                        <td th:text="${mensaje.id}">ID</td>
-                                        <td th:text="${mensaje.nombre}">Nombre</td>
-                                        <td th:text="${mensaje.apellido}">Apellido</td>
-                                        <td th:text="${mensaje.telefono}">Teléfono</td>
-                                        <td th:text="${mensaje.email}">Email</td>
-                                        <td th:text="${#strings.abbreviate(mensaje.mensaje, 50)}">Mensaje</td>
-                                        <td th:text="${#dates.format(#dates.createNow(), 'dd/MM/yyyy HH:mm')}">Fecha</td>
-                                        <td>
-                                            <form th:action="@{/eliminar_mensaje/{id}(id=${mensaje.id})}" method="post" style="display:inline; margin:0;">
-                                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                                                <button type="submit" class="btn btn-danger btn-sm" style="padding:0.4rem 0.7rem;" onclick="return confirm('¿Estás seguro de eliminar este mensaje?')">
-                                                    <i class="fas fa-trash"></i> Eliminar
-                                                </button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                    <svg class="messages-signal-visual" viewBox="0 0 470 250" aria-hidden="true" focusable="false">
+                        <defs>
+                            <linearGradient id="messages-panel-fill" x1="0" y1="0" x2="1" y2="1">
+                                <stop offset="0" stop-color="#fff"></stop>
+                                <stop offset="1" stop-color="#f5f7f4"></stop>
+                            </linearGradient>
+                            <linearGradient id="messages-envelope-fill" x1="0" y1="0" x2="1" y2="1">
+                                <stop offset="0" stop-color="#fdfefe"></stop>
+                                <stop offset="1" stop-color="#e8efea"></stop>
+                            </linearGradient>
+                            <linearGradient id="messages-seal-fill" x1="0" y1="0" x2="1" y2="1">
+                                <stop offset="0" stop-color="#3f8274"></stop>
+                                <stop offset="1" stop-color="#28594f"></stop>
+                            </linearGradient>
+                            <pattern id="messages-micro-grid" width="18" height="18" patternUnits="userSpaceOnUse">
+                                <path d="M18 0H0V18" fill="none" stroke="#416c62" stroke-opacity=".045" stroke-width=".7"></path>
+                            </pattern>
+                            <filter id="messages-card-shadow" x="-20%" y="-20%" width="140%" height="150%">
+                                <feDropShadow dx="0" dy="7" stdDeviation="8" flood-color="#283d37" flood-opacity=".09"></feDropShadow>
+                            </filter>
+                        </defs>
+                        <rect class="messages-signal-visual__frame" x="5" y="5" width="460" height="240" rx="17" fill="url(#messages-panel-fill)"></rect>
+                        <rect x="6" y="6" width="458" height="238" rx="16" fill="url(#messages-micro-grid)"></rect>
+                        <path class="messages-signal-visual__header-rule" d="M22 45H448"></path>
+                        <g class="messages-signal-visual__panel-heading">
+                            <rect x="22" y="17" width="21" height="21" rx="7"></rect>
+                            <path d="M27 24h11v8H27zm0 1 5.5 4 5.5-4"></path>
+                            <text x="52" y="27">CANAL DE COMUNICACIÓN</text>
+                            <text class="messages-signal-visual__subheading" x="52" y="36">MENSAJES DE LA COMUNIDAD</text>
+                            <circle class="messages-signal-visual__online" cx="418" cy="27" r="3"></circle>
+                            <text class="messages-signal-visual__online-label" x="427" y="29">EN LÍNEA</text>
+                        </g>
+                        <text class="messages-signal-visual__section-label" x="23" y="65">ENTRADA</text>
+                        <text class="messages-signal-visual__section-label messages-signal-visual__section-label--right" x="447" y="65">RESPUESTA</text>
+                        <g class="messages-signal-visual__routes">
+                            <path class="messages-signal-visual__route messages-signal-visual__route--one" d="M75 100C132 100 130 133 193 133"></path>
+                            <path class="messages-signal-visual__route messages-signal-visual__route--two" d="M75 158C132 158 130 133 193 133"></path>
+                            <path class="messages-signal-visual__route messages-signal-visual__route--three" d="M277 133C340 133 338 100 395 100"></path>
+                            <path class="messages-signal-visual__route messages-signal-visual__route--four" d="M277 133C340 133 338 158 395 158"></path>
+                            <circle class="messages-signal-visual__packet messages-signal-visual__packet--one" r="3"></circle>
+                            <circle class="messages-signal-visual__packet messages-signal-visual__packet--two" r="3"></circle>
+                            <circle class="messages-signal-visual__packet messages-signal-visual__packet--three" r="3"></circle>
+                            <circle class="messages-signal-visual__packet messages-signal-visual__packet--four" r="3"></circle>
+                        </g>
+                        <g class="messages-signal-visual__inbound messages-signal-visual__inbound--one">
+                            <rect x="23" y="83" width="87" height="34" rx="9"></rect>
+                            <circle cx="38" cy="100" r="8"></circle>
+                            <path d="M34.5 102c.5-2 1.7-3 3.5-3s3 .9 3.5 3"></path>
+                            <path class="messages-signal-visual__message-line" d="M52 96h45m-45 7h33"></path>
+                            <circle class="messages-signal-visual__inbound-dot" cx="101" cy="89" r="2"></circle>
+                        </g>
+                        <g class="messages-signal-visual__inbound messages-signal-visual__inbound--two">
+                            <rect x="23" y="141" width="87" height="34" rx="9"></rect>
+                            <circle cx="38" cy="158" r="8"></circle>
+                            <path d="M34.5 160c.5-2 1.7-3 3.5-3s3 .9 3.5 3"></path>
+                            <path class="messages-signal-visual__message-line" d="M52 154h45m-45 7h33"></path>
+                            <circle class="messages-signal-visual__inbound-dot" cx="101" cy="147" r="2"></circle>
+                        </g>
+                        <circle class="messages-signal-visual__hub-orbit messages-signal-visual__hub-orbit--outer" cx="235" cy="133" r="52"></circle>
+                        <circle class="messages-signal-visual__hub-orbit messages-signal-visual__hub-orbit--inner" cx="235" cy="133" r="43"></circle>
+                        <circle class="messages-signal-visual__hub-halo" cx="235" cy="133" r="34"></circle>
+                        <circle class="messages-signal-visual__hub" cx="235" cy="133" r="29"></circle>
+                        <path class="messages-signal-visual__hub-envelope" d="M220 126h30v18h-30z"></path>
+                        <path class="messages-signal-visual__hub-flap" d="m220 127 15 11 15-11"></path>
+                        <path class="messages-signal-visual__hub-check" d="m231 153 3 3 6-7"></path>
+                        <g class="messages-signal-visual__outbound messages-signal-visual__outbound--one">
+                            <rect x="360" y="83" width="87" height="34" rx="9"></rect>
+                            <rect class="messages-signal-visual__reply-badge" x="371" y="92" width="16" height="16" rx="5"></rect>
+                            <path class="messages-signal-visual__reply-icon" d="M375 100h8m-3-3 3 3-3 3"></path>
+                            <path class="messages-signal-visual__message-line" d="M393 96h43m-43 7h31"></path>
+                            <circle class="messages-signal-visual__outbound-dot" cx="441" cy="89" r="2"></circle>
+                        </g>
+                        <g class="messages-signal-visual__outbound messages-signal-visual__outbound--two">
+                            <rect x="360" y="141" width="87" height="34" rx="9"></rect>
+                            <rect class="messages-signal-visual__reply-badge" x="371" y="150" width="16" height="16" rx="5"></rect>
+                            <path class="messages-signal-visual__reply-icon" d="M375 158h8m-3-3 3 3-3 3"></path>
+                            <path class="messages-signal-visual__message-line" d="M393 154h43m-43 7h31"></path>
+                            <circle class="messages-signal-visual__outbound-dot" cx="441" cy="147" r="2"></circle>
+                        </g>
+                        <path class="messages-signal-visual__footer-rule" d="M22 194H448"></path>
+                        <text class="messages-signal-visual__footer-label" x="24" y="216">FLUJO DE ATENCIÓN</text>
+                        <path class="messages-signal-visual__pipeline" d="M140 213H430"></path>
+                        <circle class="messages-signal-visual__pipeline-node messages-signal-visual__pipeline-node--one" cx="153" cy="213" r="4"></circle>
+                        <circle class="messages-signal-visual__pipeline-node messages-signal-visual__pipeline-node--two" cx="272" cy="213" r="4"></circle>
+                        <circle class="messages-signal-visual__pipeline-node messages-signal-visual__pipeline-node--three" cx="391" cy="213" r="4"></circle>
+                        <circle class="messages-signal-visual__pipeline-pulse" r="2.8"></circle>
+                        <text class="messages-signal-visual__pipeline-label" x="153" y="230">RECIBIR</text>
+                        <text class="messages-signal-visual__pipeline-label" x="272" y="230">REVISAR</text>
+                        <text class="messages-signal-visual__pipeline-label" x="391" y="230">CONECTAR</text>
+                    </svg>
+                </section>
+
+                <div th:if="${mensaje}" class="messages-alert" role="status">
+                    <i class="fas fa-circle-check" aria-hidden="true"></i>
+                    <span th:text="${mensaje}">Operación completada.</span>
                 </div>
+
+                <section class="messages-inbox" aria-labelledby="inboxTitle">
+                    <div class="messages-inbox__heading">
+                        <div>
+                            <span class="messages-inbox__eyebrow">BANDEJA DE ENTRADA</span>
+                            <h2 id="inboxTitle">Conversaciones recibidas</h2>
+                            <p>Información enviada mediante el formulario de contacto.</p>
+                        </div>
+                        <span class="messages-count"><i class="fas fa-envelope-open-text" aria-hidden="true"></i><strong th:text="${#lists.size(mensajes)}">0</strong><span>conversaciones</span></span>
+                    </div>
+
+                    <div th:if="${#lists.isEmpty(mensajes)}" class="messages-empty">
+                        <div class="messages-empty__art" aria-hidden="true">
+                            <span class="messages-empty__orbit"></span>
+                            <span class="messages-empty__icon"><i class="fas fa-envelope-open-text"></i></span>
+                            <span class="messages-empty__spark messages-empty__spark--one"></span>
+                            <span class="messages-empty__spark messages-empty__spark--two"></span>
+                        </div>
+                        <span class="messages-empty__eyebrow">TODO EN CALMA</span>
+                        <h3>No hay mensajes por ahora</h3>
+                        <p>Cuando alguien se comunique mediante el formulario, su mensaje aparecerá aquí.</p>
+                    </div>
+
+                    <div th:unless="${#lists.isEmpty(mensajes)}" class="messages-list">
+                        <article class="message-card" th:each="mensaje : ${mensajes}">
+                            <div class="message-card__rail">
+                                <span class="message-card__avatar"><i class="fas fa-user" aria-hidden="true"></i></span>
+                                <span class="message-card__connector" aria-hidden="true"></span>
+                            </div>
+                            <div class="message-card__body">
+                                <div class="message-card__top">
+                                    <div class="message-card__sender">
+                                        <span class="message-card__eyebrow">MENSAJE <span th:text="'#' + ${mensaje.id}">#1</span></span>
+                                        <h3 th:text="${mensaje.nombre} + ' ' + ${mensaje.apellido}">Nombre Apellido</h3>
+                                    </div>
+                                    <span class="message-card__status"><span></span> Recibido</span>
+                                </div>
+                                <div class="message-card__contacts">
+                                    <a th:href="'mailto:' + ${mensaje.email}" class="message-card__contact"><i class="fas fa-envelope" aria-hidden="true"></i><span th:text="${mensaje.email}">correo@example.com</span></a>
+                                    <a th:href="'tel:' + ${mensaje.telefono}" class="message-card__contact"><i class="fas fa-phone" aria-hidden="true"></i><span th:text="${mensaje.telefono}">Teléfono</span></a>
+                                </div>
+                                <div class="message-card__message">
+                                    <i class="fas fa-quote-left" aria-hidden="true"></i>
+                                    <p th:text="${mensaje.mensaje}">Contenido del mensaje.</p>
+                                </div>
+                                <div class="message-card__footer">
+                                    <span><i class="fas fa-inbox" aria-hidden="true"></i> Consulta de contacto</span>
+                                    <a class="message-card__reply" th:href="'mailto:' + ${mensaje.email}" th:attr="aria-label='Responder a ' + ${mensaje.nombre} + ' por correo'">
+                                        <i class="fas fa-reply" aria-hidden="true"></i><span>Responder</span>
+                                    </a>
+                                    <form th:action="@{/eliminar_mensaje/{id}(id=${mensaje.id})}" method="post" class="message-card__delete-form" th:attr="onsubmit='return confirm(&quot;¿Eliminar el mensaje de ' + ${mensaje.nombre} + '? Esta acción no se puede deshacer.&quot;);'">
+                                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                        <button type="submit" class="message-card__delete"><i class="fas fa-trash-can" aria-hidden="true"></i><span>Eliminar mensaje</span></button>
+                                    </form>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+                </section>
+
+                <footer class="messages-footer">
+                    <span>Bustraker <span aria-hidden="true">·</span> Comunicaciones administrativas</span>
+                    <span>Los datos de contacto se muestran de forma privada al personal autorizado.</span>
+                </footer>
             </div>
         </main>
     </div>
-
-    <script th:src="@{/js/lista_mensajes.js}"></script>
 </body>
 </html>

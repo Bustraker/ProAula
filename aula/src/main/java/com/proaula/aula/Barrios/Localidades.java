@@ -1,8 +1,12 @@
 package com.proaula.aula.Barrios;
 
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 public class Localidades {
     // Localidad 1
@@ -54,12 +58,40 @@ public class Localidades {
         "nuevo bosque", "bosque"
     );
 
-    // Método para obtener todos los barrios
+    // Método para obtener todos los barrios sin duplicados y manteniendo el orden original
     public static List<String> obtenerTodosLosBarrios() {
+        Set<String> vistos = new LinkedHashSet<>();
         List<String> todos = new ArrayList<>();
-        todos.addAll(LOCALIDAD_1);
-        todos.addAll(LOCALIDAD_2);
-        todos.addAll(LOCALIDAD_3);
+
+        agregarSinDuplicados(todos, vistos, LOCALIDAD_1);
+        agregarSinDuplicados(todos, vistos, LOCALIDAD_2);
+        agregarSinDuplicados(todos, vistos, LOCALIDAD_3);
+
         return todos;
+    }
+
+    private static void agregarSinDuplicados(List<String> destino, Set<String> vistos, List<String> origen) {
+        for (String barrio : origen) {
+            String valor = barrio == null ? null : barrio.trim();
+            if (valor == null || valor.isEmpty()) {
+                continue;
+            }
+
+            String clave = normalizarClave(valor);
+            if (!vistos.add(clave)) {
+                continue;
+            }
+
+            destino.add(valor);
+        }
+    }
+
+    private static String normalizarClave(String valor) {
+        String normalizado = Normalizer.normalize(valor.trim(), Normalizer.Form.NFD)
+            .replaceAll("\\p{M}", "")
+            .replace("ñ", "n")
+            .replaceAll("\\s+", " ")
+            .toLowerCase(Locale.ROOT);
+        return normalizado;
     }
 }

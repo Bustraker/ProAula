@@ -1,10 +1,13 @@
 package com.proaula.aula.Controller;
 
+import java.util.List;
+
 import com.proaula.aula.Entity.Usuario;
+import com.proaula.aula.Entity.Viaje;
 import com.proaula.aula.Service.UsuarioService;
+import com.proaula.aula.Service.ViajeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -19,11 +22,17 @@ public class PerfilController {
 
     private static final Logger log = LoggerFactory.getLogger(PerfilController.class);
 
-    @Autowired
-    private UsuarioService usuarioService;
+    private final UsuarioService usuarioService;
+    private final ViajeService viajeService;
+    private final BCryptPasswordEncoder passwordEncoder;
 
-    @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
+    public PerfilController(UsuarioService usuarioService,
+                            ViajeService viajeService,
+                            BCryptPasswordEncoder passwordEncoder) {
+        this.usuarioService = usuarioService;
+        this.viajeService = viajeService;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @GetMapping("/perfil")
     public String perfil(Model model, Authentication authentication) {
@@ -34,12 +43,29 @@ public class PerfilController {
             return "redirect:/inicio-de-sesion-mejorado?error=usuario_no_encontrado";
         }
 
+        List<Viaje> viajes = viajeService.getViajesByUsername(username);
         model.addAttribute("usuario", usuario);
-        model.addAttribute("rutasFavoritas", 0);
-        model.addAttribute("viajesCompletados", 0);
-        model.addAttribute("fechaRegistro", "2026");
+        model.addAttribute("viajesTotal", viajes.size());
+        model.addAttribute("viajesCompletados", viajes.stream()
+                .filter(viaje -> viaje.getEstado() != null
+                        && "Completado".equalsIgnoreCase(viaje.getEstado().trim()))
+                .count());
+        model.addAttribute("providerLabel", providerLabel(usuario.getProvider()));
 
         return "perfil-usuario";
+    }
+
+    private String providerLabel(String provider) {
+        if (provider == null || provider.isBlank() || "LOCAL".equalsIgnoreCase(provider)) {
+            return "Cuenta local";
+        }
+        return switch (provider.toUpperCase(java.util.Locale.ROOT)) {
+            case "GOOGLE" -> "Google";
+            case "GITHUB" -> "GitHub";
+            case "DISCORD" -> "Discord";
+            case "FACEBOOK" -> "Facebook";
+            default -> "Cuenta vinculada";
+        };
     }
 
     @PostMapping("/perfil/actualizar")

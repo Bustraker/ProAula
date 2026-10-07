@@ -1,116 +1,218 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const busItems = Array.from(document.querySelectorAll('#base > li'));
+document.addEventListener('DOMContentLoaded', function () {
+    const routeArt = document.querySelector('.directory-route-art');
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (routeArt && !reducedMotion && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+        let pointerFrame = 0;
+
+        routeArt.addEventListener('pointermove', (event) => {
+            if (pointerFrame) {
+                window.cancelAnimationFrame(pointerFrame);
+            }
+
+            pointerFrame = window.requestAnimationFrame(() => {
+                const bounds = routeArt.getBoundingClientRect();
+                const horizontal = (event.clientX - bounds.left) / bounds.width - 0.5;
+                const vertical = (event.clientY - bounds.top) / bounds.height - 0.5;
+
+                routeArt.style.setProperty('--atlas-shift-x', `${horizontal * 8}px`);
+                routeArt.style.setProperty('--atlas-shift-y', `${vertical * 8}px`);
+                routeArt.style.setProperty('--atlas-tilt-x', `${horizontal * 5}deg`);
+                routeArt.style.setProperty('--atlas-tilt-y', `${vertical * -5}deg`);
+            });
+        });
+
+        routeArt.addEventListener('pointerleave', () => {
+            routeArt.style.setProperty('--atlas-shift-x', '0px');
+            routeArt.style.setProperty('--atlas-shift-y', '0px');
+            routeArt.style.setProperty('--atlas-tilt-x', '0deg');
+            routeArt.style.setProperty('--atlas-tilt-y', '0deg');
+        });
+    }
+
+    const busItems = Array.from(document.querySelectorAll('#base > .bus-card'));
     const searchInput = document.getElementById('searchInput');
     const routeFilter = document.getElementById('routeFilter');
-    const statusFilter = document.getElementById('statusFilter');
-    const searchButton = document.getElementById('searchButton');
     const clearButton = document.getElementById('clearButton');
+    const emptyClearButton = document.getElementById('emptyClearButton');
     const toggleCards = document.getElementById('toggleCards');
     const toggleTable = document.getElementById('toggleTable');
     const base = document.getElementById('base');
     const tableContainer = document.getElementById('busTableContainer');
     const tableBody = document.querySelector('#busTable tbody');
+    const visibleCount = document.getElementById('visibleCount');
+    const visibleCountLabel = document.getElementById('visibleCountLabel');
+    const resultsMessage = document.getElementById('resultsMessage');
+    const noResults = document.getElementById('noResults');
+    const authenticated = document.body.classList.contains('bus-directory-page--authenticated');
+
+    if (!searchInput || !routeFilter || !base || !tableContainer || !tableBody) {
+        return;
+    }
+
+    let listView = false;
+
+    function normalize(value) {
+        return (value || '')
+            .toLocaleLowerCase('es')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .trim();
+    }
 
     function buildRouteOptions() {
-        const routes = new Set();
-        busItems.forEach(li => {
-            const ruta = li.dataset.ruta?.trim();
-            if (ruta) routes.add(ruta);
-        });
-        routes.forEach(ruta => {
+        const routes = [...new Set(busItems
+            .map((item) => item.dataset.ruta.trim())
+            .filter(Boolean))]
+            .sort((first, second) => first.localeCompare(second, 'es'));
+
+        routes.forEach((route) => {
             const option = document.createElement('option');
-            option.value = ruta;
-            option.textContent = ruta;
+            option.value = route;
+            option.textContent = route;
             routeFilter.appendChild(option);
         });
     }
 
-    function matchesFilter(li) {
-        const text = [
-            li.querySelector('.bus-title')?.textContent,
-            li.dataset.ruta,
-            li.dataset.conductor,
-            li.dataset.modelo,
-            li.dataset.color
-        ].join(' ').toLowerCase();
+    function matchesFilter(item) {
+        const neighborhoods = Array.from(item.querySelectorAll('.barrios li'))
+            .map((neighborhood) => neighborhood.textContent.trim());
+        const searchableText = normalize([
+            item.dataset.placa,
+            item.dataset.ruta,
+            item.dataset.conductor,
+            item.dataset.modelo,
+            item.dataset.color,
+            neighborhoods.join(' ')
+        ].join(' '));
+        const query = normalize(searchInput.value);
+        const selectedRoute = routeFilter.value;
 
-        const searchValue = searchInput.value.trim().toLowerCase();
-        const routeValue = routeFilter.value;
-        const statusValue = statusFilter.value;
+        return (!query || searchableText.includes(query))
+            && (!selectedRoute || item.dataset.ruta === selectedRoute);
+    }
 
-        const matchesSearch = !searchValue || text.includes(searchValue);
-        const matchesRoute = !routeValue || li.dataset.ruta === routeValue;
-        const matchesStatus = !statusValue || li.dataset.estado === statusValue;
+    function appendCell(row, value) {
+        const cell = document.createElement('td');
+        cell.textContent = value || '—';
+        row.appendChild(cell);
+    }
 
-        return matchesSearch && matchesRoute && matchesStatus;
+    function renderTable(items) {
+        tableBody.replaceChildren();
+        items.forEach((item) => {
+            const row = document.createElement('tr');
+            const neighborhoods = Array.from(item.querySelectorAll('.barrios li'))
+                .map((neighborhood) => neighborhood.textContent.trim())
+                .filter(Boolean)
+                .join(', ');
+
+            if (authenticated) {
+                appendCell(row, `#${item.dataset.id}`);
+                appendCell(row, item.dataset.placa || 'Placa no registrada');
+                appendCell(row, item.dataset.ruta || 'Sin ruta asignada');
+                appendCell(row, item.dataset.conductor || 'Sin asignar');
+                appendCell(row, item.dataset.modelo || 'No registrado');
+                appendCell(row, item.dataset.color || 'No registrado');
+                appendCell(row, neighborhoods || 'Sin barrios registrados');
+                appendCell(row, item.dataset.hora || 'No registrada');
+                appendCell(row, item.dataset.verificada === 'true' ? 'Verificada' : 'Pendiente');
+            } else {
+                appendCell(row, item.dataset.ruta || 'Ruta sin nombre');
+                appendCell(row, neighborhoods || 'Sin barrios registrados');
+            }
+            tableBody.appendChild(row);
+        });
+    }
+
+    function updateViewControls() {
+        base.classList.toggle('is-list', listView);
+        base.hidden = listView;
+        tableContainer.hidden = !listView;
+        toggleCards.classList.toggle('is-active', !listView);
+        toggleTable.classList.toggle('is-active', listView);
+        toggleCards.setAttribute('aria-pressed', String(!listView));
+        toggleTable.setAttribute('aria-pressed', String(listView));
     }
 
     function applyFilter() {
-        let visibleCount = 0;
-        tableBody.innerHTML = '';
+        const matchingItems = busItems.filter(matchesFilter);
+        const queryActive = Boolean(searchInput.value.trim() || routeFilter.value);
 
-        busItems.forEach(li => {
-            const visible = matchesFilter(li);
-            li.style.display = visible ? '' : 'none';
-            if (visible) {
-                visibleCount += 1;
-                if (tableContainer.style.display !== 'none') {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${li.querySelector('.bus-title')?.textContent || ''}</td>
-                        <td>${li.dataset.ruta || 'Sin ruta'}</td>
-                        <td>${li.dataset.conductor || 'Sin asignar'}</td>
-                        <td>${li.dataset.modelo || 'N/A'}</td>
-                        <td>${li.dataset.color || 'N/A'}</td>
-                        <td>${Array.from(li.querySelectorAll('.barrios li')).map(item => item.textContent).join(', ') || 'Sin barrios'}</td>
-                    `;
-                    tableBody.appendChild(row);
-                }
-            }
+        busItems.forEach((item) => {
+            const visible = matchingItems.includes(item);
+            item.hidden = !visible;
         });
 
-        if (visibleCount === 0) {
-            tableBody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:1rem;color:#6b7a94;">No hay buses que coincidan con los filtros.</td></tr>`;
+        visibleCount.textContent = String(matchingItems.length);
+        visibleCountLabel.textContent = matchingItems.length === 1 ? 'unidad' : 'unidades';
+        resultsMessage.textContent = queryActive
+            ? `Mostrando ${matchingItems.length} de ${busItems.length} unidades`
+            : 'Mostrando todas las unidades';
+        noResults.hidden = busItems.length === 0 || matchingItems.length > 0;
+
+        if (listView) {
+            renderTable(matchingItems);
         }
     }
 
     function resetFilters() {
         searchInput.value = '';
         routeFilter.value = '';
-        statusFilter.value = '';
         applyFilter();
+        searchInput.focus();
     }
 
-    function showCards() {
-        base.style.display = '';
-        tableContainer.style.display = 'none';
-        toggleCards.classList.add('active');
-        toggleTable.classList.remove('active');
-        applyFilter();
-    }
+    busItems.forEach((item) => {
+        const trigger = item.querySelector('.bus-card-trigger');
+        const details = item.querySelector('.bus-card-details');
+        if (!trigger || !details) {
+            return;
+        }
 
-    function showTable() {
-        base.style.display = 'none';
-        tableContainer.style.display = '';
-        toggleCards.classList.remove('active');
-        toggleTable.classList.add('active');
-        applyFilter();
-    }
-
-    busItems.forEach(li => {
-        li.addEventListener('keydown', e => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                li.classList.toggle('open');
-                e.preventDefault();
-            }
+        trigger.addEventListener('click', () => {
+            const isOpen = item.classList.toggle('is-open');
+            trigger.setAttribute('aria-expanded', String(isOpen));
+            details.setAttribute('aria-hidden', String(!isOpen));
         });
-        li.addEventListener('click', () => li.classList.toggle('open'));
+    });
+
+    if (clearButton) {
+        clearButton.addEventListener('click', resetFilters);
+    }
+    if (emptyClearButton) {
+        emptyClearButton.addEventListener('click', resetFilters);
+    }
+
+    searchInput.addEventListener('input', applyFilter);
+    routeFilter.addEventListener('change', applyFilter);
+
+    toggleCards.addEventListener('click', () => {
+        listView = false;
+        updateViewControls();
+        applyFilter();
+    });
+
+    toggleTable.addEventListener('click', () => {
+        listView = true;
+        updateViewControls();
+        applyFilter();
+    });
+
+    document.addEventListener('keydown', (event) => {
+        const target = event.target;
+        const isTyping = target instanceof HTMLElement
+            && (target.isContentEditable || ['INPUT', 'SELECT', 'TEXTAREA'].includes(target.tagName));
+
+        if (event.key === '/' && !isTyping) {
+            event.preventDefault();
+            searchInput.focus();
+        } else if (event.key === 'Escape' && target === searchInput && searchInput.value) {
+            resetFilters();
+        }
     });
 
     buildRouteOptions();
-    searchButton.addEventListener('click', applyFilter);
-    clearButton.addEventListener('click', resetFilters);
-    toggleCards.addEventListener('click', showCards);
-    toggleTable.addEventListener('click', showTable);
+    updateViewControls();
     applyFilter();
 });
