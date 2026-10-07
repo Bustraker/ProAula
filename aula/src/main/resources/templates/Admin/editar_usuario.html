@@ -2,63 +2,89 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <meta name="theme-color" content="#01315f">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Editar Usuario - Admin</title>
-    <link rel="stylesheet" th:href="@{/css/style_3.css}">
-    <link rel="shortcut icon" th:href="@{/images/Bus_icono.png}" type="image/x-icon">    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#24191c">
+    <meta name="description" content="Actualiza la información de una cuenta de Bustraker.">
+    <title>Editar usuario · Bustraker Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/admin_pantallas_pendientes.css(v='admin-screens-20261005-1')}">
+    <link rel="shortcut icon" th:href="@{/images/Bus_icono.png}" type="image/x-icon">
 </head>
-<body>
-    <header>
-        <h1>Editar Usuario</h1>
-        <a th:href="@{/gestionar-usuarios}">Volver a Gestión</a>
-    </header>
+<body class="legacy-admin legacy-admin-account">
+<div class="legacy-shell">
+    <aside class="legacy-sidebar">
+        <a class="legacy-brand" th:href="@{/index_2}"><span class="legacy-brand__icon"><i class="fas fa-bus" aria-hidden="true"></i></span><span><strong>Bustraker</strong><small>Centro de operaciones</small></span></a>
+        <nav class="legacy-nav" aria-label="Navegación administrativa">
+            <span class="legacy-nav__label">ADMINISTRACIÓN</span>
+            <a th:href="@{/index_2}"><i class="fas fa-house" aria-hidden="true"></i><span>Panel principal</span></a>
+            <a th:href="@{/gestionar-usuarios}" class="is-active" aria-current="page"><i class="fas fa-users" aria-hidden="true"></i><span>Gestión de usuarios</span></a>
+            <a th:href="@{/reportes}"><i class="fas fa-chart-column" aria-hidden="true"></i><span>Reportes</span></a>
+            <a th:href="@{/mensajes_contacto}"><i class="fas fa-envelope" aria-hidden="true"></i><span>Mensajes</span></a>
+            <a th:href="@{/rutas/admin}"><i class="fas fa-route" aria-hidden="true"></i><span>Gestión de rutas</span></a>
+            <a th:href="@{/registro-buses}"><i class="fas fa-bus-simple" aria-hidden="true"></i><span>Gestión de buses</span></a>
+        </nav>
+        <div class="legacy-sidebar__footer"><span class="legacy-status-dot"></span><span>Sistema operativo</span></div>
+    </aside>
 
-    <main>
-        <form th:action="@{/actualizar-usuario}" method="post">
-            <input type="hidden" name="id" th:value="${usuario.id}" />
-            <div>
-                <label>Usuario:
-                    <input type="text" name="username" th:value="${usuario.username}" required />
-                </label>
-            </div>
-            <div>
-                <label>Nombres:
-                    <input type="text" name="nombres" th:value="${usuario.nombres}" required />
-                </label>
-            </div>
-            <div>
-                <label>Apellidos:
-                    <input type="text" name="apellidos" th:value="${usuario.apellidos}" required />
-                </label>
-            </div>
-            <div>
-                <label>Email:
-                    <input type="email" name="email" th:value="${usuario.email}" required />
-                </label>
-            </div>
-            <div>
-                <label>Contraseña (dejar en blanco para mantener):
-                    <input type="password" name="password" placeholder="Nueva contraseña" />
-                </label>
-            </div>
-            <div>
-                <label>Rol:
-                    <select name="role" required>
-                        <option th:value="USER" th:selected="${usuario.role == 'USER'}">Usuario</option>
-                        <option th:value="ADMIN" th:selected="${usuario.role == 'ADMIN'}">Administrador</option>
-                    </select>
-                </label>
-            </div>
-            <div class="mt-3">
-                <button type="submit">Guardar cambios</button>
-                <a th:href="@{/gestionar-usuarios}" class="ml-3">Cancelar</a>
-            </div>
-        </form>
+    <main class="legacy-main">
+        <header class="legacy-topbar">
+            <div class="legacy-breadcrumb"><a th:href="@{/index_2}">Administración</a><i class="fas fa-chevron-right" aria-hidden="true"></i><a th:href="@{/gestionar-usuarios}">Usuarios</a><i class="fas fa-chevron-right" aria-hidden="true"></i><strong>Editar cuenta</strong></div>
+            <a class="legacy-back" th:href="@{/gestionar-usuarios}"><i class="fas fa-arrow-left" aria-hidden="true"></i> Volver a usuarios</a>
+        </header>
+        <div class="legacy-content legacy-content--narrow">
+            <section class="legacy-hero legacy-hero--account" aria-labelledby="editAccountTitle">
+                <div>
+                    <p class="legacy-eyebrow"><span></span> DIRECTORIO DE CUENTAS · BUSTRAKER</p>
+                    <h1 id="editAccountTitle">Una cuenta<br><em>bien mantenida.</em></h1>
+                    <p>Actualiza los datos de contacto y conserva la identidad de acceso de esta cuenta.</p>
+                    <div class="legacy-hero__meta"><span><i class="fas fa-user-shield" aria-hidden="true"></i> Edición administrativa</span><span><i class="fas fa-lock" aria-hidden="true"></i> Acceso protegido</span></div>
+                </div>
+                <div class="legacy-hero-art legacy-hero-art--account" aria-hidden="true">
+                    <span class="legacy-art-grid"></span><span class="legacy-account-orbit"></span><span class="legacy-account-avatar"><i class="fas fa-user"></i></span>
+                    <span class="legacy-art-caption"><i class="fas fa-address-card"></i> Perfil de usuario</span>
+                </div>
+            </section>
+            <section class="legacy-card legacy-form-panel" aria-labelledby="accountFormTitle">
+                <div class="legacy-section-heading">
+                    <span class="legacy-section-icon"><i class="fas fa-user-pen" aria-hidden="true"></i></span>
+                    <div><p class="legacy-eyebrow">INFORMACIÓN DE CUENTA</p><h2 id="accountFormTitle">Editar datos del usuario</h2></div>
+                </div>
+                <p class="legacy-card-intro">El nombre de usuario y el rol se muestran como información de referencia. Puedes actualizar el nombre, correo y contraseña.</p>
+                <div class="legacy-account-summary">
+                    <div><span>USUARIO DE ACCESO</span><strong th:text="${usuario.username}">usuario</strong></div>
+                    <div><span>ROL ACTUAL</span><strong th:text="${usuario.role == 'ADMIN' ? 'Administrador' : 'Usuario'}">Usuario</strong></div>
+                </div>
+                <form th:action="@{/actualizar-usuario}" method="post" class="legacy-form legacy-form--two-column">
+                    <input type="hidden" name="id" th:value="${usuario.id}">
+                    <div class="legacy-field">
+                        <label for="nombres">Nombres</label>
+                        <div class="legacy-input-wrap"><i class="fas fa-user" aria-hidden="true"></i><input type="text" id="nombres" name="nombres" th:value="${usuario.nombres}" autocomplete="given-name" required></div>
+                    </div>
+                    <div class="legacy-field">
+                        <label for="apellidos">Apellidos</label>
+                        <div class="legacy-input-wrap"><i class="fas fa-user" aria-hidden="true"></i><input type="text" id="apellidos" name="apellidos" th:value="${usuario.apellidos}" autocomplete="family-name" required></div>
+                    </div>
+                    <div class="legacy-field legacy-field--wide">
+                        <label for="email">Correo electrónico</label>
+                        <div class="legacy-input-wrap"><i class="fas fa-envelope" aria-hidden="true"></i><input type="email" id="email" name="email" th:value="${usuario.email}" autocomplete="email" required></div>
+                    </div>
+                    <div class="legacy-field legacy-field--wide">
+                        <label for="newPassword">Nueva contraseña <span class="legacy-optional">Opcional</span></label>
+                        <div class="legacy-input-wrap"><i class="fas fa-lock" aria-hidden="true"></i><input type="password" id="newPassword" name="newPassword" placeholder="Dejar vacío para conservar la actual" autocomplete="new-password"></div>
+                        <small>Solo se cambiará la contraseña si escribes una nueva.</small>
+                    </div>
+                    <div class="legacy-form-actions legacy-field--wide">
+                        <a class="legacy-button legacy-button--secondary" th:href="@{/gestionar-usuarios}">Cancelar</a>
+                        <button type="submit" class="legacy-button"><i class="fas fa-check" aria-hidden="true"></i> Guardar cambios</button>
+                    </div>
+                </form>
+            </section>
+            <footer class="legacy-page-footer"><span>BUSTRAKER · DIRECTORIO DE CUENTAS</span><a th:href="@{/gestionar-usuarios}">Volver a usuarios <i class="fas fa-arrow-right" aria-hidden="true"></i></a></footer>
+        </div>
     </main>
-
+</div>
 </body>
 </html>

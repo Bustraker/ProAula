@@ -1,28 +1,35 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const perfilForm = document.querySelector('form');
-    if (!perfilForm) return;
+document.addEventListener('DOMContentLoaded', function () {
+    const passwordForm = document.querySelector('.profile-password-form');
+    const newPassword = document.getElementById('passwordNuevo');
+    const confirmation = document.getElementById('passwordConfirmar');
+    const matchMessage = document.getElementById('passwordMatch');
 
-    perfilForm.addEventListener('submit', function(e) {
-        const password = document.getElementById('password').value;
-        const confirmPassword = document.getElementById('confirmPassword').value;
+    if (!passwordForm || !newPassword || !confirmation || !matchMessage) {
+        return;
+    }
 
-        if (password && password !== confirmPassword) {
-            e.preventDefault();
-            alert('❌ Las contraseñas no coinciden. Por favor, verifica e intenta de nuevo.');
-            return false;
+    const validateConfirmation = function () {
+        if (!confirmation.value) {
+            confirmation.setCustomValidity('');
+            matchMessage.textContent = '';
+            matchMessage.classList.remove('is-match', 'is-mismatch');
+            return true;
         }
 
-        if (password && password.length < 6) {
-            e.preventDefault();
-            alert('❌ La contraseña debe tener al menos 6 caracteres.');
-            return false;
+        const matches = newPassword.value === confirmation.value;
+        confirmation.setCustomValidity(matches ? '' : 'Las contraseñas no coinciden.');
+        matchMessage.textContent = matches ? 'Las contraseñas coinciden.' : 'Las contraseñas no coinciden.';
+        matchMessage.classList.toggle('is-match', matches);
+        matchMessage.classList.toggle('is-mismatch', !matches);
+        return matches;
+    };
+
+    newPassword.addEventListener('input', validateConfirmation);
+    confirmation.addEventListener('input', validateConfirmation);
+    passwordForm.addEventListener('submit', function (event) {
+        if (!validateConfirmation()) {
+            event.preventDefault();
+            confirmation.reportValidity();
         }
     });
 });
-
-function confirmarEliminacion() {
-    const confirmado = confirm('⚠️ ¿Estás absolutamente seguro de que deseas eliminar tu cuenta?\n\nEsta acción no se puede deshacer y perderás todos tus datos.');
-    if (confirmado) {
-        alert('Función en desarrollo - Contacta al administrador');
-    }
-}

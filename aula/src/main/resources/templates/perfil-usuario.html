@@ -3,284 +3,257 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Perfil de Usuario - Bustraker">
-    <meta name="theme-color" content="#01315f">
-    <title>Mi Perfil - Bustraker</title>
+    <meta name="description" content="Administra tu perfil, seguridad y actividad en Bustraker.">
+    <meta name="theme-color" content="#071421">
+    <title>Mi perfil - Bustraker</title>
     <link rel="stylesheet" th:href="@{/css/style_perfil.css}">
     <link rel="stylesheet" th:href="@{/css/style_common.css}">
+    <link rel="stylesheet" th:href="@{/css/perfil-profesional.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="shortcut icon" th:href="@{/images/Bus_icono.png}" type="image/x-icon">
 </head>
-<body>
-        <!-- Encabezado -->
+<body class="profile-page">
     <header class="main-header">
         <div class="header-inner">
-            <div class="logo">
-                <img th:src="@{/images/Bus_icono.png}" alt="Logo Bustraker">
+            <a class="logo" th:href="@{/dashboard}" aria-label="Bustraker, ir al panel">
+                <img th:src="@{/images/Bus_icono.png}" alt="">
                 <span class="brand">Bustraker</span>
-            </div>
-            <nav class="main-nav">
+            </a>
+            <nav class="main-nav" aria-label="Navegación principal">
                 <a th:href="@{/dashboard}" class="nav-link">
-                    <i class="fas fa-home"></i> Dashboard
+                    <i class="fas fa-house" aria-hidden="true"></i> Dashboard
                 </a>
-                <a th:href="@{/perfil}" class="nav-link">
-                    <i class="fas fa-user"></i> Perfil
+                <a th:href="@{/perfil}" class="nav-link" aria-current="page">
+                    <i class="fas fa-user" aria-hidden="true"></i> Perfil
                 </a>
                 <a th:href="@{/rutas}" class="nav-link">
-                    <i class="fas fa-route"></i> Rutas
+                    <i class="fas fa-route" aria-hidden="true"></i> Rutas
                 </a>
                 <a th:href="@{/historial}" class="nav-link">
-                    <i class="fas fa-history"></i> Historial
+                    <i class="fas fa-clock-rotate-left" aria-hidden="true"></i> Historial
                 </a>
                 <a th:href="@{/viajar}" class="nav-link">
-                    <i class="fas fa-bus"></i> Viajar
+                    <i class="fas fa-bus" aria-hidden="true"></i> Viajar
                 </a>
                 <a th:href="@{/logout}" class="nav-link nav-link--outline">
-                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    <i class="fas fa-arrow-right-from-bracket" aria-hidden="true"></i> Cerrar sesión
                 </a>
             </nav>
         </div>
     </header>
 
-    <!-- Contenido principal -->
-    <main class="container container-md">
-        <!-- Mensajes de alerta -->
-        <div th:if="${success}" class="alert alert-success">
-            <i class="fas fa-check-circle"></i>
-            <span th:text="${success}">Perfil actualizado exitosamente</span>
-        </div>
-        
-        <div th:if="${error}" class="alert alert-danger">
-            <i class="fas fa-exclamation-triangle"></i>
-            <span th:text="${error}">Error al actualizar el perfil</span>
+    <main class="profile-main">
+        <div class="profile-page-heading">
+            <div>
+                <span class="profile-eyebrow"><i class="fas fa-sliders" aria-hidden="true"></i> ESPACIO PERSONAL</span>
+                <h1>Tu perfil</h1>
+                <p>Administra tu información y mantén tu cuenta al día.</p>
+            </div>
+            <a class="profile-history-link" th:href="@{/historial}">
+                <i class="fas fa-clock-rotate-left" aria-hidden="true"></i>
+                <span>Ver historial</span>
+                <i class="fas fa-arrow-up-right-from-square profile-history-arrow" aria-hidden="true"></i>
+            </a>
         </div>
 
-        <!-- Header del Perfil -->
-        <section class="section">
-            <div class="profile-header">
-                <div class="profile-avatar">
-                    <i class="fas fa-user"></i>
-                </div>
-                <h1 class="profile-name" th:text="${usuario.nombres} + ' ' + ${usuario.apellidos}">Nombre Usuario</h1>
-                <p class="profile-email" th:text="${usuario.email}">usuario@email.com</p>
-                <div class="mt-3">
-                    <span class="badge" th:classappend="${usuario.role == 'ADMIN'} ? 'badge-danger' : 'badge-primary'"
-                          th:text="${usuario.role == 'ADMIN'} ? 'Administrador' : 'Usuario'">
-                        Usuario
+        <div th:if="${success}" class="profile-notice profile-notice--success" role="status" aria-live="polite">
+            <span class="profile-notice-icon" aria-hidden="true"><i class="fas fa-circle-check"></i></span>
+            <span th:text="${success}">Perfil actualizado exitosamente</span>
+        </div>
+        <div th:if="${error}" class="profile-notice profile-notice--error" role="alert">
+            <span class="profile-notice-icon" aria-hidden="true"><i class="fas fa-triangle-exclamation"></i></span>
+            <span th:text="${error}">No se pudo completar la solicitud</span>
+        </div>
+
+        <section class="profile-identity" aria-labelledby="profileName">
+            <div class="profile-identity-glow" aria-hidden="true"></div>
+            <div class="profile-avatar" aria-hidden="true">
+                <span th:text="${#strings.substring(usuario.nombres, 0, 1) + #strings.substring(usuario.apellidos, 0, 1)}">US</span>
+            </div>
+            <div class="profile-identity-copy">
+                <span class="profile-identity-kicker">CUENTA BUSTRAKER</span>
+                <h2 id="profileName" th:text="${usuario.nombres} + ' ' + ${usuario.apellidos}">Nombre Usuario</h2>
+                <p class="profile-identity-email">
+                    <i class="fas fa-envelope" aria-hidden="true"></i>
+                    <span th:text="${usuario.email}">usuario@email.com</span>
+                </p>
+                <div class="profile-identity-tags">
+                    <span class="profile-tag profile-tag--role">
+                        <i class="fas fa-shield-halved" aria-hidden="true"></i>
+                        <span th:text="${#strings.contains(usuario.role, 'ADMIN')} ? 'Administrador' : 'Usuario'">Usuario</span>
+                    </span>
+                    <span class="profile-tag">
+                        <i class="fas fa-link" aria-hidden="true"></i>
+                        <span th:text="${providerLabel}">Cuenta local</span>
+                    </span>
+                    <span class="profile-tag">
+                        <i class="fas fa-at" aria-hidden="true"></i>
+                        <span th:text="${usuario.username}">usuario</span>
                     </span>
                 </div>
             </div>
+            <div class="profile-identity-mark" aria-hidden="true">
+                <span class="profile-mark-orbit profile-mark-orbit--outer"></span>
+                <span class="profile-mark-orbit profile-mark-orbit--inner"></span>
+                <i class="fas fa-id-card-clip"></i>
+            </div>
         </section>
 
-        <!-- Información Personal -->
-        <section class="section">
-            <div class="card">
-                <div class="card-header">
-                    <h3><i class="fas fa-user-circle"></i> Información Personal</h3>
+        <section class="profile-activity" aria-labelledby="profileActivityTitle">
+            <div class="profile-subsection-heading">
+                <div>
+                    <span class="profile-section-kicker">TU MOVILIDAD</span>
+                    <h2 id="profileActivityTitle">Actividad de la cuenta</h2>
                 </div>
-                <div class="card-body">
-                    <form th:action="@{/perfil/actualizar}" method="post" th:object="${usuario}">
-                        <div class="d-flex gap-2 flex-wrap">
-                            <div class="form-group flex-1 min-w-250">
-                                <label class="form-label" for="nombres">
-                                    <i class="fas fa-user"></i> Nombres
-                                </label>
-                                <input type="text" 
-                                       id="nombres" 
-                                       name="nombres"
-                                       class="form-control" 
-                                       th:value="${usuario.nombres}"
-                                       placeholder="Tus nombres"
-                                       required>
-                            </div>
-                            
-                            <div class="form-group flex-1 min-w-250">
-                                <label class="form-label" for="apellidos">
-                                    <i class="fas fa-user"></i> Apellidos
-                                </label>
-                                <input type="text" 
-                                       id="apellidos" 
-                                       name="apellidos"
-                                       class="form-control" 
-                                       th:value="${usuario.apellidos}"
-                                       placeholder="Tus apellidos"
-                                       required>
+                <span class="profile-summary-label"><i class="fas fa-chart-simple" aria-hidden="true"></i> Vista general</span>
+            </div>
+            <div class="profile-activity-grid">
+                <article class="profile-activity-card profile-activity-card--trips">
+                    <span class="profile-activity-icon" aria-hidden="true"><i class="fas fa-route"></i></span>
+                    <div>
+                        <span>Viajes registrados</span>
+                        <strong th:text="${viajesTotal}">0</strong>
+                    </div>
+                    <span class="profile-activity-watermark" aria-hidden="true">01</span>
+                </article>
+                <article class="profile-activity-card profile-activity-card--complete">
+                    <span class="profile-activity-icon" aria-hidden="true"><i class="fas fa-circle-check"></i></span>
+                    <div>
+                        <span>Viajes completados</span>
+                        <strong th:text="${viajesCompletados}">0</strong>
+                    </div>
+                    <span class="profile-activity-watermark" aria-hidden="true">02</span>
+                </article>
+                <a class="profile-activity-card profile-activity-card--history" th:href="@{/historial}">
+                    <span class="profile-activity-icon" aria-hidden="true"><i class="fas fa-book-open"></i></span>
+                    <div>
+                        <span>Registro personal</span>
+                        <strong>Explorar historial</strong>
+                    </div>
+                    <i class="fas fa-arrow-right profile-activity-arrow" aria-hidden="true"></i>
+                </a>
+            </div>
+        </section>
+
+        <div class="profile-settings-grid">
+            <section class="profile-panel profile-panel--details" aria-labelledby="profileDetailsTitle">
+                <div class="profile-panel-heading">
+                    <span class="profile-panel-icon" aria-hidden="true"><i class="fas fa-user-pen"></i></span>
+                    <div>
+                        <span class="profile-section-kicker">IDENTIDAD</span>
+                        <h2 id="profileDetailsTitle">Información personal</h2>
+                        <p>Actualiza cómo aparece tu información en la cuenta.</p>
+                    </div>
+                </div>
+                <form th:action="@{/perfil/actualizar}" method="post" class="profile-form" autocomplete="on">
+                    <div class="profile-form-row">
+                        <div class="profile-field">
+                            <label for="nombres">Nombres</label>
+                            <div class="profile-input-wrap">
+                                <i class="fas fa-user" aria-hidden="true"></i>
+                                <input type="text" id="nombres" name="nombres" th:value="${usuario.nombres}"
+                                       placeholder="Tus nombres" autocomplete="given-name" required>
                             </div>
                         </div>
-
-                        <div class="form-group">
-                            <label class="form-label" for="email">
-                                <i class="fas fa-envelope"></i> Email
-                            </label>
-                            <input type="email" 
-                                   id="email" 
-                                   name="email"
-                                   class="form-control" 
-                                   th:value="${usuario.email}"
-                                   placeholder="tu@email.com"
-                                   required>
+                        <div class="profile-field">
+                            <label for="apellidos">Apellidos</label>
+                            <div class="profile-input-wrap">
+                                <i class="fas fa-user" aria-hidden="true"></i>
+                                <input type="text" id="apellidos" name="apellidos" th:value="${usuario.apellidos}"
+                                       placeholder="Tus apellidos" autocomplete="family-name" required>
+                            </div>
                         </div>
+                    </div>
+                    <div class="profile-field">
+                        <label for="email">Correo electrónico</label>
+                        <div class="profile-input-wrap">
+                            <i class="fas fa-envelope" aria-hidden="true"></i>
+                            <input type="email" id="email" name="email" th:value="${usuario.email}"
+                                   placeholder="tu@correo.com" autocomplete="email" required>
+                        </div>
+                        <span class="profile-field-hint">Usaremos este correo para identificar tu cuenta.</span>
+                    </div>
+                    <div class="profile-form-footer">
+                        <span><i class="fas fa-circle-info" aria-hidden="true"></i> Los cambios se aplican al guardar.</span>
+                        <button type="submit" class="profile-button profile-button--primary">
+                            <i class="fas fa-floppy-disk" aria-hidden="true"></i> Guardar perfil
+                        </button>
+                    </div>
+                </form>
+            </section>
 
-                        <div class="d-flex justify-between align-center flex-wrap">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save"></i> Guardar Cambios
+            <section class="profile-panel profile-panel--security" aria-labelledby="profileSecurityTitle">
+                <div class="profile-panel-heading">
+                    <span class="profile-panel-icon profile-panel-icon--security" aria-hidden="true"><i class="fas fa-fingerprint"></i></span>
+                    <div>
+                        <span class="profile-section-kicker">PROTECCIÓN</span>
+                        <h2 id="profileSecurityTitle">Seguridad de la cuenta</h2>
+                        <p>Cambia tu contraseña cuando necesites renovarla.</p>
+                    </div>
+                </div>
+                <form th:action="@{/perfil/cambiar-password}" method="post" class="profile-form profile-password-form" autocomplete="on">
+                    <div class="profile-field">
+                        <label for="passwordActual">Contraseña actual</label>
+                        <div class="profile-input-wrap profile-input-wrap--password">
+                            <i class="fas fa-key" aria-hidden="true"></i>
+                            <input type="password" id="passwordActual" name="passwordActual"
+                                   placeholder="Escribe tu contraseña actual" autocomplete="current-password" required>
+                            <button type="button" class="profile-password-toggle" data-password-toggle
+                                    aria-controls="passwordActual" aria-label="Mostrar contraseña actual"
+                                    data-show-label="Mostrar contraseña actual" data-hide-label="Ocultar contraseña actual">
+                                <i class="fas fa-eye" aria-hidden="true"></i>
                             </button>
-                            <span class="form-text">
-                                <i class="fas fa-info-circle"></i> Los cambios se guardarán inmediatamente
-                            </span>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </section>
-
-        <!-- Cambiar Contraseña -->
-        <section class="section">
-            <div class="card">
-                <div class="card-header">
-                    <h3><i class="fas fa-lock"></i> Cambiar Contraseña</h3>
-                </div>
-                <div class="card-body">
-                    <form th:action="@{/perfil/cambiar-password}" method="post">
-                        <div class="form-group">
-                            <label class="form-label" for="passwordActual">
-                                <i class="fas fa-key"></i> Contraseña Actual
-                            </label>
-                            <input type="password" 
-                                   id="passwordActual" 
-                                   name="passwordActual"
-                                   class="form-control" 
-                                   placeholder="••••••••"
-                                   required>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label" for="passwordNuevo">
-                                <i class="fas fa-lock"></i> Nueva Contraseña
-                            </label>
-                            <input type="password" 
-                                   id="passwordNuevo" 
-                                   name="passwordNuevo"
-                                   class="form-control" 
-                                   placeholder="Mínimo 6 caracteres"
-                                   minlength="6"
-                                   required>
-                            <small class="form-text">
-                                <i class="fas fa-shield-alt"></i> La contraseña debe tener al menos 6 caracteres
-                            </small>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label" for="passwordConfirmar">
-                                <i class="fas fa-lock"></i> Confirmar Nueva Contraseña
-                            </label>
-                            <input type="password" 
-                                   id="passwordConfirmar" 
-                                   name="passwordConfirmar"
-                                   class="form-control" 
-                                   placeholder="••••••••"
-                                   required>
-                        </div>
-
-                        <button type="submit" class="btn btn-danger">
-                            <i class="fas fa-key"></i> Cambiar Contraseña
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </section>
-
-        <!-- Estadísticas del Usuario -->
-        <section class="section">
-            <div class="card">
-                <div class="card-header">
-                    <h3><i class="fas fa-chart-bar"></i> Mi Actividad</h3>
-                </div>
-                <div class="card-body">
-                    <div class="dashboard-grid">
-                        <div class="stat-card">
-                            <div class="stat-icon primary">
-                                <i class="fas fa-route"></i>
-                            </div>
-                            <div class="stat-content">
-                                <h4>Rutas Favoritas</h4>
-                                <div class="stat-value" th:text="${rutasFavoritas ?: 0}">0</div>
-                            </div>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-icon success">
-                                <i class="fas fa-check-circle"></i>
-                            </div>
-                            <div class="stat-content">
-                                <h4>Viajes Completados</h4>
-                                <div class="stat-value" th:text="${viajesCompletados ?: 0}">0</div>
-                            </div>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-icon warning">
-                                <i class="fas fa-clock"></i>
-                            </div>
-                            <div class="stat-content">
-                                <h4>Miembro Desde</h4>
-                                <div class="stat-value" th:text="${fechaRegistro ?: '2026'}">2026</div>
-                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Acciones de Cuenta -->
-        <section class="section">
-            <div class="card">
-                <div class="card-header">
-                    <h3><i class="fas fa-cog"></i> Gestión de Cuenta</h3>
-                </div>
-                <div class="card-body">
-                    <div class="d-flex gap-2 flex-wrap">
-                        <a th:href="@{/historial}" class="btn btn-secondary">
-                            <i class="fas fa-history"></i> Ver Historial de Viajes
-                        </a>
-                        
-                        <button class="btn btn-outline js-dev-alert">
-                            <i class="fas fa-bell"></i> Preferencias de Notificación
-                        </button>
+                    <div class="profile-field">
+                        <label for="passwordNuevo">Nueva contraseña</label>
+                        <div class="profile-input-wrap profile-input-wrap--password">
+                            <i class="fas fa-lock" aria-hidden="true"></i>
+                            <input type="password" id="passwordNuevo" name="passwordNuevo"
+                                   placeholder="Al menos 6 caracteres" minlength="6"
+                                   autocomplete="new-password" aria-describedby="passwordHint passwordMatch" required>
+                            <button type="button" class="profile-password-toggle" data-password-toggle
+                                    aria-controls="passwordNuevo" aria-label="Mostrar nueva contraseña"
+                                    data-show-label="Mostrar nueva contraseña" data-hide-label="Ocultar nueva contraseña">
+                                <i class="fas fa-eye" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                        <span id="passwordHint" class="profile-field-hint">Debe contener al menos 6 caracteres.</span>
                     </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Zona de Peligro -->
-        <section class="section">
-            <div class="card card-danger">
-                <div class="card-header card-header-danger">
-                    <h3><i class="fas fa-exclamation-triangle"></i> Zona de Peligro</h3>
-                </div>
-                <div class="card-body">
-                    <p class="text-gray-600 mb-3">
-                        <i class="fas fa-info-circle"></i> 
-                        Estas acciones son permanentes y no se pueden deshacer. Por favor, ten cuidado.
-                    </p>
-                    <div class="d-flex gap-2 flex-wrap">
-                        <button class="btn btn-outline js-dev-alert">
-                            <i class="fas fa-download"></i> Exportar Mis Datos
-                        </button>
-                        
-                        <button class="btn btn-danger js-confirm" data-confirm="¿Estás seguro que deseas eliminar tu cuenta?">
-                            <i class="fas fa-trash"></i> Eliminar Mi Cuenta
-                        </button>
+                    <div class="profile-field">
+                        <label for="passwordConfirmar">Confirma la nueva contraseña</label>
+                        <div class="profile-input-wrap profile-input-wrap--password">
+                            <i class="fas fa-lock" aria-hidden="true"></i>
+                            <input type="password" id="passwordConfirmar" name="passwordConfirmar"
+                                   placeholder="Repite la nueva contraseña" autocomplete="new-password"
+                                   aria-describedby="passwordMatch" required>
+                            <button type="button" class="profile-password-toggle" data-password-toggle
+                                    aria-controls="passwordConfirmar" aria-label="Mostrar confirmación de contraseña"
+                                    data-show-label="Mostrar confirmación de contraseña" data-hide-label="Ocultar confirmación de contraseña">
+                                <i class="fas fa-eye" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                        <span id="passwordMatch" class="profile-match-message" aria-live="polite"></span>
                     </div>
-                </div>
-            </div>
-        </section>
+                    <div class="profile-security-note">
+                        <i class="fas fa-shield-halved" aria-hidden="true"></i>
+                        <span>Para proteger tu cuenta, primero verificaremos tu contraseña actual.</span>
+                    </div>
+                    <button type="submit" class="profile-button profile-button--security">
+                        <i class="fas fa-key" aria-hidden="true"></i> Actualizar contraseña
+                    </button>
+                </form>
+            </section>
+        </div>
     </main>
 
-    <!-- Pie de página -->
-    <footer class="footer-dark">
-        <div class="container text-center">
-            <p class="footer-note">&copy; 2026 Bustraker. Todos los derechos reservados.</p>
+    <footer class="profile-footer">
+        <div class="profile-footer-inner">
+            <div class="profile-footer-brand">
+                <img th:src="@{/images/Bus_icono.png}" alt="">
+                <div><strong>Bustraker</strong><span>Movilidad universitaria, mejor organizada.</span></div>
+            </div>
+            <span>&copy; 2026 Bustraker. Todos los derechos reservados.</span>
         </div>
     </footer>
 

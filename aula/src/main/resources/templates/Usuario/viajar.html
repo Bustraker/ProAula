@@ -3,69 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="description" content="Mapa y consulta de rutas - Bustraker">
     <meta name="theme-color" content="#01315f">
-    <!-- CSRF seguridad -->
     <meta name="_csrf" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title>Viajar - Bustraker</title>
-    <!-- Use only the page-specific styles for a clean private map page -->
     <link rel="shortcut icon" th:href="@{/images/Bus_icono.png}" type="image/x-icon">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" th:href="@{/css/viajar.css}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous">
+    <link rel="preconnect" href="https://server.arcgisonline.com" crossorigin>
+    <link rel="preconnect" href="https://tile.openstreetmap.org" crossorigin>
+    <link rel="stylesheet" th:href="@{/css/travel.css}">
+    <link rel="stylesheet" th:href="@{/css/map-ui.css}">
 </head>
 <body>
-    <div id="map"></div>
+    <div id="map" role="application" aria-label="Mapa de rutas de Cartagena"></div>
+    <noscript><p class="sin-js">Esta página necesita JavaScript para mostrar el mapa y las rutas.</p></noscript>
 
-    <div class="options-panel">
-        <h2><i class="fas fa-route"></i> Consulta de Rutas</h2>
-        
-        <label for="origen"><i class="fas fa-map-marker-alt"></i> 1. ¿En qué barrio estás?</label>
-        <select id="origen">
-            <option value="">Selecciona tu barrio actual</option>
-        </select>
-        
-        <button class="btn-secondary js-detect-location" style="margin: 8px 0;">
-            <i class="fas fa-location-arrow"></i> Detectar Mi Ubicación
-        </button>
-        
-        <label for="destino"><i class="fas fa-map-pin"></i> 2. ¿A qué barrio vas?</label>
-        <select id="destino" disabled>
-            <option value="">Primero selecciona tu barrio de origen</option>
-        </select>
-        
-        <label for="bus"><i class="fas fa-bus"></i> 3. Rutas Disponibles:</label>
-        <div class="toggle-control">
-            <label class="toggle-label">
-                <input id="mostrarParadas" type="checkbox" checked>
-                Mostrar paradas en la ruta
-            </label>
-            <p class="small-text" style="margin-top:8px; color:#a8b7ce;">Origen y destino siempre se muestran; este botón sólo oculta las paradas intermedias.</p>
-        </div>
-        <div id="busList" class="scrollable">
-            <p class="text-muted small-text text-center" style="padding:20px;">
-                Selecciona origen y destino para consultar las rutas y ver el trazado.
-            </p>
-        </div>
-        
-        <div id="rutaInfo" class="ruta-info hidden">
-            <h4><i class="fas fa-info-circle"></i> Datos de la Ruta</h4>
-            <p><strong>Bus:</strong> <span id="infoBus"></span></p>
-            <p><strong>Ruta:</strong> <span id="infoRuta"></span></p>
-            <p><strong>Barrios:</strong> <span id="infoBarrios"></span></p>
-        </div>
-        
-        <hr class="card-divider">
+    <main class="options-panel" aria-label="Consulta de rutas">
+        <header class="panel-cab">
+            <div class="panel-cab__titulo">
+                <span class="panel-kicker">BUSTRAKER · CARTAGENA · USUARIO</span>
+                <h1><i class="fas fa-route" aria-hidden="true"></i> Consulta de rutas</h1>
+            </div>
+            <a class="icon-btn" th:href="@{/index_3}" title="Volver al inicio" aria-label="Volver al inicio"><i class="fas fa-house" aria-hidden="true"></i></a>
+            <button id="btnPanel" class="icon-btn" type="button" aria-expanded="true" aria-label="Minimizar el panel"><i class="fas fa-chevron-down" aria-hidden="true"></i></button>
+        </header>
 
-        <div class="info-note info-card-text">
-            Selecciona origen y destino, luego elige una ruta para ver su trazado en el mapa.
-        </div>
-    </div>
+        <div class="panel-cuerpo">
+            <section class="seccion" aria-labelledby="tituloViaje">
+                <h2 id="tituloViaje" class="seccion__titulo">Tu viaje</h2>
+                <div class="viaje">
+                    <div class="viaje__campos">
+                        <div class="campo">
+                            <span class="campo__marca campo__marca--a" aria-hidden="true">A</span>
+                            <label for="origen" class="sr-only">Barrio de origen</label>
+                            <input id="origen" type="search" list="listaOrigen" placeholder="¿En qué barrio estás?" autocomplete="off" spellcheck="false">
+                        </div>
+                        <div class="campo">
+                            <span class="campo__marca campo__marca--b" aria-hidden="true">B</span>
+                            <label for="destino" class="sr-only">Barrio de destino</label>
+                            <input id="destino" type="search" list="listaDestino" placeholder="Primero elige el origen" autocomplete="off" spellcheck="false" disabled>
+                        </div>
+                    </div>
+                    <button id="btnInvertir" class="icon-btn icon-btn--tenue" type="button" title="Invertir origen y destino" aria-label="Invertir origen y destino"><i class="fas fa-arrow-right-arrow-left fa-rotate-90" aria-hidden="true"></i></button>
+                </div>
+                <datalist id="listaOrigen"></datalist>
+                <datalist id="listaDestino"></datalist>
 
-        <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-        <script th:src="@{/js/common.js}"></script>
-        <script th:src="@{/js/viajar.js}"></script>
+                <div class="fila">
+                    <button id="btnSeguirUbicacion" class="btn btn--secundario" type="button" aria-pressed="false" disabled>
+                        <i class="fas fa-location-arrow" aria-hidden="true"></i> Seguir mi ubicación
+                    </button>
+                    <button id="btnLimpiar" class="btn btn--texto" type="button">Limpiar</button>
+                </div>
+                <output id="locationStatus" class="estado" aria-live="polite">El punto azul es tu ubicación GPS, no la del bus. Solo se muestra en este dispositivo.</output>
+            </section>
+
+            <section class="seccion" aria-labelledby="tituloRutas">
+                <h2 id="tituloRutas" class="seccion__titulo">Rutas disponibles</h2>
+                <p id="resumenBusqueda" class="sr-only" aria-live="polite"></p>
+                <div id="resultados" class="resultados"></div>
+            </section>
+
+            <section id="rutaDetalle" class="detalle" aria-labelledby="detalleTitulo" hidden>
+                <header class="detalle__cab">
+                    <div>
+                        <h2 id="detalleTitulo"></h2>
+                        <p id="detalleTramo" class="detalle__tramo"></p>
+                        <p id="detalleHora" class="detalle__hora"></p>
+                    </div>
+                    <button id="btnCompartir" class="icon-btn" type="button" title="Copiar enlace de esta consulta" aria-label="Copiar enlace de esta consulta"><i class="fas fa-share-nodes" aria-hidden="true"></i></button>
+                </header>
+                <div id="rutaStats" class="mu-stats" role="status"></div>
+                <div class="pestanas" role="tablist" aria-label="Detalle de la ruta">
+                    <button id="tabParadas" class="pestana" type="button" role="tab" data-pestana="paradas" aria-controls="panelParadas" aria-selected="true">Paradas <span id="contadorParadas" class="contador">0</span></button>
+                    <button id="tabBuses" class="pestana" type="button" role="tab" data-pestana="buses" aria-controls="panelBuses" aria-selected="false" tabindex="-1">Buses <span id="contadorBuses" class="contador">0</span></button>
+                    <button id="tabInfo" class="pestana" type="button" role="tab" data-pestana="info" aria-controls="panelInfo" aria-selected="false" tabindex="-1">Información</button>
+                </div>
+                <div id="panelParadas" class="pestana-panel" role="tabpanel" aria-labelledby="tabParadas"></div>
+                <div id="panelBuses" class="pestana-panel" role="tabpanel" aria-labelledby="tabBuses" hidden></div>
+                <div id="panelInfo" class="pestana-panel" role="tabpanel" aria-labelledby="tabInfo" hidden></div>
+            </section>
+
+            <details class="avanzado">
+                <summary>Opciones del mapa</summary>
+                <label class="interruptor"><input id="mostrarParadas" type="checkbox" checked> Mostrar paradas en el mapa</label>
+                <label for="trazadoTranscaribe" class="avanzado__etiqueta">Recorridos TransCaribe (referencia 2024)</label>
+                <select id="trazadoTranscaribe" disabled>
+                    <option value="">Cargando trazados…</option>
+                </select>
+                <p class="nota">Geometrías 2024 de <a href="https://www.arcgis.com/home/item.html?id=5f15cce4f923477b8c40ccc4dc2b84d1" target="_blank" rel="noopener noreferrer">Cartagena Cómo Vamos</a>. Pueden no reflejar cambios posteriores.</p>
+                <p id="barriosTrayecto" class="estado" hidden></p>
+            </details>
+
+            <footer class="panel-pie">
+                Solo aparecen rutas verificadas. El trazado y su tiempo son estimaciones en auto, no el recorrido ni el tiempo real del bus.
+                <a href="https://transcaribe.gov.co/index.php/rutas-sitm/" target="_blank" rel="noopener noreferrer">Mapas oficiales de TransCaribe</a>
+            </footer>
+        </div>
+    </main>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
+    <script th:src="@{/js/map-base.js}"></script>
+    <script th:src="@{/js/map-travel.js}"></script>
+    <script th:src="@{/js/viajar.js}"></script>
 </body>
 </html>

@@ -1,158 +1,306 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" >
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="description" content="Gestionar usuarios - Bustraker Admin">
-    <meta name="theme-color" content="#01315f">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Gestionar Usuarios - Bustraker Admin</title>
-    <link rel="stylesheet" th:href="@{/css/style_3.css}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#24191c">
+    <meta name="description" content="Gestión de usuarios y administradores de Bustraker">
+    <title>Gestión de usuarios - Bustraker Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="shortcut icon" th:href="@{/images/Bus_icono.png}" type="image/x-icon">
+    <link rel="stylesheet" th:href="@{/css/admin_usuarios.css(v='users-20261005-7')}">
 </head>
-<body>
-    <header>
-        <img th:src="@{/images/Bus_palmera.png}" alt="Bus palmera" id="logo2">
-        <h1>Bustraker - Panel Admin</h1>
-        <h2>Gestionar Usuarios</h2>
-        <div id="ingreso">
-            <a id="Volver" th:href="@{/index_2}">Volver al Panel</a>
-        </div>
-    </header>
-    <nav style="position: relative;">
-        <ul>
-            <li><a th:href="@{/index_2}">Panel Admin</a></li>
-            <li><a th:href="@{/registro-buses}">Registrar Buses</a></li>
-            <li><a th:href="@{/actualizarbuses}">Actualizar Buses</a></li>
-            <li><a th:href="@{/eliminarbuses}">Eliminar Buses</a></li>
-            <li><a th:href="@{/gestionar-usuarios}">Gestionar Usuarios</a></li>
-        </ul>
-    </nav>
-    <main>
-        <h2>Gestión de Usuarios</h2>
-        <p>Aquí puedes ver, editar y eliminar cuentas de usuario en el sistema.</p>
+<body class="admin-users">
+    <div class="users-shell">
+        <aside class="users-sidebar">
+            <a class="users-brand" th:href="@{/index_2}">
+                <span class="users-brand__icon"><i class="fas fa-bus" aria-hidden="true"></i></span>
+                <span><strong>Bustraker</strong><small>Centro de operaciones</small></span>
+            </a>
+            <nav class="users-nav" aria-label="Navegación administrativa">
+                <a th:href="@{/index_2}"><i class="fas fa-house" aria-hidden="true"></i><span>Panel principal</span></a>
+                <a th:href="@{/gestionar-usuarios}" class="active" aria-current="page"><i class="fas fa-users" aria-hidden="true"></i><span>Gestión de usuarios</span></a>
+                <a th:href="@{/reportes}"><i class="fas fa-chart-column" aria-hidden="true"></i><span>Reportes</span></a>
+                <a th:href="@{/mensajes_contacto}"><i class="fas fa-envelope" aria-hidden="true"></i><span>Mensajes</span></a>
+                <a th:href="@{/rutas/admin}"><i class="fas fa-route" aria-hidden="true"></i><span>Rutas</span></a>
+                <a th:href="@{/registro-buses}"><i class="fas fa-bus-simple" aria-hidden="true"></i><span>Buses</span></a>
+            </nav>
+            <div class="users-sidebar__footer">
+                <span class="users-status-dot"></span>
+                <span>Sesión administrativa protegida</span>
+            </div>
+        </aside>
 
-        <div th:if="${mensaje != null}" style="background:#e6ffe6;padding:10px;border:1px solid #b3ffb3;margin-bottom:10px;">
-            <strong th:text="${mensaje}">Mensaje</strong>
-        </div>
-
-        <form method="get" action="/gestionar-usuarios" style="margin-bottom: 20px; padding: 15px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 5px;">
-            <label for="buscar" style="font-weight: bold;">Buscar por nombre, email o rol:</label>
-            <input type="text" id="buscar" name="buscar" th:value="${buscar}" placeholder="Ingresa nombre, email o username..." style="padding: 8px; width: 300px; margin-right: 10px; border: 1px solid #ccc; border-radius: 3px;">
-            <button type="submit" style="padding: 8px 15px; background-color: #8e0303; color: white; border: none; border-radius: 3px; cursor: pointer;">Buscar</button>
-            <a th:href="@{/gestionar-usuarios}" style="margin-left: 10px; padding: 8px 15px; background-color: #ccc; color: #333; border: none; border-radius: 3px; text-decoration: none; cursor: pointer;">Limpiar</a>
-        </form>
-
-        <section id="ListaAdministradores">
-            <h3>Administradores</h3>
-            <p>Total de administradores: <strong th:text="${administradores != null ? administradores.size() : 0}">0</strong></p>
-            <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-                <thead>
-                    <tr style="background-color: #8e0303; color: white;">
-                        <th style="border: 1px solid #ccc; padding: 10px; text-align: left;">ID</th>
-                        <th style="border: 1px solid #ccc; padding: 10px; text-align: left;">Nombre</th>
-                        <th style="border: 1px solid #ccc; padding: 10px; text-align: left;">Email</th>
-                        <th style="border: 1px solid #ccc; padding: 10px; text-align: center;">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="usuario : ${administradores}" style="border-bottom: 1px solid #ddd;">
-                        <td style="border: 1px solid #ccc; padding: 10px;" th:text="${usuario.id}">1</td>
-                        <td style="border: 1px solid #ccc; padding: 10px;" th:text="${usuario.nombres} + ' ' + ${usuario.apellidos}">Admin Nombre</td>
-                        <td style="border: 1px solid #ccc; padding: 10px;" th:text="${usuario.email}">admin@mail.com</td>
-                        <td style="border: 1px solid #ccc; padding: 10px; text-align: center;">
-                            <a th:href="@{/editar-usuario/{id}(id=${usuario.id})}" style="color: #8e0303; margin-right: 10px; text-decoration: underline;">Editar</a>
-                            <form th:action="@{/eliminar-usuario/{id}(id=${usuario.id})}" method="post" style="display:inline; margin:0;">
-                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                                <button type="submit" style="background:none;border:none;color:red;text-decoration:underline;cursor:pointer;padding:0;font:inherit;" onclick="return confirm('¿Eliminar administrador?');">Eliminar</button>
-                            </form>
-                        </td>
-                    </tr>
-                    <tr th:if="${administradores == null or administradores.size() == 0}">
-                        <td colspan="4" style="text-align: center; padding: 20px; border: 1px solid #ccc;">No hay administradores registrados</td>
-                    </tr>
-                </tbody>
-            </table>
-        </section>
-
-        <section id="ListaUsuarios">
-            <h3>Usuarios Registrados</h3>
-            <p>Total de usuarios: <strong th:text="${usuarios != null ? usuarios.size() : 0}">0</strong></p>
-            <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-                <thead>
-                    <tr style="background-color: #8e0303; color: white;">
-                        <th style="border: 1px solid #ccc; padding: 10px; text-align: left;">ID</th>
-                        <th style="border: 1px solid #ccc; padding: 10px; text-align: left;">Nombre</th>
-                        <th style="border: 1px solid #ccc; padding: 10px; text-align: left;">Email</th>
-                        <th style="border: 1px solid #ccc; padding: 10px; text-align: center;">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="usuario : ${usuarios}" style="border-bottom: 1px solid #ddd;">
-                        <td style="border: 1px solid #ccc; padding: 10px;" th:text="${usuario.id}">1</td>
-                        <td style="border: 1px solid #ccc; padding: 10px;" th:text="${usuario.nombres} + ' ' + ${usuario.apellidos}">Juan Perez</td>
-                        <td style="border: 1px solid #ccc; padding: 10px;" th:text="${usuario.email}">juan@mail.com</td>
-                        <td style="border: 1px solid #ccc; padding: 10px; text-align: center;">
-                            <a th:href="@{/editar-usuario/{id}(id=${usuario.id})}" style="color: #8e0303; margin-right: 10px; text-decoration: underline;">Editar</a>
-                            <form th:action="@{/eliminar-usuario/{id}(id=${usuario.id})}" method="post" style="display:inline; margin:0;">
-                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                                <button type="submit" style="background:none;border:none;color:red;text-decoration:underline;cursor:pointer;padding:0;font:inherit;" onclick="return confirm('¿Eliminar usuario?');">Eliminar</button>
-                            </form>
-                        </td>
-                    </tr>
-                    <tr th:if="${usuarios == null or usuarios.size() == 0}">
-                        <td colspan="4" style="text-align: center; padding: 20px; border: 1px solid #ccc;">No hay usuarios registrados</td>
-                    </tr>
-                </tbody>
-            </table>
-        </section>
-
-        <section id="AgregarUsuario" style="margin-top: 40px;">
-            <h3>Agregar Nuevo Usuario</h3>
-            <form method="post" action="/admin-crear-usuario">
-                <fieldset>
-                    <legend>Información del Usuario</legend>
-                    <div>
-                        <label>Nombres:
-                            <input type="text" name="nombres" placeholder="Nombres completos" required>
-                        </label>
-                    </div>
-                    <div>
-                        <label>Email:
-                            <input type="email" name="email" placeholder="email@example.com" required>
-                        </label>
-                    </div>
-                    <div>
-                        <label>Usuario:
-                            <input type="text" name="username" placeholder="nombre_usuario" required>
-                        </label>
-                    </div>
-                    <div>
-                        <label>Contraseña:
-                            <input type="password" name="password" placeholder="contraseña" required>
-                        </label>
-                    </div>
-                    <div>
-                        <label>Rol:
-                            <select name="role" required>
-                                <option value="">-- Selecciona rol --</option>
-                                <option value="USER">Usuario</option>
-                                <option value="ADMIN">Administrador</option>
-                            </select>
-                        </label>
-                    </div>
-                </fieldset>
-                <div>
-                    <button type="submit">Crear Usuario</button>
+        <main class="users-main">
+            <header class="users-topbar">
+                <div class="users-breadcrumb">
+                    <span>Administración</span><i class="fas fa-chevron-right" aria-hidden="true"></i><strong>Usuarios</strong>
                 </div>
-            </form>
-        </section>
-    </main>
-    <footer id="pie">
-        <p>&copy; 2025 Bustraker. Todos los derechos reservados.</p>
-        <p>Panel de Administración</p>
-    </footer>
+                <a class="users-return" th:href="@{/index_2}"><i class="fas fa-arrow-left" aria-hidden="true"></i> Volver al panel</a>
+            </header>
+
+            <div class="users-content">
+                <section class="users-intro" aria-labelledby="usersTitle">
+                    <div>
+                        <span class="users-eyebrow"><span class="users-eyebrow__mark"></span> DIRECTORIO DE CUENTAS</span>
+                        <h1 id="usersTitle">Gestión de usuarios</h1>
+                        <p>Consulta, busca y administra los accesos registrados en Bustraker.</p>
+                    </div>
+                    <svg class="users-identity-visual" viewBox="0 0 440 252" aria-hidden="true" focusable="false">
+                        <defs>
+                            <linearGradient id="identity-panel" x1="0" y1="0" x2="1" y2="1">
+                                <stop offset="0" stop-color="#fffdfd"></stop>
+                                <stop offset="0.58" stop-color="#fcf8f8"></stop>
+                                <stop offset="1" stop-color="#f8f0f1"></stop>
+                            </linearGradient>
+                            <linearGradient id="identity-card" x1="0" y1="0" x2="1" y2="1">
+                                <stop offset="0" stop-color="#fff"></stop>
+                                <stop offset="1" stop-color="#fbf6f6"></stop>
+                            </linearGradient>
+                            <linearGradient id="identity-core" x1="0" y1="0" x2="0.9" y2="1">
+                                <stop offset="0" stop-color="#b64b59"></stop>
+                                <stop offset="1" stop-color="#922b39"></stop>
+                            </linearGradient>
+                            <pattern id="identity-grid" width="18" height="18" patternUnits="userSpaceOnUse">
+                                <path d="M18 0H0V18" fill="none" stroke="#a52a3a" stroke-opacity=".035" stroke-width=".6"></path>
+                            </pattern>
+                            <filter id="identity-shadow" x="-30%" y="-30%" width="160%" height="180%">
+                                <feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#54252d" flood-opacity=".07"></feDropShadow>
+                            </filter>
+                        </defs>
+                        <rect class="users-identity-visual__frame" x="4" y="4" width="432" height="244" rx="20" fill="url(#identity-panel)"></rect>
+                        <rect x="5" y="5" width="430" height="242" rx="19" fill="url(#identity-grid)"></rect>
+                        <path class="users-identity-visual__frame-line" d="M22 43H418"></path>
+                        <g class="users-identity-visual__topline">
+                            <path d="M23 20l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10v-5l7-3z"></path>
+                            <path d="M20 28l2 2 4-5"></path>
+                            <text x="38" y="29">CENTRO DE IDENTIDADES</text>
+                            <circle class="users-identity-visual__live-dot" cx="344" cy="24" r="3"></circle>
+                            <text class="users-identity-visual__live-label" x="353" y="27">SISTEMA ACTIVO</text>
+                        </g>
+                        <text class="users-identity-visual__column-label" x="20" y="61">CUENTAS</text>
+                        <text class="users-identity-visual__column-label" x="335" y="61">NIVELES DE ACCESO</text>
+                        <path class="users-identity-visual__link" d="M151 94C178 94 180 111 199 119"></path>
+                        <path class="users-identity-visual__link" d="M151 169C178 169 180 152 199 144"></path>
+                        <path class="users-identity-visual__link" d="M289 119C308 111 310 94 333 94"></path>
+                        <path class="users-identity-visual__link" d="M289 144C308 152 310 169 333 169"></path>
+                        <circle class="users-identity-visual__signal users-identity-visual__signal--one" r="3"></circle>
+                        <circle class="users-identity-visual__signal users-identity-visual__signal--two" r="3"></circle>
+                        <circle class="users-identity-visual__signal users-identity-visual__signal--three" r="2.7"></circle>
+                        <circle class="users-identity-visual__signal users-identity-visual__signal--four" r="2.7"></circle>
+                        <g class="users-identity-visual__account users-identity-visual__account--admin">
+                            <rect class="users-identity-visual__account-card" x="18" y="72" width="133" height="45" rx="10"></rect>
+                            <circle class="users-identity-visual__avatar" cx="39" cy="94" r="12"></circle>
+                            <circle class="users-identity-visual__head" cx="39" cy="91" r="2.5"></circle>
+                            <path class="users-identity-visual__body" d="M33.5 99c.7-3 2.5-4.4 5.5-4.4s4.8 1.4 5.5 4.4"></path>
+                            <text class="users-identity-visual__account-title" x="57" y="91">ADMINISTRADORES</text>
+                            <text class="users-identity-visual__account-meta" x="57" y="103">PERMISOS ELEVADOS</text>
+                            <circle class="users-identity-visual__account-state" cx="139" cy="82" r="2.5"></circle>
+                        </g>
+                        <g class="users-identity-visual__account users-identity-visual__account--member">
+                            <rect class="users-identity-visual__account-card" x="18" y="147" width="133" height="45" rx="10"></rect>
+                            <circle class="users-identity-visual__avatar" cx="39" cy="169" r="12"></circle>
+                            <circle class="users-identity-visual__head" cx="39" cy="166" r="2.5"></circle>
+                            <path class="users-identity-visual__body" d="M33.5 174c.7-3 2.5-4.4 5.5-4.4s4.8 1.4 5.5 4.4"></path>
+                            <text class="users-identity-visual__account-title" x="57" y="166">USUARIOS</text>
+                            <text class="users-identity-visual__account-meta" x="57" y="178">CUENTAS DE PLATAFORMA</text>
+                            <circle class="users-identity-visual__account-state" cx="139" cy="157" r="2.5"></circle>
+                        </g>
+                        <circle class="users-identity-visual__hub-orbit users-identity-visual__hub-orbit--outer" cx="244" cy="132" r="51"></circle>
+                        <circle class="users-identity-visual__hub-orbit users-identity-visual__hub-orbit--inner" cx="244" cy="132" r="43"></circle>
+                        <circle class="users-identity-visual__hub-core" cx="244" cy="132" r="34"></circle>
+                        <path class="users-identity-visual__shield" d="M244 106l17 6v12c0 12-7 20-17 25-10-5-17-13-17-25v-12l17-6z"></path>
+                        <path class="users-identity-visual__check" d="M236 124l6 6 11-13"></path>
+                        <text class="users-identity-visual__hub-label" x="244" y="160">DIRECTORIO</text>
+                        <g class="users-identity-visual__permission users-identity-visual__permission--admin">
+                            <rect x="334" y="72" width="88" height="45" rx="10"></rect>
+                            <path d="M346 88v-3a5 5 0 0 1 10 0v3"></path>
+                            <rect x="344" y="88" width="14" height="11" rx="3"></rect>
+                            <circle cx="351" cy="93" r="1.3"></circle>
+                            <text class="users-identity-visual__permission-title" x="365" y="89">ADMIN</text>
+                            <text class="users-identity-visual__permission-meta" x="365" y="100">GESTIONAR</text>
+                            <path class="users-identity-visual__permission-check" d="M414 81l2 2 3-4"></path>
+                        </g>
+                        <g class="users-identity-visual__permission users-identity-visual__permission--member">
+                            <rect x="334" y="147" width="88" height="45" rx="10"></rect>
+                            <circle cx="351" cy="164" r="6"></circle>
+                            <path d="M342 178c1-5 4-7 9-7s8 2 9 7"></path>
+                            <text class="users-identity-visual__permission-title" x="365" y="164">USUARIO</text>
+                            <text class="users-identity-visual__permission-meta" x="365" y="175">ACCESO GENERAL</text>
+                            <path class="users-identity-visual__permission-check" d="M414 156l2 2 3-4"></path>
+                        </g>
+                    </svg>
+                    <a class="users-intro__action" href="#createAdmin"><i class="fas fa-user-shield" aria-hidden="true"></i> Crear acceso administrativo</a>
+                </section>
+
+                <div th:if="${mensaje != null or param.creado != null}" class="users-alert users-alert--success" role="status">
+                    <i class="fas fa-circle-check" aria-hidden="true"></i>
+                    <span th:if="${mensaje != null}" th:text="${mensaje}">Operación completada.</span>
+                    <span th:if="${mensaje == null and param.creado != null}">Acceso administrativo creado correctamente.</span>
+                </div>
+                <div th:if="${error != null}" class="users-alert users-alert--error" role="alert">
+                    <i class="fas fa-circle-exclamation" aria-hidden="true"></i><span th:text="${error}">No se pudo completar la operación.</span>
+                </div>
+
+                <section class="users-metrics" aria-label="Resumen del directorio">
+                    <article class="users-metric users-metric--all">
+                        <span class="users-metric__icon"><i class="fas fa-address-book" aria-hidden="true"></i></span>
+                        <span class="users-metric__label">Cuentas en el directorio</span>
+                        <strong class="users-metric__value" th:text="${totalCuentas}">0</strong>
+                        <span class="users-metric__note">Administradores y usuarios</span>
+                    </article>
+                    <article class="users-metric users-metric--admins">
+                        <span class="users-metric__icon"><i class="fas fa-user-shield" aria-hidden="true"></i></span>
+                        <span class="users-metric__label">Administradores</span>
+                        <strong class="users-metric__value" th:text="${totalAdministradores}">0</strong>
+                        <span class="users-metric__note">Acceso al centro de operaciones</span>
+                    </article>
+                    <article class="users-metric users-metric--members">
+                        <span class="users-metric__icon"><i class="fas fa-user" aria-hidden="true"></i></span>
+                        <span class="users-metric__label">Usuarios</span>
+                        <strong class="users-metric__value" th:text="${totalUsuarios}">0</strong>
+                        <span class="users-metric__note">Cuentas de la plataforma</span>
+                    </article>
+                </section>
+
+                <section class="users-directory" aria-labelledby="directoryTitle">
+                    <div class="users-section-heading">
+                        <div>
+                            <span class="users-section-heading__eyebrow">CONSULTA Y MANTENIMIENTO</span>
+                            <h2 id="directoryTitle">Directorio de cuentas</h2>
+                            <p>Filtra por nombre, correo, usuario o tipo de acceso.</p>
+                        </div>
+                        <span class="users-result-count">
+                            <strong th:text="${totalCoincidencias}">0</strong>
+                            <span th:text="${buscar != null and !buscar.isEmpty()} ? 'resultados' : 'cuentas'">cuentas</span>
+                        </span>
+                    </div>
+
+                    <form class="users-search" method="get" th:action="@{/gestionar-usuarios}" role="search">
+                        <label class="users-search__field" for="buscar">
+                            <i class="fas fa-magnifying-glass" aria-hidden="true"></i>
+                            <input type="search" id="buscar" name="buscar" th:value="${buscar}" placeholder="Nombre, correo, usuario o rol" autocomplete="off">
+                        </label>
+                        <button type="submit" class="users-button users-button--primary"><i class="fas fa-search" aria-hidden="true"></i> Buscar</button>
+                        <a th:if="${buscar != null and !buscar.isEmpty()}" class="users-button users-button--quiet" th:href="@{/gestionar-usuarios}">Limpiar búsqueda</a>
+                    </form>
+
+                    <div class="users-table-section">
+                        <div class="users-table-heading">
+                            <div class="users-table-heading__icon"><i class="fas fa-user-shield" aria-hidden="true"></i></div>
+                            <div><h3>Administradores</h3><p>Accesos con permisos de administración.</p></div>
+                            <span class="users-table-heading__count" th:text="${administradores != null ? administradores.size() : 0} + ' cuentas'">0 cuentas</span>
+                        </div>
+                        <div class="users-table-wrap">
+                            <table class="users-table">
+                                <thead>
+                                    <tr><th scope="col">Administrador</th><th scope="col">Correo electrónico</th><th scope="col">Acceso</th><th scope="col" class="users-table__actions-heading">Acciones</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="usuario : ${administradores}">
+                                        <td>
+                                            <div class="users-person">
+                                                <span class="users-person__avatar users-person__avatar--admin"><i class="fas fa-user-shield" aria-hidden="true"></i></span>
+                                                <span class="users-person__identity"><strong th:text="${usuario.nombres} + ' ' + ${usuario.apellidos}">Nombre Apellido</strong><small th:text="'@' + ${usuario.username}">@usuario</small></span>
+                                            </div>
+                                        </td>
+                                        <td class="users-email" th:text="${usuario.email}">correo@example.com</td>
+                                        <td><span class="users-role users-role--admin"><span></span> Administrador</span></td>
+                                        <td>
+                                            <div class="users-row-actions">
+                                                <a class="users-icon-button users-icon-button--edit" th:href="@{/editar-usuario/{id}(id=${usuario.id})}" th:attr="aria-label='Editar ' + ${usuario.username}" title="Editar cuenta"><i class="fas fa-pen" aria-hidden="true"></i></a>
+                                                <form th:action="@{/eliminar-usuario/{id}(id=${usuario.id})}" method="post" th:attr="onsubmit='return confirm(&quot;¿Eliminar el acceso de ' + ${usuario.username} + '? Esta acción no se puede deshacer.&quot;);'">
+                                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                                    <button type="submit" class="users-icon-button users-icon-button--delete" th:attr="aria-label='Eliminar ' + ${usuario.username}" title="Eliminar cuenta"><i class="fas fa-trash-can" aria-hidden="true"></i></button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr th:if="${administradores == null or administradores.isEmpty()}"><td colspan="4"><div class="users-empty"><span><i class="fas fa-user-shield" aria-hidden="true"></i></span><strong>No hay administradores para mostrar</strong><p>Prueba con otra búsqueda o crea un acceso administrativo.</p></div></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="users-table-section users-table-section--members">
+                        <div class="users-table-heading">
+                            <div class="users-table-heading__icon users-table-heading__icon--member"><i class="fas fa-users" aria-hidden="true"></i></div>
+                            <div><h3>Usuarios registrados</h3><p>Cuentas con acceso a las funciones de usuario.</p></div>
+                            <span class="users-table-heading__count" th:text="${usuarios != null ? usuarios.size() : 0} + ' cuentas'">0 cuentas</span>
+                        </div>
+                        <div class="users-table-wrap">
+                            <table class="users-table">
+                                <thead>
+                                    <tr><th scope="col">Usuario</th><th scope="col">Correo electrónico</th><th scope="col">Acceso</th><th scope="col" class="users-table__actions-heading">Acciones</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="usuario : ${usuarios}">
+                                        <td>
+                                            <div class="users-person">
+                                                <span class="users-person__avatar"><i class="fas fa-user" aria-hidden="true"></i></span>
+                                                <span class="users-person__identity"><strong th:text="${usuario.nombres} + ' ' + ${usuario.apellidos}">Nombre Apellido</strong><small th:text="'@' + ${usuario.username}">@usuario</small></span>
+                                            </div>
+                                        </td>
+                                        <td class="users-email" th:text="${usuario.email}">correo@example.com</td>
+                                        <td><span class="users-role users-role--member"><span></span> Usuario</span></td>
+                                        <td>
+                                            <div class="users-row-actions">
+                                                <a class="users-icon-button users-icon-button--edit" th:href="@{/editar-usuario/{id}(id=${usuario.id})}" th:attr="aria-label='Editar ' + ${usuario.username}" title="Editar cuenta"><i class="fas fa-pen" aria-hidden="true"></i></a>
+                                                <form th:action="@{/eliminar-usuario/{id}(id=${usuario.id})}" method="post" th:attr="onsubmit='return confirm(&quot;¿Eliminar la cuenta de ' + ${usuario.username} + '? Esta acción no se puede deshacer.&quot;);'">
+                                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                                    <button type="submit" class="users-icon-button users-icon-button--delete" th:attr="aria-label='Eliminar ' + ${usuario.username}" title="Eliminar cuenta"><i class="fas fa-trash-can" aria-hidden="true"></i></button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr th:if="${usuarios == null or usuarios.isEmpty()}"><td colspan="4"><div class="users-empty"><span><i class="fas fa-users" aria-hidden="true"></i></span><strong>No hay usuarios para mostrar</strong><p>Prueba con otra búsqueda para consultar el directorio.</p></div></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="createAdmin" class="users-create" aria-labelledby="createAdminTitle">
+                    <div class="users-create__intro">
+                        <span class="users-create__icon"><i class="fas fa-user-plus" aria-hidden="true"></i></span>
+                        <span class="users-section-heading__eyebrow">GESTIÓN DE ACCESOS</span>
+                        <h2 id="createAdminTitle">Crear acceso administrativo</h2>
+                        <p>El nuevo acceso tendrá permisos para administrar la plataforma. Asígnalo solo a personal autorizado.</p>
+                        <div class="users-create__notice"><i class="fas fa-shield-halved" aria-hidden="true"></i><span>Se asignará el rol de administrador al crear la cuenta.</span></div>
+                    </div>
+                    <form class="users-create__form" method="post" th:action="@{/admin-crear-usuario}" th:object="${nuevoUsuario}">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                        <div class="users-form-field">
+                            <label for="nombres">Nombres</label>
+                            <input id="nombres" type="text" th:field="*{nombres}" placeholder="Ej. Andrea" autocomplete="given-name" required>
+                        </div>
+                        <div class="users-form-field">
+                            <label for="apellidos">Apellidos</label>
+                            <input id="apellidos" type="text" th:field="*{apellidos}" placeholder="Ej. Rodríguez" autocomplete="family-name" required>
+                        </div>
+                        <div class="users-form-field">
+                            <label for="email">Correo electrónico</label>
+                            <input id="email" type="email" th:field="*{email}" placeholder="nombre@empresa.com" autocomplete="email" required>
+                        </div>
+                        <div class="users-form-field">
+                            <label for="username">Nombre de usuario</label>
+                            <input id="username" type="text" th:field="*{username}" placeholder="andrea.rodriguez" autocomplete="username" minlength="4" maxlength="20" required>
+                        </div>
+                        <div class="users-form-field users-form-field--password">
+                            <label for="password">Contraseña temporal</label>
+                            <input id="password" type="password" th:field="*{password}" placeholder="Mínimo 6 caracteres" autocomplete="new-password" minlength="6" required>
+                        </div>
+                        <div class="users-create__submit">
+                            <button type="submit" class="users-button users-button--primary"><i class="fas fa-user-plus" aria-hidden="true"></i> Crear administrador</button>
+                        </div>
+                    </form>
+                </section>
+                <footer class="users-footer"><span>Bustraker · Administración de plataforma</span><span>Gestiona los accesos con responsabilidad.</span></footer>
+            </div>
+        </main>
+    </div>
 </body>
 </html>

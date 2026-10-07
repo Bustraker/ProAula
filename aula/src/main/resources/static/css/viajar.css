@@ -1,15 +1,47 @@
 :root {
-    --bg-primary: #0b1120;
-    --bg-secondary: rgba(15, 23, 42, 0.90);
-    --panel-surface: rgba(15, 23, 42, 0.92);
-    --panel-border: rgba(148, 163, 184, 0.2);
-    --text-primary: #f8fafc;
-    --text-secondary: #cbd5e1;
-    --text-muted: #94a3b8;
-    --accent: #38bdf8;
-    --accent-strong: #7c3aed;
-    --card-bg: rgba(15, 23, 42, 0.98);
-    --shadow: 0 28px 80px rgba(5, 12, 27, 0.35);
+    --bg-primary: #071419;
+    --bg-secondary: #0d2025;
+    --panel-surface: rgba(8, 22, 27, 0.96);
+    --panel-border: rgba(86, 191, 181, 0.2);
+    --text-primary: #ecf5f3;
+    --text-secondary: #bbd0ce;
+    --text-muted: #91aaa8;
+    --accent: #37c8ba;
+    --accent-strong: #159c92;
+    --success: #62d6a5;
+    --warning: #f1c66b;
+    --shadow: 0 24px 64px rgba(0, 10, 13, 0.48);
+}
+
+@keyframes premiumPanelFloat {
+    0% {
+        opacity: 0;
+        transform: translateY(16px) scale(0.98);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes premiumGlow {
+    0%, 100% { box-shadow: 0 20px 48px rgba(0, 10, 13, 0.4); }
+    50% { box-shadow: 0 24px 58px rgba(0, 10, 13, 0.5), 0 0 18px rgba(55, 200, 186, 0.08); }
+}
+
+@keyframes premiumShimmer {
+    0% {
+        transform: translateX(-20%);
+        opacity: 0.2;
+    }
+    50% {
+        transform: translateX(20%);
+        opacity: 0.7;
+    }
+    100% {
+        transform: translateX(-20%);
+        opacity: 0.2;
+    }
 }
 
 html, body {
@@ -18,9 +50,9 @@ html, body {
     margin: 0;
     padding: 0;
     font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.12), transparent 24%),
-                radial-gradient(circle at 80% 20%, rgba(124, 58, 237, 0.12), transparent 20%),
-                linear-gradient(180deg, #0f172a 0%, #020617 100%);
+    background:
+    radial-gradient(circle at 12% 14%, rgba(46, 183, 170, 0.12), transparent 24%),
+    linear-gradient(180deg, #0b1a1e 0%, #061014 100%);
     color: var(--text-primary);
     overflow: hidden;
 }
@@ -31,48 +63,85 @@ html, body {
     z-index: 1;
     width: 100%;
     height: 100vh;
-    background: #020617;
+    background: #081619;
+}
+
+#map::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(135deg, rgba(43, 173, 164, 0.045), transparent 52%);
 }
 
 .leaflet-container {
     height: 100%;
     width: 100%;
     background: transparent;
+    font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 .options-panel {
     position: fixed;
-    top: 24px;
-    right: 24px;
-    width: min(380px, calc(100vw - 32px));
-    background: var(--panel-surface);
-    padding: 24px;
-    border-radius: 28px;
+    top: 22px;
+    right: 22px;
+    width: min(390px, calc(100vw - 28px));
+    background: linear-gradient(155deg, rgba(9, 27, 31, 0.97), rgba(8, 19, 24, 0.96));
+    padding: 22px 20px 18px;
+    border-radius: 14px;
     box-shadow: var(--shadow);
     z-index: 1000;
-    max-height: calc(100vh - 48px);
+    max-height: calc(100vh - 44px);
     overflow-y: auto;
     overflow-x: hidden;
     border: 1px solid var(--panel-border);
-    backdrop-filter: blur(18px);
+    backdrop-filter: blur(18px) saturate(1.2);
+    -webkit-backdrop-filter: blur(18px) saturate(1.2);
+    animation: premiumPanelFloat 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.options-panel::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 64px;
+    border-radius: 14px 14px 0 0;
+    background: linear-gradient(90deg, rgba(55, 200, 186, 0.1), transparent 78%);
+    pointer-events: none;
+    animation: premiumShimmer 14s ease-in-out infinite;
+}
+
+.options-panel::after {
+    content: "";
+    position: absolute;
+    inset: 7px;
+    border-radius: 10px;
+    border: 1px solid rgba(116, 184, 178, 0.07);
+    pointer-events: none;
+}
+
+.options-panel > * {
+    position: relative;
+    z-index: 1;
 }
 
 .options-panel h2 {
-    margin: 0 0 20px 0;
+    margin: 0 0 18px 0;
     color: var(--text-primary);
-    font-size: 1.45rem;
+    font-size: 1.5rem;
     letter-spacing: -0.03em;
     line-height: 1.2;
-    border-bottom: 1px solid rgba(148, 163, 184, 0.16);
     padding-bottom: 14px;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.18);
 }
 
 .options-panel label {
     display: block;
-    margin: 20px 0 10px 0;
+    margin: 18px 0 9px 0;
     font-weight: 700;
     color: var(--text-primary);
-    font-size: 0.95rem;
+    font-size: 0.94rem;
+    letter-spacing: 0.01em;
 }
 
 .options-panel select,
@@ -85,72 +154,87 @@ html, body {
 .options-panel select,
 .options-panel input {
     padding: 14px 16px;
-    border: 1px solid rgba(148, 163, 184, 0.20);
+    border: 1px solid rgba(148, 163, 184, 0.22);
     border-radius: 14px;
     font-size: 0.96rem;
     color: var(--text-primary);
-    background: rgba(15, 23, 42, 0.75);
+    background: rgba(7, 20, 24, 0.92);
     outline: none;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.18s ease, background 0.2s ease;
+}
+
+.options-panel select:hover,
+.options-panel input:hover {
+    border-color: rgba(76, 201, 240, 0.52);
+    background: rgba(13, 34, 38, 0.96);
 }
 
 .options-panel select:focus,
 .options-panel input:focus {
-    border-color: rgba(56, 189, 248, 0.65);
-    box-shadow: 0 0 0 6px rgba(56, 189, 248, 0.10);
+    border-color: rgba(76, 201, 240, 0.75);
+    box-shadow: 0 0 0 3px rgba(55, 200, 186, 0.14);
 }
 
 .options-panel button {
     padding: 14px 18px;
     margin-top: 18px;
-    background: linear-gradient(135deg, #0ea5e9 0%, #6d28d9 100%);
-    color: #ffffff;
     border: none;
-    border-radius: 14px;
+    border-radius: 9px;
     font-size: 0.96rem;
     font-weight: 700;
     cursor: pointer;
-    box-shadow: 0 18px 30px rgba(14, 165, 233, 0.18);
-    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+    color: #ffffff;
+    background: linear-gradient(135deg, #12645f 0%, #167a70 100%);
+    box-shadow: 0 8px 20px rgba(0, 103, 99, 0.25);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.2s ease, filter 0.2s ease;
 }
 
 .options-panel button:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 22px 36px rgba(14, 165, 233, 0.24);
+    transform: translateY(-3px) scale(1.01);
+    box-shadow: 0 10px 24px rgba(0, 103, 99, 0.32);
+    filter: brightness(1.06);
 }
 
 .options-panel button:disabled {
     opacity: 0.55;
     cursor: not-allowed;
     box-shadow: none;
+    transform: none;
 }
 
 .ruta-info {
-    background: rgba(15, 23, 42, 0.95);
-    padding: 20px;
-    border-radius: 22px;
-    margin-top: 24px;
-    border-left: 4px solid #38bdf8;
-    box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.08);
+    position: relative;
+    background: linear-gradient(180deg, rgba(13, 31, 35, 0.98), rgba(9, 22, 26, 0.98));
+    padding: 16px;
+    border-radius: 10px;
+    margin-top: 22px;
+    border-left: 4px solid var(--accent);
+    box-shadow: inset 0 0 0 1px rgba(148, 205, 197, 0.06), 0 14px 28px rgba(0, 0, 0, 0.16);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ruta-info:hover {
+    transform: translateY(-2px);
+    box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.12), 0 24px 40px rgba(0, 0, 0, 0.18), 0 0 20px rgba(76, 201, 240, 0.12);
 }
 
 .toggle-control {
-    margin: 18px 0 0 0;
+    margin: 16px 0 0;
 }
 
 .toggle-label {
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    font-size: 0.95rem;
-    color: #cbd5e1;
+    font-size: 0.94rem;
+    color: var(--text-secondary);
     font-weight: 600;
 }
 
 .toggle-label input {
-    width: 1.1rem;
-    height: 1.1rem;
-    accent-color: #38bdf8;
+    width: 1.08rem;
+    height: 1.08rem;
+    accent-color: var(--accent);
 }
 
 .ruta-info h4 {
@@ -169,34 +253,38 @@ html, body {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #38bdf8 0%, #7c3aed 100%);
-    color: white;
-    padding: 6px 12px;
-    border-radius: 999px;
-    font-size: 0.82rem;
+    background: #15433e;
+    color: #9ce5d9;
+    padding: 5px 9px;
+    border: 1px solid rgba(74, 190, 174, 0.25);
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 700;
     margin: 4px 4px 4px 0;
+    box-shadow: 0 12px 22px rgba(91, 145, 255, 0.18);
 }
 
 .bus-card {
-    background: rgba(15, 23, 42, 0.96);
-    border: 1px solid rgba(148, 163, 184, 0.16);
-    border-radius: 22px;
-    padding: 18px 20px;
-    margin-bottom: 16px;
+    background: rgba(11, 28, 32, 0.96);
+    border: 1px solid rgba(130, 184, 179, 0.15);
+    border-radius: 10px;
+    padding: 18px 18px;
+    margin-bottom: 14px;
     cursor: pointer;
     transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
 }
 
 .bus-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.22);
-    background: rgba(15, 23, 42, 1);
+    transform: translateY(-3px) scale(1.01);
+    box-shadow: 0 18px 32px rgba(0, 0, 0, 0.14), 0 0 20px rgba(76, 201, 240, 0.12);
+    border-color: rgba(76, 201, 240, 0.38);
 }
 
 .bus-card.selected {
-    border-color: rgba(56, 189, 248, 0.85);
-    background: linear-gradient(180deg, rgba(15, 23, 42, 1) 0%, rgba(15, 23, 42, 0.90) 100%);
+    border-color: rgba(76, 201, 240, 0.78);
+    background: linear-gradient(180deg, rgba(13, 39, 42, 0.98), rgba(9, 27, 30, 0.98));
+    box-shadow: 0 18px 34px rgba(76, 201, 240, 0.12), 0 0 24px rgba(76, 201, 240, 0.12);
 }
 
 .bus-card h4 {
@@ -206,7 +294,7 @@ html, body {
 
 .bus-card p {
     margin: 6px 0;
-    font-size: 0.95rem;
+    font-size: 0.94rem;
     color: var(--text-secondary);
 }
 
@@ -214,6 +302,20 @@ html, body {
     max-height: 290px;
     overflow-y: auto;
     padding-right: 8px;
+}
+
+.scrollable::-webkit-scrollbar {
+    width: 8px;
+}
+
+.scrollable::-webkit-scrollbar-track {
+    background: rgba(148, 163, 184, 0.08);
+    border-radius: 10px;
+}
+
+.scrollable::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, rgba(69, 194, 177, 0.78), rgba(28, 111, 112, 0.78));
+    border-radius: 10px;
 }
 
 .card-divider {
@@ -230,14 +332,17 @@ html, body {
 }
 
 .btn-secondary {
-    background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+    background: linear-gradient(135deg, #176d73 0%, #249f9d 100%);
 }
 
 .leaflet-control-zoom,
 .leaflet-control-attribution {
-    background: rgba(15, 23, 42, 0.82) !important;
+    background: rgba(7, 19, 23, 0.92) !important;
     color: #e2e8f0 !important;
-    border: 1px solid rgba(148, 163, 184, 0.16) !important;
+    border: 1px solid rgba(148, 163, 184, 0.18) !important;
+    backdrop-filter: blur(8px);
+    border-radius: 9px !important;
+    box-shadow: 0 12px 26px rgba(0, 0, 0, 0.18);
 }
 
 .leaflet-control-zoom a {
@@ -245,12 +350,7 @@ html, body {
 }
 
 .leaflet-control-attribution a {
-    color: #94a3b8 !important;
-}
-
-.leaflet-control-attribution,
-.leaflet-control-zoom {
-    border-radius: 14px;
+    color: #79cfc4 !important;
 }
 
 .leaflet-control-attribution {
@@ -259,18 +359,135 @@ html, body {
 
 .leaflet-container a.leaflet-control-zoom-in,
 .leaflet-container a.leaflet-control-zoom-out {
-    background: rgba(15, 23, 42, 0.92) !important;
+    background: rgba(15, 23, 42, 0.96) !important;
     width: 36px;
     height: 36px;
     line-height: 34px;
     text-align: center;
-    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+    box-shadow: none;
 }
 
 .leaflet-control-zoom a:hover {
-    background: rgba(56, 189, 248, 0.90) !important;
+    background: rgba(33, 116, 113, 0.45) !important;
 }
 
-.leaflet-container {
-    font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+#rutaStats {
+    margin-top: 14px;
+    color: #b8e9e3;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+}
+
+@keyframes panelFloat {
+    0% { transform: translateY(8px); opacity: 0.8; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes sheen {
+    0% { transform: translateX(-18%); opacity: 0.16; }
+    50% { transform: translateX(18%); opacity: 0.35; }
+    100% { transform: translateX(-18%); opacity: 0.16; }
+}
+
+@keyframes badgePop {
+    0% { transform: scale(0.9); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.map-status {
+    display: block;
+    margin: 7px 0;
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    line-height: 1.45;
+}
+
+.user-location-icon {
+    border: 0;
+    background: transparent;
+}
+
+.user-location-icon span {
+    position: relative;
+    display: block;
+    width: 18px;
+    height: 18px;
+    border: 3px solid #fff;
+    border-radius: 50%;
+    background: #1877f2;
+    box-shadow: 0 1px 6px rgba(10, 30, 60, 0.65);
+}
+
+.user-location-icon span::after {
+    position: absolute;
+    inset: -8px;
+    border: 2px solid rgba(24, 119, 242, 0.55);
+    border-radius: 50%;
+    content: "";
+    animation: userLocationPulse 1.8s ease-out infinite;
+}
+
+.options-panel button,
+.options-panel select,
+.options-panel input,
+.bus-card,
+.badge,
+.ruta-info,
+.leaflet-control-zoom {
+    animation: none;
+}
+
+.options-panel button:hover,
+.options-panel select:hover,
+.options-panel input:hover,
+.bus-card:hover,
+.ruta-info:hover {
+    transform: none;
+}
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip,
+.leaflet-tooltip {
+    border: 1px solid rgba(95, 174, 166, 0.25);
+    color: var(--text-primary);
+    background: rgba(9, 25, 29, 0.97);
+    box-shadow: 0 10px 30px rgba(0, 8, 10, 0.42);
+}
+
+.leaflet-popup-content-wrapper { border-radius: 9px; }
+.leaflet-popup-content { margin: 12px 14px; line-height: 1.55; }
+.leaflet-popup-close-button { color: var(--text-muted) !important; }
+
+.route-flow {
+    stroke-dasharray: 8 18;
+    animation: routeFlow 1.35s linear infinite;
+    filter: drop-shadow(0 0 3px rgba(98, 239, 224, 0.5));
+}
+
+@keyframes routeFlow {
+    to { stroke-dashoffset: -52; }
+}
+
+@keyframes userLocationPulse {
+    from { transform: scale(0.65); opacity: 0.8; }
+    to { transform: scale(1.45); opacity: 0; }
+}
+
+@media (max-width: 768px) {
+    .options-panel {
+        left: 16px;
+        right: 16px;
+        top: 16px;
+        width: auto;
+        padding: 20px 18px 18px;
+        border-radius: 14px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .route-flow,
+    .user-location-icon span::after,
+    .options-panel::before {
+        animation: none !important;
+    }
 }

@@ -1,0 +1,291 @@
+/* Bustraker · Componentes visuales del mapa (compartido por viajar y viajar_public).
+   Cárgalo DESPUÉS del CSS propio de cada página. */
+
+/* ---------- Controles de Leaflet (mismo estilo que el zoom) ---------- */
+.leaflet-control-layers,
+.mu-control {
+    overflow: hidden;
+    border: 1px solid rgba(113, 168, 164, 0.24) !important;
+    border-radius: 8px !important;
+    color: #ecf5f3 !important;
+    background: rgba(7, 20, 24, 0.94) !important;
+    box-shadow: 0 6px 20px rgba(0, 8, 10, 0.3) !important;
+}
+
+.mu-control a,
+.leaflet-container .mu-control a {
+    display: grid;
+    width: 34px;
+    height: 34px;
+    place-items: center;
+    color: #ecf5f3 !important;
+    background: rgba(7, 20, 24, 0.94) !important;
+    font-size: 0.95rem;
+    text-decoration: none;
+}
+
+.mu-control a:hover,
+.mu-control a:focus-visible {
+    background: rgba(33, 116, 113, 0.45) !important;
+}
+
+.leaflet-control-layers-toggle {
+    width: 34px;
+    height: 34px;
+    filter: invert(0.92);
+}
+
+.leaflet-control-layers-expanded {
+    padding: 10px 14px 10px 10px;
+    font: 600 0.84rem/1.9 Inter, system-ui, sans-serif;
+    color: #ecf5f3;
+}
+
+.leaflet-control-layers-expanded .leaflet-control-layers-toggle { display: none; }
+.leaflet-control-layers label { margin: 0; cursor: pointer; }
+.leaflet-control-layers input { accent-color: #37c8ba; }
+.leaflet-control-layers-separator { border-top-color: rgba(113, 168, 164, 0.24) !important; }
+
+.leaflet-control-scale-line {
+    border-color: rgba(236, 245, 243, 0.8) !important;
+    color: #ecf5f3 !important;
+    background: rgba(7, 20, 24, 0.7) !important;
+    font-size: 0.7rem;
+    text-shadow: none;
+}
+
+/* ---------- Marcadores ---------- */
+.mu-pin-contenedor { border: 0; background: transparent; }
+
+.mu-pin {
+    position: relative;
+    display: block;
+    width: 34px;
+    height: 34px;
+    border: 3px solid #fff;
+    border-radius: 50% 50% 50% 0;
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.5);
+    transform: rotate(-45deg);
+}
+
+.mu-pin b {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    font: 800 14px/1 Inter, system-ui, sans-serif;
+    transform: rotate(45deg);
+}
+
+.mu-pin--origen { background: #16a34a; }
+.mu-pin--destino { background: #dc2626; }
+
+/* ---------- Tooltips y popups ---------- */
+.leaflet-tooltip.mu-tooltip {
+    padding: 4px 9px;
+    border: 1px solid rgba(95, 174, 166, 0.3);
+    border-radius: 6px;
+    color: #ecf5f3;
+    background: rgba(9, 25, 29, 0.96);
+    box-shadow: 0 6px 16px rgba(0, 8, 10, 0.4);
+    font: 600 0.78rem/1.35 Inter, system-ui, sans-serif;
+    white-space: nowrap;
+}
+
+.leaflet-tooltip.mu-tooltip::before { display: none; }
+.mu-tooltip--origen { border-color: rgba(34, 197, 94, 0.65) !important; }
+.mu-tooltip--destino { border-color: rgba(248, 113, 113, 0.7) !important; }
+.mu-tooltip b { color: #7ee2d6; }
+
+.mu-popup { display: grid; gap: 2px; }
+
+.mu-popup__titulo {
+    color: #7ee2d6;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.mu-popup strong { font-size: 0.92rem; }
+
+/* ---------- Estadísticas de ruta ---------- */
+.mu-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(132, 181, 177, 0.18);
+}
+
+.mu-stat {
+    padding: 9px 6px;
+    border: 1px solid rgba(86, 191, 181, 0.2);
+    border-radius: 9px;
+    background: rgba(55, 200, 186, 0.08);
+    text-align: center;
+}
+
+.mu-stat b { display: block; color: #ecf5f3; font-size: 1.02rem; font-weight: 750; }
+
+.mu-stat small {
+    color: #91aaa8;
+    font-size: 0.66rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.mu-stats.mu-stats--error {
+    display: block;
+    color: #f1c66b;
+    font-size: 0.82rem;
+    font-weight: 500;
+    line-height: 1.5;
+}
+
+/* ---------- Avisos (toasts) e indicador de carga ---------- */
+.mu-avisos {
+    position: fixed;
+    left: 50%;
+    bottom: 28px;
+    z-index: 1500;
+    display: grid;
+    gap: 8px;
+    width: min(440px, calc(100vw - 32px));
+    transform: translateX(-50%);
+    pointer-events: none;
+}
+
+.mu-aviso {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+    border: 1px solid rgba(95, 174, 166, 0.3);
+    border-left-width: 4px;
+    border-radius: 10px;
+    color: #ecf5f3;
+    background: rgba(9, 25, 29, 0.97);
+    box-shadow: 0 12px 32px rgba(0, 8, 10, 0.5);
+    font: 500 0.86rem/1.45 Inter, system-ui, sans-serif;
+    cursor: pointer;
+    pointer-events: auto;
+    animation: mu-entrada 220ms ease-out both;
+}
+
+.mu-aviso i { margin-top: 2px; color: #37c8ba; }
+.mu-aviso--warn { border-left-color: #f1c66b; }
+.mu-aviso--warn i { color: #f1c66b; }
+.mu-aviso--error { border-left-color: #f87171; }
+.mu-aviso--error i { color: #f87171; }
+.mu-aviso--ok { border-left-color: #62d6a5; }
+.mu-aviso--ok i { color: #62d6a5; }
+.mu-aviso--salida { opacity: 0; transform: translateY(6px); transition: opacity 200ms ease, transform 200ms ease; }
+
+.mu-cargando {
+    position: fixed;
+    left: 50%;
+    bottom: 28px;
+    z-index: 1400;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    border: 1px solid rgba(95, 174, 166, 0.3);
+    border-radius: 999px;
+    color: #ecf5f3;
+    background: rgba(9, 25, 29, 0.96);
+    box-shadow: 0 10px 28px rgba(0, 8, 10, 0.45);
+    font: 600 0.84rem/1 Inter, system-ui, sans-serif;
+    transform: translateX(-50%);
+}
+
+.mu-cargando[hidden] { display: none; }
+
+.mu-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(55, 200, 186, 0.25);
+    border-top-color: #37c8ba;
+    border-radius: 50%;
+    animation: mu-giro 0.8s linear infinite;
+}
+
+@keyframes mu-giro { to { transform: rotate(360deg); } }
+@keyframes mu-entrada { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ---------- Móvil ---------- */
+@media (max-width: 768px) {
+    .leaflet-control-scale { display: none; }
+    .mu-avisos, .mu-cargando { bottom: 20px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .mu-aviso, .mu-spinner { animation-duration: 0.01ms !important; }
+}
+
+/* ---------- Paradas numeradas ---------- */
+.mu-parada-contenedor { border: 0; background: transparent; }
+
+.mu-parada {
+    display: grid;
+    width: 26px;
+    height: 26px;
+    place-items: center;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    color: #fff;
+    background: #0e7490;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.45);
+    font: 800 11px/1 Inter, system-ui, sans-serif;
+    transition: transform 0.12s ease;
+}
+
+.mu-parada:hover { transform: scale(1.15); }
+.mu-parada--barrio { border-style: dashed; background: #475569; }
+
+.mu-popup span { color: #bbd0ce; font-size: 0.8rem; }
+.mu-popup .mu-popup__titulo { color: #7ee2d6; font-size: 0.68rem; }
+.mu-popup .mu-popup__nota { margin-top: 4px; color: #91aaa8; font-size: 0.74rem; font-style: italic; }
+
+/* ---------- Leyenda del mapa ---------- */
+.mu-leyenda {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    max-width: 260px;
+    padding: 7px 11px;
+    border: 1px solid rgba(113, 168, 164, 0.24);
+    border-radius: 8px;
+    color: #ecf5f3;
+    background: rgba(7, 20, 24, 0.9);
+    font: 600 0.72rem/1.4 Inter, system-ui, sans-serif;
+}
+
+.mu-leyenda span { display: inline-flex; align-items: center; gap: 5px; }
+
+.mu-leyenda i {
+    display: inline-grid;
+    width: 16px;
+    height: 16px;
+    place-items: center;
+    border: 1.5px solid #fff;
+    border-radius: 50%;
+    color: #fff;
+    font: 800 9px/1 Inter, system-ui, sans-serif;
+}
+
+.mu-leyenda__a { background: #16a34a; }
+.mu-leyenda__b { background: #dc2626; }
+.mu-leyenda__n { background: #0e7490; }
+.mu-leyenda__u { background: #1877f2; }
+
+@media (max-width: 700px) {
+    .mu-leyenda { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .mu-parada { transition: none; }
+}

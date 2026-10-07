@@ -7,6 +7,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotBlank;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import lombok.Data;
 
 @Entity
@@ -22,10 +25,17 @@ public class Parada {
     private String ubicacion; // Ubicación aproximada
     
     private String referencia; // Punto de referencia
+
+    private String barrio;
     
     private Integer orden; // Orden de la parada en la ruta
+    private Double latitud;
+    private Double longitud;
 
     @ManyToOne
     @JoinColumn(name = "ruta_id")
+    @JsonIgnoreProperties({"buses", "paradas"})
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Ruta ruta;
 }

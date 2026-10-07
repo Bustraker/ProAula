@@ -3,42 +3,246 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="description" content="Editar ruta - Bustraker Admin">
-    <meta name="theme-color" content="#01315f">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Editar Ruta</title>
-    <link rel="stylesheet" th:href="@{/css/style_editar_ruta.css}">
+    <meta name="description" content="Edita y verifica rutas de transporte en Bustraker.">
+    <meta name="theme-color" content="#24191c">
+    <title>Editar rutas · Bustraker Admin</title>
+    <link rel="stylesheet" th:href="@{/css/style_editar_ruta.css(v='routes-editor-20261005-3')}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="shortcut icon" th:href="@{/images/Bus_icono.png}" type="image/x-icon">
 </head>
-<body>
-    <div class="container">
-        <h2>Editar Ruta de Bus</h2>
-        <form th:action="@{'/editar-ruta/' + ${ruta != null ? ruta.id : ''}}" method="post" id="form-editar-ruta">
-            <div class="form-group">
-                <label for="ruta">Selecciona la ruta:</label>
-                <select id="ruta" name="ruta" class="js-route-select">
-                    <option value="">-- Selecciona una ruta --</option>
-                    <th:block th:each="r : ${rutas}">
-                        <option th:value="${r.id}" th:text="${r.nombre}" th:selected="${ruta != null and r.id == ruta.id}"></option>
-                    </th:block>
-                </select>
+<body class="route-editor-page">
+    <div class="route-editor-shell">
+        <aside class="route-editor-sidebar">
+            <a class="route-editor-brand" th:href="@{/index_2}" aria-label="Bustraker, panel de administración">
+                <span class="route-editor-brand__icon"><i class="fas fa-bus" aria-hidden="true"></i></span>
+                <span><strong>Bustraker</strong><small>Centro de operaciones</small></span>
+            </a>
+
+            <nav class="route-editor-nav" aria-label="Navegación administrativa">
+                <span class="route-editor-nav__label">ADMINISTRACIÓN</span>
+                <a th:href="@{/index_2}" aria-label="Panel principal" title="Panel principal"><i class="fas fa-house" aria-hidden="true"></i><span>Panel principal</span></a>
+                <a th:href="@{/gestionar-usuarios}" aria-label="Gestión de usuarios" title="Gestión de usuarios"><i class="fas fa-users" aria-hidden="true"></i><span>Gestión de usuarios</span></a>
+                <a th:href="@{/reportes}" aria-label="Reportes" title="Reportes"><i class="fas fa-chart-column" aria-hidden="true"></i><span>Reportes</span></a>
+                <a th:href="@{/mensajes_contacto}" aria-label="Mensajes" title="Mensajes"><i class="fas fa-envelope" aria-hidden="true"></i><span>Mensajes</span></a>
+                <a th:href="@{/rutas/admin}" class="is-current" aria-current="page" aria-label="Gestión de rutas" title="Gestión de rutas"><i class="fas fa-route" aria-hidden="true"></i><span>Gestión de rutas</span></a>
+                <a th:href="@{/registro-buses}" aria-label="Buses" title="Buses"><i class="fas fa-bus-simple" aria-hidden="true"></i><span>Buses</span></a>
+            </nav>
+
+            <div class="route-editor-sidebar__bottom">
+                <span class="route-editor-status"><i aria-hidden="true"></i> Sistema operativo</span>
+                <a class="route-editor-logout" th:href="@{/logout}"><i class="fas fa-arrow-right-from-bracket" aria-hidden="true"></i> Cerrar sesión</a>
             </div>
-            <div class="form-group" th:if="${ruta != null}">
-                <label>Barrios por donde pasa:</label>
-                <ul class="barrio-list" id="barrio-list">
-                    <th:block th:each="barrio, iterStat : ${barrios}">
-                        <li>
-                            <input type="text" name="barrios[__${iterStat.index}__]" th:value="${barrio}" />
-                            <button type="button" data-fn="eliminarBarrio" class="btn btn-outline">Eliminar</button>
-                        </li>
-                    </th:block>
-                </ul>
-                <button type="button" class="add-barrio-btn" data-fn="agregarBarrio">Agregar Barrio</button>
-            </div>
-            <button type="submit" class="save-btn" th:if="${ruta != null}">Guardar Cambios</button>
-        </form>
+        </aside>
+
+        <main class="route-editor-main">
+            <header class="route-editor-topbar">
+                <div class="route-editor-breadcrumb">
+                    <a th:href="@{/rutas/admin}">Rutas</a>
+                    <i class="fas fa-chevron-right" aria-hidden="true"></i>
+                    <span>Editor de recorridos</span>
+                </div>
+                <a class="route-editor-back" th:href="@{/rutas/admin}">
+                    <i class="fas fa-arrow-left" aria-hidden="true"></i><span>Volver a gestión de rutas</span>
+                </a>
+            </header>
+
+            <section class="route-editor-hero" aria-labelledby="routeEditorTitle">
+                <div class="route-editor-hero__copy">
+                    <p class="route-editor-eyebrow"><span aria-hidden="true"></span> CARTOGRAFÍA OPERATIVA · CARTAGENA</p>
+                    <h1 id="routeEditorTitle">Diseña el orden.<br><em>Define el recorrido.</em></h1>
+                    <p>Revisa la secuencia de barrios y confirma que cada ruta represente el trayecto real de la ciudad.</p>
+                    <div class="route-editor-hero__meta">
+                        <span><i class="fas fa-diagram-project" aria-hidden="true"></i> Edición de recorridos</span>
+                        <span><i class="fas fa-shield-halved" aria-hidden="true"></i> Verificación manual</span>
+                    </div>
+                </div>
+                <div class="route-editor-map" aria-hidden="true">
+                    <span class="route-editor-map__grid"></span>
+                    <span class="route-editor-map__scan"></span>
+                    <span class="route-editor-map__orbit route-editor-map__orbit--outer"></span>
+                    <span class="route-editor-map__orbit route-editor-map__orbit--inner"></span>
+                    <svg viewBox="0 0 520 280" focusable="false">
+                        <path class="editor-map-street" d="M15 60h114l43 44h116l45-45h171"></path>
+                        <path class="editor-map-street editor-map-street--dashed" d="M8 218h103l54-54h98l48 47h195"></path>
+                        <path class="editor-map-street" d="M82 12v90l48 48v118M385 0v74l-48 48v150"></path>
+                        <path class="editor-map-street editor-map-street--minor" d="M22 139h99l37-37m-37 37v70m49-132 36-36h84m-90 125 38 39h99m-55-51v-50l41-41h65m-46 142 51 50h75m-8-136 44 44h43"></path>
+                        <path class="editor-map-waterway" d="M-8 248c64-25 92-6 138-39s72-38 111-12 68 10 104-27 77-54 183-16"></path>
+                        <path class="editor-map-contour" d="M28 27c54 0 49 49 108 49s54-46 108-46 69 38 118 38 79-27 138-9"></path>
+                        <path class="editor-map-contour editor-map-contour--two" d="M38 255c66-23 86 6 137-28s74-34 113-6 70 8 103-26 71-50 126-35"></path>
+                        <path class="editor-map-route-shadow" d="M42 210c58 0 54-103 127-103s66 69 136 69 59-91 165-91"></path>
+                        <path id="editorRoutePath" pathLength="100" class="editor-map-route" d="M42 210c58 0 54-103 127-103s66 69 136 69 59-91 165-91"></path>
+                        <path class="editor-map-route-flow" d="M42 210c58 0 54-103 127-103s66 69 136 69 59-91 165-91"></path>
+                        <g class="editor-route-stops">
+                            <circle class="editor-route-stop__pulse editor-route-stop__pulse--start" cx="42" cy="210" r="15"></circle>
+                            <circle class="editor-route-stop" cx="42" cy="210" r="7"></circle>
+                            <circle class="editor-route-stop" cx="169" cy="107" r="6"></circle>
+                            <circle class="editor-route-stop" cx="305" cy="176" r="6"></circle>
+                            <circle class="editor-route-stop editor-route-stop--end" cx="470" cy="85" r="8"></circle>
+                            <circle class="editor-route-stop__pulse" cx="470" cy="85" r="15"></circle>
+                            <circle class="editor-route-stop__core" cx="470" cy="85" r="2"></circle>
+                        </g>
+                        <g class="editor-map-waypoints">
+                            <circle cx="85" cy="92" r="2"></circle><circle cx="239" cy="211" r="2"></circle>
+                            <circle cx="351" cy="66" r="2"></circle><circle cx="428" cy="207" r="2"></circle>
+                        </g>
+                        <g class="editor-route-vehicle">
+                            <circle class="editor-route-vehicle__halo" r="14"></circle>
+                            <rect x="-13" y="-7" width="26" height="13" rx="4"></rect>
+                            <path class="editor-route-vehicle__windows" d="M-8 -3h5v4h-5zm7 0h6v4h-6z"></path>
+                            <circle class="editor-route-vehicle__wheel" cx="-7" cy="7" r="2"></circle>
+                            <circle class="editor-route-vehicle__wheel" cx="7" cy="7" r="2"></circle>
+                            <animateMotion dur="10s" repeatCount="indefinite" rotate="auto">
+                                <mpath href="#editorRoutePath"></mpath>
+                            </animateMotion>
+                        </g>
+                    </svg>
+                    <span class="route-editor-map__compass"><i class="fas fa-location-arrow" aria-hidden="true"></i><small>N</small></span>
+                    <span class="route-editor-map__coordinate route-editor-map__coordinate--one">10°23′ N</span>
+                    <span class="route-editor-map__coordinate route-editor-map__coordinate--two">75°30′ O</span>
+                    <span class="route-editor-map__signal"><i aria-hidden="true"></i> CARTOGRAFÍA ILUSTRATIVA</span>
+                    <span class="route-editor-map__stop-count" id="routeMapStopCount">SECUENCIA SIN DEFINIR</span>
+                    <span class="route-editor-map__scale"><i aria-hidden="true"></i><i aria-hidden="true"></i><i aria-hidden="true"></i><small>ESCALA DE REFERENCIA</small></span>
+                </div>
+            </section>
+
+            <section class="route-editor-workspace" aria-label="Editor de rutas">
+                <div class="route-editor-workspace__heading">
+                    <div>
+                        <p class="route-editor-kicker">ESPACIO DE TRABAJO</p>
+                        <h2 th:text="${ruta != null} ? 'Ajusta la secuencia del recorrido' : 'Selecciona una ruta para comenzar'">Selecciona una ruta para comenzar</h2>
+                        <p th:text="${ruta != null} ? 'Comprueba cada parada y el estado de verificación antes de guardar.' : 'Elige una ruta existente para revisar y actualizar sus barrios.'">Elige una ruta existente para revisar sus barrios.</p>
+                    </div>
+                    <span class="route-editor-id" th:if="${ruta != null}">
+                        <i class="fas fa-route" aria-hidden="true"></i>
+                        <span>RUTA</span><strong th:text="${ruta.id}">01</strong>
+                    </span>
+                </div>
+
+                <div class="route-editor-layout" th:if="${ruta != null}">
+                    <section class="route-editor-form-panel" aria-labelledby="routeFormTitle">
+                        <div class="route-editor-panel-heading">
+                            <span class="route-editor-panel-icon"><i class="fas fa-sliders" aria-hidden="true"></i></span>
+                            <span><small>CONFIGURACIÓN</small><strong id="routeFormTitle" th:text="${ruta.nombre}">Ruta Centro</strong></span>
+                            <span class="route-editor-state" th:classappend="${ruta.verificada} ? ' is-verified' : ''">
+                                <i class="fas" th:classappend="${ruta.verificada} ? ' fa-circle-check' : ' fa-clock' " aria-hidden="true"></i>
+                                <span th:text="${ruta.verificada} ? 'Verificada' : 'Pendiente'">Pendiente</span>
+                            </span>
+                        </div>
+
+                        <form th:action="@{'/editar-ruta/' + ${ruta.id}}" method="post" id="form-editar-ruta" class="route-editor-form">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+
+                            <div class="route-editor-field route-editor-field--selector">
+                                <label for="ruta"><span>Ruta seleccionada</span><small>CAMBIA DE RECORRIDO</small></label>
+                                <div class="route-editor-select-wrap">
+                                    <i class="fas fa-route" aria-hidden="true"></i>
+                                    <select id="ruta" name="ruta" class="js-route-select" aria-label="Selecciona una ruta para editar">
+                                        <option value="">-- Selecciona una ruta --</option>
+                                        <th:block th:each="r : ${rutas}">
+                                            <option th:value="${r.id}" th:text="${r.nombre}" th:selected="${r.id == ruta.id}"></option>
+                                        </th:block>
+                                    </select>
+                                    <i class="fas fa-chevron-down route-editor-select-chevron" aria-hidden="true"></i>
+                                </div>
+                            </div>
+
+                            <div class="route-editor-divider"><span>SECUENCIA DEL RECORRIDO</span><i aria-hidden="true"></i></div>
+
+                            <div class="route-editor-field" th:if="${ordenPendiente and !#lists.isEmpty(barrios)}">
+                                <div class="route-editor-warning" role="status">
+                                    <i class="fas fa-triangle-exclamation" aria-hidden="true"></i>
+                                    <span><strong>Orden pendiente de confirmar</strong><small>Los barrios registrados son solo referencia. No se cargarán como secuencia: escribe manualmente el trayecto real antes de verificarlo.</small></span>
+                                </div>
+                                <div class="route-editor-reference">
+                                    <span>REFERENCIA ACTUAL</span>
+                                    <span th:each="barrio : ${barrios}" class="route-reference-chip" th:text="${barrio}">Centro</span>
+                                </div>
+                            </div>
+
+                            <p th:if="${errorBarrios}" class="route-editor-error" role="alert">
+                                <i class="fas fa-circle-exclamation" aria-hidden="true"></i>
+                                Ingresa al menos dos barrios distintos para definir el recorrido.
+                            </p>
+
+                            <div class="route-editor-field">
+                                <label for="barriosOrdenadosTexto">
+                                    <span>Barrios en orden de recorrido</span>
+                                    <small><span id="routeStopCount">0</span> PARADAS</small>
+                                </label>
+                                <textarea id="barriosOrdenadosTexto" name="barriosOrdenadosTexto"
+                                          th:text="${barriosOrdenadosTexto}"
+                                          placeholder="Ej. Zaragoza, El Bosque, Centro"
+                                          required rows="3" aria-describedby="ayuda-orden-barrios"></textarea>
+                                <small id="ayuda-orden-barrios" class="route-editor-help">Escribe todos los barrios separados por comas, desde el inicio hasta el final del recorrido.</small>
+                            </div>
+
+                            <label class="route-verification" for="verificada">
+                                <input type="checkbox" id="verificada" name="verificada" value="true" th:checked="${ruta.verificada}">
+                                <span class="route-verification__box"><i class="fas fa-check" aria-hidden="true"></i></span>
+                                <span class="route-verification__copy"><strong>Confirmo la secuencia de esta ruta</strong><small>Marca esta casilla solo después de revisar el trayecto completo y su sentido.</small></span>
+                                <span class="route-verification__seal"><i class="fas fa-shield-halved" aria-hidden="true"></i></span>
+                            </label>
+
+                            <div class="route-editor-actions">
+                                <a th:href="@{/rutas/admin}" class="route-cancel">Cancelar</a>
+                                <button type="submit" class="route-save">
+                                    <i class="fas fa-floppy-disk" aria-hidden="true"></i> Guardar cambios
+                                </button>
+                            </div>
+                        </form>
+                    </section>
+
+                    <aside class="route-preview-panel" aria-labelledby="routePreviewTitle">
+                        <div class="route-preview-panel__top">
+                            <span class="route-preview-icon"><i class="fas fa-map-location-dot" aria-hidden="true"></i></span>
+                            <span><small>VISTA PREVIA</small><strong id="routePreviewTitle">Secuencia de paradas</strong></span>
+                            <span class="route-preview-live"><i aria-hidden="true"></i> EN VIVO</span>
+                        </div>
+                        <p class="route-preview-description">Así quedará el orden del recorrido cuando guardes los cambios.</p>
+                        <div class="route-preview-track" aria-live="polite" aria-relevant="additions text">
+                            <div class="route-preview-line" aria-hidden="true"></div>
+                            <div class="route-preview-flow" aria-hidden="true"></div>
+                            <ol id="routePreviewStops" class="route-preview-stops">
+                                <li class="route-preview-empty"><i class="fas fa-arrow-down-wide-short" aria-hidden="true"></i><span>Escribe los barrios para ver el recorrido</span></li>
+                            </ol>
+                        </div>
+                        <div class="route-preview-summary">
+                            <span><i class="fas fa-location-dot" aria-hidden="true"></i> Paradas detectadas</span>
+                            <strong id="routePreviewSummary">0</strong>
+                        </div>
+                        <div class="route-preview-note">
+                            <i class="fas fa-circle-info" aria-hidden="true"></i>
+                            <span>La vista previa representa el orden indicado, no una geolocalización en tiempo real.</span>
+                        </div>
+                    </aside>
+                </div>
+
+                <div class="route-picker" th:unless="${ruta != null}">
+                    <a class="route-picker-card" th:each="r, iter : ${rutas}" th:href="@{/editar-ruta/{id}(id=${r.id})}">
+                        <span class="route-picker-card__index" th:text="${#numbers.formatInteger(iter.count, 2)}">01</span>
+                        <span class="route-picker-card__icon"><i class="fas fa-route" aria-hidden="true"></i></span>
+                        <span class="route-picker-card__copy"><strong th:text="${r.nombre}">Ruta Centro</strong><small><span th:text="${#lists.size(r.barrios)}">0</span> barrios registrados</small></span>
+                        <span class="route-picker-card__status" th:classappend="${r.verificada} ? ' is-verified' : ''">
+                            <i class="fas" th:classappend="${r.verificada} ? ' fa-circle-check' : ' fa-clock' " aria-hidden="true"></i>
+                            <span th:text="${r.verificada} ? 'Verificada' : 'Pendiente'">Pendiente</span>
+                        </span>
+                        <i class="fas fa-arrow-up-right-from-square route-picker-card__open" aria-hidden="true"></i>
+                    </a>
+                    <div class="route-picker-empty" th:if="${#lists.isEmpty(rutas)}">
+                        <span><i class="fas fa-route" aria-hidden="true"></i></span>
+                        <strong>Todavía no hay rutas registradas</strong>
+                        <p>Crea una ruta para comenzar a organizar sus paradas y verificar el sentido del recorrido.</p>
+                        <a th:href="@{/rutas/admin}">Ir a gestión de rutas <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+                    </div>
+                </div>
+            </section>
+
+            <footer class="route-editor-footer">
+                <span><i class="fas fa-shield-halved" aria-hidden="true"></i> Los cambios se guardan en el registro operativo de Bustraker.</span>
+                <a th:href="@{/index_2}">Panel principal <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+            </footer>
+        </main>
     </div>
-    <script th:src="@{/js/editar_ruta.js}"></script>
+    <script th:src="@{/js/editar_ruta.js(v='route-editor-20261005-3')}" defer></script>
 </body>
 </html>

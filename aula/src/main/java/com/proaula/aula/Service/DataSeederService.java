@@ -2,8 +2,6 @@ package com.proaula.aula.Service;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -19,8 +17,6 @@ import org.springframework.stereotype.Service;
 import com.github.javafaker.Faker;
 import com.proaula.aula.Barrios.Localidades;
 import com.proaula.aula.Entity.Barrio;
-import com.proaula.aula.Entity.Bus;
-import com.proaula.aula.Entity.Parada;
 import com.proaula.aula.Entity.Ruta;
 import com.proaula.aula.Entity.Usuario;
 import com.proaula.aula.Entity.Viaje;
@@ -99,122 +95,11 @@ public class DataSeederService implements CommandLineRunner {
             // Asignar coordenadas GPS reales
             barrioService.inicializarBarrios();
             
-            // Verificar si ya existen datos para evitar duplicados
-            boolean existingRoutes = rutaRepository.count() > 0;
             log.info("Estado actual: {} rutas, {} buses, {} usuarios, {} barrios", 
                 rutaRepository.count(), busRepository.count(), usuarioRepository.count(), barrioRepository.count());
 
-            int rutasToCreate = 300;      // 300 rutas
-            int busesToCreate = 900;      // 900 buses (3 por ruta en promedio)
             int usuariosToCreate = 3000;  // 3.000 usuarios
-            // Estima volumen de datos generados
-
-            if (existingRoutes) {
-                log.info("Se detectaron rutas existentes. Se omite la creación de rutas y buses para evitar duplicados.");
-            } else {
-                log.info("Iniciando carga masiva de rutas y buses...");
-            }
-
-            // Insertar rutas con barrios y paradas
-            List<Ruta> rutas = new ArrayList<>();
-            if (!existingRoutes) {
-                try {
-                    log.info("Creando {} rutas...", rutasToCreate);
-                    
-                    for (int i = 0; i < rutasToCreate; i++) {
-                        Ruta ruta = new Ruta();
-                        
-                        // Nombres más realistas para rutas en Cartagena
-                        String[] tiposRuta = {"Ruta", "Línea", "Servicio", "Express"};
-                        String[] zonas = {"Centro", "Norte", "Sur", "Occidente", "Oriente", "Universitaria", "Turística"};
-                        
-                        String nombre = tiposRuta[random.nextInt(tiposRuta.length)] + " " +
-                                       zonas[random.nextInt(zonas.length)] + " " +
-                                       (i + 1);
-                        ruta.setNombre(nombre);
-                        
-                        // Horarios más realistas (6 AM a 10 PM)
-                        int hora = random.nextInt(16) + 6; // 6-22
-                        int minuto = random.nextInt(4); // 0, 15, 30, 45
-                        ruta.setHoraAproximada(LocalTime.of(hora, minuto * 15));
-                        
-                        // Asignar 3-6 barrios aleatorios de Localidades
-                        List<String> barriosRuta = new ArrayList<>();
-                        Set<String> barriosUnicos = new HashSet<>();
-                        int numBarrios = random.nextInt(4) + 3; // 3-6 barrios
-                        
-                        for (int j = 0; j < numBarrios; j++) {
-                            String barrio = allBarrios.get(random.nextInt(allBarrios.size()));
-                            if (barriosUnicos.add(barrio)) {
-                                barriosRuta.add(barrio);
-                            }
-                        }
-                        ruta.setBarrios(barriosRuta);
-                        ruta.setParadas(new ArrayList<>());
-                        
-                        // Agregar 2-5 paradas por ruta
-                        int numParadas = random.nextInt(4) + 2; // 2-5 paradas
-                        for (int j = 0; j < numParadas; j++) {
-                            Parada parada = new Parada();
-                            parada.setNombre(faker.address().streetName() + " #" + (j + 1));
-                            parada.setUbicacion(faker.address().fullAddress());
-                            parada.setReferencia("Cerca a " + faker.commerce().department());
-                            parada.setOrden(j + 1);
-                            parada.setRuta(ruta);
-                            ruta.getParadas().add(parada);
-                        }
-                        
-                        rutas.add(rutaRepository.save(ruta));
-                        
-                        // Progreso cada 100 rutas
-                        if ((i + 1) % 100 == 0) {
-                            log.info("   Creadas {} rutas...", (i + 1));
-                        }
-                    }
-                    log.info("Completado: {} rutas creadas exitosamente", rutasToCreate);
-
-                    // Agregar rutas predeterminadas para asegurar cobertura
-                    log.info("Agregando rutas predeterminadas...");
-                    agregarRutasPredeterminadas(rutaRepository, paradaRepository);
-                    log.info("Completado: Rutas predeterminadas agregadas");
-
-                    // Insertar buses
-                    log.info("Creando {} buses...", busesToCreate);
-                    
-                    String[] coloresComunes = {"Blanco", "Azul", "Rojo", "Verde", "Amarillo", "Gris", "Negro", "Plateado"};
-                    String[] marcasBus = {"Mercedes Benz", "Volvo", "Scania", "MAN", "Iveco", "Ford", "Chevrolet"};
-                    
-                    for (int i = 0; i < busesToCreate; i++) {
-                        Bus bus = new Bus();
-                        
-                        // Placas más realistas (formato colombiano)
-                        String letras = faker.bothify("???").toUpperCase();
-                        int numeros = faker.number().numberBetween(100, 999);
-                        bus.setPlaca(letras + "-" + String.valueOf(numeros));
-                        
-                        // Modelo más realista
-                        int yearModelo = random.nextInt(15) + 2010; // 2010-2025
-                        bus.setModelo(marcasBus[random.nextInt(marcasBus.length)] + " " + yearModelo);
-                        
-                        bus.setColor(coloresComunes[random.nextInt(coloresComunes.length)]);
-                        bus.setConductor(faker.name().fullName());
-                        bus.setRuta(rutas.get(random.nextInt(rutas.size())));
-                        
-                        busRepository.save(bus);
-                        
-                        // Progreso cada 500 buses
-                        if ((i + 1) % 500 == 0) {
-                            log.info("   Creados {} buses...", (i + 1));
-                        }
-                    }
-                    log.info("Completado: {} buses creados exitosamente", busesToCreate);
-                } catch (Exception ex) {
-                    log.error("Error al crear rutas y buses: {}", ex.getMessage(), ex);
-                    log.warn("Se continúa con la creación de usuarios aunque la carga de rutas/buses haya fallado.");
-                }
-            } else {
-                log.info("Rutas existentes detectadas. No se crearon rutas ni buses nuevos.");
-            }
+            log.info("No se generan rutas, buses ni paradas de demostración: deben cargarse datos verificados.");
 
             // Crear usuario administrador por defecto si no existe
             if (!usuarioRepository.existsByUsername("admin")) {
@@ -432,38 +317,4 @@ public class DataSeederService implements CommandLineRunner {
         }
     }
 
-    private void agregarRutasPredeterminadas(RutaRepository rutaRepository, ParadaRepository paradaRepository) {
-        // Rutas que cubren barrios comunes
-        List<String[]> rutasData = List.of(
-            new String[]{"Centro", "Getsemani", "San Diego", "La Matuna"},
-            new String[]{"Bocagrande", "Castillogrande", "El Laguito", "Centro"},
-            new String[]{"Pie de la Popa", "La Popa", "Centro", "Getsemani"},
-            new String[]{"Terminal", "Centro", "Manga", "Bazurto"},
-            new String[]{"Olaya Herrera", "Centro", "La Candelaria", "Pie de la Popa"},
-            new String[]{"Nelson Mandela", "Centro", "Getsemani", "San Diego"},
-            new String[]{"Villa Olimpica", "Centro", "La Matuna", "El Prado"},
-            new String[]{"Bosque", "Centro", "Getsemani", "La Victoria"}
-        );
-
-        for (int i = 0; i < rutasData.size(); i++) {
-            Ruta ruta = new Ruta();
-            ruta.setNombre("Ruta Predeterminada " + (i + 1));
-            ruta.setHoraAproximada(LocalTime.of(6 + (i % 4), 0)); // Horas variadas
-            ruta.setBarrios(List.of(rutasData.get(i)));
-            ruta.setParadas(new ArrayList<>());
-            
-            // Agregar paradas básicas
-            for (int j = 0; j < rutasData.get(i).length; j++) {
-                Parada parada = new Parada();
-                parada.setNombre("Parada " + rutasData.get(i)[j]);
-                parada.setUbicacion("Ubicación en " + rutasData.get(i)[j]);
-                parada.setReferencia("Referencia para " + rutasData.get(i)[j]);
-                parada.setOrden(j + 1);
-                parada.setRuta(ruta);
-                ruta.getParadas().add(parada);
-            }
-            
-            rutaRepository.save(ruta);
-        }
-    }
 }

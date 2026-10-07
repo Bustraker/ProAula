@@ -1,53 +1,232 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" >
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="description" content="Actualizar buses - Bustraker Admin">
-    <meta name="theme-color" content="#01315f">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Actualizar Buses - Bustraker Admin</title>
-    <link rel="stylesheet" th:href="@{/css/style_3.css}">
-    <link rel="stylesheet" th:href="@{/css/style_actualizar.css}">
+    <meta name="description" content="Actualiza la información de los buses de la flota Bustraker.">
+    <meta name="theme-color" content="#24191c">
+    <title>Editar flota · Bustraker Admin</title>
+    <link rel="stylesheet" th:href="@{/css/style_actualizar.css(v='fleet-editor-20261005-2')}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="shortcut icon" th:href="@{/images/Bus_icono.png}" type="image/x-icon">
 </head>
-<body>
-    <header>
-        <img th:src="@{/images/Bus_palmera.png}" alt="Bus palmera" id="logo2">
-        <h1>Bustraker - Panel Admin</h1>
-        <h2>Actualizar Buses</h2>
-        <div id="ingreso">
-            <a id="Volver" th:href="@{/index_2}">Volver al Panel</a>
-        </div>
-    </header>
-    <nav>
-        <ul>
-            <li><a th:href="@{/index_2}">Panel Admin</a></li>
-            <li><a th:href="@{/registro-buses}">Registrar Buses</a></li>
-            <li><a th:href="@{/actualizarbuses}">Actualizar Buses</a></li>
-            <li><a th:href="@{/eliminarbuses}">Eliminar Buses</a></li>
-        </ul>
-    </nav>
-    <main>
-        <h2>Actualizar Información de Buses</h2>
-        <p>Modifica los datos de los buses en circulación. Los cambios serán visibles para los usuarios en tiempo real.</p>
-        <p>Selecciona un bus para actualizar su información:</p>
-        <ul>
-            <li th:each="bus : ${buses}">Bus <span th:text="${bus.id}"></span>: <span th:text="${bus.placa}"></span> - <a th:href="@{/actualizar-bus/{id}(id=${bus.id})}">Editar</a></li>
-        </ul>
-        <form th:if="${bus}" th:action="@{/actualizar-bus/{id}(id=${bus.id})}" method="post" th:object="${bus}">
-            <h3>Editar Bus <span th:text="${bus.id}"></span></h3>
-            <label>Placa: <input type="text" th:field="*{placa}"></label><br>
-            <label>Modelo: <input type="text" th:field="*{modelo}"></label><br>
-            <button type="submit">Actualizar</button>
-        </form>
-        <p><em>Nota: Los cambios en buses se reflejan inmediatamente en la consulta de buses para los usuarios.</em></p>
-    </main>
-    <footer id="pie">
-        <p>&copy; 2025 Bustraker. Todos los derechos reservados.</p>
-        <p>Panel de Administración</p>
-    </footer>
+<body class="fleet-editor-page">
+    <div class="fleet-shell">
+        <aside class="fleet-sidebar">
+            <a class="fleet-brand" th:href="@{/index_2}" aria-label="Bustraker, panel administrativo">
+                <span class="fleet-brand__mark"><i class="fas fa-bus" aria-hidden="true"></i></span>
+                <span><strong>Bustraker</strong><small>Centro de operaciones</small></span>
+            </a>
+            <nav class="fleet-nav" aria-label="Navegación administrativa">
+                <span class="fleet-nav__label">ADMINISTRACIÓN</span>
+                <a th:href="@{/index_2}" aria-label="Panel principal" title="Panel principal"><i class="fas fa-house" aria-hidden="true"></i><span>Panel principal</span></a>
+                <a th:href="@{/gestionar-usuarios}" aria-label="Gestión de usuarios" title="Gestión de usuarios"><i class="fas fa-users" aria-hidden="true"></i><span>Gestión de usuarios</span></a>
+                <a th:href="@{/reportes}" aria-label="Reportes" title="Reportes"><i class="fas fa-chart-column" aria-hidden="true"></i><span>Reportes</span></a>
+                <a th:href="@{/mensajes_contacto}" aria-label="Mensajes" title="Mensajes"><i class="fas fa-envelope" aria-hidden="true"></i><span>Mensajes</span></a>
+                <a th:href="@{/rutas/admin}" aria-label="Gestión de rutas" title="Gestión de rutas"><i class="fas fa-route" aria-hidden="true"></i><span>Gestión de rutas</span></a>
+                <a th:href="@{/registro-buses}" class="is-active" aria-current="page" aria-label="Gestión de buses" title="Gestión de buses"><i class="fas fa-bus-simple" aria-hidden="true"></i><span>Gestión de buses</span></a>
+            </nav>
+            <div class="fleet-sidebar__bottom">
+                <span class="fleet-system-status"><i aria-hidden="true"></i> Sistema operativo</span>
+                <a th:href="@{/logout}"><i class="fas fa-arrow-right-from-bracket" aria-hidden="true"></i> Cerrar sesión</a>
+            </div>
+        </aside>
+
+        <main class="fleet-main">
+            <header class="fleet-topbar">
+                <div class="fleet-breadcrumb"><a th:href="@{/index_2}">Panel</a><i class="fas fa-chevron-right" aria-hidden="true"></i><a th:href="@{/registro-buses}">Flota</a><i class="fas fa-chevron-right" aria-hidden="true"></i><span>Editar buses</span></div>
+                <a class="fleet-back" th:href="@{/index_2}"><i class="fas fa-arrow-left" aria-hidden="true"></i><span>Volver al panel</span></a>
+            </header>
+
+            <section class="fleet-hero" aria-labelledby="fleetTitle">
+                <div class="fleet-hero__copy">
+                    <p class="fleet-eyebrow"><span></span> CONTROL DE FLOTA <b>·</b> BUSTRAKER</p>
+                    <h1 id="fleetTitle">Cada detalle<br><em>mantiene la ruta.</em></h1>
+                    <p>Administra la identidad de cada unidad y conserva la información de operación sincronizada.</p>
+                    <div class="fleet-hero__metrics">
+                        <span><i class="fas fa-layer-group" aria-hidden="true"></i><b th:text="${#lists.size(buses)}">0</b> unidades registradas</span>
+                        <span><i class="fas fa-pen-to-square" aria-hidden="true"></i> Edición de flota</span>
+                    </div>
+                </div>
+                <div class="fleet-illustration" aria-hidden="true">
+                    <div class="fleet-illustration__grid"></div>
+                    <div class="fleet-illustration__radar fleet-illustration__radar--one"></div>
+                    <div class="fleet-illustration__radar fleet-illustration__radar--two"></div>
+                    <div class="fleet-illustration__track fleet-illustration__track--back"></div>
+                    <div class="fleet-illustration__track fleet-illustration__track--front"></div>
+                    <span class="fleet-illustration__node fleet-illustration__node--one"><i></i></span>
+                    <span class="fleet-illustration__node fleet-illustration__node--two"><i></i></span>
+                    <span class="fleet-illustration__node fleet-illustration__node--three"><i></i></span>
+                    <svg class="fleet-bus-art" viewBox="0 0 420 180" focusable="false">
+                        <defs>
+                            <linearGradient id="busBodyGradient" x1="0" y1="0" x2="1" y2="1">
+                                <stop offset="0" stop-color="#ffc1c8"></stop>
+                                <stop offset=".48" stop-color="#d84a5d"></stop>
+                                <stop offset="1" stop-color="#8d2232"></stop>
+                            </linearGradient>
+                            <linearGradient id="busGlassGradient" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0" stop-color="#53252d"></stop>
+                                <stop offset="1" stop-color="#29181d"></stop>
+                            </linearGradient>
+                            <filter id="busGlow"><feGaussianBlur stdDeviation="8" result="blur"></feGaussianBlur><feMerge><feMergeNode in="blur"></feMergeNode><feMergeNode in="SourceGraphic"></feMergeNode></feMerge></filter>
+                        </defs>
+                        <ellipse class="fleet-bus-shadow" cx="209" cy="150" rx="151" ry="12"></ellipse>
+                        <g class="fleet-bus-body">
+                            <path d="M66 117V66c0-12 8-22 20-26l35-12h151c14 0 26 8 32 20l20 39 17 10v30H66z" fill="url(#busBodyGradient)"></path>
+                            <path d="M124 39 91 50c-5 2-8 7-8 13v20h41zM133 39v44h69V39zm78 0v44h65V39zm76 8 17 35h-66V39h36c5 0 10 3 13 8z" fill="url(#busGlassGradient)" stroke="#a3f2ee" stroke-opacity=".28" stroke-width="2"></path>
+                            <path d="M84 93h233M83 105h232" fill="none" stroke="#fff1f2" stroke-opacity=".58" stroke-width="2"></path>
+                            <path d="M98 99h9m9 0h9m-27 12h7m8 0h7" stroke="#fff1f2" stroke-linecap="round" stroke-width="2" opacity=".84"></path>
+                            <path d="M321 93h15v10h-15z" fill="#d9ffff" opacity=".95"></path>
+                            <path d="M68 101h10v13H68z" fill="#ffb879"></path>
+                            <rect x="153" y="60" width="17" height="4" rx="2" fill="#ffc0c8" opacity=".72"></rect>
+                            <rect x="184" y="60" width="17" height="4" rx="2" fill="#ffc0c8" opacity=".72"></rect>
+                            <path d="M81 119v-23m239 22V95" stroke="#0b2d45" stroke-opacity=".45" stroke-width="3"></path>
+                            <circle class="fleet-bus-wheel" cx="121" cy="127" r="20"></circle>
+                            <circle class="fleet-bus-wheel" cx="289" cy="127" r="20"></circle>
+                            <circle class="fleet-bus-hub" cx="121" cy="127" r="8"></circle>
+                            <circle class="fleet-bus-hub" cx="289" cy="127" r="8"></circle>
+                            <path d="M121 111v32m-16-16h32m136 0h32m-16-16v32" stroke="#7ba9b8" stroke-opacity=".35" stroke-width="1.5"></path>
+                        </g>
+                        <path class="fleet-bus-light" d="M331 98h39"></path>
+                    </svg>
+                    <span class="fleet-illustration__label fleet-illustration__label--unit"><i class="fas fa-satellite-dish" aria-hidden="true"></i> UNIDAD <b th:text="${bus != null ? bus.id : '---'}">---</b></span>
+                    <span class="fleet-illustration__label fleet-illustration__label--signal"><i></i> DATOS DE FLOTA</span>
+                    <span class="fleet-illustration__coordinate">10°23′ N · 75°30′ O</span>
+                </div>
+            </section>
+
+            <section class="fleet-workspace" aria-label="Gestión y edición de unidades">
+                <div class="fleet-section-heading">
+                    <div><p>GESTIÓN OPERATIVA</p><h2>Unidades de la flota</h2><span>Selecciona un bus para actualizar sus datos identificativos.</span></div>
+                    <a th:href="@{/registro-buses}" class="fleet-add-link"><i class="fas fa-plus" aria-hidden="true"></i> Registrar bus</a>
+                </div>
+
+                <div class="fleet-workspace__grid">
+                    <section class="fleet-directory" aria-labelledby="fleetDirectoryTitle">
+                        <div class="fleet-panel-heading">
+                            <span class="fleet-panel-icon"><i class="fas fa-list-check" aria-hidden="true"></i></span>
+                            <span><small>DIRECTORIO</small><strong id="fleetDirectoryTitle">Buses registrados</strong></span>
+                            <span class="fleet-directory-count" th:text="${#lists.size(buses)}">0</span>
+                        </div>
+                        <div class="fleet-search">
+                            <i class="fas fa-magnifying-glass" aria-hidden="true"></i>
+                            <input id="fleetSearch" type="search" placeholder="Buscar por placa, modelo o ruta…" aria-label="Buscar buses">
+                            <kbd>/</kbd>
+                        </div>
+                        <div class="fleet-bus-list" id="fleetBusList">
+                            <a class="fleet-bus-card" th:each="item, iter : ${buses}"
+                               th:href="@{/actualizar-bus/{id}(id=${item.id})}"
+                               th:classappend="${bus != null and item.id == bus.id} ? ' is-selected' : ''"
+                               th:attr="data-search=${(item.placa != null ? item.placa : '') + ' ' + (item.modelo != null ? item.modelo : '') + ' ' + (item.ruta != null ? item.ruta.nombre : '')}">
+                                <span class="fleet-bus-card__number" th:text="${#numbers.formatInteger(iter.count, 2)}">01</span>
+                                <span class="fleet-bus-card__icon"><i class="fas fa-bus-simple" aria-hidden="true"></i></span>
+                                <span class="fleet-bus-card__identity">
+                                    <strong th:text="${item.placa}">ABC-123</strong>
+                                    <small th:text="${item.modelo}">Modelo de bus</small>
+                                </span>
+                                <span class="fleet-bus-card__route">
+                                    <i class="fas fa-route" aria-hidden="true"></i>
+                                    <span th:text="${item.ruta != null ? item.ruta.nombre : 'Sin ruta asignada'}">Sin ruta asignada</span>
+                                </span>
+                                <i class="fas fa-chevron-right fleet-bus-card__chevron" aria-hidden="true"></i>
+                            </a>
+                            <div class="fleet-no-results" id="fleetNoResults" hidden>
+                                <i class="fas fa-magnifying-glass" aria-hidden="true"></i><span>No hay buses que coincidan con la búsqueda.</span>
+                            </div>
+                            <div class="fleet-empty" th:if="${#lists.isEmpty(buses)}">
+                                <span><i class="fas fa-bus" aria-hidden="true"></i></span>
+                                <strong>La flota aún está vacía</strong>
+                                <p>Cuando registres una unidad, aparecerá aquí para su edición.</p>
+                                <a th:href="@{/registro-buses}">Registrar primera unidad <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+                            </div>
+                        </div>
+                        <div class="fleet-directory__footer" th:unless="${#lists.isEmpty(buses)}">
+                            <i class="fas fa-circle-info" aria-hidden="true"></i>
+                            <span>La ruta y demás datos operativos se conservan al guardar esta edición.</span>
+                        </div>
+                    </section>
+
+                    <section class="fleet-editor-card" aria-labelledby="fleetEditorTitle">
+                        <div class="fleet-panel-heading">
+                            <span class="fleet-panel-icon fleet-panel-icon--blue"><i class="fas fa-pen-ruler" aria-hidden="true"></i></span>
+                            <span><small>FICHA DE UNIDAD</small><strong id="fleetEditorTitle" th:text="${bus != null} ? 'Editar información' : 'Selecciona una unidad'">Selecciona una unidad</strong></span>
+                            <span class="fleet-edit-badge" th:if="${bus != null}"><i class="fas fa-circle" aria-hidden="true"></i> EN EDICIÓN</span>
+                        </div>
+
+                        <div class="fleet-editor-empty" th:if="${bus == null and !#lists.isEmpty(buses)}">
+                            <div class="fleet-editor-empty__diagram" aria-hidden="true">
+                                <span class="fleet-empty-orbit fleet-empty-orbit--a"></span>
+                                <span class="fleet-empty-orbit fleet-empty-orbit--b"></span>
+                                <i class="fas fa-bus-simple"></i>
+                                <span class="fleet-empty-spark fleet-empty-spark--a"></span>
+                                <span class="fleet-empty-spark fleet-empty-spark--b"></span>
+                                <span class="fleet-empty-spark fleet-empty-spark--c"></span>
+                            </div>
+                            <strong>Tu siguiente ajuste empieza aquí</strong>
+                            <p>Elige una unidad del directorio para cargar su ficha y modificar la información del vehículo.</p>
+                            <div class="fleet-empty-hint"><i class="fas fa-arrow-left" aria-hidden="true"></i> Selecciona un bus de la lista</div>
+                        </div>
+
+                        <div class="fleet-editor-empty" th:if="${bus == null and #lists.isEmpty(buses)}">
+                            <div class="fleet-editor-empty__diagram" aria-hidden="true"><i class="fas fa-bus-simple"></i></div>
+                            <strong>Sin unidades para editar</strong>
+                            <p>Registra el primer bus de la flota y vuelve para completar su ficha.</p>
+                            <a class="fleet-empty-hint fleet-empty-hint--link" th:href="@{/registro-buses}">Ir a registrar buses <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+                        </div>
+
+                        <form th:if="${bus != null}" th:action="@{/actualizar-bus/{id}(id=${bus.id})}" method="post" th:object="${bus}" id="fleetEditForm" class="fleet-form">
+                            <div class="fleet-form__id-strip">
+                                <span class="fleet-form__bus-mark"><i class="fas fa-bus" aria-hidden="true"></i></span>
+                                <span><small>IDENTIFICADOR INTERNO</small><strong>Unidad #<b th:text="${bus.id}">01</b></strong></span>
+                                <span class="fleet-form__status"><i class="fas fa-shield-halved" aria-hidden="true"></i> Registro activo</span>
+                            </div>
+                            <div class="fleet-field">
+                                <label for="placa">Placa del vehículo <small>IDENTIFICACIÓN VISIBLE</small></label>
+                                <div class="fleet-input-wrap">
+                                    <i class="fas fa-id-card" aria-hidden="true"></i>
+                                    <input id="placa" type="text" th:field="*{placa}" placeholder="Ej. ABC-123" autocomplete="off" required maxlength="20" aria-describedby="plateHelp">
+                                    <span class="fleet-input-state"><i class="fas fa-circle-check" aria-hidden="true"></i></span>
+                                </div>
+                                <small id="plateHelp" class="fleet-field-help">Usa el código que identifica oficialmente la unidad.</small>
+                            </div>
+                            <div class="fleet-field">
+                                <label for="modelo">Modelo <small>MARCA Y REFERENCIA</small></label>
+                                <div class="fleet-input-wrap">
+                                    <i class="fas fa-gears" aria-hidden="true"></i>
+                                    <input id="modelo" type="text" th:field="*{modelo}" placeholder="Ej. Volvo 9700" autocomplete="off" required maxlength="100">
+                                    <span class="fleet-input-state"><i class="fas fa-circle-check" aria-hidden="true"></i></span>
+                                </div>
+                            </div>
+
+                            <div class="fleet-immutable-details">
+                                <div class="fleet-details-heading"><span>DATOS OPERATIVOS</span><i class="fas fa-lock" aria-hidden="true"></i> Se mantienen sin cambios</div>
+                                <div class="fleet-detail-grid">
+                                    <div class="fleet-detail">
+                                        <span class="fleet-detail__icon"><i class="fas fa-palette" aria-hidden="true"></i></span>
+                                        <span><small>COLOR</small><strong th:text="${bus.color != null and !#strings.isEmpty(bus.color) ? bus.color : 'No especificado'}">No especificado</strong></span>
+                                    </div>
+                                    <div class="fleet-detail">
+                                        <span class="fleet-detail__icon"><i class="fas fa-id-badge" aria-hidden="true"></i></span>
+                                        <span><small>CONDUCTOR</small><strong th:text="${bus.conductor != null and !#strings.isEmpty(bus.conductor) ? bus.conductor : 'No asignado'}">No asignado</strong></span>
+                                    </div>
+                                    <div class="fleet-detail fleet-detail--route">
+                                        <span class="fleet-detail__icon"><i class="fas fa-route" aria-hidden="true"></i></span>
+                                        <span><small>RUTA ASIGNADA</small><strong th:text="${bus.ruta != null ? bus.ruta.nombre : 'Sin ruta asignada'}">Sin ruta asignada</strong></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="fleet-form__actions">
+                                <a th:href="@{/actualizarbuses}" class="fleet-cancel">Cancelar</a>
+                                <button type="submit" class="fleet-save"><i class="fas fa-floppy-disk" aria-hidden="true"></i><span>Guardar cambios</span><i class="fas fa-arrow-right fleet-save__arrow" aria-hidden="true"></i></button>
+                            </div>
+                        </form>
+                    </section>
+                </div>
+            </section>
+            <footer class="fleet-footer"><span><i class="fas fa-shield-halved" aria-hidden="true"></i> Actualización segura de la flota Bustraker</span><a th:href="@{/index_2}">Panel administrativo <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a></footer>
+        </main>
+    </div>
+    <script th:src="@{/js/editar_buses.js(v='fleet-editor-20261005-1')}" defer></script>
 </body>
 </html>
