@@ -9,6 +9,7 @@ import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,10 +26,14 @@ public class CartoTileController {
         "https://basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png";
 
     private final String apiKey;
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
 
     public CartoTileController(@Value("${carto.api-key:${CARTO_API_KEY:}}") String apiKey) {
         this.apiKey = apiKey;
+        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+        requestFactory.setConnectTimeout(3000);
+        requestFactory.setReadTimeout(5000);
+        this.restTemplate = new RestTemplate(requestFactory);
     }
 
     @GetMapping(value = "/api/map/tiles", produces = MediaType.IMAGE_PNG_VALUE)
@@ -62,7 +67,9 @@ public class CartoTileController {
             }
             return ResponseEntity.ok()
                 .contentType(MediaType.IMAGE_PNG)
-                .cacheControl(CacheControl.maxAge(java.time.Duration.ofHours(1)).cachePublic())
+                .cacheControl(CacheControl.maxAge(java.time.Duration.ofDays(7))
+                    .cachePublic()
+                    .staleWhileRevalidate(java.time.Duration.ofDays(1)))
                 .body(respuesta.getBody());
         } catch (RestClientResponseException exception) {
             LOGGER.warn("CARTO rechazó la solicitud de mosaico con estado HTTP {}", exception.getStatusCode());

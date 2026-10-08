@@ -11,8 +11,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous">
     <link rel="preconnect" href="https://server.arcgisonline.com" crossorigin>
     <link rel="preconnect" href="https://tile.openstreetmap.org" crossorigin>
-    <link rel="stylesheet" th:href="@{/css/travel.css}">
-    <link rel="stylesheet" th:href="@{/css/map-ui.css}">
+    <link rel="stylesheet" th:href="@{/css/travel.css(v='map-polish-3')}">
+    <link rel="stylesheet" th:href="@{/css/map-ui.css(v='map-polish-3')}">
 </head>
 <body>
     <div id="map" role="application" aria-label="Mapa de rutas de Cartagena"></div>
@@ -49,6 +49,10 @@
                 <datalist id="listaOrigen"></datalist>
                 <datalist id="listaDestino"></datalist>
 
+                <button id="btnPlanificar" class="btn btn--principal" type="button">
+                    <i class="fas fa-route" aria-hidden="true"></i> Planificar
+                </button>
+                <output id="plannerStatus" class="estado" role="status" aria-live="polite"></output>
                 <div class="fila">
                     <button id="btnSeguirUbicacion" class="btn btn--secundario" type="button" aria-pressed="false" disabled>
                         <i class="fas fa-location-arrow" aria-hidden="true"></i> Seguir mi ubicación
@@ -59,7 +63,7 @@
             </section>
 
             <section class="seccion" aria-labelledby="tituloRutas">
-                <h2 id="tituloRutas" class="seccion__titulo">Rutas disponibles</h2>
+                <h2 id="tituloRutas" class="seccion__titulo">Mejor ruta para llegar</h2>
                 <p id="resumenBusqueda" class="sr-only" aria-live="polite"></p>
                 <div id="resultados" class="resultados"></div>
             </section>
@@ -96,15 +100,15 @@
             </details>
 
             <footer class="panel-pie">
-                Solo aparecen rutas verificadas. El trazado y su tiempo son estimaciones en auto, no el recorrido ni el tiempo real del bus.
+                Se recomienda una sola ruta: primero se prioriza una ruta directa; si no existe, menos transbordos y luego menos barrios intermedios. El trazado y su tiempo son estimaciones en auto, no el recorrido ni el tiempo real del bus.
                 <a href="https://transcaribe.gov.co/index.php/rutas-sitm/" target="_blank" rel="noopener noreferrer">Mapas oficiales de TransCaribe</a>
             </footer>
         </div>
     </main>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
-    <script th:src="@{/js/map-base.js}"></script>
-    <script th:src="@{/js/map-travel.js}"></script>
+    <script th:src="@{/js/map-base.js(v='map-polish-3')}"></script>
+    <script th:src="@{/js/map-travel.js(v='map-polish-3')}"></script>
     <script th:src="@{/js/viajar_public.js}"></script>
 </body>
 </html>
