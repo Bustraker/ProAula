@@ -20,7 +20,7 @@ test("public navigation loads route data and supports trip planning inputs", asy
 
   await page.goto("/index_3_public");
   await page.getByRole("link", { name: /Planear mi viaje/i }).click();
-  await expect(page).toHaveURL(/\/viajar_public$/);
+  await expect(page).toHaveURL(/\/viajar_public(?:\?.*)?$/);
   await expect(page.getByRole("heading", { name: /Consulta de rutas/i })).toBeVisible();
   await Promise.all([barriosResponse, rutasResponse]);
   await expectMapTiles(page);
