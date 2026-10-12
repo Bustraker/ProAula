@@ -1,0 +1,8 @@
+src/main/resources/application.properties
+target
+.git
+.github
+.vscode
+cookiejar.txt
+headers.txt
+test-final.log

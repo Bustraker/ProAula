@@ -137,17 +137,4 @@ public class AdminLoginController {
         }
     }
     
-    // Cierra sesión admin
-    @GetMapping("/admin/logout")
-    public String logoutAdmin(HttpSession session, RedirectAttributes redirectAttributes) {
-        try {
-            SecurityContextHolder.clearContext();
-            session.removeAttribute("adminCodeVerified");
-            session.invalidate();
-            redirectAttributes.addFlashAttribute("success", "✅ Sesión cerrada correctamente");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Error al cerrar sesión");
-        }
-        return "redirect:/admin-login";
-    }
 }

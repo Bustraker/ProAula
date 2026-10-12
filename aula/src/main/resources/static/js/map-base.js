@@ -41,6 +41,12 @@
     var ESRI = 'https://server.arcgisonline.com/ArcGIS/rest/services/';
 
     /* ===================== UTILIDADES ===================== */
+    function urlAplicacion(ruta) {
+        var meta = document.querySelector('meta[name="app-context-path"]');
+        var contexto = meta ? meta.content.replace(/\/+$/, '') : '';
+        return contexto + (ruta.charAt(0) === '/' ? ruta : '/' + ruta);
+    }
+
     function escapeHtml(valor) {
         return String(valor == null ? '' : valor)
             .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -87,7 +93,7 @@
         var bases = {
             Oscuro: gris('Dark'),
             Claro: gris('Light'),
-            Calles: L.tileLayer('/api/map/tiles?z={z}&x={x}&y={y}', {
+            Calles: L.tileLayer(urlAplicacion('/api/map/tiles') + '?z={z}&x={x}&y={y}', {
                 maxZoom: 20, keepBuffer: 4, updateWhenIdle: false, attribution: ATRIB_CARTO
             }),
             OpenStreetMap: L.tileLayer(ESRI + 'World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
@@ -170,46 +176,87 @@
                     case 'calles':
                         svg = '<svg width="120" height="38" viewBox="0 0 120 38" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
                             + '<rect width="120" height="38" rx="6" fill="' + (estilo.muestra || '#e8eef2') + '" />'
+                            + '<g fill="#d5e0e0" opacity=".72"><path d="M8 3h17v6H8zM34 3h17v6H34zM69 3h18v5H69zM95 4h17v7H95zM4 30h13v5H4zM36 30h13v5H36zM82 29h13v6H82z" /></g>'
+                            + '<path d="M56 3h12v8H56zM56 29h17v6H56z" fill="#b8d8c4" opacity=".9" />'
+                            + '<g class="mu-mini-calles__cuadricula" fill="none" stroke="#9eafb1" stroke-width=".8" opacity=".42">'
+                            + '<path d="M0 8 L120 31 M5 0 L21 38 M55 0 L67 38 M103 0 L88 38" />'
+                            + '</g>'
+                            + '<g fill="none" stroke="#fff" stroke-linecap="round" opacity=".8"><path d="M0 20 20 11 42 22 62 12 83 21 120 8" stroke-width="3.6"/><path d="M30 0 36 38M91 0 82 38" stroke-width="2.4"/></g>'
                             + '<g class="mu-mini-calles" fill="none" stroke-width="2.4">'
                             + '<path class="mu-mini-calles__borde" d="M6 28 L28 12 L52 26 L76 10 L112 26" />'
-                            + '<path d="M6 28 L28 12 L52 26 L76 10 L112 26" stroke-linecap="round" stroke-linejoin="round" />'
+                            + '<path class="mu-mini-calles__resplandor" d="M6 28 L28 12 L52 26 L76 10 L112 26" />'
+                            + '<path class="mu-mini-calles__ruta" d="M6 28 L28 12 L52 26 L76 10 L112 26" stroke-linecap="round" stroke-linejoin="round" />'
+                            + '<circle class="mu-mini-calles__nodo" cx="52" cy="26" r="2.1" />'
+                            + '<circle class="mu-mini-calles__vehiculo" cx="6" cy="28" r="2.7" />'
                             + '</g></svg>';
                         break;
                     case 'oscuro':
                         svg = '<svg width="120" height="38" viewBox="0 0 120 38" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
                             + '<rect width="120" height="38" rx="6" fill="' + (estilo.muestra || '#0f1b21') + '" />'
                             + '<path d="M0 29 L25 22 L47 27 L71 18 L94 25 L120 15 V38 H0Z" fill="#20373d" />'
-                            + '<g fill="#d4e6df"><circle cx="20" cy="10" r="1" /><circle cx="43" cy="16" r="1" /><circle cx="78" cy="8" r="1" /></g>'
-                            + '<g class="mu-mini-oscuro"><circle cx="96" cy="10" r="5" />'
-                            + '<circle cx="94" cy="8" r="5" fill="' + (estilo.muestra || '#0f1b21') + '" />'
+                            + '<path d="M7 31 V26 H13 V31 M18 30 V23 H23 V30 M31 32 V27 H36 V32 M52 29 V23 H58 V29 M82 29 V21 H88 V29 M103 26 V20 H109 V26" fill="#29464b" />'
+                            + '<g class="mu-mini-oscuro__calles" fill="none" stroke-linecap="round"><path d="M0 24 28 18 49 23 72 13 95 19 120 10M18 38 30 0M63 38 69 0M101 38 92 0" stroke="#43646a" stroke-width="1.5"/><path d="M0 24 28 18 49 23 72 13 95 19 120 10" stroke="#8ae8d2" stroke-width=".65" opacity=".72"/></g>'
+                            + '<path class="mu-mini-oscuro__ruta-halo" d="M4 27 27 19 49 24 72 14 96 20 116 11" fill="none" stroke="#35d6bd" stroke-width="4" opacity=".18" stroke-linecap="round"/>'
+                            + '<path class="mu-mini-oscuro__ruta" d="M4 27 27 19 49 24 72 14 96 20 116 11" fill="none" stroke="#74f0d2" stroke-width="1.15" stroke-dasharray="1 4" stroke-linecap="round"/>'
+                            + '<circle class="mu-mini-oscuro__baliza" cx="72" cy="14" r="2" fill="#d6fff0"/>'
+                            + '<g class="mu-mini-oscuro__estrellas" fill="#d4e6df">'
+                            + '<circle class="mu-mini-oscuro__estrella-a" cx="20" cy="10" r="1.1" /><circle class="mu-mini-oscuro__estrella-b" cx="43" cy="16" r=".9" /><circle class="mu-mini-oscuro__estrella-c" cx="78" cy="8" r="1.2" />'
+                            + '</g>'
+                            + '<g class="mu-mini-oscuro__luna" fill="none" stroke="#b9d7ce" stroke-width=".8" opacity=".42"><circle cx="96" cy="10" r="8" /></g>'
+                            + '<g class="mu-mini-oscuro"><circle class="mu-mini-oscuro__disco" cx="96" cy="10" r="5" />'
+                            + '<circle class="mu-mini-oscuro__sombra" cx="94" cy="8" r="5" fill="' + (estilo.muestra || '#0f1b21') + '" />'
                             + '</g></svg>';
                         break;
                     case 'claro':
                         svg = '<svg width="120" height="38" viewBox="0 0 120 38" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
                             + '<rect width="120" height="38" rx="6" fill="' + (estilo.muestra || '#f4f6f7') + '" />'
+                            + '<path d="M0 3h29v8H0zM38 2h20v7H38zM79 3h25v7H79zM6 24h17v7H6zM55 27h22v8H55zM98 25h18v8H98z" fill="#dce7df" />'
+                            + '<path d="M28 0c11 8 5 15-2 22S17 32 26 38M81 0c-10 7-5 13 2 18s7 12-1 20" fill="none" stroke="#b8d9d3" stroke-width="2.2" opacity=".9" />'
                             + '<path d="M0 30 L24 23 L46 28 L70 17 L95 24 L120 13" fill="none" stroke="#a8b7bb" stroke-width="2" />'
                             + '<path d="M0 34 L25 29 L50 33 L74 25 L100 30 L120 23" fill="none" stroke="#c2ced0" stroke-width="1.5" />'
+                            + '<path class="mu-mini-claro__ruta-halo" d="M3 26 24 20 45 25 68 14 94 21 117 10" fill="none" stroke="#fff" stroke-width="4.4" stroke-linecap="round" opacity=".86" />'
+                            + '<path class="mu-mini-claro__ruta" d="M3 26 24 20 45 25 68 14 94 21 117 10" fill="none" stroke="#178f8a" stroke-width="1.4" stroke-linecap="round" stroke-dasharray="1 5" />'
+                            + '<circle class="mu-mini-claro__pin" cx="68" cy="14" r="2" fill="#fff" stroke="#168b87" stroke-width="1.2" />'
+                            + '<g class="mu-mini-claro__rayos" fill="none" stroke="#e8ad42" stroke-width="1.1" stroke-linecap="round">'
+                            + '<path d="M12 1 V3 M12 17 V19 M3 10 H5 M19 10 H21 M5.6 3.6 L7 5 M17 15 L18.4 16.4 M18.4 3.6 L17 5 M7 15 L5.6 16.4" />'
+                            + '</g>'
+                            + '<circle class="mu-mini-claro__halo" cx="12" cy="10" r="7" fill="#f2b84b" opacity=".16" />'
                             + '<g class="mu-mini-claro">'
-                            + '<circle cx="12" cy="10" r="5" />'
+                            + '<circle class="mu-mini-claro__sol" cx="12" cy="10" r="4.2" />'
                             + '</g></svg>';
                         break;
                     case 'satelite':
                         svg = '<svg width="120" height="38" viewBox="0 0 120 38" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
                             + '<rect width="120" height="38" rx="6" fill="' + (estilo.muestra || '#1d3f52') + '" />'
-                            + '<path d="M0 0 H45 L57 14 L38 23 L18 20 L0 29Z" fill="#41694d" />'
-                            + '<path d="M72 0 H120 V20 L99 18 L87 29 L65 19Z" fill="#58724b" />'
-                            + '<path d="M0 35 L40 17 L83 25 L120 7" fill="none" stroke="#c7b98a" stroke-width="2" />'
+                            + '<path d="M0 0 H45 L57 14 L38 23 L18 20 L0 29Z" fill="#41694d" /><path d="M72 0 H120 V20 L99 18 L87 29 L65 19Z" fill="#58724b" /><path d="M0 31 23 24 39 30 61 24 78 31 105 20 120 23V38H0Z" fill="#365d49" />'
+                            + '<path d="M4 4 L25 8 L39 4 M76 5 L92 10 L112 4 M9 30 L27 25 L41 32 M74 30 L91 24 L111 29 M47 3l5 8-9 5 5 6M103 18l-7 5 7 5" fill="none" stroke="#a2bd83" stroke-width=".7" opacity=".72" />'
+                            + '<path d="M6 2 21 14 33 12M85 0 79 12 90 19M30 38 44 28 58 35M108 38 101 29 114 23" fill="none" stroke="#718e68" stroke-width=".6" opacity=".68" />'
+                            + '<path d="M0 35 L40 17 L83 25 L120 7" fill="none" stroke="#182c28" stroke-width="4" opacity=".55" />'
+                            + '<path d="M0 35 L40 17 L83 25 L120 7" fill="none" stroke="#f2dfaa" stroke-width="2.8" opacity=".85" />'
+                            + '<path class="mu-mini-sat__carretera" d="M0 35 L40 17 L83 25 L120 7" fill="none" stroke="#e3d19b" stroke-width="1.5" stroke-dasharray="5 3" />'
+                            + '<path class="mu-mini-sat__reticula" d="M0 8H120M0 19H120M0 30H120M30 0V38M60 0V38M90 0V38" fill="none" stroke="#d4e7c5" stroke-width=".35" opacity=".28" />'
+                            + '<circle class="mu-mini-sat__anillo" cx="73" cy="21" r="7" fill="none" stroke="#fff0bd" stroke-width=".45" stroke-dasharray="1 2" />'
+                            + '<circle class="mu-mini-sat__objetivo" cx="73" cy="21" r="4.5" fill="none" stroke="#f3e6b9" stroke-width=".8" />'
+                            + '<circle class="mu-mini-sat__punto" cx="73" cy="21" r="1.5" fill="#fff5cb" />'
                             + '<g class="mu-mini-sat">'
-                            + '<rect x="-120" y="0" width="120" height="38" fill="#fff" opacity=".2" />'
+                            + '<path class="mu-mini-sat__barrido" d="M-30 0 H-10 L13 38 H-7Z" fill="url(#mu-mini-sat-luz)" />'
+                            + '<defs><linearGradient id="mu-mini-sat-luz" x1="0" x2="1"><stop stop-color="#fff" stop-opacity="0" /><stop offset=".5" stop-color="#fff" stop-opacity=".24" /><stop offset="1" stop-color="#fff" stop-opacity="0" /></linearGradient></defs>'
                             + '</g></svg>';
                         break;
                     case 'openstreetmap':
                         svg = '<svg width="120" height="38" viewBox="0 0 120 38" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'
                             + '<rect width="120" height="38" rx="6" fill="' + (estilo.muestra || '#d9e8c8') + '" />'
-                            + '<path d="M4 5 H37 V17 H4Z M83 4 H116 V15 H83Z M47 24 H74 V35 H47Z" fill="#b8d3ad" />'
+                            + '<path d="M4 5 H37 V17 H4Z M83 4 H116 V15 H83Z M47 24 H74 V35 H47Z" fill="#b8d3ad" /><path d="M5 6h30v9H5zM85 5h29v8H85z" fill="#a7c69b" opacity=".7" />'
+                            + '<path d="M1 3c18 8 2 14 20 19s2 10 20 16" fill="none" stroke="#9bd5de" stroke-width="3.2" opacity=".86" />'
+                            + '<path d="M44 2 V36 M78 1 V37 M1 20 H119 M15 1v37M105 0v38M1 9h118M1 31h118" stroke="#fffdf4" stroke-width="2" opacity=".84" />'
+                            + '<path d="M44 2 V36 M78 1 V37 M1 20 H119" stroke="#bdc9af" stroke-width=".55" opacity=".8" />'
+                            + '<g class="mu-mini-osm__poi"><circle cx="24" cy="11" r="2.2" fill="#e67e61"/><circle cx="94" cy="24" r="2.1" fill="#edb84e"/><circle cx="54" cy="8" r="1.8" fill="#7796bf"/></g>'
                             + '<g class="mu-mini-osm" fill="none" stroke-width="2">'
                             + '<path class="mu-mini-osm__borde" d="M10 26 L30 12 L50 26 L70 14 L110 26" />'
-                            + '<path d="M10 26 L30 12 L50 26 L70 14 L110 26" stroke-linecap="round" stroke-width="1.2" />'
+                            + '<path class="mu-mini-osm__halo" d="M10 26 L30 12 L50 26 L70 14 L110 26" stroke="#fff" stroke-width="3.2" opacity=".85" />'
+                            + '<path class="mu-mini-osm__ruta" d="M10 26 L30 12 L50 26 L70 14 L110 26" stroke-linecap="round" stroke-width="1.2" />'
+                            + '<circle class="mu-mini-osm__marcador" cx="10" cy="26" r="2.5" />'
+                            + '<circle class="mu-mini-osm__parada" cx="70" cy="14" r="2" />'
                             + '</g></svg>';
                         break;
                     default:
@@ -395,15 +442,17 @@
     }
 
     /* ===================== MARCADORES ===================== */
-    function contenidoPopup(titulo, nombre) {
+    function contenidoPopup(titulo, nombre, nota) {
         return '<div class="mu-popup"><span class="mu-popup__titulo">' + escapeHtml(titulo) +
-            '</span><strong>' + escapeHtml(nombre) + '</strong></div>';
+            '</span><strong>' + escapeHtml(nombre) + '</strong>' +
+            (nota ? '<span class="mu-popup__nota">' + escapeHtml(nota) + '</span>' : '') + '</div>';
     }
 
     /** Pin con letra: tipo 'origen' (A, verde) o 'destino' (B, rojo). */
-    function crearPin(lat, lng, tipo, nombre) {
+    function crearPin(lat, lng, tipo, nombre, nota) {
         var esOrigen = tipo === 'origen';
         var titulo = esOrigen ? 'Origen' : 'Destino';
+        var etiqueta = escapeHtml(nombre) + (nota ? ' · <small>Ubicación aproximada</small>' : '');
         var icono = L.divIcon({
             className: 'mu-pin-contenedor',
             html: '<span class="mu-pin mu-pin--' + tipo + '"><b>' + (esOrigen ? 'A' : 'B') + '</b></span>',
@@ -413,10 +462,10 @@
             popupAnchor: [0, -48]
         });
         return L.marker([lat, lng], { icon: icono, riseOnHover: true, keyboard: true, title: titulo + ': ' + nombre })
-            .bindTooltip('<b>' + titulo + '</b> · ' + escapeHtml(nombre), {
+            .bindTooltip('<b>' + titulo + '</b> · ' + etiqueta, {
                 permanent: true, direction: 'top', className: 'mu-tooltip mu-tooltip--' + tipo
             })
-            .bindPopup(contenidoPopup(titulo + ' del tramo', nombre));
+            .bindPopup(contenidoPopup(titulo + ' del tramo', nombre, nota));
     }
 
     /** Punto pequeño para paradas / barrios intermedios. */
@@ -455,9 +504,14 @@
         }
         var titulo = esTransbordo ? 'Transbordo ' + numero : (esParada ? 'Parada ' : 'Barrio ') + numero;
         return L.marker([lat, lng], { icon: icono, keyboard: true, title: titulo + ': ' + (datos.nombre || '') })
-            .bindTooltip(escapeHtml(datos.nombre || titulo), { direction: 'top', className: 'mu-tooltip' })
+            .bindTooltip(escapeHtml(datos.nombre || titulo) +
+                (datos.coordenadaEstimada ? ' · <small>Ubicación aproximada</small>' : ''),
+                { direction: 'top', className: 'mu-tooltip' })
             .bindPopup('<div class="mu-popup"><span class="mu-popup__titulo">' + titulo + '</span><strong>' +
-                escapeHtml(datos.nombre || '') + '</strong>' + detalle.join('') + '</div>');
+                escapeHtml(datos.nombre || '') + '</strong>' +
+                (datos.coordenadaEstimada
+                    ? '<span class="mu-popup__nota">Ubicación aproximada; verifica el recorrido antes de viajar.</span>'
+                    : '') + detalle.join('') + '</div>');
     }
 
     /** Decide qué punto es el origen y cuál el destino (por nombre; si no hay coincidencia, primero y último). */
@@ -633,6 +687,7 @@
     global.BustrakerMap = {
         CENTRO: CENTRO,
         escapeHtml: escapeHtml,
+        url: urlAplicacion,
         fetchJSON: fetchJSON,
         crearMapa: crearMapa,
         ajustarVista: ajustarVista,

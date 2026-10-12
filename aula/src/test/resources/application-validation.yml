@@ -1,0 +1,29 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:bustraker-validation;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema-validation.sql
+  thymeleaf:
+    cache: false
+server:
+  port: 3466
+  servlet:
+    session:
+      cookie:
+        secure: false
+jwt:
+  secret: validation-only-key-with-more-than-32-characters
+  expiration-ms: 60000
+app:
+  bootstrap-admin:
+    enabled: false

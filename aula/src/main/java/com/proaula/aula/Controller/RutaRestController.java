@@ -69,6 +69,9 @@ public class RutaRestController {
                 : ruta.getBarrios();
             Map<String, double[]> coords = barrioService.obtenerCoordenadas(barriosCoordenadas);
             mapa.put("coordenadasBarrios", coords);
+            mapa.put("coordenadasEstimadas", barriosCoordenadas.stream()
+                .filter(barrio -> !barrioService.tieneCoordenadaShapefile(barrio))
+                .toList());
 
             List<Map<String, Object>> buses = new ArrayList<>();
             ruta.getBuses().forEach(bus -> {

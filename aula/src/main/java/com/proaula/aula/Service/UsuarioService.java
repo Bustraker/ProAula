@@ -1,16 +1,25 @@
 package com.proaula.aula.Service;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import com.proaula.aula.Entity.Usuario;
+import com.proaula.aula.Entity.Rol;
+import com.proaula.aula.Repository.RolRepository;
 import com.proaula.aula.Repository.UsuarioRepository;
+import com.proaula.aula.Repository.ViajeRepository;
+import com.proaula.aula.Repository.PasajeRepository;
+import com.proaula.aula.Repository.NotificacionRepository;
+import com.proaula.aula.Repository.ConductorRepository;
 import com.proaula.aula.exception.AulaException;
 import com.proaula.aula.exception.UsuarioNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.HashSet;
 
 @Service
 public class UsuarioService {
@@ -20,15 +29,33 @@ public class UsuarioService {
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
+    @Autowired
+    private RolRepository rolRepository;
+
+    @Autowired
+    private ViajeRepository viajeRepository;
+
+    @Autowired
+    private PasajeRepository pasajeRepository;
+
+    @Autowired
+    private NotificacionRepository notificacionRepository;
+
+    @Autowired
+    private ConductorRepository conductorRepository;
+
     // Registra usuario y encripta contraseña no hasheada
     // Normaliza rol a ROLE_USER o ROLE_ADMIN
+    @Transactional
     public Usuario register(Usuario usuario) {
-        // Normalizar rol
+        usuario.setUsername(normalizarIdentificador(usuario.getUsername()));
+        usuario.setEmail(normalizarIdentificador(usuario.getEmail()));
+
         String role = usuario.getRole();
         if (role == null || role.trim().isEmpty()) {
             usuario.setRole("ROLE_USER");
         } else {
-            role = role.trim().toUpperCase();
+            role = role.trim().toUpperCase(Locale.ROOT);
             if (!role.startsWith("ROLE_")) {
                 usuario.setRole("ROLE_" + role);
             } else {
@@ -36,11 +63,24 @@ public class UsuarioService {
             }
         }
 
-        // Prevenir doble hash si la contraseña ya fue encriptada
         String password = usuario.getPassword();
-        if (password != null && !password.startsWith("$2a$") && !password.startsWith("$2b$")) {
-            usuario.setPassword(passwordEncoder.encode(password));
+        if (password == null || password.length() < 6 || password.length() > 72) {
+            throw new IllegalArgumentException("La contraseña debe tener entre 6 y 72 caracteres");
         }
+        usuario.setPassword(passwordEncoder.encode(password));
+
+        String nombreRol = usuario.getRole();
+        Rol rol = rolRepository.findByNombreIgnoreCase(nombreRol)
+            .orElseGet(() -> {
+                Rol nuevoRol = new Rol();
+                nuevoRol.setNombre(nombreRol);
+                return rolRepository.save(nuevoRol);
+            });
+        if (usuario.getRoles() == null) {
+            usuario.setRoles(new HashSet<>());
+        }
+        usuario.getRoles().clear();
+        usuario.getRoles().add(rol);
 
         return usuarioRepository.save(usuario);
     }
@@ -81,10 +121,25 @@ public class UsuarioService {
         return usuarioRepository.findById(id).orElse(null);
     }
 
+    @Transactional
     public void deleteById(Long id) {
-        if (id != null) {
-            usuarioRepository.deleteById(id);
+        if (id == null || !usuarioRepository.existsById(id)) {
+            return;
         }
+        if (hasRelatedRecords(id)) {
+            throw new AulaException(
+                "No se puede eliminar el usuario porque tiene viajes, pasajes, notificaciones o un perfil de conductor asociado.",
+                "RESOURCE_IN_USE");
+        }
+        usuarioRepository.deleteById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean hasRelatedRecords(Long id) {
+        return id != null && (viajeRepository.existsByUsuario_Id(id)
+                || pasajeRepository.existsByUsuario_Id(id)
+                || notificacionRepository.existsByUsuario_Id(id)
+                || conductorRepository.existsByUsuario_Id(id));
     }
 
     public Usuario findByUsername(String username) {
@@ -101,9 +156,19 @@ public class UsuarioService {
         Usuario usuario = usuarioRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Usuario no encontrado con id: " + id));
 
-        usuario.setNombres(usuarioDetails.getNombres());
-        usuario.setApellidos(usuarioDetails.getApellidos());
-        usuario.setEmail(usuarioDetails.getEmail());
+        String emailNormalizado = normalizarIdentificador(usuarioDetails.getEmail());
+        if (emailNormalizado == null || emailNormalizado.isBlank()
+                || usuarioDetails.getNombres() == null || usuarioDetails.getNombres().isBlank()
+                || usuarioDetails.getApellidos() == null || usuarioDetails.getApellidos().isBlank()) {
+            throw new AulaException("Nombres, apellidos y correo son obligatorios", "VALIDATION_ERROR");
+        }
+        if (!emailNormalizado.equalsIgnoreCase(usuario.getEmail())
+                && usuarioRepository.existsByEmail(emailNormalizado)) {
+            throw new AulaException("El correo electrónico ya está registrado", "EMAIL_ALREADY_EXISTS");
+        }
+        usuario.setNombres(usuarioDetails.getNombres().trim());
+        usuario.setApellidos(usuarioDetails.getApellidos().trim());
+        usuario.setEmail(emailNormalizado);
 
         return usuarioRepository.save(usuario);
     }
@@ -141,5 +206,9 @@ public class UsuarioService {
 
     public Optional<Usuario> findByIdOptional(Long id) {
         return usuarioRepository.findById(id);
+    }
+
+    private String normalizarIdentificador(String value) {
+        return value == null ? null : value.trim().toLowerCase(Locale.ROOT);
     }
 }

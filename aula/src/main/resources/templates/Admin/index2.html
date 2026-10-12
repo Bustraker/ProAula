@@ -10,6 +10,7 @@
     <link rel="stylesheet" th:href="@{/css/style_responsive.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/admin_index2.css(v='admin-20261005-4')}">
+    <link rel="stylesheet" th:href="@{/css/logout.css}">
 </head>
 <body class="admin-dashboard">
     <div class="admin-container">
@@ -26,7 +27,10 @@
                 <a th:href="@{/mensajes_contacto}"><i class="fas fa-envelope"></i> Mensajes</a>
                 <a th:href="@{/rutas/admin}"><i class="fas fa-route"></i> Rutas</a>
                 <a th:href="@{/registro-buses}"><i class="fas fa-bus"></i> Buses</a>
-                <a th:href="@{/logout}"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+                <form th:action="@{/logout}" method="post" class="logout-form">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <button type="submit" class="logout-form__button"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</button>
+                </form>
             </nav>
             <div class="sidebar-footer">
                 <span class="system-status-dot"></span>

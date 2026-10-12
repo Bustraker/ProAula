@@ -35,7 +35,8 @@ class BusRestControllerTest {
         Bus secondBus = crearBus();
         secondBus.setId(4L);
         secondBus.setPlaca("XYZ789");
-        when(busService.getAllBuses()).thenReturn(List.of(bus, secondBus));
+        when(busService.getBusConsultations(false)).thenReturn(
+                com.proaula.aula.dto.BusConsultaMapper.publicRoutes(List.of(bus, secondBus)));
 
         List<BusConsultaDto> result = controller.getAllBusesWithRuta(null);
 
@@ -58,7 +59,8 @@ class BusRestControllerTest {
     @Test
     void getAllBusesWithRutaIncludesFullBusAndRouteDetailsForAuthenticatedUsers() {
         Bus bus = crearBus();
-        when(busService.getAllBuses()).thenReturn(List.of(bus));
+        when(busService.getBusConsultations(true)).thenReturn(
+                com.proaula.aula.dto.BusConsultaMapper.authenticatedBuses(List.of(bus)));
         Authentication authentication = new UsernamePasswordAuthenticationToken(
                 "usuario", "credenciales", List.of(new SimpleGrantedAuthority("ROLE_USER")));
 

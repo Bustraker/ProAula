@@ -4,10 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,9 +18,13 @@ import org.springframework.web.bind.annotation.RestController;
 import com.proaula.aula.Entity.Usuario;
 import com.proaula.aula.Service.UsuarioService;
 import com.proaula.aula.config.JwtTokenProvider;
+import com.proaula.aula.dto.UsuarioRegistroRequest;
+import com.proaula.aula.dto.UsuarioRegistroResponse;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/usuarios")
+@Validated
 public class UsuarioController {
     private static final Logger log = LoggerFactory.getLogger(UsuarioController.class);
 
@@ -29,13 +35,28 @@ public class UsuarioController {
     private JwtTokenProvider jwtTokenProvider;
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody Usuario usuario) {
-        try {
-            return ResponseEntity.ok(usuarioService.register(usuario));
-        } catch (Exception e) {
-            log.error("Error al registrar usuario", e);
-            return ResponseEntity.badRequest().body(Map.of("error", "No se pudo completar el registro"));
+    public ResponseEntity<?> register(@Valid @RequestBody UsuarioRegistroRequest request) {
+        if (usuarioService.existsByUsername(request.username())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Map.of("error", "El nombre de usuario ya está en uso"));
         }
+        if (usuarioService.existsByEmail(request.email())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Map.of("error", "El correo electrónico ya está registrado"));
+        }
+
+        Usuario nuevoUsuario = new Usuario();
+        nuevoUsuario.setUsername(request.username().trim());
+        nuevoUsuario.setPassword(request.password());
+        nuevoUsuario.setNombres(request.nombres().trim());
+        nuevoUsuario.setApellidos(request.apellidos().trim());
+        nuevoUsuario.setEmail(request.email().trim());
+        nuevoUsuario.setProvider("LOCAL");
+        nuevoUsuario.setRole("ROLE_USER");
+
+        Usuario creado = usuarioService.register(nuevoUsuario);
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(UsuarioRegistroResponse.from(creado));
     }
 
     @PostMapping("/login")

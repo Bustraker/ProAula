@@ -18,7 +18,7 @@ public class Localidades {
         "patio portal", "madre bernarda", "delicias", "lo amador", "el prado",
         "la popa", "terminal", "terminal de transporte", "crisanto luque", 
         "crisantoluque", "los angeles", "cuidad jardin", "universidad tecnologia",
-        "Barcelona", "Las Americas"
+        "Barcelona", "Las Americas", "Torices"
     );
 
     // Localidad 2
@@ -35,7 +35,7 @@ public class Localidades {
         "republica de venezuela", "san antonio", "san jose obrero", "13 de junio", 
         "viejo porvenir", "arroyo grande", "las europas", "arroyo de las canoas", 
         "arroyo de piedra", "punta canoa", "pontezuela", "manzanillo del mar", 
-        "puerto rey", "tierra baja", "la boquilla", "bayunca", "palmarito", "el consulado"
+        "puerto rey", "tierra baja", "la boquilla", "bayunca", "palmarito", "el consulado", "Villagrande"
     );
 
     // Localidad 3
@@ -55,7 +55,7 @@ public class Localidades {
         "el educador", "el reposo", "henequen", "jaime pardo leal", "la consolata", 
         "la victoria", "los jardines", "luis carlos galan", "manuela vergara de curi", 
         "san pedro martir", "vista hermosa", "pasacaballo", "recreo", "membrillal", 
-        "nuevo bosque", "bosque"
+        "nuevo bosque", "bosque", "El Rodeo", "La Plazuela", "Calamares", "Simón Bolívar"
     );
 
     // Método para obtener todos los barrios sin duplicados y manteniendo el orden original

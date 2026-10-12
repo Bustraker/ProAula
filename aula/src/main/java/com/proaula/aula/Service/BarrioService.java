@@ -347,4 +347,8 @@ public class BarrioService {
         }
         return resultado;
     }
+
+    public boolean tieneCoordenadaShapefile(String nombre) {
+        return nombre != null && COORDENADAS_SHAPEFILE.containsKey(normalize(nombre));
+    }
 }

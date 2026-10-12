@@ -129,7 +129,7 @@
                     <li><span><i class="fas fa-key" aria-hidden="true"></i></span><div><strong>Código administrativo</strong><small>Confirma tu autorización</small></div></li>
                     <li><span><i class="fas fa-user-lock" aria-hidden="true"></i></span><div><strong>Usuario y contraseña</strong><small>Valida tus credenciales</small></div></li>
                 </ol>
-                <button type="button" id="continueAdmin" class="modal-admin-button">
+                <button type="button" id="continueAdmin" class="modal-admin-button" th:attr="data-admin-login-url=@{/admin-login}">
                     Continuar al acceso <i class="fas fa-arrow-right" aria-hidden="true"></i>
                 </button>
             </div>

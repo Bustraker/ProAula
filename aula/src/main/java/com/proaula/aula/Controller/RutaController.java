@@ -11,8 +11,11 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import jakarta.validation.Valid;
 
 import com.proaula.aula.Entity.Ruta;
+import com.proaula.aula.Entity.RutaParada;
 import com.proaula.aula.Service.RutaService;
 
 @Controller
@@ -39,10 +42,11 @@ public class RutaController {
         model.addAttribute("ruta", ruta);
         model.addAttribute("barrios", ruta != null ? ruta.getBarrios() : new ArrayList<>());
         model.addAttribute("barriosOrdenadosTexto",
-            ruta != null && ruta.isOrdenBarriosConfirmado()
+            ruta != null && Boolean.TRUE.equals(ruta.getVerificada()) && ruta.isOrdenBarriosConfirmado()
                 ? String.join(", ", ruta.getBarriosOrdenados())
                 : "");
-        model.addAttribute("ordenPendiente", ruta != null && !ruta.isOrdenBarriosConfirmado());
+        model.addAttribute("ordenPendiente", ruta != null
+            && (!Boolean.TRUE.equals(ruta.getVerificada()) || !ruta.isOrdenBarriosConfirmado()));
         model.addAttribute("errorBarrios", ERROR_BARRIOS.equals(error));
         model.addAttribute("rutas", rutaService.getAllRutas());
         return "Admin/editar_ruta";
@@ -72,7 +76,8 @@ public class RutaController {
     public String listarRutas(Model model,
                              @RequestParam(required = false) String buscar,
                              @RequestParam(required = false) String barrio) {
-        List<Ruta> rutas = rutaService.getRutasVerificadas();
+        List<Ruta> todasLasRutas = rutaService.getAllRutas();
+        List<Ruta> rutas = new ArrayList<>(todasLasRutas);
         
         // Filtros
         if (buscar != null && !buscar.isEmpty()) {
@@ -88,13 +93,15 @@ public class RutaController {
         }
         
         // Obtener barrios únicos
-        List<String> barrios = rutaService.getRutasVerificadas().stream()
+        List<String> barrios = todasLasRutas.stream()
             .flatMap(r -> r.getBarrios() != null ? r.getBarrios().stream() : new ArrayList<String>().stream())
             .distinct()
             .sorted()
             .collect(Collectors.toList());
         
         model.addAttribute("rutas", rutas);
+        model.addAttribute("hayRutasProvisionales",
+            todasLasRutas.stream().anyMatch(r -> !Boolean.TRUE.equals(r.getVerificada())));
         model.addAttribute("barriosDisponibles", barrios);
         model.addAttribute("buscar", buscar);
         model.addAttribute("barrioSeleccionado", barrio);
@@ -106,8 +113,11 @@ public class RutaController {
     @GetMapping("/ruta/{id}")
     public String detalleRuta(@PathVariable Long id, Model model) {
         Ruta ruta = rutaService.getRutaById(id);
-        if (ruta != null && Boolean.TRUE.equals(ruta.getVerificada())) {
+        if (ruta != null) {
             model.addAttribute("ruta", ruta);
+            model.addAttribute("paradasIda", rutaService.getParadasPorSentido(id, RutaParada.Sentido.IDA));
+            model.addAttribute("paradasVuelta", rutaService.getParadasPorSentido(id, RutaParada.Sentido.VUELTA));
+            model.addAttribute("paradasRuta", rutaService.getParadasPorRuta(id));
             return "detalle-ruta";
         }
         return "redirect:/rutas";
@@ -130,11 +140,12 @@ public class RutaController {
         model.addAttribute("horasFormateadas", horasFormateadas);
         model.addAttribute("newRuta", new Ruta());
         model.addAttribute("errorBarrios", ERROR_BARRIOS.equals(error));
+        model.addAttribute("errorRelaciones", "relaciones".equals(error));
         return "Admin/agregar_rutas";
     }
 
     @PostMapping("/rutas")
-    public String agregarRuta(@ModelAttribute Ruta ruta, @RequestParam String barriosOrdenadosTexto) {
+    public String agregarRuta(@Valid @ModelAttribute Ruta ruta, @RequestParam String barriosOrdenadosTexto) {
         List<String> barriosOrdenados = procesarBarrios(barriosOrdenadosTexto);
         if (barriosOrdenados.stream().distinct().count() < 2) {
             return "redirect:/rutas/admin?error=barrios";
@@ -146,7 +157,12 @@ public class RutaController {
     }
 
     @PostMapping("/eliminar-ruta/{id}")
-    public String eliminarRuta(@PathVariable Long id) {
+    public String eliminarRuta(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        if (rutaService.hasRelatedRecords(id)) {
+            redirectAttributes.addFlashAttribute("errorMessage",
+                "No se puede eliminar la ruta porque tiene buses, paradas o historial asociado.");
+            return "redirect:/rutas/admin?error=relaciones";
+        }
         rutaService.deleteRuta(id);
         return "redirect:/rutas";
     }

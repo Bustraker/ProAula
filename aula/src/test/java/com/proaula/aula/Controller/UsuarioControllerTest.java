@@ -14,10 +14,15 @@ import org.springframework.http.ResponseEntity;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.proaula.aula.dto.UsuarioRegistroRequest;
+import com.proaula.aula.dto.UsuarioRegistroResponse;
+import org.mockito.ArgumentCaptor;
 @ExtendWith(MockitoExtension.class)
 class UsuarioControllerTest {
 
@@ -58,5 +63,27 @@ class UsuarioControllerTest {
         assertThat(safeUser).isNotNull();
         assertThat(safeUser.get("username")).isEqualTo("alice");
         assertThat(safeUser).doesNotContainKey("password");
+    }
+
+    @Test
+    void registrationIgnoresClientSuppliedRoleAndDoesNotReturnPassword() {
+        Usuario savedUser = new Usuario();
+        savedUser.setId(2L);
+        savedUser.setUsername("new-user");
+        savedUser.setNombres("New");
+        savedUser.setApellidos("User");
+        savedUser.setEmail("new-user@test.com");
+        when(usuarioService.register(any(Usuario.class))).thenReturn(savedUser);
+
+        ResponseEntity<?> response = usuarioController.register(new UsuarioRegistroRequest(
+            "new-user", "long-password", "New", "User", "new-user@test.com"));
+
+        ArgumentCaptor<Usuario> userCaptor = ArgumentCaptor.forClass(Usuario.class);
+        verify(usuarioService).register(userCaptor.capture());
+        assertThat(userCaptor.getValue().getRole()).isEqualTo("ROLE_USER");
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(response.getBody()).isEqualTo(new UsuarioRegistroResponse(
+            2L, "new-user", "New", "User", "new-user@test.com"));
+        assertThat(response.getBody().toString()).doesNotContain("password");
     }
 }

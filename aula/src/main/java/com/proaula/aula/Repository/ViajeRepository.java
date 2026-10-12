@@ -9,6 +9,10 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ViajeRepository extends JpaRepository<Viaje, Long> {
+    boolean existsByUsuario_Id(Long usuarioId);
+
+    boolean existsByRuta_Id(Long rutaId);
+
     List<Viaje> findByUsuarioUsernameIgnoreCase(String username);
     Optional<Viaje> findByIdAndUsuarioUsernameIgnoreCase(Long id, String username);
 }

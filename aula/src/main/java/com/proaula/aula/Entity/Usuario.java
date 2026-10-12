@@ -4,10 +4,23 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Column;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import lombok.Data;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @Data
@@ -18,6 +31,7 @@ public class Usuario {
 
     @NotBlank(message = "El nombre de usuario es obligatorio")
     @Size(min = 4, max = 20, message = "El nombre de usuario debe tener entre 4 y 20 caracteres")
+    @Column(nullable = false, unique = true, length = 20)
     private String username;
     
     @NotBlank(message = "La contraseña es obligatoria")
@@ -38,5 +52,36 @@ public class Usuario {
     
     @NotBlank(message = "El email es obligatorio")
     @Email(message = "Debe ser una dirección de email válida")
+    @Column(nullable = false, unique = true, length = 254)
     private String email; // Agregado
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "rol_usuario",
+        joinColumns = @JoinColumn(name = "usuario_id"),
+        inverseJoinColumns = @JoinColumn(name = "rol_id")
+    )
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private Set<Rol> roles = new HashSet<>();
+
+    @OneToOne(mappedBy = "usuario", fetch = FetchType.LAZY)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private Conductor conductor;
+
+    @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private List<Viaje> viajes = new java.util.ArrayList<>();
+
+    @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private List<Pasaje> pasajes = new java.util.ArrayList<>();
+
+    @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private List<Notificacion> notificaciones = new java.util.ArrayList<>();
 }

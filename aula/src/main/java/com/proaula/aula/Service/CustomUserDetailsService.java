@@ -13,6 +13,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Locale;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -38,10 +41,17 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     private Collection<? extends GrantedAuthority> getAuthorities(Usuario usuario) {
-        String role = usuario.getRole() != null ? usuario.getRole().trim() : "ROLE_USER";
-        if (!role.startsWith("ROLE_")) {
-            role = "ROLE_" + role;
+        Set<String> roles = usuario.getRoles().stream()
+            .map(role -> normalizarRol(role.getNombre()))
+            .collect(Collectors.toSet());
+        if (roles.isEmpty()) {
+            roles = Collections.singleton(normalizarRol(usuario.getRole()));
         }
-        return Collections.singletonList(new SimpleGrantedAuthority(role));
+        return roles.stream().map(SimpleGrantedAuthority::new).toList();
+    }
+
+    private String normalizarRol(String role) {
+        String normalized = role == null || role.isBlank() ? "ROLE_USER" : role.trim().toUpperCase(Locale.ROOT);
+        return normalized.startsWith("ROLE_") ? normalized : "ROLE_" + normalized;
     }
 }

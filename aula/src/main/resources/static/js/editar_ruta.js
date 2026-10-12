@@ -11,8 +11,9 @@
     if (routeSelect) {
         routeSelect.addEventListener('change', () => {
             const routeId = routeSelect.value;
-            if (/^\d+$/.test(routeId)) {
-                window.location.assign(`/editar-ruta/${routeId}`);
+            const editUrlPrefix = routeSelect.dataset.editUrlPrefix;
+            if (/^\d+$/.test(routeId) && editUrlPrefix) {
+                window.location.assign(`${editUrlPrefix}${routeId}`);
             }
         });
     }

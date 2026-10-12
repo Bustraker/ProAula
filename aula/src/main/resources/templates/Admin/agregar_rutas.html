@@ -71,6 +71,7 @@
                     <p class="legacy-card-intro">Completa la información para incorporar un recorrido al sistema.</p>
                     <form th:action="@{/rutas}" method="post" th:object="${newRuta}" class="legacy-form">
                         <p th:if="${errorBarrios}" class="legacy-alert" role="alert"><i class="fas fa-circle-exclamation" aria-hidden="true"></i> Ingresa al menos dos barrios distintos para definir el recorrido.</p>
+                        <p th:if="${errorRelaciones}" class="legacy-alert" role="alert"><i class="fas fa-circle-exclamation" aria-hidden="true"></i> No se puede eliminar la ruta porque tiene datos asociados.</p>
                         <label for="nombre">Nombre de la ruta</label>
                         <input type="text" id="nombre" th:field="*{nombre}" placeholder="Ej. Avenida Express" autocomplete="off" required>
                         <span th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}" class="legacy-field-error"></span>
@@ -123,7 +124,7 @@
                             </div>
                             <div class="legacy-route-item__bottom">
                                 <span class="legacy-route-time" th:if="${horasFormateadas[iterStat.index] != ''}"><i class="fas fa-clock" aria-hidden="true"></i><span th:text="${horasFormateadas[iterStat.index]}">--:--</span></span>
-                                <span class="legacy-order-state" th:text="${ruta.ordenBarriosConfirmado ? 'Sentido confirmado' : 'Orden por confirmar'}">Orden por confirmar</span>
+                                <span class="legacy-order-state" th:text="${ruta.verificada and ruta.ordenBarriosConfirmado ? 'Sentido confirmado' : 'Orden por confirmar'}">Orden por confirmar</span>
                             </div>
                             <div class="legacy-route-actions">
                                 <a class="legacy-button legacy-button--secondary" th:href="@{/editar-ruta/{id}(id=${ruta.id})}"><i class="fas fa-pen" aria-hidden="true"></i> Editar recorrido</a>

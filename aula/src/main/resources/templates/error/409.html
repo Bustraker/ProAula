@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Conflicto - Bustraker</title>
+    <link rel="stylesheet" th:href="@{/css/error.css}">
+</head>
+<body class="error-page error-page--409">
+    <main class="error-main">
+        <section class="error-container" role="alert">
+            <p class="error-code">409</p>
+            <h1 class="error-title">No se puede completar la operación</h1>
+            <p class="error-message" th:text="${errorMessage}">El recurso tiene información relacionada.</p>
+            <div class="error-actions">
+                <a th:href="@{/}" class="btn-error btn-primary">Ir al inicio</a>
+                <button class="btn-error btn-secondary js-go-back" type="button">Volver</button>
+            </div>
+        </section>
+    </main>
+    <script th:src="@{/js/error.js}"></script>
+</body>
+</html>

@@ -172,7 +172,7 @@
     font: 500 0.86rem/1.45 Inter, system-ui, sans-serif;
     cursor: pointer;
     pointer-events: auto;
-    animation: mu-entrada 220ms ease-out both;
+    animation: mu-entrada 380ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .mu-aviso i { margin-top: 2px; color: #37c8ba; }
@@ -182,7 +182,7 @@
 .mu-aviso--error i { color: #f87171; }
 .mu-aviso--ok { border-left-color: #62d6a5; }
 .mu-aviso--ok i { color: #62d6a5; }
-.mu-aviso--salida { opacity: 0; transform: translateY(6px); transition: opacity 200ms ease, transform 200ms ease; }
+.mu-aviso--salida { opacity: 0; transform: translateY(4px); filter: blur(2px); transition: opacity 220ms ease, transform 260ms cubic-bezier(0.2, 0.8, 0.2, 1), filter 220ms ease; }
 
 .mu-cargando {
     position: fixed;
@@ -207,14 +207,18 @@
 .mu-spinner {
     width: 16px;
     height: 16px;
-    border: 2px solid rgba(55, 200, 186, 0.25);
+    border: 1.5px solid rgba(55, 200, 186, 0.19);
     border-top-color: #37c8ba;
     border-radius: 50%;
-    animation: mu-giro 0.8s linear infinite;
+    box-shadow: 0 0 8px rgba(55, 200, 186, 0.12);
+    animation: mu-giro 1.05s linear infinite;
 }
 
 @keyframes mu-giro { to { transform: rotate(360deg); } }
-@keyframes mu-entrada { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes mu-entrada {
+    0% { opacity: 0; filter: blur(4px); transform: translateY(10px) scale(0.985); }
+    100% { opacity: 1; filter: blur(0); transform: translateY(0) scale(1); }
+}
 
 /* ---------- Móvil ---------- */
 @media (max-width: 768px) {
@@ -357,7 +361,7 @@
     top: calc(100% + 8px);
     left: 0;
     z-index: 1200;
-    width: 268px; /* slightly wider for SVGs */
+    width: 300px;
     padding: 14px;
     border: 1px solid var(--mu-linea);
     border-radius: 14px;
@@ -367,11 +371,11 @@
     -webkit-backdrop-filter: blur(16px);
     backdrop-filter: blur(16px);
     transform-origin: top left;
-    transition: transform 200ms cubic-bezier(.2,.9,.3,1), opacity 160ms ease, box-shadow 180ms, visibility 160ms;
-    opacity: 0; visibility: hidden; pointer-events: none; transform: translateY(-8px) scale(0.99);
+    transition: transform 340ms cubic-bezier(0.16, 1, 0.3, 1), opacity 220ms ease, box-shadow 260ms ease, visibility 220ms ease, filter 220ms ease;
+    opacity: 0; visibility: hidden; pointer-events: none; filter: blur(5px); transform: translateY(-10px) scale(0.985);
 }
 .mu-estilos__menu[hidden] { display: none; }
-.mu-estilos__menu[aria-visible="true"] { opacity: 1; visibility: visible; pointer-events: auto; transform: translateY(0) scale(1); }
+.mu-estilos__menu[aria-visible="true"] { opacity: 1; visibility: visible; pointer-events: auto; filter: blur(0); transform: translateY(0) scale(1); }
 /* When the control button is expanded, visually indicate it */
 .mu-estilos__boton[aria-expanded="true"] { background: rgba(22,160,133,0.08); box-shadow: 0 10px 30px rgba(14,36,34,0.28); border: 1px solid rgba(22,160,133,0.12); }
 
@@ -383,7 +387,7 @@
     letter-spacing: 0.12em;
     text-transform: uppercase;
 }
-.mu-estilos__rejilla { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.mu-estilos__rejilla { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 .mu-estilo {
     display: grid;
     gap: 6px;
@@ -395,14 +399,14 @@
     background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));
     font: 700 0.72rem/1.1 Inter, system-ui, sans-serif;
     cursor: pointer;
-    transition: transform 160ms ease, box-shadow 160ms ease, background 120ms ease;
+    transition: transform 240ms cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 240ms ease, background 220ms ease, border-color 220ms ease;
 }
-.mu-estilo:hover, .mu-estilo:focus-visible { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(6,12,14,0.45); outline: 2px solid rgba(255,235,205,0.04); }
+.mu-estilo:hover, .mu-estilo:focus-visible { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(6,12,14,0.45); outline: 2px solid rgba(255,235,205,0.04); }
 .mu-estilo--activo { border-color: var(--mu-acento); color: #ecf5f3; background: linear-gradient(180deg, rgba(22,160,133,0.06), rgba(14,120,95,0.04)); box-shadow: 0 10px 26px rgba(10,40,36,0.36); }
 .mu-estilo__muestra {
     display: grid;
     width: 100%;
-    height: 40px;
+    height: 46px;
     place-items: center;
     border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: 9px;
@@ -413,26 +417,94 @@
 }
 /* Improve text contrast for option labels */
 .mu-estilo__texto { color: #d9f3ef; font-size: 0.74rem; }
-/* Per-style miniature animations — SVG-focused and CSS-enhanced. Respect reduced-motion */
+/* Each preview layers map-specific motion instead of reusing a generic effect. */
 @media (prefers-reduced-motion: no-preference) {
-    .mu-mini-calles path { stroke-dasharray: 120; stroke-dashoffset: 120; animation: mu-mini-line 2.2s linear infinite; stroke: #245b61; }
-    .mu-mini-calles .mu-mini-calles__borde { stroke: rgba(255,255,255,0.92); stroke-width: 4; }
-    @keyframes mu-mini-line { 0% { stroke-dashoffset: 120 } 100% { stroke-dashoffset: 0 } }
+    .mu-estilos__menu[aria-visible="true"] .mu-estilo { animation: mu-opcion-entrada 360ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+    .mu-estilos__menu[aria-visible="true"] .mu-estilo:nth-child(2) { animation-delay: 35ms; }
+    .mu-estilos__menu[aria-visible="true"] .mu-estilo:nth-child(3) { animation-delay: 70ms; }
+    .mu-estilos__menu[aria-visible="true"] .mu-estilo:nth-child(4) { animation-delay: 105ms; }
+    .mu-estilos__menu[aria-visible="true"] .mu-estilo:nth-child(5) { animation-delay: 140ms; }
+    .mu-estilos__menu:not([aria-visible="true"]) .mu-estilo__muestra * { animation-play-state: paused; }
 
-    .mu-mini-oscuro circle:first-child { transform-origin: 96px 10px; animation: mu-mini-moon 3s ease-in-out infinite; fill: #f3efd5; }
-    @keyframes mu-mini-moon { 0% { transform: translateY(0) scale(0.9); opacity:0.75 } 50% { transform: translateY(-2px) scale(1.05); opacity:1 } 100% { transform: translateY(0) scale(0.9); opacity:0.75 } }
+    .mu-estilos__menu[aria-visible="true"] .mu-mini-calles__cuadricula { animation: mu-calles-cuadricula 7s ease-in-out infinite; transform-origin: center; }
+    .mu-mini-calles .mu-mini-calles__borde { stroke: rgba(255,255,255,.96); stroke-width: 4; }
+    .mu-mini-calles .mu-mini-calles__resplandor { stroke: #42d8c1; stroke-width: 5.4; stroke-linecap: round; opacity: .25; animation: mu-calles-resplandor 2.8s ease-in-out infinite; }
+    .mu-mini-calles .mu-mini-calles__ruta { stroke: #087e78; stroke-width: 1.55; stroke-dasharray: 1 7; animation: mu-calles-trafico 2.2s linear infinite; }
+    .mu-mini-calles__nodo { fill: #fff; stroke: #168b87; stroke-width: 1; transform-box: view-box; transform-origin: 52px 26px; animation: mu-calles-nodo 2.8s ease-out infinite; }
+    .mu-mini-calles__vehiculo { fill: #087e78; stroke: #fff; stroke-width: 1.4; transform-box: view-box; transform-origin: center; animation: mu-calles-vehiculo 4.8s cubic-bezier(0.45, 0, 0.55, 1) infinite; }
+    @keyframes mu-calles-cuadricula { 0%, 100% { opacity: .32; } 50% { opacity: .62; } }
+    @keyframes mu-calles-resplandor { 0%, 100% { opacity: .14; stroke-width: 4; } 50% { opacity: .42; stroke-width: 7; } }
+    @keyframes mu-calles-trafico { to { stroke-dashoffset: -24; } }
+    @keyframes mu-calles-nodo { 0% { opacity: .85; transform: scale(.55); } 75%, 100% { opacity: 0; transform: scale(2.2); } }
+    @keyframes mu-calles-vehiculo {
+        0%, 100% { transform: translate(0, 0); }
+        22% { transform: translate(20px, -13px); }
+        47% { transform: translate(43px, -2px); }
+        72% { transform: translate(68px, -18px); }
+        90% { transform: translate(99px, -2px); }
+    }
 
-    .mu-mini-claro circle { transform-origin: 12px 10px; animation: mu-mini-sun 2.2s ease-in-out infinite; fill: #f2b84b; filter: drop-shadow(0 2px 6px rgba(255,200,90,0.18)); }
-    @keyframes mu-mini-sun { 0% { transform: scale(0.9) } 50% { transform: scale(1.06) } 100% { transform: scale(0.9) } }
+    .mu-estilos__menu[aria-visible="true"] .mu-mini-oscuro__luna { animation: mu-oscuro-orbita 8s ease-in-out infinite; transform-origin: 96px 10px; }
+    .mu-estilos__menu[aria-visible="true"] .mu-mini-oscuro__disco { fill: #f3efd5; filter: drop-shadow(0 0 3px rgba(243, 239, 213, .5)); }
+    .mu-mini-oscuro__calles { stroke-dasharray: 2 7; animation: mu-oscuro-red 6s linear infinite; }
+    .mu-mini-oscuro__ruta-halo { animation: mu-oscuro-halo 2.6s ease-in-out infinite; }
+    .mu-mini-oscuro__ruta { animation: mu-oscuro-flujo 2.1s linear infinite; }
+    .mu-mini-oscuro__baliza { filter: drop-shadow(0 0 2px #80ffe0); animation: mu-oscuro-baliza 1.9s ease-in-out infinite; transform-box: view-box; transform-origin: 72px 14px; }
+    .mu-mini-oscuro__estrella-a { animation: mu-oscuro-titilar 3.2s ease-in-out infinite; }
+    .mu-mini-oscuro__estrella-b { animation: mu-oscuro-titilar 4.1s ease-in-out 1.2s infinite; }
+    .mu-mini-oscuro__estrella-c { animation: mu-oscuro-titilar 3.8s ease-in-out .6s infinite; }
+    @keyframes mu-oscuro-orbita { 0%, 100% { opacity: .28; transform: scale(.92); } 50% { opacity: .68; transform: scale(1.08); } }
+    @keyframes mu-oscuro-titilar { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
+    @keyframes mu-oscuro-red { to { stroke-dashoffset: -36; } }
+    @keyframes mu-oscuro-halo { 0%, 100% { opacity: .12; } 50% { opacity: .42; } }
+    @keyframes mu-oscuro-flujo { to { stroke-dashoffset: -25; } }
+    @keyframes mu-oscuro-baliza { 0%, 100% { opacity: .64; transform: scale(.76); } 50% { opacity: 1; transform: scale(1.5); } }
 
-    .mu-mini-sat rect { animation: mu-mini-sat 2.6s ease-in-out infinite; }
-    @keyframes mu-mini-sat { 0% { transform: translateX(0) } 100% { transform: translateX(240px) } }
+    .mu-estilos__menu[aria-visible="true"] .mu-mini-claro__rayos { animation: mu-claro-rayos 18s linear infinite; transform-box: view-box; transform-origin: 12px 10px; }
+    .mu-mini-claro__sol { fill: #f2b84b; filter: drop-shadow(0 0 2px rgba(255, 187, 64, .72)); animation: mu-claro-sol 3.4s ease-in-out infinite; transform-box: view-box; transform-origin: 12px 10px; }
+    .mu-mini-claro__halo { animation: mu-claro-halo 3.4s ease-in-out infinite; transform-box: view-box; transform-origin: 12px 10px; }
+    .mu-mini-claro__ruta { animation: mu-claro-flujo 3.2s linear infinite; }
+    .mu-mini-claro__pin { filter: drop-shadow(0 1px 1px rgba(12,61,59,.3)); transform-box: view-box; transform-origin: 68px 14px; animation: mu-claro-pin 2.5s ease-in-out infinite; }
+    @keyframes mu-claro-rayos { to { transform: rotate(360deg); } }
+    @keyframes mu-claro-sol { 0%, 100% { opacity: .82; } 50% { opacity: 1; } }
+    @keyframes mu-claro-halo { 0%, 100% { opacity: .1; transform: scale(.92); } 50% { opacity: .27; transform: scale(1.18); } }
+    @keyframes mu-claro-flujo { to { stroke-dashoffset: -30; } }
+    @keyframes mu-claro-pin { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-1.3px); } }
 
-    .mu-mini-osm path { stroke-dasharray: 140; stroke-dashoffset: 140; animation: mu-mini-line 2.6s linear infinite; stroke: #4c6c50; }
+    .mu-estilos__menu[aria-visible="true"] .mu-mini-sat__barrido { animation: mu-satelite-barrido 4.6s cubic-bezier(.65, 0, .35, 1) infinite; }
+    .mu-mini-sat__carretera { stroke-dasharray: 2 5; animation: mu-satelite-ruta 2.6s linear infinite; }
+    .mu-mini-sat__reticula { animation: mu-satelite-reticula 5s ease-in-out infinite; }
+    .mu-mini-sat__anillo { transform-box: view-box; transform-origin: 73px 21px; animation: mu-satelite-anillo 12s linear infinite; }
+    .mu-mini-sat__objetivo { transform-box: view-box; transform-origin: 73px 21px; animation: mu-satelite-objetivo 2.8s ease-out infinite; }
+    .mu-mini-sat__punto { filter: drop-shadow(0 0 2px #fff5cb); animation: mu-satelite-punto 2.8s ease-in-out infinite; }
+    @keyframes mu-satelite-barrido { 0% { opacity: 0; transform: translateX(0); } 12% { opacity: .8; } 82% { opacity: .8; } 100% { opacity: 0; transform: translateX(155px); } }
+    @keyframes mu-satelite-ruta { to { stroke-dashoffset: -28; } }
+    @keyframes mu-satelite-reticula { 0%, 100% { opacity: .17; } 50% { opacity: .48; } }
+    @keyframes mu-satelite-anillo { to { transform: rotate(360deg); } }
+    @keyframes mu-satelite-objetivo { 0% { opacity: .85; transform: scale(.55); } 75%, 100% { opacity: 0; transform: scale(1.7); } }
+    @keyframes mu-satelite-punto { 0%, 100% { opacity: .72; } 50% { opacity: 1; } }
+
     .mu-mini-osm .mu-mini-osm__borde { stroke: #fff; stroke-width: 4; }
+    .mu-mini-osm .mu-mini-osm__halo { animation: mu-osm-halo 3.4s ease-in-out infinite; }
+    .mu-mini-osm .mu-mini-osm__ruta { stroke: #4c6c50; stroke-dasharray: 2 7; animation: mu-osm-trazado 2.8s linear infinite; }
+    .mu-mini-osm__marcador { fill: #d85048; stroke: #fff; stroke-width: 1.2; animation: mu-osm-marcador 4.2s cubic-bezier(.45, 0, .55, 1) infinite; }
+    .mu-mini-osm__parada { fill: #f0ad41; stroke: #fff; stroke-width: 1; animation: mu-osm-parada 2.6s ease-in-out infinite; transform-box: view-box; transform-origin: 70px 14px; }
+    .mu-mini-osm__poi circle { transform-box: view-box; transform-origin: center; animation: mu-osm-poi 3s ease-in-out infinite; }
+    .mu-mini-osm__poi circle:nth-child(2) { animation-delay: .8s; }
+    .mu-mini-osm__poi circle:nth-child(3) { animation-delay: 1.5s; }
+    @keyframes mu-osm-trazado { to { stroke-dashoffset: -27; } }
+    @keyframes mu-osm-halo { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
+    @keyframes mu-osm-marcador { 0%, 100% { transform: translate(0, 0); } 25% { transform: translate(20px, -14px); } 50% { transform: translate(40px, 0); } 75% { transform: translate(60px, -12px); } }
+    @keyframes mu-osm-parada { 0%, 100% { opacity: .68; transform: scale(.85); } 50% { opacity: 1; transform: scale(1.25); } }
+    @keyframes mu-osm-poi { 0%, 100% { opacity: .62; transform: scale(.82); } 50% { opacity: 1; transform: scale(1.25); } }
+
+    @keyframes mu-opcion-entrada {
+        0% { opacity: 0; filter: blur(3px); transform: translateY(5px); }
+        100% { opacity: 1; filter: blur(0); transform: translateY(0); }
+    }
 }
 @media (prefers-reduced-motion: reduce) {
-    .mu-mini-calles path, .mu-mini-oscuro circle, .mu-mini-claro circle, .mu-mini-sat rect, .mu-mini-osm path { animation: none !important; }
+    .mu-mini-calles *, .mu-mini-oscuro *, .mu-mini-claro *, .mu-mini-sat *, .mu-mini-osm * { animation: none !important; }
     .mu-estilos__menu, .mu-estilo { transition: none !important; }
 }
 /* ensure SVGs and icons are above decorative layers */
@@ -487,9 +559,140 @@
 @media (max-width: 700px) {
     .leaflet-bar a { width: 42px !important; height: 42px !important; line-height: 42px !important; }
     .mu-control a, .leaflet-container .mu-control a { width: 42px; height: 42px; }
-    .mu-estilos__menu { top: calc(100% + 8px); left: 0; width: min(268px, calc(100vw - 32px)); }
+    .mu-estilos__menu { top: calc(100% + 8px); left: 0; width: min(300px, calc(100vw - 32px)); }
+}
+
+/* Estado GPS desplegable, integrado con los controles izquierdos del mapa. */
+.estado-viaje-control {
+    display: grid;
+    justify-items: start;
+    gap: 10px;
+    overflow: visible;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+.estado-viaje__boton {
+    position: relative;
+    display: grid;
+    width: 46px;
+    height: 46px;
+    place-items: center;
+    border: 1px solid rgba(132, 245, 222, 0.6);
+    border-radius: 15px;
+    color: #eafffb;
+    background: linear-gradient(145deg, #0e8c83, #07545a);
+    box-shadow: 0 8px 24px rgba(0, 15, 21, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.24);
+    font: inherit;
+    font-size: 1.08rem;
+    cursor: pointer;
+    transition: transform 240ms cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 240ms ease, filter 240ms ease;
+}
+
+.estado-viaje__boton:hover,
+.estado-viaje__boton:focus-visible {
+    z-index: 1;
+    filter: brightness(1.16);
+    transform: translateY(-1px);
+    box-shadow: 0 12px 28px rgba(0, 15, 21, 0.58), 0 0 0 4px rgba(73, 224, 196, 0.14);
+}
+
+.estado-viaje__indicador {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 9px;
+    height: 9px;
+    border: 2px solid #07343c;
+    border-radius: 50%;
+    background: #f2bd58;
+}
+
+.estado-viaje__boton--activo .estado-viaje__indicador { background: #6bf0b4; }
+.estado-viaje__boton--movimiento .estado-viaje__indicador { background: #72f6d5; animation: estado-senal 2.2s ease-in-out infinite; }
+.estado-viaje__barrios > :nth-child(2) { animation-delay: 45ms; }
+.estado-viaje__barrios > :nth-child(3) { animation-delay: 90ms; }
+.estado-viaje__barrios > :nth-child(4) { animation-delay: 135ms; }
+.estado-viaje__barrios > :nth-child(5) { animation-delay: 180ms; }
+
+.estado-viaje {
+    width: min(350px, calc(100vw - 76px));
+    padding: 16px;
+    border: 1px solid rgba(116, 226, 205, 0.34);
+    border-radius: 17px;
+    color: #e9f7f4;
+    background:
+        radial-gradient(ellipse at 100% 0%, rgba(46, 190, 169, 0.2), transparent 48%),
+        linear-gradient(155deg, rgba(8, 29, 36, 0.97), rgba(6, 18, 25, 0.97));
+    box-shadow: 0 18px 48px rgba(0, 9, 15, 0.58), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    -webkit-backdrop-filter: blur(18px) saturate(1.3);
+    backdrop-filter: blur(18px) saturate(1.3);
+    transform-origin: top left;
+}
+
+.estado-viaje[hidden] { display: none; }
+.estado-viaje:not([hidden]) { animation: estado-desplegar 480ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+.estado-viaje__cabecera { display: flex; align-items: center; gap: 10px; }
+.estado-viaje:not([hidden]) .estado-viaje__cabecera { animation: estado-contenido 420ms cubic-bezier(0.16, 1, 0.3, 1) 45ms both; }
+.estado-viaje:not([hidden]) .estado-viaje__estado { animation: estado-contenido 420ms cubic-bezier(0.16, 1, 0.3, 1) 85ms both; }
+.estado-viaje:not([hidden]) .estado-viaje__ruta { animation: estado-contenido 420ms cubic-bezier(0.16, 1, 0.3, 1) 125ms both; }
+.estado-viaje:not([hidden]) .estado-viaje__subtitulo { animation: estado-contenido 420ms cubic-bezier(0.16, 1, 0.3, 1) 165ms both; }
+.estado-viaje:not([hidden]) .estado-viaje__nota { animation: estado-contenido 420ms cubic-bezier(0.16, 1, 0.3, 1) 195ms both; }
+.estado-viaje:not([hidden]) .estado-viaje__pie { animation: estado-contenido 420ms cubic-bezier(0.16, 1, 0.3, 1) 240ms both; }
+.estado-viaje__insignia { display: grid; flex: none; width: 38px; height: 38px; place-items: center; border: 1px solid rgba(123, 238, 214, 0.32); border-radius: 12px; color: #8af0dc; background: rgba(45, 189, 166, 0.14); }
+.estado-viaje__titulos { flex: 1; min-width: 0; }
+.estado-viaje__eyebrow { color: #75d8c6; font-size: 0.59rem; font-weight: 850; letter-spacing: 0.13em; }
+.estado-viaje__titulos h2 { margin: 2px 0 0; font-size: 1rem; letter-spacing: -0.02em; }
+.estado-viaje__cerrar { display: grid; width: 30px; height: 30px; place-items: center; border: 1px solid rgba(174, 215, 210, 0.17); border-radius: 9px; color: #a9c4c0; background: rgba(255, 255, 255, 0.04); cursor: pointer; }
+.estado-viaje__cerrar:hover { color: #fff; background: rgba(255, 255, 255, 0.1); }
+.estado-viaje__estado { display: flex; align-items: flex-start; gap: 8px; margin-top: 14px; padding: 10px 11px; border: 1px solid rgba(104, 225, 194, 0.2); border-radius: 11px; color: #c9eee5; background: rgba(46, 178, 150, 0.1); font-size: 0.77rem; font-weight: 700; line-height: 1.45; }
+.estado-viaje__estado::before { content: ""; flex: none; width: 7px; height: 7px; margin-top: 4px; border-radius: 50%; background: #5be4b0; box-shadow: 0 0 10px rgba(91, 228, 176, 0.8); }
+.estado-viaje__estado--aviso { border-color: rgba(242, 189, 88, 0.27); color: #f6ddb0; background: rgba(157, 105, 24, 0.13); }
+.estado-viaje__estado--aviso::before { background: #f2bd58; box-shadow: 0 0 10px rgba(242, 189, 88, 0.75); }
+.estado-viaje__estado--movimiento { border-color: rgba(104, 240, 201, 0.42); color: #d8fff1; background: linear-gradient(100deg, rgba(20, 155, 122, 0.24), rgba(15, 91, 94, 0.2)); }
+.estado-viaje__estado--movimiento::before { animation: estado-senal 2.2s ease-in-out infinite; }
+.estado-viaje__ruta { margin: 9px 1px 14px; color: #93b8b3; font-size: 0.7rem; line-height: 1.45; overflow-wrap: anywhere; }
+.estado-viaje__subtitulo { margin: 0; color: #dff8f2; font-size: 0.78rem; letter-spacing: 0.02em; }
+.estado-viaje__nota { margin: 4px 0 9px; color: #8ea9a7; font-size: 0.66rem; line-height: 1.45; }
+.estado-viaje__barrios { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.estado-viaje__barrio { display: flex; align-items: center; gap: 9px; min-width: 0; padding: 8px 9px; border: 1px solid rgba(125, 204, 190, 0.15); border-radius: 11px; background: linear-gradient(100deg, rgba(30, 109, 104, 0.22), rgba(14, 38, 44, 0.4)); animation: estado-barrio 420ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+.estado-viaje__punto { display: grid; flex: none; width: 27px; height: 27px; place-items: center; border: 1px solid rgba(115, 230, 205, 0.33); border-radius: 9px; color: #91f2dc; background: rgba(55, 200, 186, 0.13); font-size: 0.7rem; font-weight: 850; }
+.estado-viaje__detalle { display: grid; flex: 1; min-width: 0; gap: 2px; }
+.estado-viaje__detalle strong { color: #effbf8; font-size: 0.78rem; overflow-wrap: anywhere; }
+.estado-viaje__detalle small { color: #96b3af; font-size: 0.66rem; }
+.estado-viaje__estimado { flex: none; padding: 3px 6px; border: 1px solid rgba(242, 189, 88, 0.2); border-radius: 99px; color: #f2d390; background: rgba(157, 105, 24, 0.12); font-size: 0.58rem; font-weight: 800; }
+.estado-viaje__vacio { padding: 10px; border: 1px dashed rgba(125, 204, 190, 0.19); border-radius: 10px; color: #94aeaa; font-size: 0.72rem; line-height: 1.5; list-style: none; }
+.estado-viaje__pie { display: flex; gap: 7px; margin: 12px 0 0; padding-top: 10px; border-top: 1px solid rgba(125, 204, 190, 0.13); color: #8ba5a2; font-size: 0.64rem; line-height: 1.5; }
+.estado-viaje__pie i { flex: none; margin-top: 2px; color: #83cfc0; }
+.estado-viaje__reintentar { width: 100%; margin-top: 10px; padding: 9px 12px; border: 1px solid rgba(110, 228, 204, 0.34); border-radius: 10px; color: #dffff8; background: rgba(44, 164, 148, 0.2); font: inherit; font-size: 0.75rem; font-weight: 800; cursor: pointer; }
+.estado-viaje__reintentar:hover { background: rgba(44, 164, 148, 0.36); }
+
+@keyframes estado-desplegar {
+    0% { opacity: 0; filter: blur(7px); transform: translateY(-12px) scale(0.985); }
+    72% { opacity: 1; filter: blur(0); transform: translateY(1px) scale(1); }
+    100% { opacity: 1; filter: blur(0); transform: translateY(0) scale(1); }
+}
+@keyframes estado-contenido {
+    0% { opacity: 0; transform: translateY(5px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes estado-barrio {
+    0% { opacity: 0; filter: blur(3px); transform: translateY(5px); }
+    100% { opacity: 1; filter: blur(0); transform: translateY(0); }
+}
+@keyframes estado-senal {
+    0%, 100% { opacity: 0.86; box-shadow: 0 0 0 0 rgba(91, 228, 176, 0); transform: scale(0.96); }
+    50% { opacity: 1; box-shadow: 0 0 0 2px rgba(91, 228, 176, 0.1), 0 0 8px rgba(91, 228, 176, 0.38); transform: scale(1); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .leaflet-bar a { transition: none; }
+    .leaflet-bar a, .estado-viaje__boton { transition: none !important; }
+    .estado-viaje:not([hidden]), .estado-viaje__cabecera, .estado-viaje__estado,
+    .estado-viaje__ruta, .estado-viaje__subtitulo, .estado-viaje__nota,
+    .estado-viaje__pie, .estado-viaje__barrio,
+    .estado-viaje__boton--movimiento .estado-viaje__indicador,
+    .estado-viaje__estado--movimiento::before, .mu-aviso, .mu-spinner { animation: none !important; }
+    .mu-aviso--salida { transition: none !important; }
+    .mu-estilos__menu, .mu-estilo { transition: none !important; }
 }

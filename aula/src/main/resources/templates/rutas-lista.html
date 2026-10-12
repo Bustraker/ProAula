@@ -8,6 +8,7 @@
     <title>Rutas Disponibles - Bustraker</title>
     <link rel="stylesheet" th:href="@{/css/style_rutas.css}">
     <link rel="stylesheet" th:href="@{/css/style_common.css}">
+    <link rel="stylesheet" th:href="@{/css/logout.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="shortcut icon" th:href="@{/images/Bus_icono.png}" type="image/x-icon">
 </head>
@@ -35,9 +36,12 @@
                 <a th:href="@{/viajar}" class="nav-link">
                     <i class="fas fa-bus" aria-hidden="true"></i> Viajar
                 </a>
-                <a th:href="@{/logout}" class="nav-link nav-link--outline">
+                <form th:action="@{/logout}" method="post" class="logout-form">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <button type="submit" class="nav-link nav-link--outline logout-form__button">
                     <i class="fas fa-sign-out-alt" aria-hidden="true"></i> Cerrar Sesión
-                </a>
+                    </button>
+                </form>
             </nav>
         </div>
     </header>
@@ -48,9 +52,9 @@
             <div class="routes-hero-copy">
                 <span class="routes-eyebrow"><i class="fas fa-compass" aria-hidden="true"></i> Muévete por la ciudad</span>
                 <h1 id="routesTitle">Encuentra tu próximo recorrido</h1>
-                <p>Explora rutas, horarios y paradas para planear tu viaje con confianza.</p>
+                <p>Consulta los recorridos registrados y revisa su estado de verificación antes de viajar.</p>
                 <div class="routes-hero-meta">
-                    <span class="routes-total"><i class="fas fa-route" aria-hidden="true"></i><strong th:text="${#lists.size(rutas)}">0</strong><span>rutas disponibles</span></span>
+                    <span class="routes-total"><i class="fas fa-route" aria-hidden="true"></i><strong th:text="${#lists.size(rutas)}">0</strong><span>rutas registradas</span></span>
                     <span class="routes-meta-divider" aria-hidden="true"></span>
                     <span><i class="fas fa-location-dot" aria-hidden="true"></i> Cartagena</span>
                 </div>
@@ -110,6 +114,12 @@
             </div>
         </section>
 
+        <div th:if="${hayRutasProvisionales}" class="alert alert-warning routes-provisional-notice" role="note">
+            <i class="fas fa-triangle-exclamation" aria-hidden="true"></i>
+            <span>Algunas rutas son información inicial pendiente de verificación. Consulta su ficha con cautela;
+                estos recorridos no están habilitados para planear viajes.</span>
+        </div>
+
         <!-- Lista de Rutas -->
         <section class="section" aria-label="Resultados de rutas">
             <div th:if="${not #lists.isEmpty(rutas)}" class="ruta-grid" id="rutasGrid">
@@ -120,7 +130,18 @@
                             <span class="route-card-kicker">RECORRIDO</span>
                             <h3 th:text="${ruta.nombre}">Ruta Centro</h3>
                         </div>
-                        <span class="badge badge-success"><i class="fas fa-circle" aria-hidden="true"></i> Activa</span>
+                        <span th:if="${not ruta.verificada}" class="badge badge-warning">
+                            <i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Provisional
+                        </span>
+                        <span th:if="${ruta.verificada and ruta.estado == T(com.proaula.aula.Entity.Ruta.Estado).ACTIVA}" class="badge badge-success">
+                            <i class="fas fa-circle" aria-hidden="true"></i> Activa
+                        </span>
+                        <span th:if="${ruta.verificada and ruta.estado == T(com.proaula.aula.Entity.Ruta.Estado).INACTIVA}" class="badge badge-danger">
+                            <i class="fas fa-circle" aria-hidden="true"></i> Inactiva
+                        </span>
+                        <span th:if="${ruta.verificada and ruta.estado == T(com.proaula.aula.Entity.Ruta.Estado).SUSPENDIDA}" class="badge badge-warning">
+                            <i class="fas fa-circle" aria-hidden="true"></i> Suspendida
+                        </span>
                     </div>
                     <div class="ruta-card-body">
                         <div class="ruta-info">
@@ -162,8 +183,10 @@
                         </div>
                     </div>
                     <div class="ruta-card-footer">
+                        <span th:if="${not ruta.verificada}" class="route-provisional-label">Pendiente de verificación</span>
                         <a th:href="@{/ruta/{id}(id=${ruta.id})}" class="btn btn-primary btn-sm">
-                            <i class="fas fa-arrow-right" aria-hidden="true"></i> Explorar recorrido
+                            <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                            <span th:text="${ruta.verificada ? 'Explorar recorrido' : 'Consultar ficha'}">Consultar ficha</span>
                         </a>
                     </div>
                 </div>

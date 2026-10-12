@@ -8,9 +8,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.io.IOException;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -24,6 +27,8 @@ import org.springframework.security.oauth2.core.oidc.OidcIdToken;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClientException;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -38,6 +43,7 @@ import com.proaula.aula.Service.UsuarioService;
 @Service
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
+    private static final Logger log = LoggerFactory.getLogger(CustomOAuth2UserService.class);
     private static final String PROVIDER_GOOGLE = "google";
     private static final String PROVIDER_GITHUB = "github";
     private static final String ATTRIBUTE_EMAIL = "email";
@@ -51,11 +57,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     }
 
     @Override
+    @Transactional
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oauth2User = super.loadUser(userRequest);
         return processOAuth2User(userRequest, oauth2User);
     }
 
+    @Transactional
     public OidcUser loadOidcUser(OidcUserRequest userRequest) {
         OidcUser oidcUser = new OidcUserService().loadUser(userRequest);
         OAuth2User localUser = processOAuth2User(userRequest, oidcUser);
@@ -64,18 +72,34 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private OAuth2User processOAuth2User(OAuth2UserRequest userRequest, OAuth2User oauth2User) {
         String registrationId = userRequest.getClientRegistration().getRegistrationId().toLowerCase(Locale.ROOT);
-        String email = getEmail(userRequest, oauth2User, registrationId);
+        String email = getVerifiedEmail(userRequest, oauth2User, registrationId);
 
         if (email == null || email.isBlank()) {
-            throw new OAuth2AuthenticationException("No se pudo obtener el email del proveedor OAuth2");
+            throw new OAuth2AuthenticationException(
+                "El proveedor OAuth2 no confirmó un correo electrónico verificado");
         }
 
-        Usuario usuario = usuarioRepository.findByEmail(email);
+        String providerId = getProviderId(oauth2User, registrationId);
+        if (providerId == null || providerId.isBlank()) {
+            throw new OAuth2AuthenticationException(
+                "El proveedor OAuth2 no devolvió un identificador de cuenta válido");
+        }
+        Usuario usuario = usuarioRepository.findByProviderAndProviderId(
+            registrationId.toUpperCase(Locale.ROOT), providerId);
+        if (usuario == null) {
+            usuario = usuarioRepository.findByEmail(email);
+        }
         if (usuario == null) {
             usuario = createUsuarioFromOAuth2User(oauth2User, registrationId, email);
         } else {
+            if (!email.equalsIgnoreCase(usuario.getEmail())
+                    && usuarioRepository.existsByEmail(email)) {
+                throw new OAuth2AuthenticationException(
+                    "El correo verificado ya está asociado a otra cuenta");
+            }
             usuario.setProvider(registrationId.toUpperCase(Locale.ROOT));
-            usuario.setProviderId(getProviderId(oauth2User, registrationId));
+            usuario.setProviderId(providerId);
+            usuario.setEmail(email);
             usuarioRepository.save(usuario);
         }
 
@@ -83,8 +107,20 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         attributes.put("username", usuario.getUsername());
         attributes.put("sub", usuario.getUsername());
         Set<GrantedAuthority> authorities = new HashSet<>(oauth2User.getAuthorities());
-        authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+        if (usuario.getRoles().isEmpty()) {
+            authorities.add(new SimpleGrantedAuthority(normalizarRol(usuario.getRole())));
+        } else {
+            usuario.getRoles().stream()
+                .map(rol -> normalizarRol(rol.getNombre()))
+                .map(SimpleGrantedAuthority::new)
+                .forEach(authorities::add);
+        }
         return new DefaultOAuth2User(authorities, attributes, "username");
+    }
+
+    private String normalizarRol(String role) {
+        String normalized = role == null || role.isBlank() ? "ROLE_USER" : role.trim().toUpperCase(Locale.ROOT);
+        return normalized.startsWith("ROLE_") ? normalized : "ROLE_" + normalized;
     }
 
     private Usuario createUsuarioFromOAuth2User(OAuth2User oauth2User, String registrationId, String email) {
@@ -108,30 +144,46 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             prefix = "user";
         }
 
-        String username = prefix;
-        int suffix = 1;
-        while (usuarioRepository.existsByUsername(username)) {
-            username = prefix + suffix++;
-        }
+        String username;
+        int suffix = 0;
+        do {
+            String suffixText = suffix == 0 ? "" : Integer.toString(suffix);
+            int maxPrefixLength = 20 - suffixText.length();
+            String truncatedPrefix = prefix.substring(0, Math.min(prefix.length(), maxPrefixLength));
+            username = truncatedPrefix + suffixText;
+            suffix++;
+        } while (usuarioRepository.existsByUsernameIgnoreCase(username));
         return username;
     }
 
-    private String getEmail(OAuth2UserRequest userRequest, OAuth2User user, String registrationId) {
+    private String getVerifiedEmail(OAuth2UserRequest userRequest, OAuth2User user, String registrationId) {
+        String email = user.getAttribute(ATTRIBUTE_EMAIL);
         if (PROVIDER_GITHUB.equals(registrationId)) {
-            String email = user.getAttribute(ATTRIBUTE_EMAIL);
-            if (email != null && !email.isBlank()) {
-                return email;
+            email = fetchGithubEmail(userRequest);
+        } else if (PROVIDER_GOOGLE.equals(registrationId)) {
+            if (!Boolean.TRUE.equals(user.getAttribute("email_verified"))) {
+                return null;
             }
-            return fetchGithubEmail(userRequest);
+        } else if ("discord".equals(registrationId)) {
+            if (!Boolean.TRUE.equals(user.getAttribute("verified"))) {
+                return null;
+            }
+        } else if ("facebook".equals(registrationId)) {
+            if (!Boolean.TRUE.equals(user.getAttribute("email_verified"))) {
+                return null;
+            }
+        } else {
+            return null;
         }
-        return user.getAttribute(ATTRIBUTE_EMAIL);
+        return email == null ? null : email.trim().toLowerCase(Locale.ROOT);
     }
 
     private String getProviderId(OAuth2User user, String registrationId) {
         if (PROVIDER_GOOGLE.equals(registrationId)) {
             return user.getAttribute("sub");
         }
-        return String.valueOf(user.getAttribute("id"));
+        Object providerId = user.getAttribute("id");
+        return providerId == null ? null : providerId.toString();
     }
 
     private String getFirstName(OAuth2User user, String registrationId) {
@@ -188,8 +240,10 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                     .map(entry -> (String) entry.get("email"))
                     .filter(email -> email != null && !email.isBlank())
                     .findFirst().orElse(null);
-        } catch (Exception exception) {
-            return null;
+        } catch (IOException | RestClientException exception) {
+            log.warn("No se pudo verificar el correo de GitHub durante el inicio OAuth2", exception);
+            throw new OAuth2AuthenticationException(
+                "No se pudo verificar el correo electrónico de GitHub");
         }
     }
 

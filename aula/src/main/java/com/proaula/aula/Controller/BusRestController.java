@@ -1,8 +1,10 @@
 package com.proaula.aula.Controller;
 
 import java.util.List;
+import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,7 +20,7 @@ import org.springframework.security.core.Authentication;
 import com.proaula.aula.Entity.Bus;
 import com.proaula.aula.Service.BusService;
 import com.proaula.aula.dto.BusConsultaDto;
-import com.proaula.aula.dto.BusConsultaMapper;
+import com.proaula.aula.dto.BusResponseDto;
 
 @RestController
 @RequestMapping("/api/buses")
@@ -27,8 +29,8 @@ public class BusRestController {
     private BusService busService;
 
     @GetMapping
-    public List<Bus> getAllBuses() {
-        return busService.getAllBuses();
+    public List<BusResponseDto> getAllBuses() {
+        return busService.getAllBusResponses();
     }
 
     @GetMapping("/todos")
@@ -36,31 +38,39 @@ public class BusRestController {
         boolean autenticado = authentication != null
                 && authentication.isAuthenticated()
                 && !(authentication instanceof AnonymousAuthenticationToken);
-        List<Bus> buses = busService.getAllBuses();
-        return autenticado
-                ? BusConsultaMapper.authenticatedBuses(buses)
-                : BusConsultaMapper.publicRoutes(buses);
+        return busService.getBusConsultations(autenticado);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Bus> getBusById(@PathVariable Long id) {
-        Bus bus = busService.getBusById(id);
+    public ResponseEntity<BusResponseDto> getBusById(@PathVariable Long id) {
+        BusResponseDto bus = busService.getBusResponse(id);
         return bus != null ? ResponseEntity.ok(bus) : ResponseEntity.notFound().build();
     }
 
     @PostMapping
-    public Bus createBus(@RequestBody Bus bus) {
-        return busService.saveBus(bus);
+    public ResponseEntity<BusResponseDto> createBus(@Valid @RequestBody Bus bus) {
+        bus.setId(null);
+        return ResponseEntity.status(201).body(busService.saveBusResponse(bus));
     }
 
     @PutMapping("/{id}")
-    public Bus updateBus(@PathVariable Long id, @RequestBody Bus bus) {
+    public ResponseEntity<BusResponseDto> updateBus(@PathVariable Long id, @Valid @RequestBody Bus bus) {
+        if (busService.getBusById(id) == null) {
+            return ResponseEntity.notFound().build();
+        }
         bus.setId(id);
-        return busService.saveBus(bus);
+        return ResponseEntity.ok(busService.saveBusResponse(bus));
     }
 
     @DeleteMapping("/{id}")
-    public void deleteBus(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteBus(@PathVariable Long id) {
+        if (busService.getBusResponse(id) == null) {
+            return ResponseEntity.notFound().build();
+        }
+        if (busService.hasRelatedRecords(id)) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
         busService.deleteBus(id);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -47,7 +47,10 @@ if (modal && openBtn) {
 
 if (continueBtn) {
     continueBtn.addEventListener('click', function() {
-        window.location.href = '/admin-login';
+        const loginUrl = continueBtn.dataset.adminLoginUrl;
+        if (loginUrl) {
+            window.location.assign(loginUrl);
+        }
     });
 }
 

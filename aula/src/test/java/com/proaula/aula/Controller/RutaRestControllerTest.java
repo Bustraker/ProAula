@@ -36,6 +36,8 @@ class RutaRestControllerTest {
         Ruta ruta = rutaVerificadaConBus();
         when(rutaService.getRutasVerificadas()).thenReturn(List.of(ruta));
         when(barrioService.obtenerCoordenadas(anyList())).thenReturn(Map.of());
+        when(barrioService.tieneCoordenadaShapefile("Centro")).thenReturn(true);
+        when(barrioService.tieneCoordenadaShapefile("Manga")).thenReturn(false);
 
         Map<String, Object> datosRuta = rutaRestController.obtenerRutasConCoordenadas(null)
             .getBody().get(0);
@@ -44,6 +46,7 @@ class RutaRestControllerTest {
 
         assertThat(datosRuta.get("barriosOrdenados")).isEqualTo(List.of("Centro", "Manga"));
         assertThat(datosRuta.get("ordenBarriosConfirmado")).isEqualTo(true);
+        assertThat(datosRuta.get("coordenadasEstimadas")).isEqualTo(List.of("Manga"));
         assertThat(buses).hasSize(1);
         assertThat(bus.get("placa")).isEqualTo("ABC123");
         assertThat(bus.containsKey("conductor")).isFalse();

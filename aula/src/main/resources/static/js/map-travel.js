@@ -128,6 +128,9 @@
             controlador: null,
             trayecto: null, barriosTrayecto: [],
             ubicacion: null, seguimiento: null,
+            gpsError: '',
+            intentadoSeguimientoAutomatico: false,
+            movimientoRuta: { ultimaMuestra: null, avances: 0, detectado: false },
             transcaribe: []
         };
         var capas = {
@@ -136,6 +139,7 @@
             transcaribe: null, usuario: null, precision: null
         };
         var el = {};
+        var panelEstado = {};
 
         var mapa = M.crearMapa('map', {
             obtenerLimites: function () {
@@ -147,6 +151,7 @@
         });
         capas.paradas.addTo(mapa);
         agregarLeyenda();
+        agregarPanelSeguimiento();
 
         var arrancado = false;
         document.addEventListener('DOMContentLoaded', arrancar);
@@ -191,8 +196,8 @@
             mostrarEsqueleto();
             try {
                 var resultados = await Promise.all([
-                    M.fetchJSON('/api/barrios/todos', 20000),
-                    M.fetchJSON('/api/rutas-con-coordenadas', 20000)
+                    M.fetchJSON(M.url('/api/barrios/todos'), 20000),
+                    M.fetchJSON(M.url('/api/rutas-con-coordenadas'), 20000)
                 ]);
                 procesarBarrios(resultados[0] || []);
                 procesarRutas(resultados[1] || []);
@@ -200,6 +205,10 @@
                 restaurarDesdeURL();
                 pintarResultados();
                 el.btnSeguirUbicacion.disabled = false;
+                if (!estado.intentadoSeguimientoAutomatico) {
+                    estado.intentadoSeguimientoAutomatico = true;
+                    iniciarSeguimiento();
+                }
             } catch (error) {
                 console.error('Error cargando datos de viaje:', error);
                 M.mostrarAviso('No se pudieron cargar las rutas. Revisa tu conexión e intenta de nuevo.', 'error', 8000);
@@ -214,7 +223,10 @@
                 var lat = Number.parseFloat(b.latitud), lng = Number.parseFloat(b.longitud);
                 var n = normalizar(b.nombre);
                 if (!n) return;
-                estado.barrios.push({ nombre: b.nombre, nombreN: n, lat: lat, lng: lng });
+                estado.barrios.push({
+                    nombre: b.nombre, nombreN: n, lat: lat, lng: lng,
+                    coordenadaEstimada: b.coordenadaEstimada === true
+                });
                 if (Number.isFinite(lat) && Number.isFinite(lng)) estado.coordenadas[n] = { lat: lat, lng: lng };
             });
         }
@@ -233,12 +245,12 @@
                 var barriosN = barrios.map(normalizar);
                 barrios.forEach(function (nombre, i) { if (!estado.servidos.has(barriosN[i])) estado.servidos.set(barriosN[i], nombre); });
                 var paradas = (r.paradas || [])
-                    .filter(function (p) { return p.nombre && normalizar(p.barrio); })
+                    .filter(function (p) { return p.nombre; })
                     .map(function (p) {
                         var tieneCoordenadas = p.latitud != null && p.longitud != null
                             && Number.isFinite(Number(p.latitud)) && Number.isFinite(Number(p.longitud));
                         return {
-                            nombre: p.nombre, barrio: p.barrio, barrioN: normalizar(p.barrio),
+                            nombre: p.nombre, barrio: p.barrio, barrioN: normalizar(p.barrio || ''),
                             referencia: p.referencia, ubicacion: p.ubicacion,
                             orden: p.orden == null ? Number.MAX_SAFE_INTEGER : p.orden,
                             lat: tieneCoordenadas ? Number(p.latitud) : null,
@@ -249,7 +261,8 @@
                 return {
                     id: r.id, nombre: r.nombre, hora: r.horaAproximada,
                     barrios: barrios, barriosN: barriosN, paradas: paradas,
-                    buses: r.buses || [], coordenadas: r.coordenadasBarrios || {}
+                    buses: r.buses || [], coordenadas: r.coordenadasBarrios || {},
+                    coordenadasEstimadas: new Set((r.coordenadasEstimadas || []).map(normalizar))
                 };
             });
         }
@@ -413,7 +426,6 @@
 
         function reiniciarConsulta() {
             el.origen.value = '';
-            estado.origen = '';
             alCambiarOrigen();
             limpiarRuta();
             limpiarTranscaribe();
@@ -429,7 +441,16 @@
             var desde = ruta.barriosN.indexOf(origenN);
             var hasta = ruta.barriosN.indexOf(destinoN, desde + 1);
             var tramoN = new Set(ruta.barriosN.slice(desde, hasta + 1));
-            return ps.filter(function (p) { return p.barrioN && tramoN.has(p.barrioN); });
+            var indicesIncluidos = [];
+            ps.forEach(function (parada, indice) {
+                if (parada.barrioN && tramoN.has(parada.barrioN)) indicesIncluidos.push(indice);
+            });
+            if (!indicesIncluidos.length) return [];
+            var primero = indicesIncluidos[0], ultimo = indicesIncluidos[indicesIncluidos.length - 1];
+            return ps.filter(function (parada, indice) {
+                return indice >= primero && indice <= ultimo
+                    && (!parada.barrioN || tramoN.has(parada.barrioN));
+            });
         }
 
         function crearTramo(ruta, inicio, fin) {
@@ -734,7 +755,10 @@
                     if (respaldo) { latitud = respaldo.lat; longitud = respaldo.lng; }
                 }
                 if (Number.isFinite(latitud) && Number.isFinite(longitud)) {
-                    items.push({ nombre: mayuscula(barrio), barrio: barrio, lat: latitud, lng: longitud, tipo: 'barrio' });
+                    items.push({
+                        nombre: mayuscula(barrio), barrio: barrio, lat: latitud, lng: longitud, tipo: 'barrio',
+                        coordenadaEstimada: tramo.ruta.coordenadasEstimadas.has(tramo.barriosN[indice])
+                    });
                 }
             });
             return items;
@@ -778,9 +802,11 @@
             limpiarTranscaribe();
             limpiarRuta();
             estado.activo = tramo;
+            estado.movimientoRuta = { ultimaMuestra: null, avances: 0, detectado: false };
             estado.pestana = 'paradas';
             pintarResultados();
             actualizarURL();
+            actualizarPanelSeguimiento();
             dibujarTramo(tramo);
         }
 
@@ -788,6 +814,13 @@
             var items = construirItems(tramo);
             estado.items = items;
             pintarDetalle(tramo);
+            if (items.some(function (item) { return item.coordenadaEstimada; })) {
+                M.mostrarAviso(
+                    'Algunos puntos usan ubicaciones aproximadas de barrio. Verifica el recorrido antes de viajar.',
+                    'warn',
+                    8000
+                );
+            }
 
             if (items.length < 2) {
                 pintarStats({ sinCoordenadas: true });
@@ -799,7 +832,8 @@
             items.forEach(function (it, i) {
                 if (i === 0 || i === ultimo) {
                     var tipo = i === 0 ? 'origen' : 'destino';
-                    var pin = M.crearPin(it.lat, it.lng, tipo, it.nombre).addTo(mapa);
+                    var nota = it.coordenadaEstimada ? 'Ubicación aproximada; verifica el recorrido antes de viajar.' : null;
+                    var pin = M.crearPin(it.lat, it.lng, tipo, it.nombre, nota).addTo(mapa);
                     it.marcador = pin;
                     if (i === 0) capas.pinOrigen = pin; else capas.pinDestino = pin;
                 } else {
@@ -1073,6 +1107,9 @@
                     }
                 }
                 texto.appendChild(h('strong', null, 'Toma ' + parte.ruta.nombre));
+                texto.appendChild(h('small', null, 'Tramo ' + (indice + 1) + ' de ' + tramo.tramos.length +
+                    ': ' + mayuscula(parte.barrios[0]) + ' → ' +
+                    mayuscula(parte.barrios[parte.barrios.length - 1]) + '.'));
                 var paradaInicial = parte.paradas.find(function (parada) {
                     return parada.barrioN === parte.barriosN[0];
                 });
@@ -1087,6 +1124,31 @@
                         mayuscula(parte.barrios[parte.barrios.length - 1]) + ').'
                     : 'No hay parada de bajada registrada en ' +
                         mayuscula(parte.barrios[parte.barrios.length - 1]) + '.'));
+                if (parte.paradas.length) {
+                    texto.appendChild(h('small', null, 'Paradas registradas, en orden:'));
+                    var listaParadas = h('ol', 'itinerario-paradas');
+                    parte.paradas.forEach(function (parada, indiceParada) {
+                        var descripcion = parada.barrio
+                            ? parada.nombre + ' (' + mayuscula(parada.barrio) + ')'
+                            : parada.nombre;
+                        if (parada.ubicacion && parada.ubicacion !== parada.nombre) {
+                            descripcion += ' · ' + parada.ubicacion;
+                        }
+                        if (parada.referencia && parada.referencia !== parada.nombre) {
+                            descripcion += ' · ' + parada.referencia;
+                        }
+                        if (!Number.isFinite(parada.lat) || !Number.isFinite(parada.lng)) {
+                            descripcion += ' · ubicación exacta no disponible';
+                        }
+                        if (parada === paradaInicial) descripcion = 'Abordaje: ' + descripcion;
+                        else if (parada === paradaFinal) descripcion = 'Bajada: ' + descripcion;
+                        listaParadas.appendChild(h('li', null, descripcion));
+                    });
+                    texto.appendChild(listaParadas);
+                } else {
+                    texto.appendChild(h('small', 'paso-caminata',
+                        'No hay paradas registradas para detallar este tramo; confirma el recorrido antes de viajar.'));
+                }
                 li.appendChild(texto);
                 pasos.appendChild(li);
             });
@@ -1126,6 +1188,7 @@
                 el.barriosTrayecto.hidden = !el.barriosTrayecto.textContent;
             }
             actualizarEstadoUbicacion();
+            actualizarPanelSeguimiento();
         }
 
         /* ===================== TRANSCARIBE ===================== */
@@ -1236,7 +1299,11 @@
         function alRecibirUbicacion(posicion) {
             var lat = posicion.coords.latitude, lng = posicion.coords.longitude;
             var primera = estado.ubicacion === null;
-            estado.ubicacion = { lat: lat, lng: lng, precision: posicion.coords.accuracy };
+            estado.ubicacion = {
+                lat: lat, lng: lng, precision: posicion.coords.accuracy,
+                timestamp: posicion.timestamp || Date.now()
+            };
+            estado.gpsError = '';
 
             if (!capas.usuario) {
                 capas.usuario = L.marker([lat, lng], {
@@ -1261,6 +1328,8 @@
                 mapa.setView([lat, lng], Math.max(mapa.getZoom(), 15));
             }
             actualizarEstadoUbicacion();
+            evaluarCoincidenciaDeRuta();
+            actualizarPanelSeguimiento();
         }
 
         /** Propone el barrio con servicio más cercano, o el barrio registrado más cercano si no hay rutas. */
@@ -1280,7 +1349,7 @@
         function fijarBotonSeguimiento(activo) {
             el.btnSeguirUbicacion.replaceChildren(
                 icono(activo ? 'fas fa-location-crosshairs' : 'fas fa-location-arrow'),
-                document.createTextNode(activo ? ' Dejar de seguir' : ' Seguir mi ubicación'));
+                document.createTextNode(activo ? ' Pausar GPS' : ' Activar GPS'));
             el.btnSeguirUbicacion.setAttribute('aria-pressed', String(activo));
         }
 
@@ -1290,12 +1359,22 @@
                 estado.seguimiento = null;
                 fijarBotonSeguimiento(false);
                 el.locationStatus.textContent = 'Seguimiento pausado. Se conserva la última posición en el mapa.';
+                estado.gpsError = 'GPS pausado. Activa el seguimiento para continuar.';
+                actualizarPanelSeguimiento();
                 return;
             }
+            iniciarSeguimiento();
+        }
+
+        function iniciarSeguimiento() {
             if (!navigator.geolocation) {
                 el.locationStatus.textContent = 'Este navegador no permite acceder a la ubicación.';
+                estado.gpsError = 'Este navegador no permite acceder a la ubicación.';
+                expandirPanelSeguimiento(true);
+                actualizarPanelSeguimiento();
                 return;
             }
+            estado.gpsError = '';
             el.locationStatus.textContent = 'Esperando permiso y señal GPS…';
             fijarBotonSeguimiento(true);
             estado.seguimiento = navigator.geolocation.watchPosition(alRecibirUbicacion, function (error) {
@@ -1305,10 +1384,236 @@
                     3: 'La ubicación tardó demasiado. Intenta de nuevo.'
                 };
                 el.locationStatus.textContent = mensajes[error.code] || 'No se pudo obtener la ubicación.';
+                estado.gpsError = el.locationStatus.textContent;
                 if (estado.seguimiento !== null) navigator.geolocation.clearWatch(estado.seguimiento);
                 estado.seguimiento = null;
                 fijarBotonSeguimiento(false);
+                expandirPanelSeguimiento(true);
+                actualizarPanelSeguimiento();
             }, { enableHighAccuracy: true, maximumAge: 5000, timeout: 20000 });
+            actualizarPanelSeguimiento();
+        }
+
+        function evaluarCoincidenciaDeRuta() {
+            var movimiento = estado.movimientoRuta, ubicacion = estado.ubicacion;
+            if (!estado.activo || !estado.trayecto || !ubicacion
+                || (Number.isFinite(ubicacion.precision) && ubicacion.precision > 65)) {
+                movimiento.ultimaMuestra = null;
+                movimiento.avances = 0;
+                movimiento.detectado = false;
+                return;
+            }
+            var proyeccion = proyectarEnTrayecto(ubicacion.lat, ubicacion.lng, estado.trayecto);
+            if (!proyeccion || proyeccion.distanciaAlTrayectoKm > 0.12) {
+                movimiento.ultimaMuestra = null;
+                movimiento.avances = 0;
+                if (proyeccion && proyeccion.distanciaAlTrayectoKm > 0.25) movimiento.detectado = false;
+                return;
+            }
+
+            var actual = { distancia: proyeccion.distanciaDesdeInicioKm, tiempo: ubicacion.timestamp };
+            var anterior = movimiento.ultimaMuestra;
+            if (anterior) {
+                var segundos = (actual.tiempo - anterior.tiempo) / 1000;
+                if (segundos >= 1 && segundos <= 25) {
+                    var avanceKm = actual.distancia - anterior.distancia;
+                    var velocidadKmh = avanceKm * 3600 / segundos;
+                    if (avanceKm >= 0.012 && velocidadKmh >= 7 && velocidadKmh <= 60) {
+                        movimiento.avances++;
+                    } else if (avanceKm < -0.02 || velocidadKmh > 60 || velocidadKmh < 0) {
+                        movimiento.avances = 0;
+                    }
+                    movimiento.ultimaMuestra = actual;
+                } else if (segundos > 25 || segundos <= 0) {
+                    movimiento.avances = 0;
+                    movimiento.ultimaMuestra = actual;
+                }
+            } else {
+                movimiento.ultimaMuestra = actual;
+            }
+            if (!movimiento.detectado && movimiento.avances >= 2) {
+                movimiento.detectado = true;
+                expandirPanelSeguimiento(true);
+            }
+        }
+
+        function agregarPanelSeguimiento() {
+            var ControlSeguimiento = L.Control.extend({
+                options: { position: 'topleft' },
+                onAdd: function () {
+                    var contenedor = L.DomUtil.create('div', 'estado-viaje-control');
+                    var boton = L.DomUtil.create('button', 'estado-viaje__boton', contenedor);
+                    boton.type = 'button';
+                    boton.setAttribute('aria-label', 'Abrir estado del viaje');
+                    boton.setAttribute('aria-expanded', 'false');
+                    boton.setAttribute('aria-controls', 'panelEstadoViaje');
+                    boton.appendChild(icono('fas fa-satellite-dish'));
+                    boton.appendChild(h('span', 'estado-viaje__indicador'));
+
+                    var panel = h('section', 'estado-viaje');
+                    panel.id = 'panelEstadoViaje';
+                    panel.setAttribute('aria-label', 'Estado del viaje en tiempo real');
+                    panel.hidden = true;
+                    var cabecera = h('header', 'estado-viaje__cabecera');
+                    var insignia = h('span', 'estado-viaje__insignia');
+                    insignia.appendChild(icono('fas fa-location-crosshairs'));
+                    cabecera.appendChild(insignia);
+                    var titulos = h('div', 'estado-viaje__titulos');
+                    titulos.appendChild(h('span', 'estado-viaje__eyebrow', 'BUSTRAKER · GPS EN VIVO'));
+                    titulos.appendChild(h('h2', null, 'Estado del viaje'));
+                    cabecera.appendChild(titulos);
+                    var cerrar = h('button', 'estado-viaje__cerrar');
+                    cerrar.type = 'button';
+                    cerrar.setAttribute('aria-label', 'Cerrar estado del viaje');
+                    cerrar.appendChild(icono('fas fa-xmark'));
+                    cabecera.appendChild(cerrar);
+                    panel.appendChild(cabecera);
+                    var estadoVisual = h('div', 'estado-viaje__estado');
+                    estadoVisual.setAttribute('role', 'status');
+                    estadoVisual.setAttribute('aria-live', 'polite');
+                    panel.appendChild(estadoVisual);
+                    var ruta = h('p', 'estado-viaje__ruta');
+                    panel.appendChild(ruta);
+                    var tituloBarrios = h('h3', 'estado-viaje__subtitulo', 'Barrios muy cerca');
+                    panel.appendChild(tituloBarrios);
+                    var descripcion = h('p', 'estado-viaje__nota',
+                        'Radio de 300 m desde el GPS. Distancias a puntos de referencia del barrio; no indican sus límites.');
+                    panel.appendChild(descripcion);
+                    var lista = h('ul', 'estado-viaje__barrios');
+                    panel.appendChild(lista);
+                    var precision = h('p', 'estado-viaje__pie');
+                    precision.appendChild(icono('fas fa-circle-info'));
+                    precision.appendChild(document.createTextNode(
+                        'La coincidencia con la ruta es aproximada y no confirma el abordaje ni la ubicación del bus.'));
+                    panel.appendChild(precision);
+                    var reintentar = h('button', 'estado-viaje__reintentar', 'Reintentar GPS');
+                    reintentar.type = 'button';
+                    reintentar.hidden = true;
+                    reintentar.addEventListener('click', iniciarSeguimiento);
+                    panel.appendChild(reintentar);
+                    contenedor.appendChild(panel);
+
+                    boton.addEventListener('click', function () {
+                        expandirPanelSeguimiento(panel.hidden);
+                    });
+                    cerrar.addEventListener('click', function () { expandirPanelSeguimiento(false); });
+                    L.DomEvent.disableClickPropagation(contenedor);
+                    L.DomEvent.disableScrollPropagation(contenedor);
+                    panelEstado.boton = boton;
+                    panelEstado.panel = panel;
+                    panelEstado.estado = estadoVisual;
+                    panelEstado.ruta = ruta;
+                    panelEstado.lista = lista;
+                    panelEstado.reintentar = reintentar;
+                    panelEstado.firma = '';
+                    panelEstado.barriosVisibles = '';
+                    return contenedor;
+                }
+            });
+            mapa.addControl(new ControlSeguimiento());
+        }
+
+        function expandirPanelSeguimiento(abierto) {
+            if (!panelEstado.panel) return;
+            panelEstado.panel.hidden = !abierto;
+            panelEstado.boton.setAttribute('aria-expanded', String(abierto));
+            panelEstado.boton.setAttribute('aria-label', abierto
+                ? 'Cerrar estado del viaje' : 'Abrir estado del viaje');
+        }
+
+        function actualizarPanelSeguimiento() {
+            if (!panelEstado.panel) return;
+            var ubicacion = estado.ubicacion;
+            var precisionBaja = ubicacion && Number.isFinite(ubicacion.precision) && ubicacion.precision > 100;
+            var barriosCercanos = [];
+            if (ubicacion && estado.seguimiento !== null && !estado.gpsError
+                && estado.activo && !precisionBaja) {
+                var rutaNombres = new Set(estado.activo.barriosN);
+                barriosCercanos = estado.barrios.filter(function (barrio) {
+                    return rutaNombres.has(barrio.nombreN)
+                        && Number.isFinite(barrio.lat) && Number.isFinite(barrio.lng);
+                }).map(function (barrio) {
+                    return {
+                        barrio: barrio,
+                        distancia: haversineKm(ubicacion.lat, ubicacion.lng, barrio.lat, barrio.lng) * 1000
+                    };
+                }).filter(function (item) { return item.distancia <= 300; })
+                    .sort(function (a, b) { return a.distancia - b.distancia; })
+                    .slice(0, 4);
+            }
+
+            var mensaje, clase = '';
+            if (estado.gpsError) {
+                mensaje = estado.gpsError;
+                clase = ' estado-viaje__estado--aviso';
+            } else if (!ubicacion) {
+                mensaje = 'Solicitando acceso y señal GPS…';
+            } else if (!estado.activo) {
+                mensaje = 'Planifica y selecciona una ruta verificada para activar el seguimiento del recorrido.';
+            } else if (precisionBaja) {
+                mensaje = 'La señal GPS tiene poca precisión para mostrar barrios cercanos con fiabilidad.';
+                clase = ' estado-viaje__estado--aviso';
+            } else if (!estado.trayecto) {
+                mensaje = 'Ruta seleccionada. Calculando su trazado de referencia…';
+            } else if (estado.movimientoRuta.detectado) {
+                mensaje = 'Posible desplazamiento coincidente con el recorrido';
+                clase = ' estado-viaje__estado--movimiento';
+            } else {
+                var proyeccion = proyectarEnTrayecto(ubicacion.lat, ubicacion.lng, estado.trayecto);
+                mensaje = proyeccion && proyeccion.distanciaAlTrayectoKm <= 0.12
+                    ? 'GPS cerca del recorrido; comprobando movimiento…'
+                    : 'Esperando una ubicación próxima al recorrido seleccionado…';
+            }
+            panelEstado.estado.className = 'estado-viaje__estado' + clase;
+            panelEstado.estado.textContent = mensaje;
+            panelEstado.reintentar.hidden = !estado.gpsError;
+            panelEstado.ruta.textContent = estado.activo
+                ? 'Recorrido: ' + estado.activo.tramos.map(function (tramo) { return tramo.ruta.nombre; }).join(' → ')
+                : 'Sin recorrido seleccionado';
+            panelEstado.boton.classList.toggle('estado-viaje__boton--activo',
+                !!(ubicacion && estado.seguimiento !== null && !estado.gpsError));
+            panelEstado.boton.classList.toggle('estado-viaje__boton--movimiento',
+                !!(estado.movimientoRuta && estado.movimientoRuta.detectado));
+
+            var firmaBarrios = barriosCercanos.map(function (item) { return item.barrio.nombreN; }).join('|');
+            if (firmaBarrios && firmaBarrios !== panelEstado.barriosVisibles) {
+                expandirPanelSeguimiento(true);
+            }
+            panelEstado.barriosVisibles = firmaBarrios;
+            var firma = mensaje + '|' + barriosCercanos.map(function (item) {
+                return item.barrio.nombreN + ':' + Math.round(item.distancia / 10);
+            }).join('|');
+            if (firma === panelEstado.firma) return;
+            panelEstado.firma = firma;
+            vaciar(panelEstado.lista);
+            if (!estado.activo) {
+                panelEstado.lista.appendChild(h('li', 'estado-viaje__vacio',
+                    'Los barrios se mostrarán cuando elijas el recorrido de tu viaje.'));
+            } else if (precisionBaja) {
+                panelEstado.lista.appendChild(h('li', 'estado-viaje__vacio',
+                    'Mejora la señal GPS para identificar barrios próximos.'));
+            } else if (!estado.seguimiento || estado.gpsError) {
+                panelEstado.lista.appendChild(h('li', 'estado-viaje__vacio',
+                    'Activa el GPS para actualizar los barrios cercanos en tiempo real.'));
+            } else if (!barriosCercanos.length) {
+                panelEstado.lista.appendChild(h('li', 'estado-viaje__vacio',
+                    'No hay barrios del recorrido a menos de 300 m de tu ubicación.'));
+            } else {
+                barriosCercanos.forEach(function (item, indice) {
+                    var fila = h('li', 'estado-viaje__barrio');
+                    var marcador = h('span', 'estado-viaje__punto', String(indice + 1));
+                    fila.appendChild(marcador);
+                    var detalle = h('span', 'estado-viaje__detalle');
+                    detalle.appendChild(h('strong', null, item.barrio.nombre));
+                    detalle.appendChild(h('small', null, 'A ' + formatearDistancia(item.distancia) +
+                        ' del punto de referencia'));
+                    fila.appendChild(detalle);
+                    if (item.barrio.coordenadaEstimada) {
+                        fila.appendChild(h('span', 'estado-viaje__estimado', 'Aprox.'));
+                    }
+                    panelEstado.lista.appendChild(fila);
+                });
+            }
         }
 
         /* ===================== URL, PANEL, LEYENDA ===================== */

@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="app-context-path" th:content="@{/}">
     <meta name="description" content="Mapa y consulta de rutas - Bustraker">
     <meta name="theme-color" content="#01315f">
     <meta name="_csrf" th:content="${_csrf.token}"/>
@@ -13,8 +14,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous">
     <link rel="preconnect" href="https://server.arcgisonline.com" crossorigin>
     <link rel="preconnect" href="https://tile.openstreetmap.org" crossorigin>
-    <link rel="stylesheet" th:href="@{/css/travel.css(v='map-polish-3')}">
-    <link rel="stylesheet" th:href="@{/css/map-ui.css(v='map-polish-3')}">
+    <link rel="stylesheet" th:href="@{/css/travel.css(v='map-polish-8')}">
+    <link rel="stylesheet" th:href="@{/css/map-ui.css(v='map-polish-9')}">
 </head>
 <body>
     <div id="map" role="application" aria-label="Mapa de rutas de Cartagena"></div>
@@ -57,11 +58,11 @@
                 <output id="plannerStatus" class="estado" role="status" aria-live="polite"></output>
                 <div class="fila">
                     <button id="btnSeguirUbicacion" class="btn btn--secundario" type="button" aria-pressed="false" disabled>
-                        <i class="fas fa-location-arrow" aria-hidden="true"></i> Seguir mi ubicación
+                        <i class="fas fa-location-arrow" aria-hidden="true"></i> Activar GPS
                     </button>
                     <button id="btnLimpiar" class="btn btn--texto" type="button">Limpiar</button>
                 </div>
-                <output id="locationStatus" class="estado" aria-live="polite">El punto azul es tu ubicación GPS, no la del bus. Solo se muestra en este dispositivo.</output>
+                <output id="locationStatus" class="estado" aria-live="polite">Al abrir este mapa se solicitará permiso para seguir tu GPS. Tu ubicación solo se muestra en este dispositivo; el GPS del usuario no confirma la posición del bus.</output>
             </section>
 
             <section class="seccion" aria-labelledby="tituloRutas">
@@ -109,8 +110,8 @@
     </main>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
-    <script th:src="@{/js/map-base.js(v='map-polish-3')}"></script>
-    <script th:src="@{/js/map-travel.js(v='map-polish-3')}"></script>
+    <script th:src="@{/js/map-base.js(v='map-polish-6')}"></script>
+    <script th:src="@{/js/map-travel.js(v='map-polish-6')}"></script>
     <script th:src="@{/js/viajar.js}"></script>
 </body>
 </html>

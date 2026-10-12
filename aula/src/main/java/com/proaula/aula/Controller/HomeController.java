@@ -295,8 +295,13 @@ public class HomeController {
     public String eliminarUsuario(@PathVariable Long id, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttrs) {
         Usuario u = usuarioService.getUsuarioById(id);
         if (u != null) {
-            usuarioService.deleteById(id);
-            redirectAttrs.addFlashAttribute(MODEL_ATTR_MENSAJE, "Usuario eliminado correctamente.");
+            if (usuarioService.hasRelatedRecords(id)) {
+                redirectAttrs.addFlashAttribute(MODEL_ATTR_ERROR,
+                    "No se puede eliminar el usuario porque conserva historial o datos relacionados.");
+            } else {
+                usuarioService.deleteById(id);
+                redirectAttrs.addFlashAttribute(MODEL_ATTR_MENSAJE, "Usuario eliminado correctamente.");
+            }
         } else {
             redirectAttrs.addFlashAttribute(MODEL_ATTR_MENSAJE, "Usuario no encontrado.");
         }

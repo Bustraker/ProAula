@@ -64,13 +64,14 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf
-                .ignoringRequestMatchers("/api/**")
-            )
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
             )
             .authorizeHttpRequests(auth -> auth
+                .requestMatchers(HttpMethod.POST, "/rutas").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.POST, "/api/buses/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/api/buses/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/buses/**").hasRole("ADMIN")
                 // Rutas completamente públicas
                 .requestMatchers(
                     "/", "/registro-mejorado", "/registro-mejorado.html", "/registro", "/registro/**",
@@ -80,13 +81,15 @@ public class SecurityConfig {
                     "/public_index_3", "/viajar_public", "/index_3_public",
                     "/contacto", "/contacto_public", "/contacto_usuario", "/consultas",
                     "/terminos", "/terminos.html", "/privacidad", "/privacidad.html",
-                    "/oauth2/**", "/login/oauth2/**", "/oauth2/authorization/**",
+                    "/login/oauth2/**", "/oauth2/authorization/**",
                     "/api/usuarios/login", "/api/usuarios/register",
                     // Permite acceso público para barrios
                     "/api/barrios/**",
                     "/rutas", "/rutas/detalle/**", "/ruta/**", "/buses/**"
                 ).permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/buses/todos", "/api/rutas-con-coordenadas", "/api/map/tiles").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/buses/todos", "/api/rutas", "/api/rutas-con-coordenadas",
+                    "/api/map/tiles").permitAll()
+                .requestMatchers("/oauth2/complete-password").hasAnyRole("USER", "ADMIN")
                 // Protege rutas de administración
                 .requestMatchers(
                     "/index_2", "/admin/**", "/reportes", "/gestionar-usuarios",
