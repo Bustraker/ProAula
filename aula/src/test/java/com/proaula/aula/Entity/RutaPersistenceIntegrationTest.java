@@ -8,6 +8,7 @@ import com.proaula.aula.Repository.RutaParadaRepository;
 import com.proaula.aula.Repository.RutaRepository;
 import com.proaula.aula.Service.BusService;
 import com.proaula.aula.Service.DataSeederService;
+import com.proaula.aula.Service.LocalDatabaseBootstrapService;
 import com.proaula.aula.Service.RutaService;
 import com.proaula.aula.Service.UsuarioService;
 import com.proaula.aula.exception.AulaException;
@@ -15,9 +16,11 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.DefaultApplicationArguments;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -26,9 +29,11 @@ import java.util.List;
 import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
+@ActiveProfiles("validation")
 @Transactional
 @Rollback
 class RutaPersistenceIntegrationTest {
@@ -50,6 +55,9 @@ class RutaPersistenceIntegrationTest {
 
     @Autowired
     private DataSeederService dataSeederService;
+
+    @Autowired
+    private LocalDatabaseBootstrapService localDatabaseBootstrapService;
 
     @Autowired
     private RutaController rutaController;
@@ -113,6 +121,10 @@ class RutaPersistenceIntegrationTest {
             ruta.getId(), RutaParada.Sentido.VUELTA))
             .extracting(relacion -> relacion.getParada().getNombre())
             .first().isEqualTo("Castillogrande");
+        assertThat(jdbcTemplate.queryForObject("SELECT COUNT(*) FROM ruta_barrios", Integer.class))
+            .isEqualTo(26);
+        assertThat(jdbcTemplate.queryForObject("SELECT COUNT(*) FROM ruta_barrios_ordenados", Integer.class))
+            .isEqualTo(26);
 
         for (String codigo : List.of("RUT-POZ-TORICES", "RUT-37-SIM-CENTRO", "RUT-30A-NB-CENTRO")) {
             Ruta otraRuta = rutaRepository.findByCodigo(codigo).orElseThrow();
@@ -125,12 +137,18 @@ class RutaPersistenceIntegrationTest {
         assertThat(barrioRepository.findAll()).extracting(Barrio::getNombre)
             .contains("El Rodeo", "Villagrande", "La Plazuela", "Torices", "Calamares", "Simón Bolívar");
 
+        assertThatCode(() -> localDatabaseBootstrapService.run(
+            new DefaultApplicationArguments(new String[0]))).doesNotThrowAnyException();
         dataSeederService.run();
 
         assertThat(rutaRepository.count()).isEqualTo(totalRutas);
         assertThat(paradaRepository.count()).isEqualTo(totalParadas);
         assertThat(rutaParadaRepository.count()).isEqualTo(totalRelaciones).isEqualTo(84);
         assertThat(paradaRepository.findByRuta_IdOrderByOrdenAsc(ruta.getId())).hasSize(10);
+        assertThat(jdbcTemplate.queryForObject("SELECT COUNT(*) FROM ruta_barrios", Integer.class))
+            .isEqualTo(26);
+        assertThat(jdbcTemplate.queryForObject("SELECT COUNT(*) FROM ruta_barrios_ordenados", Integer.class))
+            .isEqualTo(26);
     }
 
     @Test

@@ -17,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.ActiveProfiles;
 
 import com.proaula.aula.Entity.Bus;
 import com.proaula.aula.Entity.Ruta;
@@ -24,6 +25,7 @@ import com.proaula.aula.Service.BusService;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("validation")
 class ConsultasPageIntegrationTest {
 
     @Autowired
@@ -86,7 +88,7 @@ class ConsultasPageIntegrationTest {
                         "/css/travel.css?v=map-polish-8",
                         "/css/map-ui.css?v=map-polish-9",
                         "/js/map-base.js?v=map-polish-6",
-                        "/js/map-travel.js?v=map-polish-6");
+                        "/js/map-travel.js?v=map-polish-7");
 
         MockHttpSession session = new MockHttpSession();
         SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
@@ -108,7 +110,7 @@ class ConsultasPageIntegrationTest {
                         "/css/travel.css?v=map-polish-8",
                         "/css/map-ui.css?v=map-polish-9",
                         "/js/map-base.js?v=map-polish-6",
-                        "/js/map-travel.js?v=map-polish-6");
+                        "/js/map-travel.js?v=map-polish-7");
     }
 
     private Bus bus() {

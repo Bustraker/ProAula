@@ -41,6 +41,44 @@ aprovisiona o migra la base por un proceso controlado y confirma que su esquema
 corresponda a las entidades actuales. La aplicación fallará al arrancar si `validate`
 detecta diferencias. No cambies `ddl-auto` a `update` en producción para sortear
 errores de esquema; define y revisa las migraciones antes de automatizar cambios.
+## Datos sintéticos de prueba
+
+El perfil local carga las rutas provisionales y sus paradas desde
+[`local-reference-data.sql`](../src/main/resources/db/seed/local-reference-data.sql).
+En XAMPP, crea primero la base `bustraker` y arranca la aplicación: Hibernate crea
+las tablas de entidades, el inicializador SQL añade la referencia que aún no exista
+y el seeder Faker local genera datos de demostración en las tablas vacías. La carga
+es idempotente. El SQL es la única fuente de rutas y paradas provisionales; el
+seeder Java conserva la inicialización de barrios y el aprovisionamiento opcional del
+administrador. Usa `SYNTHETIC_DATA_ENABLED=false` para desactivar la generación
+sintética.
+
+El seeder crea cuentas `demo_...` identificadas con `provider=SYNTHETIC` y limita
+las relaciones sintéticas a esas cuentas. No restaura cuentas, contraseñas, mensajes
+ni otros registros personales del respaldo. La exportación privada
+`src/bustraker.csv` está excluida de Git; no la agregues al repositorio.
+
+En MySQL local, [`mysql-analytics-schema.sql`](../src/main/resources/db/seed/mysql-analytics-schema.sql)
+crea las tablas auxiliares necesarias para esos datos. La aplicación solo permite
+la carga sintética MySQL contra `localhost`/`127.0.0.1` y valida el esquema antes de
+escribir. No habilites esta semilla en producción.
+
+En el esquema XAMPP `bustraker` usado para esta carga, Hibernate también detecta una
+diferencia preexistente: `horario.dias_semana` es `SET` en MySQL pero la entidad Java
+espera `VARCHAR`. Solo para esa ejecución local se inició con
+`SPRING_JPA_HIBERNATE_DDL_AUTO=none`; esto no modifica el esquema, pero desactiva la
+validación de Hibernate durante el proceso. No lo dejes configurado para el uso normal
+de la aplicación; corrige esa diferencia mediante una migración revisada antes de
+volver a exigir `ddl-auto=validate`.
+
+Las cantidades se pueden acotar con `SYNTHETIC_DATA_USER_COUNT`,
+`SYNTHETIC_DATA_BUS_COUNT`, `SYNTHETIC_DATA_TRIP_COUNT`,
+`SYNTHETIC_DATA_TICKET_COUNT`, `SYNTHETIC_DATA_HISTORY_DAYS`,
+`SYNTHETIC_DATA_POSITION_COUNT` y `SYNTHETIC_DATA_INCIDENT_COUNT`. La semilla
+reproducible se configura con `SYNTHETIC_DATA_SEED`. Estos registros sirven para
+validar el procesamiento y los pipelines; no representan observaciones reales y no
+deben tratarse como evidencia de comportamiento para entrenar o evaluar modelos.
+
 
 ## OAuth
 
