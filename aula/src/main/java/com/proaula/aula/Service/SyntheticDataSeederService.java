@@ -760,14 +760,40 @@ public class SyntheticDataSeederService implements ApplicationRunner {
             throw new IllegalStateException("No se pudo validar el esquema analítico de MySQL.", exception);
         }
 
-        List<String> sourceColumnTypes = jdbcTemplate.queryForList(
-            "SELECT COLUMN_TYPE FROM information_schema.COLUMNS "
-                + "WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = 'fuente_datos'",
-            String.class, "demanda_historica");
-        if (sourceColumnTypes.isEmpty() || !sourceColumnTypes.get(0).contains("'SINTETICO'")) {
-            throw new IllegalStateException("Aplique MIGRATION_SYNTHETIC_DEMAND_SOURCE.sql antes de habilitar "
-                + "la carga Faker en MySQL.");
+        List<Map<String, Object>> sourceColumns = jdbcTemplate.queryForList(
+            "SELECT DATA_TYPE, COLUMN_TYPE, CHARACTER_MAXIMUM_LENGTH "
+                + "FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() "
+                + "AND TABLE_NAME = ? AND COLUMN_NAME = ?",
+            "demanda_historica", "fuente_datos");
+        if (sourceColumns.isEmpty()
+                || !supportsSyntheticDemandSource(sourceColumns.get(0))) {
+            throw new IllegalStateException("demanda_historica.fuente_datos debe aceptar el valor SINTETICO.");
         }
+    }
+
+    static boolean supportsSyntheticDemandSource(Map<String, Object> column) {
+        String dataType = String.valueOf(metadataValue(column, "DATA_TYPE")).toLowerCase(Locale.ROOT);
+        String columnType = String.valueOf(metadataValue(column, "COLUMN_TYPE")).toLowerCase(Locale.ROOT);
+        if (dataType.equals("enum")) {
+            return columnType.contains("'sintetico'");
+        }
+        if (Set.of("tinytext", "text", "mediumtext", "longtext").contains(dataType)) {
+            return true;
+        }
+        if (!Set.of("char", "varchar").contains(dataType)) {
+            return false;
+        }
+
+        Object maximumLength = metadataValue(column, "CHARACTER_MAXIMUM_LENGTH");
+        return maximumLength instanceof Number length && length.intValue() >= "SINTETICO".length();
+    }
+
+    private static Object metadataValue(Map<String, Object> metadata, String columnName) {
+        return metadata.entrySet().stream()
+            .filter(entry -> columnName.equalsIgnoreCase(entry.getKey()))
+            .map(Map.Entry::getValue)
+            .findFirst()
+            .orElse(null);
     }
 
     private Map<DemandKey, OccupancySummary> seedOccupancyReports(

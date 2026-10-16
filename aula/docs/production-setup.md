@@ -61,7 +61,10 @@ ni otros registros personales del respaldo. La exportación privada
 En MySQL local, [`mysql-analytics-schema.sql`](../src/main/resources/db/seed/mysql-analytics-schema.sql)
 crea las tablas auxiliares necesarias para esos datos. La aplicación solo permite
 la carga sintética MySQL contra `localhost`/`127.0.0.1` y valida el esquema antes de
-escribir. No habilites esta semilla en producción.
+escribir. Si `demanda_historica.fuente_datos` es un `ENUM` antiguo sin el valor
+`SINTETICO`, el bootstrap local lo amplía antes de cargar los datos; las columnas de
+texto con espacio suficiente también son compatibles. No habilites esta semilla en
+producción.
 
 En el esquema XAMPP `bustraker` usado para esta carga, Hibernate también detecta una
 diferencia preexistente: `horario.dias_semana` es `SET` en MySQL pero la entidad Java

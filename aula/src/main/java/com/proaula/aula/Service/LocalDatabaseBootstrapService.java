@@ -8,6 +8,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.stereotype.Component;
@@ -31,13 +32,16 @@ public class LocalDatabaseBootstrapService implements ApplicationRunner {
     private final DataSource dataSource;
     private final ResourceLoader resourceLoader;
     private final Environment environment;
+    private final JdbcTemplate jdbcTemplate;
 
     public LocalDatabaseBootstrapService(DataSource dataSource,
                                          ResourceLoader resourceLoader,
-                                         Environment environment) {
+                                         Environment environment,
+                                         JdbcTemplate jdbcTemplate) {
         this.dataSource = dataSource;
         this.resourceLoader = resourceLoader;
         this.environment = environment;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
@@ -46,10 +50,48 @@ public class LocalDatabaseBootstrapService implements ApplicationRunner {
         if ("MySQL".equalsIgnoreCase(databaseProduct)
                 && environment.acceptsProfiles(Profiles.of("local"))) {
             executeScript(MYSQL_ANALYTICS_SCRIPT);
+            ensureSyntheticDemandSourceValue();
         }
 
         executeScript(REFERENCE_DATA_SCRIPT);
         log.info("Datos de referencia locales cargados desde SQL.");
+    }
+
+    private void ensureSyntheticDemandSourceValue() {
+        String columnType = jdbcTemplate.queryForObject(
+            "SELECT COLUMN_TYPE FROM information_schema.COLUMNS "
+                + "WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?",
+            String.class, "demanda_historica", "fuente_datos");
+        if (columnType == null) {
+            throw new IllegalStateException(
+                "No se encontró demanda_historica.fuente_datos para preparar los datos sintéticos locales.");
+        }
+        if (!needsSyntheticDemandEnumMigration(columnType)) {
+            return;
+        }
+
+        String expandedColumnType = appendSyntheticDemandEnumValue(columnType);
+        jdbcTemplate.execute("ALTER TABLE `demanda_historica` MODIFY COLUMN `fuente_datos` "
+            + expandedColumnType + " NOT NULL DEFAULT 'CONSOLIDADO'");
+        log.info("Se habilitó la fuente SINTETICO en demanda_historica.fuente_datos.");
+    }
+
+    static boolean needsSyntheticDemandEnumMigration(String columnType) {
+        String normalizedType = columnType.toLowerCase(java.util.Locale.ROOT);
+        return normalizedType.startsWith("enum(") && !normalizedType.contains("'sintetico'");
+    }
+
+    static String appendSyntheticDemandEnumValue(String columnType) {
+        if (!needsSyntheticDemandEnumMigration(columnType)) {
+            return columnType;
+        }
+
+        int closingParenthesis = columnType.lastIndexOf(')');
+        if (closingParenthesis < "enum(".length()) {
+            throw new IllegalArgumentException("Definición ENUM inválida para demanda_historica.fuente_datos.");
+        }
+        return columnType.substring(0, closingParenthesis) + ",'SINTETICO'"
+            + columnType.substring(closingParenthesis);
     }
 
     private String getDatabaseProduct() {
