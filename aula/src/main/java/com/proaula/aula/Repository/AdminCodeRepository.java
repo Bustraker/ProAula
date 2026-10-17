@@ -9,6 +9,6 @@ import com.proaula.aula.Entity.AdminCode;
 
 @Repository
 public interface AdminCodeRepository extends JpaRepository<AdminCode, Long> {
-    Optional<AdminCode> findByCodigoIgnoreCase(String codigo);
-    boolean existsByCodigoIgnoreCase(String codigo);
+    Optional<AdminCode> findByCodeHash(String codeHash);
+    boolean existsByCodeHash(String codeHash);
 }

@@ -68,13 +68,16 @@ public class SecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
             )
             .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/actuator/health").permitAll()
                 .requestMatchers(HttpMethod.POST, "/rutas").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/buses/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.PUT, "/api/buses/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/api/buses/**").hasRole("ADMIN")
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 // Rutas completamente públicas
                 .requestMatchers(
                     "/", "/registro-mejorado", "/registro-mejorado.html", "/registro", "/registro/**",
+                    "/solicitar-codigo-admin", "/firebase-messaging-sw.js", "/api/firebase/config",
                     "/inicio-de-sesion-mejorado", "/inicio-de-sesion-mejorado.html", "/inicio_de_sesion",
                     "/admin-login", "/admin/verificar-codigo", "/admin/login",
                     "/css/**", "/js/**", "/images/**",

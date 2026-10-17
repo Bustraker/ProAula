@@ -20,6 +20,17 @@ spring:
     mode: HTML
     encoding: UTF-8
     cache: false
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
   security:
     oauth2:
       client:
@@ -63,7 +74,7 @@ spring:
             user-info-uri: https://graph.facebook.com/me?fields=id,name,email
             user-name-attribute: id
 server:
-  port: ${PORT:3465}
+  port: ${PORT:5679}
   servlet:
     encoding:
       charset: UTF-8
@@ -96,8 +107,31 @@ carto:
 app:
   admin:
     registration-code: ${ADMIN_REGISTRATION_CODE:}
+    approver-email: ${ADMIN_APPROVER_EMAIL:}
+  public-base-url: ${APP_PUBLIC_BASE_URL:http://localhost:${PORT:5679}}
+  firebase:
+    api-key: ${FIREBASE_API_KEY:AIzaSyBIZkDnH3moEM9J9Miudb96lqCA7fYG4DI}
+    auth-domain: ${FIREBASE_AUTH_DOMAIN:bustrakerproyect24.firebaseapp.com}
+    project-id: ${FIREBASE_PROJECT_ID:bustrakerproyect24}
+    storage-bucket: ${FIREBASE_STORAGE_BUCKET:bustrakerproyect24.firebasestorage.app}
+    messaging-sender-id: ${FIREBASE_MESSAGING_SENDER_ID:267298502117}
+    app-id: ${FIREBASE_APP_ID:1:267298502117:web:fec8d5f48c49345c1d2b0c}
+    measurement-id: ${FIREBASE_MEASUREMENT_ID:G-LBQV7RLSMB}
+    vapid-key: ${FIREBASE_VAPID_KEY:}
+    admin-enabled: ${FIREBASE_ADMIN_ENABLED:false}
+    credentials-file: ${FIREBASE_CREDENTIALS_FILE:}
   bootstrap-admin:
     enabled: ${BOOTSTRAP_ADMIN_ENABLED:false}
     username: ${BOOTSTRAP_ADMIN_USERNAME:}
     email: ${BOOTSTRAP_ADMIN_EMAIL:}
     password: ${BOOTSTRAP_ADMIN_PASSWORD:}
+  synthetic-data:
+    enabled: ${SYNTHETIC_DATA_ENABLED:false}
+    seed: ${SYNTHETIC_DATA_SEED:20261011}
+    user-count: ${SYNTHETIC_DATA_USER_COUNT:80}
+    bus-count: ${SYNTHETIC_DATA_BUS_COUNT:16}
+    trip-count: ${SYNTHETIC_DATA_TRIP_COUNT:2400}
+    ticket-count: ${SYNTHETIC_DATA_TICKET_COUNT:6000}
+    history-days: ${SYNTHETIC_DATA_HISTORY_DAYS:365}
+    position-count: ${SYNTHETIC_DATA_POSITION_COUNT:6000}
+    incident-count: ${SYNTHETIC_DATA_INCIDENT_COUNT:240}

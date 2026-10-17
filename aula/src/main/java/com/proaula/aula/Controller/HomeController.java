@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Comparator;
 import java.util.Locale;
@@ -89,6 +90,7 @@ public class HomeController {
     }
 
     @PostMapping("/registro")
+    @Transactional
     public String registrar(@ModelAttribute UsuarioFormDto usuarioForm,
                            @RequestParam(required = false) String adminCode,
                            @RequestParam(required = false) Boolean terminos,
@@ -124,12 +126,13 @@ public class HomeController {
 
         if ("ADMIN".equals(roleIngresado)) {
             if (adminCode == null || adminCode.trim().isEmpty()) {
-                model.addAttribute(MODEL_ATTR_ERROR, "Debes proporcionar el código de administrador para crear una cuenta de administrador");
+                model.addAttribute(MODEL_ATTR_ERROR, "Debes solicitar y usar un código de invitación ADMIN válido.");
                 model.addAttribute(MODEL_ATTR_USUARIO, usuarioForm);
                 return VIEW_REGISTRO_MEJORADO;
             }
-            if (!adminCodeService.isValidAdminCode(adminCode.trim())) {
-                model.addAttribute(MODEL_ATTR_ERROR, "Código de administrador incorrecto");
+            if (!adminCodeService.consumeRegistrationInvite(adminCode.trim(), usuarioForm.getEmail())) {
+                model.addAttribute(MODEL_ATTR_ERROR,
+                    "El código no es válido para este correo, ya fue usado o venció. Solicita uno nuevo.");
                 model.addAttribute(MODEL_ATTR_USUARIO, usuarioForm);
                 return VIEW_REGISTRO_MEJORADO;
             }

@@ -1,6 +1,7 @@
 package com.proaula.aula.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
@@ -31,7 +32,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(UsuarioNotFoundException.class)
     public Object handleUsuarioNotFoundException(UsuarioNotFoundException ex, Model model,
-                                                  HttpServletRequest request) {
+                                                HttpServletRequest request) {
         logger.warn("UsuarioNotFoundException: {}", ex.getMessage());
         return respond(HttpStatus.NOT_FOUND, ex.getErrorCode(), "Usuario no encontrado",
             "error/404", model, request, Map.of());
@@ -49,8 +50,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AccessDeniedException.class)
     public Object handleAccessDeniedException(AccessDeniedException ex, Model model,
-                                              HttpServletRequest request) {
+                                            HttpServletRequest request, HttpServletResponse response) {
         logger.warn("AccessDeniedException: {}", ex.getMessage());
+        response.setStatus(HttpStatus.FORBIDDEN.value());
         return respond(HttpStatus.FORBIDDEN, "ACCESS_DENIED",
             "No tienes permisos para acceder a este recurso", "error/403", model, request, Map.of());
     }

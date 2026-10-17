@@ -198,18 +198,22 @@
                             </select>
                         </div>
 
-                        <!-- Código ADMIN visible solo si aplica -->
+                        <!-- Código de invitación ADMIN visible solo si aplica -->
                         <div class="form-group hidden" id="adminCodeGroup" style="display: none;" aria-live="polite">
                             <label class="form-label" for="adminCode">
-                                <i class="fas fa-key"></i> Código de Administrador *
+                                <i class="fas fa-key"></i> Código de invitación ADMIN *
                             </label>
                                 <input type="text" 
                                     id="adminCode" 
                                     name="adminCode"
                                     class="form-control" 
-                                    placeholder="Ingresa el código de administrador"
+                                    placeholder="Ingresa el código enviado a tu correo"
                                     autocomplete="off"
-                                    maxlength="20">
+                                    maxlength="24">
+                            <small class="form-text">
+                                <a th:href="@{/solicitar-codigo-admin}">Solicitar un código de invitación</a>.
+                                Solo funciona una vez y vence en 24 horas.
+                            </small>
                         </div>
 
                         <!-- Términos y Condiciones -->

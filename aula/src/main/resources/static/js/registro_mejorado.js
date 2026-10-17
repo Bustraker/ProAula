@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (role === 'ADMIN' && adminCode.trim() === '') {
                 e.preventDefault();
-                alert('❌ Debes ingresar el código de administrador para crear una cuenta de administrador.');
+                alert('❌ Solicita e ingresa el código de invitación ADMIN enviado a tu correo.');
                 document.getElementById('adminCode').focus();
                 return false;
             }
