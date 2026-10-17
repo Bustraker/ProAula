@@ -37,3 +37,4 @@ build/
 /headers.txt
 /test-final.log
 /src/main/resources/application.properties
+/src/bustraker.csv
