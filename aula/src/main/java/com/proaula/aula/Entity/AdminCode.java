@@ -15,8 +15,8 @@ public class AdminCode {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "codigo", nullable = false, unique = true)
-    private String codigo;
+    @Column(name = "codigo", nullable = false, unique = true, length = 255)
+    private String codeHash;
 
     @Column(name = "descripcion")
     private String descripcion;
@@ -24,12 +24,12 @@ public class AdminCode {
     public AdminCode() {
     }
 
-    public AdminCode(String codigo) {
-        this.codigo = codigo;
+    public AdminCode(String codeHash) {
+        this.codeHash = codeHash;
     }
 
-    public AdminCode(String codigo, String descripcion) {
-        this.codigo = codigo;
+    public AdminCode(String codeHash, String descripcion) {
+        this.codeHash = codeHash;
         this.descripcion = descripcion;
     }
 
@@ -41,12 +41,12 @@ public class AdminCode {
         this.id = id;
     }
 
-    public String getCodigo() {
-        return codigo;
+    public String getCodeHash() {
+        return codeHash;
     }
 
-    public void setCodigo(String codigo) {
-        this.codigo = codigo;
+    public void setCodeHash(String codeHash) {
+        this.codeHash = codeHash;
     }
 
     public String getDescripcion() {

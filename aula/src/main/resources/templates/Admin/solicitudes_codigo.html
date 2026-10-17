@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#01315f">
+    <meta name="csrf-token" th:content="${_csrf.token}">
+    <meta name="csrf-header" th:content="${_csrf.headerName}">
+    <title>Solicitudes de acceso ADMIN - Bustraker</title>
+    <link rel="stylesheet" th:href="@{/css/style_common.css}">
+</head>
+<body>
+<main class="container" style="max-width: 960px; margin: 2rem auto; padding: 1rem;">
+    <header>
+        <p><a th:href="@{/index_2}">← Panel de administración</a></p>
+        <h1>Solicitudes de códigos ADMIN</h1>
+        <p>Solicitudes pendientes: <strong th:text="${pendingCount}">0</strong></p>
+    </header>
+
+    <div th:if="${success}" class="alert alert-success" role="status" th:text="${success}"></div>
+    <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
+
+    <section aria-labelledby="pushHeading" style="margin: 1.5rem 0; padding: 1rem; border: 1px solid #ccd5df; border-radius: .5rem;">
+        <h2 id="pushHeading">Avisos en este dispositivo</h2>
+        <p id="pushStatus" role="status"
+           th:text="${pushConfigured} ? 'Activa las notificaciones para recibir avisos en este dispositivo.' : 'Falta configurar la clave pública Web Push (FIREBASE_VAPID_KEY).'">
+            Estado de las notificaciones
+        </p>
+        <button id="enablePush" type="button" th:disabled="${!pushConfigured}">Activar notificaciones</button>
+        <button id="disablePush" type="button" hidden>Desactivar en este dispositivo</button>
+    </section>
+
+    <section aria-label="Solicitudes">
+        <p th:if="${#lists.isEmpty(requests)}">Aún no hay solicitudes.</p>
+        <article th:each="request : ${requests}"
+                 style="margin: 1rem 0; padding: 1rem; border: 1px solid #ccd5df; border-radius: .5rem;">
+            <h2 style="font-size: 1.1rem;" th:text="${request.email}">solicitante@example.com</h2>
+            <p>Estado: <strong th:text="${request.status}">PENDING</strong></p>
+            <p>Recibida: <time th:datetime="${request.createdAt}"
+                               th:text="${#temporals.format(request.createdAt, 'yyyy-MM-dd HH:mm')}">fecha</time></p>
+            <div th:if="${request.status.name() == 'PENDING'}" style="display: flex; gap: .75rem;">
+                <form th:action="@{/admin/solicitudes-codigo/{id}/aprobar(id=${request.id})}" method="post">
+                    <button type="submit">Aprobar y enviar código</button>
+                </form>
+                <form th:action="@{/admin/solicitudes-codigo/{id}/rechazar(id=${request.id})}" method="post">
+                    <button type="submit">Rechazar</button>
+                </form>
+            </div>
+            <p th:if="${request.decidedBy != null}">
+                Decidida por <span th:text="${request.decidedBy}">admin</span>
+            </p>
+        </article>
+    </section>
+</main>
+<script type="module" th:src="@{/js/admin-push-notifications.js}"></script>
+</body>
+</html>

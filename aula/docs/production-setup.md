@@ -12,10 +12,10 @@ Define estas variables antes de iniciar el proceso:
 | --- | --- | --- |
 | `SPRING_PROFILES_ACTIVE` | Sí | Debe ser `prod`. |
 | `SPRING_DATASOURCE_URL` | Sí | URL JDBC de la base MySQL. |
-| `SPRING_DATASOURCE_USERNAME` | Sí | Usuario de base de datos con privilegios mínimos. |
+| `SPRING_DATASOURCE_USERNAME` | Sí | Usuario de base de datos con privilegios mínimos para crear tablas e índices y alterar el tipo de `horario.dias_semana` durante la migración. |
 | `SPRING_DATASOURCE_PASSWORD` | Sí | Contraseña de ese usuario. |
 | `JWT_SECRET` | Sí | Secreto aleatorio de al menos 32 bytes para firmar JWT. |
-| `PORT` | No | Puerto HTTP; por defecto `3465`. |
+| `PORT` | No | Puerto HTTP; por defecto `5679`. |
 | `SESSION_COOKIE_SECURE` | No | En producción debe permanecer habilitada. |
 | `SESSION_COOKIE_DOMAIN` | No | Dominio de la cookie de sesión, si aplica. |
 | `CARTO_API_KEY` | No | Clave de CARTO, si la integración se utiliza. |
@@ -24,6 +24,13 @@ Define estas variables antes de iniciar el proceso:
 | `BOOTSTRAP_ADMIN_USERNAME` | Condicional | Usuario inicial; obligatorio si `BOOTSTRAP_ADMIN_ENABLED=true`. |
 | `BOOTSTRAP_ADMIN_EMAIL` | Condicional | Correo del administrador inicial; obligatorio si `BOOTSTRAP_ADMIN_ENABLED=true`. |
 | `BOOTSTRAP_ADMIN_PASSWORD` | Condicional | Contraseña inicial; obligatorio si `BOOTSTRAP_ADMIN_ENABLED=true`. |
+| `MAIL_USERNAME` | Para invitaciones ADMIN | Cuenta Gmail emisora; debe coincidir con `ADMIN_APPROVER_EMAIL`. |
+| `MAIL_PASSWORD` | Para invitaciones ADMIN | Contraseña de aplicación de Gmail, guardada como secreto. |
+| `ADMIN_APPROVER_EMAIL` | Para invitaciones ADMIN | Correo de la cuenta emisora y de la cuenta ADMIN autorizada para aprobar. |
+| `APP_PUBLIC_BASE_URL` | Para enlaces del flujo | URL HTTPS pública del backend, sin barra final. |
+| `FIREBASE_VAPID_KEY` | Para notificaciones web | Clave pública Web Push configurada en Firebase. |
+| `FIREBASE_ADMIN_ENABLED` | Para enviar notificaciones push | `true` solo cuando Firebase Admin y su identidad/credenciales estén configurados. |
+| `FIREBASE_CREDENTIALS_FILE` | Solo si no hay identidad administrada | Ruta `file:` a credenciales externas al repositorio; vacía cuando se usa ADC. |
 
 Genera `JWT_SECRET` fuera del repositorio, por ejemplo con
 `openssl rand -base64 48`, y guárdalo en el gestor de secretos del entorno. No uses
@@ -89,6 +96,30 @@ reproducible se configura con `SYNTHETIC_DATA_SEED`. Estos registros sirven para
 validar el procesamiento y los pipelines; no representan observaciones reales y no
 deben tratarse como evidencia de comportamiento para entrenar o evaluar modelos.
 
+## Esquema y despliegue
+
+El perfil `prod` ejecuta la migración Flyway
+[`V20261015_01__admin_code_approval_flow.sql`](../src/main/resources/db/migration/mysql/V20261015_01__admin_code_approval_flow.sql)
+para crear las tablas de solicitudes, invitaciones y suscripciones push, y la
+migración
+[`V20261015_02__normalize_horario_days_column.sql`](../src/main/resources/db/migration/mysql/V20261015_02__normalize_horario_days_column.sql)
+normaliza `horario.dias_semana` de MySQL `SET` a `VARCHAR(255)`, como espera la
+entidad Java. La conversión conserva el valor textual de los días seleccionados.
+Flyway está configurado con `baseline-on-migrate`; antes del primer despliegue
+respalda la base, confirma que las tablas de la migración `01` aún no existan y que
+la columna `horario.dias_semana` sí exista. El usuario de conexión necesita permiso
+para crear tablas e índices y modificar esa columna. Si parte del esquema ya fue
+migrado manualmente, revisa el historial de Flyway antes de ejecutar para evitar
+migraciones duplicadas.
+
+Los perfiles locales y de validación deshabilitan estas migraciones MySQL: el
+entorno local administra su esquema con Hibernate y las pruebas usan su esquema H2
+aislado. Esto evita ejecutar DDL de producción sobre bases de prueba.
+
+Al terminar Flyway, Hibernate usa `ddl-auto=validate`: comprueba que el esquema
+corresponda a las entidades y falla al arrancar si detecta diferencias. No cambies
+`ddl-auto` a `update` en producción para sortear errores de esquema; revisa y versiona
+cualquier migración adicional antes de desplegarla.
 
 ## OAuth
 

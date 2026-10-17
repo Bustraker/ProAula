@@ -60,6 +60,7 @@ public class DataSeederService implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) {
+        adminCodeService.migrateLegacyAdminCodes();
         seedBarrios();
         initializeAdminRegistrationCode();
         bootstrapAdminIfConfigured();
@@ -129,6 +130,10 @@ public class DataSeederService implements CommandLineRunner {
     private String normalizeName(String name) {
         return Normalizer.normalize(name.trim(), Normalizer.Form.NFD)
             .replaceAll("\\p{M}", "")
+            .replace("ñ", "n")
+            .replaceAll("[^\\p{L}\\p{N}]+", " ")
+            .replaceAll("\\s+", " ")
+            .trim()
             .toLowerCase(Locale.ROOT);
     }
 
