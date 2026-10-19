@@ -36,14 +36,18 @@ OAuth en el gestor de secretos solo para los proveedores que se vayan a ofrecer:
 
 ## Esquema y despliegue
 
-Flyway se ejecuta al arrancar el perfil `prod`, con migraciones en
-`src/main/resources/db/migration/mysql`. En bases existentes, `baseline-on-migrate`
-registra el esquema actual y aplica las migraciones versionadas posteriores. El
-despliegue incluye `V20261015_02__normalize_horario_days_column.sql`, que convierte
-`horario.dias_semana` de `SET` a `VARCHAR(255)` para que coincida con la entidad
-`Horario`. El usuario de base de datos necesita permisos para ejecutar esa migración.
-Si una migración falla, revisa el error de Flyway y corrige la causa antes de reiniciar;
-no cambies `ddl-auto=validate` a `update` para ocultar una diferencia de esquema.
+**Workaround temporal de Render:** el perfil `prod` tiene Flyway deshabilitado y
+`ddl-auto=none` porque la conexión TiDB se cierra durante el baseline de Flyway. Esto
+permite que Hibernate no rechace el tipo existente de `horario.dias_semana`, pero no
+modifica esa columna y deja de validar todo el esquema. No lo consideres una reparación
+permanente.
+
+La migración preparada
+`src/main/resources/db/migration/mysql/V20261015_02__normalize_horario_days_column.sql`
+convierte `horario.dias_semana` de `SET` a `VARCHAR(255)`. Cuando se confirme que TiDB
+acepta la operación, habilita Flyway en `application-prod.yml`, ejecuta la migración y
+restablece `ddl-auto=validate`. No cambies `ddl-auto` a `update` para ocultar diferencias
+de esquema.
 ## Datos sintéticos de prueba
 
 El perfil local carga las rutas provisionales y sus paradas desde
