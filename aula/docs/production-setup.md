@@ -36,11 +36,14 @@ OAuth en el gestor de secretos solo para los proveedores que se vayan a ofrecer:
 
 ## Esquema y despliegue
 
-No hay una migración Flyway/Liquibase versionada en este proyecto. Antes de desplegar,
-aprovisiona o migra la base por un proceso controlado y confirma que su esquema
-corresponda a las entidades actuales. La aplicación fallará al arrancar si `validate`
-detecta diferencias. No cambies `ddl-auto` a `update` en producción para sortear
-errores de esquema; define y revisa las migraciones antes de automatizar cambios.
+Flyway se ejecuta al arrancar el perfil `prod`, con migraciones en
+`src/main/resources/db/migration/mysql`. En bases existentes, `baseline-on-migrate`
+registra el esquema actual y aplica las migraciones versionadas posteriores. El
+despliegue incluye `V20261015_02__normalize_horario_days_column.sql`, que convierte
+`horario.dias_semana` de `SET` a `VARCHAR(255)` para que coincida con la entidad
+`Horario`. El usuario de base de datos necesita permisos para ejecutar esa migración.
+Si una migración falla, revisa el error de Flyway y corrige la causa antes de reiniciar;
+no cambies `ddl-auto=validate` a `update` para ocultar una diferencia de esquema.
 ## Datos sintéticos de prueba
 
 El perfil local carga las rutas provisionales y sus paradas desde
