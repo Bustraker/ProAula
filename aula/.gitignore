@@ -33,6 +33,9 @@ build/
 .vscode/
 
 # Local credentials and request captures
+/.env
+/.env.*
+!/.env.example
 /cookiejar.txt
 /headers.txt
 /test-final.log

@@ -2,9 +2,9 @@
 
 ## Perfil y base de datos
 
-Inicia la aplicación con `SPRING_PROFILES_ACTIVE=prod`. El perfil `prod` usa MySQL y
-`spring.jpa.hibernate.ddl-auto=validate`: comprueba que las tablas y columnas ya
-existen y son compatibles, pero no crea ni modifica el esquema.
+Inicia la aplicación con `SPRING_PROFILES_ACTIVE=prod`. El perfil `prod` usa MySQL.
+En el workaround temporal actualmente desplegado, Hibernate no valida ni modifica
+el esquema (`spring.jpa.hibernate.ddl-auto=none`).
 
 Define estas variables antes de iniciar el proceso:
 

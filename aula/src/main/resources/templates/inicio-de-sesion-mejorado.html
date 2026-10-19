@@ -55,6 +55,11 @@
                     <h1 id="loginTitle"><i class="fas fa-sign-in-alt" aria-hidden="true"></i> Iniciar Sesión</h1>
                 </div>
                 <div class="card-body">
+                    <div th:if="${param.oauthError}" class="alert alert-danger" role="alert">
+                        <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
+                        <span>No se pudo completar el inicio con el proveedor externo. Comprueba la configuración, la URL de retorno y el correo que autorizaste compartir.</span>
+                    </div>
+
                     <!-- Estado de error -->
                     <div th:if="${param.error}" class="alert alert-danger" role="alert">
                         <i class="fas fa-exclamation-triangle"></i>
@@ -146,16 +151,20 @@
                 <!-- Login social -->
                 <div class="card-body">
                     <div class="auth-social-grid">
-                        <a th:href="@{/oauth2/authorization/google}" class="btn btn-outline btn-block d-inline-flex align-center justify-center">
+                        <a th:if="${!#strings.isEmpty(@environment.getProperty('spring.security.oauth2.client.registration.google.client-id')) and !#strings.startsWith(@environment.getProperty('spring.security.oauth2.client.registration.google.client-id'), 'placeholder-') and !#strings.isEmpty(@environment.getProperty('spring.security.oauth2.client.registration.google.client-secret')) and !#strings.startsWith(@environment.getProperty('spring.security.oauth2.client.registration.google.client-secret'), 'placeholder-')}"
+                           th:href="@{/oauth2/authorization/google}" class="btn btn-outline btn-block d-inline-flex align-center justify-center">
                             <i class="fab fa-google text-google auth-social-icon" aria-hidden="true"></i> Google
                         </a>
-                        <a th:href="@{/oauth2/authorization/github}" class="btn btn-outline btn-block d-inline-flex align-center justify-center">
+                        <a th:if="${!#strings.isEmpty(@environment.getProperty('spring.security.oauth2.client.registration.github.client-id')) and !#strings.startsWith(@environment.getProperty('spring.security.oauth2.client.registration.github.client-id'), 'placeholder-') and !#strings.isEmpty(@environment.getProperty('spring.security.oauth2.client.registration.github.client-secret')) and !#strings.startsWith(@environment.getProperty('spring.security.oauth2.client.registration.github.client-secret'), 'placeholder-')}"
+                           th:href="@{/oauth2/authorization/github}" class="btn btn-outline btn-block d-inline-flex align-center justify-center">
                             <i class="fab fa-github auth-social-icon" aria-hidden="true"></i> GitHub
                         </a>
-                        <a th:href="@{/oauth2/authorization/discord}" class="btn btn-outline btn-block d-inline-flex align-center justify-center">
+                        <a th:if="${!#strings.isEmpty(@environment.getProperty('spring.security.oauth2.client.registration.discord.client-id')) and !#strings.startsWith(@environment.getProperty('spring.security.oauth2.client.registration.discord.client-id'), 'placeholder-') and !#strings.isEmpty(@environment.getProperty('spring.security.oauth2.client.registration.discord.client-secret')) and !#strings.startsWith(@environment.getProperty('spring.security.oauth2.client.registration.discord.client-secret'), 'placeholder-')}"
+                           th:href="@{/oauth2/authorization/discord}" class="btn btn-outline btn-block d-inline-flex align-center justify-center">
                             <i class="fab fa-discord auth-social-icon auth-social-icon--discord" aria-hidden="true"></i> Discord
                         </a>
-                        <a th:href="@{/oauth2/authorization/facebook}" class="btn btn-outline btn-block d-inline-flex align-center justify-center">
+                        <a th:if="${!#strings.isEmpty(@environment.getProperty('spring.security.oauth2.client.registration.facebook.client-id')) and !#strings.startsWith(@environment.getProperty('spring.security.oauth2.client.registration.facebook.client-id'), 'placeholder-') and !#strings.isEmpty(@environment.getProperty('spring.security.oauth2.client.registration.facebook.client-secret')) and !#strings.startsWith(@environment.getProperty('spring.security.oauth2.client.registration.facebook.client-secret'), 'placeholder-')}"
+                           th:href="@{/oauth2/authorization/facebook}" class="btn btn-outline btn-block d-inline-flex align-center justify-center">
                             <i class="fab fa-facebook-f auth-social-icon auth-social-icon--facebook" aria-hidden="true"></i> Facebook
                         </a>
                     </div>
