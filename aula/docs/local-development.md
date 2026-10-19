@@ -1,28 +1,29 @@
 # Desarrollo local
 
-## Arranque rápido sin servicios externos
+## Arranque local con XAMPP
 
-Requisitos: Git y JDK 21. Desde la carpeta `aula`, ejecuta:
+Requisitos: Git, JDK 21 y MySQL iniciado desde XAMPP. Crea la base de datos en
+phpMyAdmin y, desde la carpeta `aula`, ejecuta:
 
 ```cmd
-run-demo.cmd
+run-local.cmd
 ```
 
-El perfil `demo` usa una base H2 en memoria y crea su esquema al iniciar. No requiere
-XAMPP, Firebase ni credenciales OAuth. Los datos de la base se pierden al detener la
-aplicación. Abre `http://localhost:3465`.
+El perfil `local` conecta a `localhost:3306` como `root` sin contraseña y usa la base
+`bustraker` de forma predeterminada. Para usar otro nombre, define `DB_NAME` con ese
+nombre en `.env` o antes de ejecutar el script. Por ejemplo, cambia `DB_NAME` en
+`.env` al nombre que creaste en phpMyAdmin. Para usar `.env`, cópialo primero desde
+`.env.example`; está excluido de Git. La aplicación conserva MySQL; no usa una base
+H2.
+Abre `http://localhost:3465`.
 
-Para habilitar un proveedor OAuth en este perfil, copia `.env.example` como `.env`
-dentro de `aula` y completa únicamente las credenciales necesarias. El archivo se
-carga al arrancar el perfil demo y está excluido de Git. Registra en el proveedor la
-URL de callback local:
+Para habilitar un proveedor OAuth, copia `.env.example` como `.env` dentro de `aula`
+y completa únicamente las credenciales necesarias. El archivo se carga en el perfil
+`local` y está excluido de Git. Registra en el proveedor la URL de callback local:
 `http://localhost:3465/login/oauth2/code/github` (sustituye `github` por el proveedor
 configurado).
 Sin credenciales válidas, esos botones no aparecen en el formulario de acceso.
 
-## XAMPP
-
-El perfil `local` existente conserva la conexión MySQL a XAMPP. Inicia la base
-`bustraker` y usa las instrucciones de [`production-setup.md`](production-setup.md)
-para la carga de datos sintéticos. No se cambia el perfil `local` ni la configuración
-de producción en Render.
+Para la inicialización local y los datos sintéticos, consulta
+[`production-setup.md`](production-setup.md). El perfil de producción y Render no
+dependen de `DB_NAME` ni se modifican con este ajuste.
