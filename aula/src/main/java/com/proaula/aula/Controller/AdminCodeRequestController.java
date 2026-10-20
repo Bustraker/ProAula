@@ -23,7 +23,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
 import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,43 +35,45 @@ public class AdminCodeRequestController {
     private final AdminPushNotificationService pushNotificationService;
     private final UsuarioService usuarioService;
     private final String approverEmail;
-    private final String firebaseVapidKey;
 
     public AdminCodeRequestController(
             AdminCodeRequestService requestService,
             AdminPushNotificationService pushNotificationService,
             UsuarioService usuarioService,
-            @Value("${app.admin.approver-email:}") String approverEmail,
-            @Value("${app.firebase.vapid-key:}") String firebaseVapidKey) {
+            @Value("${app.admin.approver-email:}") String approverEmail) {
         this.requestService = requestService;
         this.pushNotificationService = pushNotificationService;
         this.usuarioService = usuarioService;
         this.approverEmail = approverEmail;
-        this.firebaseVapidKey = firebaseVapidKey;
     }
 
-    @GetMapping("/solicitar-codigo-admin")
-    public String requestPage() {
-        return "solicitar-codigo-admin";
-    }
-
-    @PostMapping("/solicitar-codigo-admin")
-    public String submitRequest(@RequestParam(required = false) String email,
+    @PostMapping("/admin/solicitudes-codigo")
+    public String submitRequest(@RequestParam(required = false) String nombres,
+                                @RequestParam(required = false) String apellidos,
+                                @RequestParam(required = false) String email,
+                                @RequestParam(required = false) String motivo,
+                                Principal principal,
                                 RedirectAttributes redirectAttributes) {
         try {
-            requestService.createRequest(email);
+            boolean pushSent = requestService.createRequest(
+                nombres, apellidos, email, motivo, principal == null ? null : principal.getName());
             redirectAttributes.addFlashAttribute("success",
-                "Si el correo puede recibir una solicitud, el administrador la revisará y recibirás una respuesta.");
+                "Solicitud enviada al responsable de aprobación.");
+            if (!pushSent) {
+                redirectAttributes.addFlashAttribute("warning",
+                    "No se pudo entregar la notificación push. El responsable recibió un correo y puede revisar "
+                        + "la solicitud en el panel.");
+            }
         } catch (IllegalArgumentException | IllegalStateException exception) {
             if (exception instanceof IllegalArgumentException) {
                 redirectAttributes.addFlashAttribute("error", exception.getMessage());
             } else {
-                log.error("Could not process an ADMIN access request.", exception);
+                log.error("Could not create an ADMIN registration request.", exception);
                 redirectAttributes.addFlashAttribute("error",
-                    "No pudimos procesar la solicitud ahora. Inténtalo más tarde.");
+                    "No se pudo enviar la solicitud. Verifica la configuración del correo e inténtalo de nuevo.");
             }
         }
-        return "redirect:/solicitar-codigo-admin";
+        return "redirect:/gestionar-usuarios";
     }
 
     @GetMapping("/admin/solicitudes-codigo")
@@ -82,7 +83,7 @@ public class AdminCodeRequestController {
         model.addAttribute("requests", requests);
         model.addAttribute("pendingCount", requests.stream()
             .filter(request -> request.getStatus() == AdminCodeRequest.Status.PENDING).count());
-        model.addAttribute("pushConfigured", !firebaseVapidKey.isBlank());
+        model.addAttribute("pushConfigured", pushNotificationService.isPushConfigured());
         return "Admin/solicitudes_codigo";
     }
 
@@ -90,9 +91,11 @@ public class AdminCodeRequestController {
     public String approve(@PathVariable long id, Principal principal, RedirectAttributes redirectAttributes) {
         requireApprover(principal);
         try {
-            requestService.approve(id, principal.getName());
+            String code = requestService.approve(id, principal.getName());
+            redirectAttributes.addFlashAttribute("issuedCode", code);
+            redirectAttributes.addFlashAttribute("issuedCodeRequestId", id);
             redirectAttributes.addFlashAttribute("success",
-                "Solicitud aprobada. Se envió el código al correo del solicitante.");
+                "Solicitud aprobada. El código quedó guardado como hash; revísalo y envíalo al candidato si corresponde.");
         } catch (IllegalArgumentException | IllegalStateException exception) {
             if (exception instanceof IllegalArgumentException) {
                 redirectAttributes.addFlashAttribute("error", exception.getMessage());
@@ -102,6 +105,40 @@ public class AdminCodeRequestController {
                     "No se pudo completar la aprobación. No se confirmó el envío del código.");
             }
         }
+        return "redirect:/admin/solicitudes-codigo";
+    }
+
+    @PostMapping("/admin/solicitudes-codigo/{id}/nuevo-codigo")
+    public String replaceCode(@PathVariable long id, Principal principal, RedirectAttributes redirectAttributes) {
+        requireApprover(principal);
+        try {
+            String code = requestService.replaceApprovedCode(id);
+            redirectAttributes.addFlashAttribute("issuedCode", code);
+            redirectAttributes.addFlashAttribute("issuedCodeRequestId", id);
+            redirectAttributes.addFlashAttribute("success",
+                "Se generó un nuevo código y se guardó como hash. El código anterior quedó invalidado.");
+        } catch (IllegalArgumentException | IllegalStateException exception) {
+            redirectAttributes.addFlashAttribute("error", exception.getMessage());
+        }
+        return "redirect:/admin/solicitudes-codigo";
+    }
+
+    @PostMapping("/admin/solicitudes-codigo/{id}/enviar-codigo")
+    public String sendApprovedCode(@PathVariable long id,
+                                   @RequestParam String codigoAdmin,
+                                   Principal principal,
+                                   RedirectAttributes redirectAttributes) {
+        requireApprover(principal);
+        try {
+            requestService.sendApprovedCode(id, codigoAdmin, principal.getName());
+            redirectAttributes.addFlashAttribute("success", "El código fue enviado al correo del candidato.");
+        } catch (IllegalArgumentException | IllegalStateException exception) {
+            log.error("Could not deliver ADMIN access code for request {}.", id, exception);
+            redirectAttributes.addFlashAttribute("error",
+                "No se pudo enviar el código. El código aprobado sigue disponible para reintentar o generar uno nuevo.");
+        }
+        redirectAttributes.addFlashAttribute("issuedCode", codigoAdmin);
+        redirectAttributes.addFlashAttribute("issuedCodeRequestId", id);
         return "redirect:/admin/solicitudes-codigo";
     }
 

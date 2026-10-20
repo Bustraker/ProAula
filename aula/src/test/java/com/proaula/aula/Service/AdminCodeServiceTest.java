@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.clearInvocations;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
@@ -52,8 +52,24 @@ class AdminCodeServiceTest {
         when(adminCodeRepository.existsByCodeHash(savedCode.getCodeHash())).thenReturn(true);
         assertThat(adminCodeService.isValidAdminCode("MY-ADMIN-CODE")).isTrue();
         verify(adminCodeRepository).existsByCodeHash(savedCode.getCodeHash());
+        clearInvocations(adminCodeRepository);
         assertThat(adminCodeService.isValidAdminCode(null)).isFalse();
-        verify(adminCodeRepository, never()).existsByCodeHash(null);
+        assertThat(adminCodeService.isValidAdminCode("x".repeat(257))).isFalse();
+        verifyNoInteractions(adminCodeRepository);
+    }
+
+    @Test
+    void configuredAdminCodeIsFoundByItsNormalizedDatabaseHash() {
+        adminCodeService.ensureDefaultAdminCodes(List.of("ADMIN2026"));
+
+        ArgumentCaptor<AdminCode> codeCaptor = ArgumentCaptor.forClass(AdminCode.class);
+        verify(adminCodeRepository).save(codeCaptor.capture());
+        AdminCode storedCode = codeCaptor.getValue();
+        when(adminCodeRepository.findByCodeHash(storedCode.getCodeHash())).thenReturn(Optional.of(storedCode));
+
+        assertThat(adminCodeService.findByCodigo(" admin2026 ")).isSameAs(storedCode);
+        assertThat(storedCode.getCodeHash()).startsWith("sha256$").doesNotContain("ADMIN2026");
+        verify(adminCodeRepository).findByCodeHash(storedCode.getCodeHash());
     }
 
     @Test
@@ -85,6 +101,42 @@ class AdminCodeServiceTest {
         assertThat(invite.getExpiresAt())
             .isAfterOrEqualTo(beforeIssue.plusHours(24))
             .isBeforeOrEqualTo(LocalDateTime.now().plusHours(24));
+    }
+
+    @Test
+    void issueAdminAccessCodeIsMemorableEmailBoundAndStoredOnlyAsHash() {
+        String code = adminCodeService.issueAdminAccessCode("Applicant@Example.com", 42L);
+
+        ArgumentCaptor<AdminCode> codeCaptor = ArgumentCaptor.forClass(AdminCode.class);
+        verify(adminCodeRepository).save(codeCaptor.capture());
+        AdminCode storedCode = codeCaptor.getValue();
+
+        assertThat(code).matches("(?i)([a-z]+-){5}\\d{4}[!@#$%&?*+=]{2}");
+        assertThat(storedCode.getCodeHash())
+            .matches("sha256\\$[0-9a-f]{64}")
+            .isNotEqualTo(code);
+        assertThat(storedCode.getEmail()).isEqualTo("applicant@example.com");
+        assertThat(storedCode.getRegistrationRequestId()).isEqualTo(42L);
+        assertThat(adminCodeService.findByCodigo(code)).isNull();
+    }
+
+    @Test
+    void replacingAnAdminAccessCodeUpdatesTheExistingRequestRow() {
+        AdminCode existing = new AdminCode("sha256$" + "a".repeat(64));
+        existing.setEmail("applicant@example.com");
+        existing.setRegistrationRequestId(42L);
+        when(adminCodeRepository.findByRegistrationRequestId(42L)).thenReturn(Optional.of(existing));
+
+        String replacement = adminCodeService.replaceAdminAccessCode("Applicant@Example.com", 42L);
+
+        ArgumentCaptor<AdminCode> codeCaptor = ArgumentCaptor.forClass(AdminCode.class);
+        verify(adminCodeRepository).save(codeCaptor.capture());
+        assertThat(codeCaptor.getValue()).isSameAs(existing);
+        assertThat(existing.getCodeHash()).matches("sha256\\$[0-9a-f]{64}")
+            .isNotEqualTo("sha256$" + "a".repeat(64))
+            .doesNotContain(replacement);
+        assertThat(existing.getEmail()).isEqualTo("applicant@example.com");
+        assertThat(replacement).matches("(?i)([a-z]+-){5}\\d{4}[!@#$%&?*+=]{2}");
     }
 
     @Test

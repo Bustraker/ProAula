@@ -2,6 +2,7 @@ package com.proaula.aula.Controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.proaula.aula.Service.AdminPushNotificationService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,9 +16,11 @@ public class FirebaseWebController {
 
     private final ObjectMapper objectMapper;
     private final FirebaseWebConfig firebaseConfig;
+    private final AdminPushNotificationService pushNotificationService;
 
     public FirebaseWebController(
             ObjectMapper objectMapper,
+            AdminPushNotificationService pushNotificationService,
             @Value("${app.firebase.api-key:}") String apiKey,
             @Value("${app.firebase.auth-domain:}") String authDomain,
             @Value("${app.firebase.project-id:}") String projectId,
@@ -27,6 +30,7 @@ public class FirebaseWebController {
             @Value("${app.firebase.measurement-id:}") String measurementId,
             @Value("${app.firebase.vapid-key:}") String vapidKey) {
         this.objectMapper = objectMapper;
+        this.pushNotificationService = pushNotificationService;
         this.firebaseConfig = new FirebaseWebConfig(apiKey, authDomain, projectId, storageBucket,
             messagingSenderId, appId, measurementId, vapidKey);
     }
@@ -42,7 +46,7 @@ public class FirebaseWebController {
         response.put("appId", firebaseConfig.appId());
         response.put("measurementId", firebaseConfig.measurementId());
         response.put("vapidKey", firebaseConfig.vapidKey());
-        response.put("pushConfigured", !firebaseConfig.vapidKey().isBlank());
+        response.put("pushConfigured", pushNotificationService.isPushConfigured());
         return response;
     }
 
@@ -59,7 +63,7 @@ public class FirebaseWebController {
                   const notification = payload.notification || {};
                   self.registration.showNotification(notification.title || "Bustraker", {
                     body: notification.body || "Hay una solicitud ADMIN para revisar.",
-                    icon: "/images/Bus_icono.png",
+                    icon: "/images/logo.png",
                     data: payload.data || { link: "/admin/solicitudes-codigo" }
                   });
                 });

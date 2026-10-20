@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -212,13 +211,9 @@ public class BarrioService {
         if (nombre == null) {
             return null;
         }
-        return Normalizer.normalize(nombre.trim(), Normalizer.Form.NFD)
+        return Normalizer.normalize(nombre.trim().toLowerCase(), Normalizer.Form.NFD)
             .replaceAll("\\p{M}", "")
-            .replace("ñ", "n")
-            .replaceAll("[^\\p{L}\\p{N}]+", " ")
-            .replaceAll("\\s+", " ")
-            .trim()
-            .toLowerCase(Locale.ROOT);
+            .replace("ñ", "n");
     }
 
     private static void cargarCoordenadasDesdeShapefile() {

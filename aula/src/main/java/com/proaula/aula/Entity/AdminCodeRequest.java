@@ -22,7 +22,8 @@ public class AdminCodeRequest {
     public enum Status {
         PENDING,
         APPROVED,
-        REJECTED
+        REJECTED,
+        REGISTERED
     }
 
     @Id
@@ -31,6 +32,21 @@ public class AdminCodeRequest {
 
     @Column(nullable = false, length = 254)
     private String email;
+
+    @Column(name = "nombres", length = 100)
+    private String nombres;
+
+    @Column(name = "apellidos", length = 100)
+    private String apellidos;
+
+    @Column(name = "motivo", length = 500)
+    private String motivo;
+
+    @Column(name = "created_by", length = 20)
+    private String createdBy;
+
+    @Column(name = "created_by_name", length = 201)
+    private String createdByName;
 
     @Column(name = "request_status", nullable = false, length = 20)
     @Enumerated(EnumType.STRING)
@@ -45,6 +61,12 @@ public class AdminCodeRequest {
     @Column(name = "decided_by", length = 20)
     private String decidedBy;
 
+    @Column(name = "code_email_sent_at")
+    private LocalDateTime codeEmailSentAt;
+
+    @Column(name = "code_email_sent_by", length = 20)
+    private String codeEmailSentBy;
+
     public Long getId() {
         return id;
     }
@@ -55,6 +77,46 @@ public class AdminCodeRequest {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getNombres() {
+        return nombres;
+    }
+
+    public void setNombres(String nombres) {
+        this.nombres = nombres;
+    }
+
+    public String getApellidos() {
+        return apellidos;
+    }
+
+    public void setApellidos(String apellidos) {
+        this.apellidos = apellidos;
+    }
+
+    public String getMotivo() {
+        return motivo;
+    }
+
+    public void setMotivo(String motivo) {
+        this.motivo = motivo;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public String getCreatedByName() {
+        return createdByName;
+    }
+
+    public void setCreatedByName(String createdByName) {
+        this.createdByName = createdByName;
     }
 
     public Status getStatus() {
@@ -83,5 +145,21 @@ public class AdminCodeRequest {
 
     public void setDecidedBy(String decidedBy) {
         this.decidedBy = decidedBy;
+    }
+
+    public LocalDateTime getCodeEmailSentAt() {
+        return codeEmailSentAt;
+    }
+
+    public void setCodeEmailSentAt(LocalDateTime codeEmailSentAt) {
+        this.codeEmailSentAt = codeEmailSentAt;
+    }
+
+    public String getCodeEmailSentBy() {
+        return codeEmailSentBy;
+    }
+
+    public void setCodeEmailSentBy(String codeEmailSentBy) {
+        this.codeEmailSentBy = codeEmailSentBy;
     }
 }

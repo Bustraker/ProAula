@@ -23,9 +23,14 @@ import jakarta.servlet.http.HttpSession;
 
 import com.proaula.aula.Entity.AdminInviteCode;
 import com.proaula.aula.Entity.AdminCode;
+import com.proaula.aula.Entity.AdminCodeRequest;
+import com.proaula.aula.Entity.Usuario;
+import com.proaula.aula.Repository.AdminCodeRequestRepository;
 import com.proaula.aula.Repository.AdminCodeRepository;
 import com.proaula.aula.Repository.AdminInviteCodeRepository;
+import com.proaula.aula.Repository.UsuarioRepository;
 import com.proaula.aula.Service.AdminCodeService;
+import com.proaula.aula.Service.UsuarioService;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -40,10 +45,22 @@ class AdminCodeApprovalFlowIntegrationTest {
     private AdminCodeService adminCodeService;
 
     @Autowired
+    private UsuarioService usuarioService;
+
+    @Autowired
     private AdminInviteCodeRepository inviteCodeRepository;
 
     @Autowired
     private AdminCodeRepository adminCodeRepository;
+
+    @Autowired
+    private AdminCodeRequestRepository requestRepository;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder passwordEncoder;
 
     @Test
     void adminLoginRecognizesOnlyCodesPersistedInTheDatabase() throws Exception {
@@ -90,38 +107,113 @@ class AdminCodeApprovalFlowIntegrationTest {
     }
 
     @Test
-    void publicRequestFormHandlesMissingMalformedAndUnconfiguredSubmissionsSafely() throws Exception {
+    void legacyPublicAdminRequestPageIsNoLongerAvailable() throws Exception {
         MvcResult health = mockMvc.perform(get("/actuator/health"))
             .andExpect(jsonPath("$.status").exists())
             .andReturn();
         assertThat(health.getResponse().getStatus()).isIn(200, 503);
 
         mockMvc.perform(get("/solicitar-codigo-admin"))
-            .andExpect(status().isOk());
-
-        MvcResult missingEmail = mockMvc.perform(post("/solicitar-codigo-admin").with(csrf()))
             .andExpect(status().is3xxRedirection())
-            .andExpect(header().string("Location", "/solicitar-codigo-admin"))
-            .andReturn();
-        assertThat(missingEmail.getFlashMap().get("error").toString())
-            .contains("correo electrónico válido");
+            .andExpect(header().string("Location", "http://localhost/inicio-de-sesion-mejorado"));
+    }
 
-        MvcResult malformedEmail = mockMvc.perform(post("/solicitar-codigo-admin")
+    @Test
+    void approvedCandidateCanCompleteRegistrationAndKeepTheirEmailBoundAccessCode() throws Exception {
+        AdminCodeRequest request = new AdminCodeRequest();
+        request.setNombres("Candidata");
+        request.setApellidos("Autorizada");
+        request.setEmail("approved-candidate@example.test");
+        request.setCreatedBy("existing-admin");
+        request.setStatus(AdminCodeRequest.Status.APPROVED);
+        request.setDecidedBy("approver");
+        request.setDecidedAt(LocalDateTime.now());
+        request = requestRepository.saveAndFlush(request);
+        String accessCode = adminCodeService.issueAdminAccessCode(request.getEmail(), request.getId());
+
+        MvcResult verification = mockMvc.perform(post("/admin/verificar-codigo")
                 .with(csrf())
-                .param("email", "not-an-email"))
+                .param("codigoAdmin", accessCode))
             .andExpect(status().is3xxRedirection())
+            .andExpect(header().string("Location", "/admin-login?verified=true"))
             .andReturn();
-        assertThat(malformedEmail.getFlashMap().get("error").toString())
-            .contains("correo electrónico válido");
+        HttpSession session = verification.getRequest().getSession(false);
+        assertThat(session).isNotNull();
 
-        MvcResult unconfiguredMail = mockMvc.perform(post("/solicitar-codigo-admin")
+        mockMvc.perform(get("/admin-login").session((org.springframework.mock.web.MockHttpSession) session))
+            .andExpect(status().isOk())
+            .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.model()
+                .attribute("registrationPending", true));
+
+        mockMvc.perform(post("/admin/registrar")
                 .with(csrf())
-                .param("email", "applicant@example.test"))
+                .session((org.springframework.mock.web.MockHttpSession) session)
+                .param("username", "approvedadmin")
+                .param("password", "candidate-password-26")
+                .param("passwordConfirm", "candidate-password-26"))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(header().string("Location", "/admin-login?verified=true"));
+
+        var registered = usuarioRepository.findByUsername("approvedadmin");
+        assertThat(registered).isNotNull();
+        assertThat(registered.getEmail()).isEqualTo("approved-candidate@example.test");
+        assertThat(registered.getRole()).isEqualTo("ROLE_ADMIN");
+        assertThat(passwordEncoder.matches("candidate-password-26", registered.getPassword())).isTrue();
+        assertThat(requestRepository.findById(request.getId()).orElseThrow().getStatus())
+            .isEqualTo(AdminCodeRequest.Status.REGISTERED);
+        assertThat(adminCodeService.isValidAdminCode(accessCode)).isTrue();
+
+        MvcResult returningCode = mockMvc.perform(post("/admin/verificar-codigo")
+                .with(csrf())
+                .param("codigoAdmin", accessCode))
             .andExpect(status().is3xxRedirection())
             .andReturn();
-        assertThat(unconfiguredMail.getFlashMap().get("error").toString())
-            .contains("Inténtalo más tarde")
-            .doesNotContain("MAIL_USERNAME", "ADMIN_APPROVER_EMAIL");
+        HttpSession loginSession = returningCode.getRequest().getSession(false);
+
+        Usuario otherAdmin = new Usuario();
+        otherAdmin.setUsername("otheradmin");
+        otherAdmin.setEmail("other-admin@example.test");
+        otherAdmin.setPassword("candidate-password-26");
+        otherAdmin.setNombres("Otro");
+        otherAdmin.setApellidos("Administrador");
+        otherAdmin.setRole("ROLE_ADMIN");
+        otherAdmin.setProvider("LOCAL");
+        usuarioService.register(otherAdmin);
+
+        mockMvc.perform(post("/admin/login")
+                .with(csrf())
+                .session((org.springframework.mock.web.MockHttpSession) loginSession)
+                .param("username", "otheradmin")
+                .param("password", "candidate-password-26"))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(header().string("Location", "/admin-login?verified=true"));
+
+        mockMvc.perform(post("/admin/login")
+                .with(csrf())
+                .session((org.springframework.mock.web.MockHttpSession) loginSession)
+                .param("username", "approvedadmin")
+                .param("password", "candidate-password-26"))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(header().string("Location", "/index_2"));
+    }
+
+    @Test
+    void onlyAuthenticatedAdministratorsCanSubmitRegistrationRequests() throws Exception {
+        mockMvc.perform(post("/admin/solicitudes-codigo")
+                .with(csrf())
+                .param("nombres", "Candidato")
+                .param("apellidos", "Prueba")
+                .param("email", "candidate@example.test"))
+            .andExpect(status().is3xxRedirection());
+
+        mockMvc.perform(post("/admin/solicitudes-codigo")
+                .with(csrf())
+                .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user("ordinary-user")
+                    .roles("USER"))
+                .param("nombres", "Candidato")
+                .param("apellidos", "Prueba")
+                .param("email", "candidate@example.test"))
+            .andExpect(status().isForbidden());
     }
 
     @Test

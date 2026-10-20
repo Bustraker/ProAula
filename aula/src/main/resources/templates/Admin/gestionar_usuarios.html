@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" th:href="@{/images/logo.png}" type="image/png">
-    <link rel="stylesheet" th:href="@{/css/admin_usuarios.css(v='users-20261005-7')}">
+    <link rel="stylesheet" th:href="@{/css/admin_usuarios.css(v='users-20261020-8')}">
 </head>
 <body class="admin-users">
     <div class="users-shell">
@@ -43,11 +43,42 @@
             </header>
 
             <div class="users-content">
+                <div th:if="${success}" class="alert alert-success" role="status" th:text="${success}"></div>
+                <div th:if="${warning}" class="alert alert-warning" role="status" th:text="${warning}"></div>
+                <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
                 <section class="users-intro" aria-labelledby="usersTitle">
                     <div>
                         <span class="users-eyebrow"><span class="users-eyebrow__mark"></span> DIRECTORIO DE CUENTAS</span>
                         <h1 id="usersTitle">Gestión de usuarios</h1>
                         <p>Consulta, busca y administra los accesos registrados en Bustraker.</p>
+                        <section class="users-approval-flow" aria-labelledby="approvalFlowTitle">
+                            <div class="users-approval-flow__heading">
+                                <h2 id="approvalFlowTitle">Ruta de autorización</h2>
+                                <span><i class="fas fa-shield-halved" aria-hidden="true"></i> ACCESO SEGURO</span>
+                            </div>
+                            <ol class="users-approval-flow__steps">
+                                <li class="users-approval-flow__step">
+                                    <span class="users-approval-flow__node"><i class="fas fa-file-lines" aria-hidden="true"></i></span>
+                                    <span class="users-approval-flow__label">SOLICITUD</span>
+                                    <span class="users-approval-flow__detail">Datos y motivo</span>
+                                </li>
+                                <li class="users-approval-flow__step">
+                                    <span class="users-approval-flow__node"><i class="fas fa-user-check" aria-hidden="true"></i></span>
+                                    <span class="users-approval-flow__label">REVISIÓN</span>
+                                    <span class="users-approval-flow__detail">Decisión ADMIN</span>
+                                </li>
+                                <li class="users-approval-flow__step">
+                                    <span class="users-approval-flow__node"><i class="fas fa-key" aria-hidden="true"></i></span>
+                                    <span class="users-approval-flow__label">CÓDIGO</span>
+                                    <span class="users-approval-flow__detail">Hash protegido</span>
+                                </li>
+                                <li class="users-approval-flow__step">
+                                    <span class="users-approval-flow__node"><i class="fas fa-envelope" aria-hidden="true"></i></span>
+                                    <span class="users-approval-flow__label">ENTREGA</span>
+                                    <span class="users-approval-flow__detail">Envío manual</span>
+                                </li>
+                            </ol>
+                        </section>
                     </div>
                     <svg class="users-identity-visual" viewBox="0 0 440 252" aria-hidden="true" focusable="false">
                         <defs>
@@ -267,34 +298,31 @@
                     <div class="users-create__intro">
                         <span class="users-create__icon"><i class="fas fa-user-plus" aria-hidden="true"></i></span>
                         <span class="users-section-heading__eyebrow">GESTIÓN DE ACCESOS</span>
-                        <h2 id="createAdminTitle">Crear acceso administrativo</h2>
-                        <p>El nuevo acceso tendrá permisos para administrar la plataforma. Asígnalo solo a personal autorizado.</p>
-                        <div class="users-create__notice"><i class="fas fa-shield-halved" aria-hidden="true"></i><span>Se asignará el rol de administrador al crear la cuenta.</span></div>
+                        <h2 id="createAdminTitle">Solicitar acceso administrativo</h2>
+                        <p>La persona responsable revisará quién recomienda al candidato y el motivo de acceso. Si se aprueba, podrá enviarse un código para que el candidato cree sus credenciales.</p>
+                        <div class="users-create__notice"><i class="fas fa-shield-halved" aria-hidden="true"></i><span>No solicites contraseñas antes de la aprobación. El rol ADMIN solo se asigna al completar el registro con el código aprobado.</span></div>
                     </div>
-                    <form class="users-create__form" method="post" th:action="@{/admin-crear-usuario}" th:object="${nuevoUsuario}">
+                    <form class="users-create__form" method="post" th:action="@{/admin/solicitudes-codigo}">
                         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                         <div class="users-form-field">
                             <label for="nombres">Nombres</label>
-                            <input id="nombres" type="text" th:field="*{nombres}" placeholder="Ej. Andrea" autocomplete="given-name" required>
+                            <input id="nombres" type="text" name="nombres" placeholder="Ej. Andrea" autocomplete="given-name" maxlength="100" required>
                         </div>
                         <div class="users-form-field">
                             <label for="apellidos">Apellidos</label>
-                            <input id="apellidos" type="text" th:field="*{apellidos}" placeholder="Ej. Rodríguez" autocomplete="family-name" required>
+                            <input id="apellidos" type="text" name="apellidos" placeholder="Ej. Rodríguez" autocomplete="family-name" maxlength="100" required>
                         </div>
                         <div class="users-form-field">
                             <label for="email">Correo electrónico</label>
-                            <input id="email" type="email" th:field="*{email}" placeholder="nombre@empresa.com" autocomplete="email" required>
+                            <input id="email" type="email" name="email" placeholder="nombre@empresa.com" autocomplete="email" maxlength="254" required>
                         </div>
-                        <div class="users-form-field">
-                            <label for="username">Nombre de usuario</label>
-                            <input id="username" type="text" th:field="*{username}" placeholder="andrea.rodriguez" autocomplete="username" minlength="4" maxlength="20" required>
-                        </div>
-                        <div class="users-form-field users-form-field--password">
-                            <label for="password">Contraseña temporal</label>
-                            <input id="password" type="password" th:field="*{password}" placeholder="Mínimo 6 caracteres" autocomplete="new-password" minlength="6" required>
+                        <div class="users-form-field users-form-field--wide">
+                            <label for="motivo">Motivo de acceso administrativo</label>
+                            <textarea id="motivo" name="motivo" placeholder="Explica las responsabilidades que justifican el acceso ADMIN." minlength="20" maxlength="500" rows="4" required aria-describedby="motivoHelp"></textarea>
+                            <small id="motivoHelp">Entre 20 y 500 caracteres. No incluyas contraseñas ni datos sensibles.</small>
                         </div>
                         <div class="users-create__submit">
-                            <button type="submit" class="users-button users-button--primary"><i class="fas fa-user-plus" aria-hidden="true"></i> Crear administrador</button>
+                            <button type="submit" class="users-button users-button--primary"><i class="fas fa-user-shield" aria-hidden="true"></i> Enviar solicitud de administrador</button>
                         </div>
                     </form>
                 </section>

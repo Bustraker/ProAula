@@ -90,9 +90,7 @@ public class Localidades {
         String normalizado = Normalizer.normalize(valor.trim(), Normalizer.Form.NFD)
             .replaceAll("\\p{M}", "")
             .replace("ñ", "n")
-            .replaceAll("[^\\p{L}\\p{N}]+", " ")
             .replaceAll("\\s+", " ")
-            .trim()
             .toLowerCase(Locale.ROOT);
         return normalizado;
     }

@@ -42,9 +42,9 @@ if (statusMessage && enableButton && disableButton && "serviceWorker" in navigat
         throw new Error("El navegador no concedió permiso para mostrar notificaciones.");
       }
       const registration = await navigator.serviceWorker.register("/firebase-messaging-sw.js");
-      const { initializeApp } = await import("https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js");
+      const { getApp, getApps, initializeApp } = await import("https://www.gstatic.com/firebasejs/13.0.0/firebase-app.js");
       const { getMessaging, getToken } = await import("https://www.gstatic.com/firebasejs/13.0.0/firebase-messaging.js");
-      const app = initializeApp({
+      const firebaseConfig = {
         apiKey: config.apiKey,
         authDomain: config.authDomain,
         projectId: config.projectId,
@@ -52,7 +52,8 @@ if (statusMessage && enableButton && disableButton && "serviceWorker" in navigat
         messagingSenderId: config.messagingSenderId,
         appId: config.appId,
         measurementId: config.measurementId
-      });
+      };
+      const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
       const messaging = getMessaging(app);
       activeMessaging = messaging;
       const token = await getToken(messaging, {

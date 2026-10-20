@@ -13,8 +13,8 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.charset.StandardCharsets;
 import java.text.Normalizer;
-import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -30,9 +30,6 @@ public class DataSeederService implements CommandLineRunner {
     private final UsuarioRepository usuarioRepository;
     private final UsuarioService usuarioService;
 
-    @Value("${app.admin.registration-code:}")
-    private String adminRegistrationCode;
-
     @Value("${app.bootstrap-admin.enabled:false}")
     private boolean bootstrapAdminEnabled;
 
@@ -44,6 +41,9 @@ public class DataSeederService implements CommandLineRunner {
 
     @Value("${app.bootstrap-admin.password:}")
     private String bootstrapAdminPassword;
+
+    @Value("${app.admin.approver-email:}")
+    private String adminApproverEmail;
 
     public DataSeederService(BarrioRepository barrioRepository,
                              BarrioService barrioService,
@@ -62,7 +62,6 @@ public class DataSeederService implements CommandLineRunner {
     public void run(String... args) {
         adminCodeService.migrateLegacyAdminCodes();
         seedBarrios();
-        initializeAdminRegistrationCode();
         bootstrapAdminIfConfigured();
     }
 
@@ -88,21 +87,20 @@ public class DataSeederService implements CommandLineRunner {
         barrioService.inicializarBarrios();
     }
 
-    private void initializeAdminRegistrationCode() {
-        if (adminRegistrationCode != null && !adminRegistrationCode.isBlank()) {
-            adminCodeService.ensureDefaultAdminCodes(List.of(adminRegistrationCode.trim()));
-        }
-    }
-
     private void bootstrapAdminIfConfigured() {
         if (!bootstrapAdminEnabled) {
             return;
         }
         if (isBlank(bootstrapAdminUsername) || isBlank(bootstrapAdminEmail)
-                || isBlank(bootstrapAdminPassword) || bootstrapAdminPassword.length() < 12
-                || bootstrapAdminPassword.length() > 72) {
+                || isBlank(bootstrapAdminPassword) || isBlank(adminApproverEmail)
+                || bootstrapAdminPassword.length() < 12 || bootstrapAdminPassword.length() > 72
+                || bootstrapAdminPassword.getBytes(StandardCharsets.UTF_8).length > 72) {
             throw new IllegalStateException(
-                "El aprovisionamiento requiere usuario, correo y contraseña segura (12 a 72 caracteres)");
+                "El aprovisionamiento requiere usuario, correo aprobador y contraseña segura (12 a 72 bytes UTF-8)");
+        }
+        if (!bootstrapAdminEmail.trim().equalsIgnoreCase(adminApproverEmail.trim())) {
+            throw new IllegalStateException(
+                "El correo del administrador inicial debe coincidir con ADMIN_APPROVER_EMAIL.");
         }
 
         String username = bootstrapAdminUsername.trim();
@@ -110,6 +108,12 @@ public class DataSeederService implements CommandLineRunner {
             if (!usuarioService.isAdminUser(username)) {
                 throw new IllegalStateException(
                     "El usuario configurado para el aprovisionamiento existe y no tiene rol de administrador");
+            }
+            Usuario existingAdmin = usuarioRepository.findByUsername(username);
+            if (existingAdmin == null || existingAdmin.getEmail() == null
+                    || !existingAdmin.getEmail().equalsIgnoreCase(adminApproverEmail.trim())) {
+                throw new IllegalStateException(
+                    "El administrador configurado no coincide con ADMIN_APPROVER_EMAIL.");
             }
             log.info("El administrador configurado ya existe; no se realizaron cambios.");
             return;
@@ -130,10 +134,6 @@ public class DataSeederService implements CommandLineRunner {
     private String normalizeName(String name) {
         return Normalizer.normalize(name.trim(), Normalizer.Form.NFD)
             .replaceAll("\\p{M}", "")
-            .replace("ñ", "n")
-            .replaceAll("[^\\p{L}\\p{N}]+", " ")
-            .replaceAll("\\s+", " ")
-            .trim()
             .toLowerCase(Locale.ROOT);
     }
 

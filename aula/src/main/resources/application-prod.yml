@@ -3,12 +3,16 @@ spring:
     enabled: false
     locations: classpath:db/migration/mysql
     baseline-on-migrate: true
+  mail:
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
   datasource:
     url: ${SPRING_DATASOURCE_URL}
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
     hibernate:
       ddl-auto: none
 server:
@@ -18,3 +22,10 @@ server:
         secure: true
 jwt:
   secret: ${JWT_SECRET}
+app:
+  admin:
+    approver-email: ${ADMIN_APPROVER_EMAIL}
+  public-base-url: ${APP_PUBLIC_BASE_URL}
+  firebase:
+    vapid-key: ${FIREBASE_VAPID_KEY}
+    admin-enabled: ${FIREBASE_ADMIN_ENABLED}

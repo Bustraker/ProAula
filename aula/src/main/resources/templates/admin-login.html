@@ -10,15 +10,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" th:href="@{/css/style_admin_login.css(v='admin-login-20261005-3')}">
+    <link rel="stylesheet" th:href="@{/css/style_admin_login.css(v='admin-login-logo-20261020-1')}">
     <link rel="icon" th:href="@{/images/logo.png}" type="image/png">
 </head>
 <body class="admin-login-page">
     <main class="admin-login-shell">
         <aside class="login-visual" aria-label="Centro de operaciones Bustraker">
             <a class="login-brand" th:href="@{/}" aria-label="Bustraker, volver al inicio">
-                <span class="login-brand__mark"><i class="fas fa-bus" aria-hidden="true"></i></span>
-                <span><strong>Bustraker</strong><small>CENTRO DE OPERACIONES</small></span>
+                <img class="login-brand__logo" th:src="@{/images/admin-login-logo.png}" alt="" aria-hidden="true">
             </a>
 
             <div class="login-visual__copy">
@@ -62,15 +61,15 @@
 
         <section class="login-panel" aria-labelledby="loginTitle">
             <div class="login-panel__topline">
-                <a class="login-mobile-brand" th:href="@{/}"><span class="login-brand__mark"><i class="fas fa-bus" aria-hidden="true"></i></span><strong>Bustraker</strong></a>
+                <a class="login-mobile-brand" th:href="@{/}" aria-label="Bustraker, volver al inicio"><img class="login-brand__logo" th:src="@{/images/admin-login-logo.png}" alt="" aria-hidden="true"></a>
                 <span class="login-panel__secure"><i class="fas fa-lock" aria-hidden="true"></i> CONEXIÓN PROTEGIDA</span>
             </div>
 
             <div class="login-content">
                 <header class="login-heading">
                     <span class="login-heading__eyebrow"><span></span> ACCESO ADMINISTRATIVO</span>
-                    <h1 id="loginTitle" th:text="${verified} ? 'Identifica tu cuenta' : 'Verifica tu acceso'">Verifica tu acceso</h1>
-                    <p th:text="${verified} ? 'Confirma tus credenciales para ingresar al centro de operaciones.' : 'Completa los dos pasos para ingresar al centro de operaciones.'">Completa los dos pasos para ingresar al centro de operaciones.</p>
+                        <h1 id="loginTitle" th:text="${!verified ? 'Verifica tu acceso' : (registrationPending ? 'Completa tu registro' : 'Identifica tu cuenta')}">Verifica tu acceso</h1>
+                        <p th:text="${!verified ? 'Ingresa el código autorizado para continuar.' : (registrationPending ? 'Crea el usuario y la contraseña de tu cuenta administrativa.' : 'Confirma tus credenciales para ingresar al centro de operaciones.')}">Completa los pasos para ingresar al centro de operaciones.</p>
                 </header>
 
                 <div class="security-notice">
@@ -82,9 +81,13 @@
                     <i class="fas fa-circle-exclamation" aria-hidden="true"></i>
                     <span th:text="${param.error[0]}">Credenciales inválidas</span>
                 </div>
-                <div th:if="${param.verified}" class="alert alert-success" role="status">
+                <div th:if="${verified}" class="alert alert-success" role="status">
                     <i class="fas fa-circle-check" aria-hidden="true"></i>
                     <span>Código verificado. Ingresa tus credenciales.</span>
+                </div>
+                <div th:if="${success}" class="alert alert-success" role="status">
+                    <i class="fas fa-circle-check" aria-hidden="true"></i>
+                    <span th:text="${success}">Registro completado.</span>
                 </div>
                 <div th:if="${error}" class="alert alert-error" role="alert">
                     <i class="fas fa-circle-exclamation" aria-hidden="true"></i>
@@ -97,7 +100,7 @@
                     </div>
                     <span class="step-connector" th:classappend="${verified} ? 'is-complete' : ''" aria-hidden="true"></span>
                     <div class="step" id="step2" th:classappend="${verified} ? 'active' : ''" th:attr="aria-current=${verified} ? 'step' : null">
-                        <span class="step__number">02</span><span class="step__label">Iniciar sesión</span>
+                        <span class="step__number">02</span><span class="step__label" th:text="${registrationPending} ? 'Completar registro' : 'Iniciar sesión'">Iniciar sesión</span>
                     </div>
                 </div>
 
@@ -106,15 +109,44 @@
                         <label for="codigoAdmin">Código de administrador</label>
                         <div class="input-wrapper">
                             <span class="input-icon"><i class="fas fa-key" aria-hidden="true"></i></span>
-                            <input type="password" id="codigoAdmin" name="codigoAdmin" class="code-input" placeholder="Ingresa tu código" maxlength="15" autocomplete="one-time-code" required autofocus>
+                            <input type="password" id="codigoAdmin" name="codigoAdmin" class="code-input" placeholder="Ingresa tu código" maxlength="256" autocomplete="one-time-code" required autofocus>
                             <span class="input-trailing-icon"><i class="fas fa-shield-halved" aria-hidden="true"></i></span>
                         </div>
-                        <p class="field-hint"><i class="fas fa-circle-info" aria-hidden="true"></i> Usa el código de verificación asignado al personal administrativo.</p>
+                        <p class="field-hint"><i class="fas fa-circle-info" aria-hidden="true"></i> El código debe estar registrado y autorizado en el sistema.</p>
                     </div>
                     <button type="submit" class="btn-login"><span>Continuar</span><i class="fas fa-arrow-right" aria-hidden="true"></i></button>
                 </form>
 
-                <form th:if="${verified}" th:action="@{/admin/login}" method="post" class="login-form credentials-step">
+                <form th:if="${verified and registrationPending}" th:action="@{/admin/registrar}" method="post" class="login-form credentials-step">
+                    <div class="security-notice">
+                        <span class="security-notice__icon"><i class="fas fa-user-shield" aria-hidden="true"></i></span>
+                        <p><strong th:text="${candidateName}">Nombre del candidato</strong><span th:text="${candidateEmail}">correo@example.com</span></p>
+                    </div>
+                    <div class="form-group">
+                        <label for="newUsername">Nombre de usuario</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon"><i class="fas fa-user" aria-hidden="true"></i></span>
+                            <input type="text" id="newUsername" name="username" placeholder="Elige un nombre de usuario" autocomplete="username" minlength="4" maxlength="20" pattern="[A-Za-z0-9._-]+" required autofocus>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="newPassword">Contraseña</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon"><i class="fas fa-lock" aria-hidden="true"></i></span>
+                            <input type="password" id="newPassword" name="password" placeholder="Crea una contraseña segura" autocomplete="new-password" minlength="8" maxlength="72" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="passwordConfirm">Confirmar contraseña</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon"><i class="fas fa-lock" aria-hidden="true"></i></span>
+                            <input type="password" id="passwordConfirm" name="passwordConfirm" placeholder="Repite la contraseña" autocomplete="new-password" minlength="8" maxlength="72" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-login"><span>Crear cuenta ADMIN</span><i class="fas fa-arrow-right" aria-hidden="true"></i></button>
+                </form>
+
+                <form th:if="${verified and !registrationPending}" th:action="@{/admin/login}" method="post" class="login-form credentials-step">
                     <div class="form-group">
                         <label for="username">Usuario</label>
                         <div class="input-wrapper">
