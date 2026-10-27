@@ -3,16 +3,19 @@ package com.proaula.aula.Service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.atLeastOnce;
 
 import java.util.Optional;
 import java.util.Properties;
 
 import jakarta.mail.Session;
+import jakarta.mail.Message;
 import jakarta.mail.internet.MimeMessage;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -25,8 +28,11 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.MailSendException;
 
 import com.proaula.aula.Entity.AdminCodeRequest;
+import com.proaula.aula.Entity.AdminCode;
+import com.proaula.aula.Entity.Usuario;
 import com.proaula.aula.Repository.AdminCodeRequestRepository;
 import com.proaula.aula.Repository.UsuarioRepository;
+import com.proaula.aula.Service.UsuarioService;
 
 @ExtendWith(MockitoExtension.class)
 class AdminCodeRequestServiceTest {
@@ -44,6 +50,9 @@ class AdminCodeRequestServiceTest {
     private AdminPushNotificationService pushNotificationService;
 
     @Mock
+    private UsuarioService usuarioService;
+
+    @Mock
     private JavaMailSender mailSender;
 
     private AdminCodeRequestService requestService;
@@ -55,19 +64,21 @@ class AdminCodeRequestServiceTest {
             usuarioRepository,
             adminCodeService,
             pushNotificationService,
+            usuarioService,
             mailSender,
             "approver@example.com",
-            "approver@example.com",
+            "notifications@example.com",
             "test-only-mail-password",
             "https://bustraker.example");
     }
 
     @Test
-    void createRequestNormalizesEmailAndNotifiesApprover() {
+    void createRequestNormalizesApplicantDataAndNotifiesApprover() throws Exception {
         when(mailSender.createMimeMessage()).thenReturn(new MimeMessage(Session.getInstance(new Properties())));
         when(usuarioRepository.existsByEmail("applicant@example.com")).thenReturn(false);
-        when(requestRepository.existsByEmailIgnoreCaseAndStatus(
-                "applicant@example.com", AdminCodeRequest.Status.PENDING))
+        when(usuarioRepository.findByUsername("approver")).thenReturn(adminRequester());
+        when(requestRepository.existsByEmailIgnoreCaseAndStatusIn(
+                eq("applicant@example.com"), any()))
             .thenReturn(false);
         when(requestRepository.saveAndFlush(any(AdminCodeRequest.class)))
             .thenAnswer(invocation -> {
@@ -75,29 +86,85 @@ class AdminCodeRequestServiceTest {
                 ReflectionTestUtils.setField(request, "id", 1L);
                 return request;
             });
+        when(pushNotificationService.notifyPendingRequest(
+                1L, "Andrea", "Perez", "applicant@example.com"))
+            .thenReturn(true);
 
-        requestService.createRequest(" Applicant@Example.com ");
+        assertThat(requestService.createRequest(
+            " Andrea ", " Perez ", " Applicant@Example.com ",
+            " Necesita administrar las rutas y revisar la operación diaria. ", "approver")).isTrue();
 
-        verify(requestRepository).saveAndFlush(any(AdminCodeRequest.class));
-        verify(mailSender).send(any(MimeMessage.class));
-        verify(pushNotificationService).notifyPendingRequest(1L);
+        org.mockito.ArgumentCaptor<AdminCodeRequest> requestCaptor =
+            org.mockito.ArgumentCaptor.forClass(AdminCodeRequest.class);
+        verify(requestRepository).saveAndFlush(requestCaptor.capture());
+        assertThat(requestCaptor.getValue().getNombres()).isEqualTo("Andrea");
+        assertThat(requestCaptor.getValue().getApellidos()).isEqualTo("Perez");
+        assertThat(requestCaptor.getValue().getEmail()).isEqualTo("applicant@example.com");
+        assertThat(requestCaptor.getValue().getCreatedBy()).isEqualTo("approver");
+        assertThat(requestCaptor.getValue().getCreatedByName()).isEqualTo("Admin Approver");
+        assertThat(requestCaptor.getValue().getMotivo())
+            .isEqualTo("Necesita administrar las rutas y revisar la operación diaria.");
+        org.mockito.ArgumentCaptor<MimeMessage> messageCaptor =
+            org.mockito.ArgumentCaptor.forClass(MimeMessage.class);
+        verify(mailSender, atLeastOnce()).send(messageCaptor.capture());
+        MimeMessage notification = messageCaptor.getValue();
+        assertThat(notification.getFrom()[0].toString()).isEqualTo("notifications@example.com");
+        assertThat(notification.getRecipients(Message.RecipientType.TO)[0].toString())
+            .isEqualTo("approver@example.com");
+        assertThat(notification.getContent().toString())
+            .contains("Andrea Perez", "applicant@example.com", "Admin Approver", "Necesita administrar las rutas",
+                "/admin/solicitudes-codigo#solicitud-1", "Aprobar o Rechazar")
+            .doesNotContain("password", "contraseña");
+        verify(pushNotificationService).notifyPendingRequest(
+            1L, "Andrea", "Perez", "applicant@example.com");
     }
 
     @Test
-    void approveSendsInviteAndPersistsDecision() {
-        when(mailSender.createMimeMessage()).thenReturn(new MimeMessage(Session.getInstance(new Properties())));
+    void approveIssuesAccessCodeAndPersistsDecision() {
         AdminCodeRequest request = new AdminCodeRequest();
         request.setEmail("applicant@example.com");
+        request.setNombres("Andrea");
+        request.setApellidos("Perez");
+        ReflectionTestUtils.setField(request, "id", 7L);
         when(requestRepository.findByIdForUpdate(7L)).thenReturn(Optional.of(request));
-        when(adminCodeService.issueRegistrationInvite("applicant@example.com")).thenReturn("INVITE-CODE");
+        when(adminCodeService.issueAdminAccessCode("applicant@example.com", 7L)).thenReturn("Nube-Ruta-Luna-4827!#");
 
-        requestService.approve(7L, "approver");
+        String issuedCode = requestService.approve(7L, "approver");
 
+        assertThat(issuedCode).isEqualTo("Nube-Ruta-Luna-4827!#");
         assertThat(request.getStatus()).isEqualTo(AdminCodeRequest.Status.APPROVED);
         assertThat(request.getDecidedAt()).isNotNull();
         assertThat(request.getDecidedBy()).isEqualTo("approver");
-        verify(adminCodeService).issueRegistrationInvite("applicant@example.com");
-        verify(mailSender).send(any(MimeMessage.class));
+        verify(adminCodeService).issueAdminAccessCode("applicant@example.com", 7L);
+        verifyNoInteractions(mailSender);
+        verify(requestRepository).save(request);
+    }
+
+    @Test
+    void codeIsEmailedOnlyAfterExplicitRequestAndDeliveryIsRecorded() throws Exception {
+        when(mailSender.createMimeMessage()).thenReturn(new MimeMessage(Session.getInstance(new Properties())));
+        AdminCodeRequest request = new AdminCodeRequest();
+        request.setEmail("applicant@example.com");
+        request.setNombres("Andrea");
+        request.setApellidos("Perez");
+        request.setStatus(AdminCodeRequest.Status.APPROVED);
+        ReflectionTestUtils.setField(request, "id", 15L);
+        AdminCode accessCode = new AdminCode("sha256$" + "a".repeat(64));
+        accessCode.setEmail("applicant@example.com");
+        accessCode.setRegistrationRequestId(15L);
+        when(requestRepository.findByIdForUpdate(15L)).thenReturn(Optional.of(request));
+        when(adminCodeService.findByCodigo("Nube-Ruta-Luna-4827!#")).thenReturn(accessCode);
+
+        requestService.sendApprovedCode(15L, "Nube-Ruta-Luna-4827!#", "approver");
+
+        assertThat(request.getCodeEmailSentAt()).isNotNull();
+        assertThat(request.getCodeEmailSentBy()).isEqualTo("approver");
+        org.mockito.ArgumentCaptor<MimeMessage> messageCaptor = org.mockito.ArgumentCaptor.forClass(MimeMessage.class);
+        verify(mailSender).send(messageCaptor.capture());
+        assertThat(messageCaptor.getValue().getRecipients(Message.RecipientType.TO)[0].toString())
+            .isEqualTo("applicant@example.com");
+        assertThat(messageCaptor.getValue().getContent().toString())
+            .contains("Nube-Ruta-Luna-4827!#", "/admin-login");
         verify(requestRepository).save(request);
     }
 
@@ -113,63 +180,82 @@ class AdminCodeRequestServiceTest {
         assertThat(request.getStatus()).isEqualTo(AdminCodeRequest.Status.REJECTED);
         assertThat(request.getDecidedAt()).isNotNull();
         assertThat(request.getDecidedBy()).isEqualTo("approver");
-        verify(adminCodeService, never()).issueRegistrationInvite(any(String.class));
+        verify(adminCodeService, never()).issueAdminAccessCode(any(String.class), org.mockito.ArgumentMatchers.anyLong());
         verify(mailSender).send(any(MimeMessage.class));
         verify(requestRepository).save(request);
     }
 
     @Test
-    void createRequestRejectsMalformedOrMissingEmailWithoutSideEffects() {
-        assertThatThrownBy(() -> requestService.createRequest(null))
+    void createRequestRejectsMalformedOrMissingDataWithoutSideEffects() {
+        assertThatThrownBy(() -> requestService.createRequest(
+                null, "Perez", "applicant@example.com", "Motivo suficientemente largo", "admin"))
             .isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> requestService.createRequest("not-an-email"))
+        assertThatThrownBy(() -> requestService.createRequest(
+                "Andrea", "Perez", "not-an-email", "Motivo suficientemente largo", "admin"))
             .isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> requestService.createRequest("x".repeat(250) + "@example.com"))
+        assertThatThrownBy(() -> requestService.createRequest(
+                "Andrea", "Perez", "x".repeat(250) + "@example.com",
+                "Motivo suficientemente largo", "admin"))
             .isInstanceOf(IllegalArgumentException.class);
 
-        verifyNoInteractions(requestRepository, usuarioRepository, mailSender, pushNotificationService);
+        verifyNoInteractions(requestRepository, usuarioRepository, mailSender, pushNotificationService, usuarioService);
     }
 
     @Test
-    void createRequestDoesNotRevealExistingAccountOrPendingRequestAndSendsNothing() {
+    void createRequestRejectsMissingOrShortAccessReason() {
+        assertThatThrownBy(() -> requestService.createRequest(
+                "Andrea", "Perez", "applicant@example.com", "Acceso", "admin"))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("20 y 500");
+        verifyNoInteractions(requestRepository, usuarioRepository, mailSender, pushNotificationService, usuarioService);
+    }
+
+    @Test
+    void createRequestRejectsExistingAccountsAndActiveRequests() {
         when(usuarioRepository.existsByEmail("exists@example.com")).thenReturn(true);
         when(usuarioRepository.existsByEmail("pending@example.com")).thenReturn(false);
-        when(requestRepository.existsByEmailIgnoreCaseAndStatus(
-                "pending@example.com", AdminCodeRequest.Status.PENDING))
+        when(requestRepository.existsByEmailIgnoreCaseAndStatusIn(
+                "pending@example.com", java.util.List.of(
+                    AdminCodeRequest.Status.PENDING, AdminCodeRequest.Status.APPROVED)))
             .thenReturn(true);
 
-        requestService.createRequest("exists@example.com");
-        requestService.createRequest("pending@example.com");
+        when(usuarioRepository.findByUsername("admin")).thenReturn(adminRequester());
+        assertThatThrownBy(() -> requestService.createRequest(
+                "A", "B", "exists@example.com", "Necesita administrar rutas de la plataforma.", "admin"))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("Ya existe");
+        assertThatThrownBy(() -> requestService.createRequest(
+                "A", "B", "pending@example.com", "Necesita administrar rutas de la plataforma.", "admin"))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("solicitud activa");
 
         verify(requestRepository, never()).saveAndFlush(any(AdminCodeRequest.class));
         verifyNoInteractions(mailSender, pushNotificationService);
     }
 
     @Test
-    void createRequestFailsClosedWhenMailConfigurationIsMissingOrSenderDiffers() {
+    void createRequestFailsClosedWhenMailConfigurationIsMissing() {
         AdminCodeRequestService missingPasswordService = new AdminCodeRequestService(
-            requestRepository, usuarioRepository, adminCodeService, pushNotificationService, mailSender,
+            requestRepository, usuarioRepository, adminCodeService, pushNotificationService, usuarioService, mailSender,
             "approver@example.com", "approver@example.com", "", "https://bustraker.example");
-        AdminCodeRequestService mismatchedSenderService = new AdminCodeRequestService(
-            requestRepository, usuarioRepository, adminCodeService, pushNotificationService, mailSender,
-            "approver@example.com", "another@example.com", "test-only-mail-password", "https://bustraker.example");
 
-        assertThatThrownBy(() -> missingPasswordService.createRequest("applicant@example.com"))
-            .isInstanceOf(IllegalStateException.class);
-        assertThatThrownBy(() -> mismatchedSenderService.createRequest("applicant@example.com"))
+        assertThatThrownBy(() -> missingPasswordService.createRequest(
+                "A", "B", "applicant@example.com", "Necesita administrar rutas de la plataforma.", "admin"))
             .isInstanceOf(IllegalStateException.class);
 
-        verifyNoInteractions(usuarioRepository, requestRepository, mailSender, pushNotificationService);
+        verifyNoInteractions(usuarioRepository, requestRepository, mailSender, pushNotificationService, usuarioService);
     }
 
     @Test
-    void approvalFailureDoesNotMarkRequestApproved() {
-        when(mailSender.createMimeMessage()).thenReturn(new MimeMessage(Session.getInstance(new Properties())));
+    void codeIssuanceFailureDoesNotMarkRequestApproved() {
         AdminCodeRequest request = new AdminCodeRequest();
         request.setEmail("applicant@example.com");
+        request.setNombres("Andrea");
+        request.setApellidos("Perez");
+        ReflectionTestUtils.setField(request, "id", 9L);
         when(requestRepository.findByIdForUpdate(9L)).thenReturn(Optional.of(request));
-        when(adminCodeService.issueRegistrationInvite("applicant@example.com")).thenReturn("INVITE-CODE");
-        doThrow(new MailSendException("mail transport failed")).when(mailSender).send(any(MimeMessage.class));
+        when(adminCodeService.issueAdminAccessCode("applicant@example.com", 9L))
+            .thenThrow(new IllegalStateException("code storage failed"));
 
         assertThatThrownBy(() -> requestService.approve(9L, "approver"))
             .isInstanceOf(IllegalStateException.class);
@@ -195,5 +281,35 @@ class AdminCodeRequestServiceTest {
 
         verifyNoInteractions(adminCodeService, mailSender);
         verify(requestRepository, never()).save(any(AdminCodeRequest.class));
+    }
+
+    @Test
+    void completeRegistrationRejectsPasswordsThatExceedBcryptUtf8Limit() {
+        AdminCodeRequest request = new AdminCodeRequest();
+        request.setEmail("applicant@example.com");
+        request.setStatus(AdminCodeRequest.Status.APPROVED);
+        ReflectionTestUtils.setField(request, "id", 12L);
+        when(requestRepository.findByIdForUpdate(12L)).thenReturn(Optional.of(request));
+
+        AdminCode accessCode = new AdminCode("sha256$" + "a".repeat(64));
+        accessCode.setEmail("applicant@example.com");
+        accessCode.setRegistrationRequestId(12L);
+        when(adminCodeService.findById(34L)).thenReturn(Optional.of(accessCode));
+
+        assertThatThrownBy(() -> requestService.completeRegistration(
+                12L, 34L, "applicantadmin", "ñ".repeat(40)))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("72 bytes");
+
+        verify(usuarioService, never()).register(any());
+    }
+
+    private Usuario adminRequester() {
+        Usuario requester = new Usuario();
+        requester.setUsername("approver");
+        requester.setNombres("Admin");
+        requester.setApellidos("Approver");
+        requester.setEmail("approver@example.com");
+        return requester;
     }
 }

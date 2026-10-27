@@ -1,7 +1,12 @@
 import json
 import os
-import shapefile
-from pyproj import CRS, Transformer
+import shapefile  # type: ignore[import-not-found]
+from pyproj import CRS, Transformer  # type: ignore[import-not-found]
+
+
+def _clean_text(value: object) -> str:
+    return "" if value is None else str(value).strip()
+
 
 folder = r"c:/Users/HP/OneDrive/Desktop/Programas/Samuel/Sprint boot/Universidad/ProAula/Barrios_Ctg"
 shp_path = os.path.join(folder, "Barrios_Ctg.shp")
@@ -16,6 +21,8 @@ transformer = Transformer.from_crs(src_crs, CRS.from_epsg(4326), always_xy=True)
 
 output = []
 for rec, shape in zip(reader.iterRecords(), reader.iterShapes()):
+    if rec is None or shape is None:
+        continue
     codigo, nombre, ucg, loc, zona = rec[0], rec[1], rec[2], rec[3], rec[4]
     points = shape.points
     if not points:
@@ -26,11 +33,11 @@ for rec, shape in zip(reader.iterRecords(), reader.iterShapes()):
     centroid_y = sum(ys) / len(ys)
     lon, lat = transformer.transform(centroid_x, centroid_y)
     output.append({
-        "codigo": codigo.strip(),
-        "nombre": nombre.strip(),
-        "zona": zona.strip(),
+        "codigo": _clean_text(codigo),
+        "nombre": _clean_text(nombre),
+        "zona": _clean_text(zona),
         "ucg": ucg,
-        "loc": loc.strip(),
+        "loc": _clean_text(loc),
         "lat": round(lat, 6),
         "lng": round(lon, 6),
     })

@@ -1,12 +1,13 @@
 package com.proaula.aula.Service;
 
 import java.util.List;
+import java.util.Locale;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.HexFormat;
-import java.util.Locale;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +23,17 @@ public class AdminCodeService {
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
     private static final char[] INVITE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789".toCharArray();
     private static final int INVITE_CODE_LENGTH = 24;
+    private static final int MAX_ADMIN_CODE_LENGTH = 256;
+    private static final List<String> ACCESS_CODE_WORDS = List.of(
+        "barco", "brisa", "campo", "canto", "carga", "cielo", "claro", "cobre",
+        "coral", "costa", "delta", "duna", "farol", "faro", "fiesta", "flor",
+        "fuego", "girasol", "globo", "hoja", "isla", "jardin", "lago", "lima",
+        "lince", "llave", "loma", "luna", "mapa", "mar", "mate", "mesa",
+        "monte", "naranja", "nube", "ola", "oliva", "palma", "pampa", "pasto",
+        "piedra", "pino", "plaza", "prado", "puente", "rayo", "rio", "roble",
+        "roca", "rueda", "salto", "selva", "senda", "sol", "suave", "tango",
+        "tela", "tierra", "tigre", "trigo", "valle", "vela", "viento", "zorro");
+    private static final char[] ACCESS_CODE_SYMBOLS = "!@#$%&?*+=".toCharArray();
 
     private final AdminCodeRepository adminCodeRepository;
     private final AdminInviteCodeRepository inviteCodeRepository;
@@ -33,17 +45,57 @@ public class AdminCodeService {
     }
 
     public boolean isValidAdminCode(String codigo) {
-        if (codigo == null || codigo.trim().isEmpty()) {
+        if (codigo == null || codigo.trim().isEmpty() || codigo.length() > MAX_ADMIN_CODE_LENGTH) {
             return false;
         }
         return adminCodeRepository.existsByCodeHash(hashAdminCode(codigo));
     }
 
     public AdminCode findByCodigo(String codigo) {
-        if (codigo == null || codigo.trim().isEmpty()) {
+        if (codigo == null || codigo.trim().isEmpty() || codigo.length() > MAX_ADMIN_CODE_LENGTH) {
             return null;
         }
         return adminCodeRepository.findByCodeHash(hashAdminCode(codigo)).orElse(null);
+    }
+
+    public Optional<AdminCode> findById(long id) {
+        return adminCodeRepository.findById(id);
+    }
+
+    @Transactional
+    public String issueAdminAccessCode(String email, long registrationRequestId) {
+        if (email == null || email.isBlank() || registrationRequestId <= 0) {
+            throw new IllegalArgumentException("El correo y la solicitud de registro son obligatorios.");
+        }
+
+        String code = generateAdminAccessCode();
+        AdminCode adminCode = new AdminCode(hashAdminCode(code), "Código de acceso ADMIN");
+        adminCode.setEmail(email.trim().toLowerCase(Locale.ROOT));
+        adminCode.setRegistrationRequestId(registrationRequestId);
+        adminCodeRepository.save(adminCode);
+        return code;
+    }
+
+    @Transactional
+    public String replaceAdminAccessCode(String email, long registrationRequestId) {
+        if (email == null || email.isBlank() || registrationRequestId <= 0) {
+            throw new IllegalArgumentException("El correo y la solicitud de registro son obligatorios.");
+        }
+
+        AdminCode adminCode = adminCodeRepository.findByRegistrationRequestId(registrationRequestId)
+            .orElse(null);
+        String code = generateAdminAccessCode();
+        if (adminCode == null) {
+            adminCode = new AdminCode(hashAdminCode(code), "Código de acceso ADMIN");
+            adminCode.setEmail(email.trim().toLowerCase(Locale.ROOT));
+            adminCode.setRegistrationRequestId(registrationRequestId);
+            adminCodeRepository.save(adminCode);
+            return code;
+        }
+        adminCode.setCodeHash(hashAdminCode(code));
+        adminCode.setEmail(email.trim().toLowerCase(Locale.ROOT));
+        adminCodeRepository.save(adminCode);
+        return code;
     }
 
     @Transactional
@@ -113,6 +165,22 @@ public class AdminCodeService {
             code[index] = INVITE_ALPHABET[SECURE_RANDOM.nextInt(INVITE_ALPHABET.length)];
         }
         return new String(code);
+    }
+
+    private String generateAdminAccessCode() {
+        StringBuilder code = new StringBuilder();
+        for (int index = 0; index < 5; index++) {
+            if (index > 0) {
+                code.append('-');
+            }
+            String word = ACCESS_CODE_WORDS.get(SECURE_RANDOM.nextInt(ACCESS_CODE_WORDS.size()));
+            code.append(Character.toUpperCase(word.charAt(0))).append(word.substring(1));
+        }
+        code.append('-');
+        code.append(String.format(Locale.ROOT, "%04d", SECURE_RANDOM.nextInt(10_000)));
+        code.append(ACCESS_CODE_SYMBOLS[SECURE_RANDOM.nextInt(ACCESS_CODE_SYMBOLS.length)]);
+        code.append(ACCESS_CODE_SYMBOLS[SECURE_RANDOM.nextInt(ACCESS_CODE_SYMBOLS.length)]);
+        return code.toString();
     }
 
     private String hashCode(String code) {

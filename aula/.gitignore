@@ -36,8 +36,11 @@ build/
 /.env
 /.env.*
 !/.env.example
+/src/client_secret_*.json
 /cookiejar.txt
 /headers.txt
 /test-final.log
+/migracion_tidb.log
 /src/main/resources/application.properties
 /src/bustraker.csv
+/src/bustrakerproyect24-firebase-adminsdk-fbsvc-ca28681802.json

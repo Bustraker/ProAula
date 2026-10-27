@@ -19,7 +19,7 @@ module.exports = defineConfig({
     env: {
       JWT_SECRET: "validation-only-key-with-more-than-32-characters"
     },
-    url: `${baseURL}/actuator/health`,
+    url: `${baseURL}/solicitar-codigo-admin`,
     reuseExistingServer: !process.env.CI,
     timeout: 180000
   }

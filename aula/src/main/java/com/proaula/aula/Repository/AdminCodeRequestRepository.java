@@ -9,9 +9,11 @@ import jakarta.persistence.LockModeType;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Collection;
 
 public interface AdminCodeRequestRepository extends JpaRepository<AdminCodeRequest, Long> {
     boolean existsByEmailIgnoreCaseAndStatus(String email, AdminCodeRequest.Status status);
+    boolean existsByEmailIgnoreCaseAndStatusIn(String email, Collection<AdminCodeRequest.Status> statuses);
     List<AdminCodeRequest> findAllByOrderByCreatedAtDesc();
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)

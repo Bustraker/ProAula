@@ -6,6 +6,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.ui.ExtendedModelMap;
 
 import java.util.Map;
@@ -23,7 +24,8 @@ class GlobalExceptionHandlerTest {
         HttpServletRequest request = new MockHttpServletRequest("GET", "/api/buses");
 
         Object result = handler.handleGenericException(
-            new IllegalStateException("internal detail"), new ExtendedModelMap(), request);
+            new IllegalStateException("internal detail"), new ExtendedModelMap(), request,
+            new MockHttpServletResponse());
 
         assertThat(result).isInstanceOf(ResponseEntity.class);
         ResponseEntity<?> response = (ResponseEntity<?>) result;
@@ -43,12 +45,14 @@ class GlobalExceptionHandlerTest {
         when(environment.getActiveProfiles()).thenReturn(new String[0]);
         GlobalExceptionHandler handler = new GlobalExceptionHandler(environment);
         HttpServletRequest request = new MockHttpServletRequest("GET", "/dashboard");
+        MockHttpServletResponse response = new MockHttpServletResponse();
         ExtendedModelMap model = new ExtendedModelMap();
 
         Object result = handler.handleGenericException(
-            new IllegalStateException("internal detail"), model, request);
+            new IllegalStateException("internal detail"), model, request, response);
 
         assertThat(result).isEqualTo("error/500");
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
         assertThat(model.get("errorCode")).isEqualTo("INTERNAL_ERROR");
         assertThat(model.get("errorMessage")).isEqualTo("Ha ocurrido un error interno en el servidor");
     }

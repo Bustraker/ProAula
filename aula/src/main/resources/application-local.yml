@@ -5,20 +5,28 @@ spring:
     enabled: false
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/${DB_NAME:bustraker}}
-    username: ${SPRING_DATASOURCE_USERNAME:root}
+    username: ${SPRING_DATASOURCE_USERNAME:}
     password: ${SPRING_DATASOURCE_PASSWORD:}
     driver-class-name: ${SPRING_DATASOURCE_DRIVER_CLASS_NAME:com.mysql.cj.jdbc.Driver}
   jpa:
-    database-platform: ${SPRING_JPA_DATABASE_PLATFORM:org.hibernate.dialect.MySQLDialect}
     hibernate:
       ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
 app:
+  firebase:
+    admin-enabled: ${FIREBASE_ADMIN_ENABLED:true}
+    credentials-file: ${FIREBASE_CREDENTIALS_FILE:}
+    vapid-key: ${FIREBASE_VAPID_KEY:}
   synthetic-data:
     enabled: ${SYNTHETIC_DATA_ENABLED:true}
 server:
+  ssl:
+    enabled: ${LOCAL_HTTPS_ENABLED:false}
+    key-store: ${LOCAL_HTTPS_KEYSTORE:}
+    key-store-password: ${LOCAL_HTTPS_KEYSTORE_PASSWORD:}
+    key-store-type: PKCS12
   servlet:
     session:
       cookie:
         secure: ${SESSION_COOKIE_SECURE:false}
 jwt:
-  secret: ${JWT_SECRET:local-only-secret-key-do-not-use-in-production}
+  secret: ${JWT_SECRET}

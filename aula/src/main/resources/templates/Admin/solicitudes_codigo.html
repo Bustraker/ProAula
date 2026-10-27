@@ -7,6 +7,7 @@
     <meta name="csrf-token" th:content="${_csrf.token}">
     <meta name="csrf-header" th:content="${_csrf.headerName}">
     <title>Solicitudes de acceso ADMIN - Bustraker</title>
+    <link rel="icon" th:href="@{/images/logo.png}" type="image/png">
     <link rel="stylesheet" th:href="@{/css/style_common.css}">
 </head>
 <body>
@@ -23,7 +24,7 @@
     <section aria-labelledby="pushHeading" style="margin: 1.5rem 0; padding: 1rem; border: 1px solid #ccd5df; border-radius: .5rem;">
         <h2 id="pushHeading">Avisos en este dispositivo</h2>
         <p id="pushStatus" role="status"
-           th:text="${pushConfigured} ? 'Activa las notificaciones para recibir avisos en este dispositivo.' : 'Falta configurar la clave pública Web Push (FIREBASE_VAPID_KEY).'">
+           th:text="${pushConfigured} ? 'Activa las notificaciones para recibir avisos en este dispositivo.' : 'Push no está listo. Verifica FIREBASE_VAPID_KEY, FIREBASE_ADMIN_ENABLED y las credenciales del servidor Firebase.'">
             Estado de las notificaciones
         </p>
         <button id="enablePush" type="button" th:disabled="${!pushConfigured}">Activar notificaciones</button>
@@ -32,18 +33,49 @@
 
     <section aria-label="Solicitudes">
         <p th:if="${#lists.isEmpty(requests)}">Aún no hay solicitudes.</p>
-        <article th:each="request : ${requests}"
+        <article th:each="request : ${requests}" th:id="'solicitud-' + ${request.id}"
                  style="margin: 1rem 0; padding: 1rem; border: 1px solid #ccd5df; border-radius: .5rem;">
-            <h2 style="font-size: 1.1rem;" th:text="${request.email}">solicitante@example.com</h2>
-            <p>Estado: <strong th:text="${request.status}">PENDING</strong></p>
+        <h2 style="font-size: 1.1rem;"
+            th:text="${request.nombres != null ? request.nombres + ' ' + request.apellidos : request.email}">Nombre del candidato</h2>
+        <p>Correo del candidato: <strong th:text="${request.email}">solicitante@example.com</strong></p>
+        <p th:if="${request.createdBy != null}">Recomendado por: <strong th:text="${request.createdByName}">Nombre del administrador</strong> (<span th:text="'@' + ${request.createdBy}">@admin</span>)</p>
+        <p th:if="${request.motivo != null}">Motivo de acceso: <span th:text="${request.motivo}">Motivo indicado</span></p>
+        <p>Estado: <strong th:text="${request.status}">PENDING</strong></p>
             <p>Recibida: <time th:datetime="${request.createdAt}"
                                th:text="${#temporals.format(request.createdAt, 'yyyy-MM-dd HH:mm')}">fecha</time></p>
             <div th:if="${request.status.name() == 'PENDING'}" style="display: flex; gap: .75rem;">
                 <form th:action="@{/admin/solicitudes-codigo/{id}/aprobar(id=${request.id})}" method="post">
-                    <button type="submit">Aprobar y enviar código</button>
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <button type="submit">Aprobar y generar código</button>
                 </form>
                 <form th:action="@{/admin/solicitudes-codigo/{id}/rechazar(id=${request.id})}" method="post">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                     <button type="submit">Rechazar</button>
+                </form>
+            </div>
+            <div th:if="${request.status.name() == 'APPROVED'}">
+                <p th:if="${request.codeEmailSentAt != null}">
+                    Código enviado por correo el
+                    <time th:datetime="${request.codeEmailSentAt}"
+                          th:text="${#temporals.format(request.codeEmailSentAt, 'yyyy-MM-dd HH:mm')}">fecha</time>
+                    <span th:if="${request.codeEmailSentBy != null}" th:text="' por ' + ${request.codeEmailSentBy}"> por admin</span>.
+                </p>
+                <p th:unless="${request.codeEmailSentAt != null}">El código aún no se ha enviado por correo.</p>
+                <div th:if="${issuedCodeRequestId != null and issuedCodeRequestId == request.id}"
+                     style="margin: 1rem 0; padding: 1rem; border: 1px solid #387565; border-radius: .5rem;">
+                    <p>Comparte el código únicamente con el candidato autorizado:</p>
+                    <p><code th:text="${issuedCode}">CODIGO-ADMIN</code></p>
+                    <form th:action="@{/admin/solicitudes-codigo/{id}/enviar-codigo(id=${request.id})}" method="post">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                        <input type="hidden" name="codigoAdmin" th:value="${issuedCode}">
+                        <button type="submit"
+                                th:text="${request.codeEmailSentAt == null ? 'Enviar código al correo del candidato' : 'Reenviar código al correo del candidato'}">Enviar código al correo del candidato</button>
+                    </form>
+                </div>
+                <form th:action="@{/admin/solicitudes-codigo/{id}/nuevo-codigo(id=${request.id})}" method="post"
+                      onsubmit="return confirm('El código anterior dejará de funcionar. ¿Generar un código nuevo?');">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <button type="submit">Generar un código nuevo</button>
                 </form>
             </div>
             <p th:if="${request.decidedBy != null}">

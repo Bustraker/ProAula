@@ -19,22 +19,41 @@ Define estas variables antes de iniciar el proceso:
 | `SESSION_COOKIE_SECURE` | No | En producción debe permanecer habilitada. |
 | `SESSION_COOKIE_DOMAIN` | No | Dominio de la cookie de sesión, si aplica. |
 | `CARTO_API_KEY` | No | Clave de CARTO, si la integración se utiliza. |
-| `ADMIN_REGISTRATION_CODE` | No | Código para el flujo de registro administrativo, si está habilitado. |
 | `BOOTSTRAP_ADMIN_ENABLED` | No | Solo habilítalo durante el aprovisionamiento inicial de un administrador. |
 | `BOOTSTRAP_ADMIN_USERNAME` | Condicional | Usuario inicial; obligatorio si `BOOTSTRAP_ADMIN_ENABLED=true`. |
 | `BOOTSTRAP_ADMIN_EMAIL` | Condicional | Correo del administrador inicial; obligatorio si `BOOTSTRAP_ADMIN_ENABLED=true`. |
 | `BOOTSTRAP_ADMIN_PASSWORD` | Condicional | Contraseña inicial; obligatorio si `BOOTSTRAP_ADMIN_ENABLED=true`. |
-| `MAIL_USERNAME` | Para invitaciones ADMIN | Cuenta Gmail emisora; debe coincidir con `ADMIN_APPROVER_EMAIL`. |
-| `MAIL_PASSWORD` | Para invitaciones ADMIN | Contraseña de aplicación de Gmail, guardada como secreto. |
-| `ADMIN_APPROVER_EMAIL` | Para invitaciones ADMIN | Correo de la cuenta emisora y de la cuenta ADMIN autorizada para aprobar. |
-| `APP_PUBLIC_BASE_URL` | Para enlaces del flujo | URL HTTPS pública del backend, sin barra final. |
-| `FIREBASE_VAPID_KEY` | Para notificaciones web | Clave pública Web Push configurada en Firebase. |
-| `FIREBASE_ADMIN_ENABLED` | Para enviar notificaciones push | `true` solo cuando Firebase Admin y su identidad/credenciales estén configurados. |
+| `MAIL_USERNAME` | Sí | Cuenta SMTP emisora; puede ser distinta de `ADMIN_APPROVER_EMAIL`. |
+| `MAIL_PASSWORD` | Sí | Contraseña de aplicación SMTP, guardada como secreto. |
+| `ADMIN_APPROVER_EMAIL` | Sí | Correo de la cuenta ADMIN autorizada para aprobar. |
+| `APP_PUBLIC_BASE_URL` | Sí | Origen HTTPS público del backend, sin barra final ni ruta. |
+| `FIREBASE_VAPID_KEY` | Sí para push | Clave pública Web Push configurada en Firebase. |
+| `FIREBASE_ADMIN_ENABLED` | Sí para push | Debe ser `true` para enviar notificaciones desde el backend. |
 | `FIREBASE_CREDENTIALS_FILE` | Solo si no hay identidad administrada | Ruta `file:` a credenciales externas al repositorio; vacía cuando se usa ADC. |
+
+Flyway debe permanecer habilitado en producción: `application-prod.yml` lo
+activa explícitamente para que ejecute las migraciones antes de la validación de
+Hibernate. Si el servicio no inicia y el log salta directamente a Hibernate sin
+mostrar actividad de Flyway, revisa las variables del servicio en Render y
+elimina `SPRING_FLYWAY_ENABLED=false` si está definida; una variable de entorno
+puede anular el archivo de perfil.
+
+En desarrollo y producción, configura `ADMIN_APPROVER_EMAIL` mediante el entorno
+y asegúrate de que pertenezca a la cuenta ADMIN aprobadora. `MAIL_USERNAME` es
+la cuenta SMTP emisora y puede ser diferente del aprobador. Proporciona una
+contraseña de aplicación SMTP vigente mediante `MAIL_PASSWORD`; no la guardes
+en archivos del proyecto.
+
+Los valores de correo, aprobador, URL pública, VAPID y habilitación de Firebase
+son obligatorios para el flujo en el perfil `prod`; dicho perfil no arranca si
+faltan las variables. `ADMIN_APPROVER_EMAIL` es el destinatario y aprobador;
+`MAIL_USERNAME` es el remitente autenticado por SMTP. Sin Firebase Admin o VAPID, la interfaz deshabilita la
+activación de push y solo queda el correo como canal de aviso.
 
 Genera `JWT_SECRET` fuera del repositorio, por ejemplo con
 `openssl rand -base64 48`, y guárdalo en el gestor de secretos del entorno. No uses
-el secreto local ni lo escribas en archivos versionados. Define credenciales de
+un valor predeterminado del proyecto ni lo escribas en archivos versionados; el
+perfil local también requiere `JWT_SECRET` como variable de entorno. Define credenciales de
 OAuth en el gestor de secretos solo para los proveedores que se vayan a ofrecer:
 `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET`,
 `GITHUB_CLIENT_ID`/`GITHUB_CLIENT_SECRET`,
@@ -98,23 +117,37 @@ deben tratarse como evidencia de comportamiento para entrenar o evaluar modelos.
 
 ## Esquema y despliegue
 
-El perfil `prod` ejecuta la migración Flyway
-[`V20261015_01__admin_code_approval_flow.sql`](../src/main/resources/db/migration/mysql/V20261015_01__admin_code_approval_flow.sql)
-para crear las tablas de solicitudes, invitaciones y suscripciones push, y la
-migración
-[`V20261015_02__normalize_horario_days_column.sql`](../src/main/resources/db/migration/mysql/V20261015_02__normalize_horario_days_column.sql)
-normaliza `horario.dias_semana` de MySQL `SET` a `VARCHAR(255)`, como espera la
-entidad Java. La conversión conserva el valor textual de los días seleccionados.
+El perfil `prod` ejecuta las migraciones Flyway en orden:
+
+1. [`V20261015_01__admin_code_approval_flow.sql`](../src/main/resources/db/migration/mysql/V20261015_01__admin_code_approval_flow.sql)
+   crea las tablas del flujo.
+2. [`V20261015_02__normalize_horario_days_column.sql`](../src/main/resources/db/migration/mysql/V20261015_02__normalize_horario_days_column.sql)
+   normaliza `horario.dias_semana` de MySQL `SET` a `VARCHAR(255)`, conservando
+   el valor textual que espera la entidad Java.
+3. [`V20261016_01__hash_existing_admin_codes.sql`](../src/main/resources/db/migration/mysql/V20261016_01__hash_existing_admin_codes.sql)
+   convierte códigos existentes a hashes.
+4. [`V20261017_01__admin_registration_approval.sql`](../src/main/resources/db/migration/mysql/V20261017_01__admin_registration_approval.sql)
+   asocia cada código nuevo al correo y a la solicitud aprobada.
 Flyway está configurado con `baseline-on-migrate`; antes del primer despliegue
-respalda la base, confirma que las tablas de la migración `01` aún no existan y que
-la columna `horario.dias_semana` sí exista. El usuario de conexión necesita permiso
-para crear tablas e índices y modificar esa columna. Si parte del esquema ya fue
-migrado manualmente, revisa el historial de Flyway antes de ejecutar para evitar
-migraciones duplicadas.
+respalda la base y confirma que el esquema base de Bustraker y
+`horario.dias_semana` existan. Revisa `flyway_schema_history` y las columnas,
+índices y restricciones actuales de las tablas ADMIN. La migración `01` crea
+las tablas del flujo y fallará si ya existen sin una migración registrada; la
+migración `V20261017_01` sí comprueba columnas, índices y la FK antes de
+añadirlos. `ddl-auto=validate` seguirá fallando si los tipos o columnas no
+coinciden. El
+usuario de conexión necesita permiso para crear tablas e índices y modificar
+`horario.dias_semana`. No uses `flyway repair` para ignorar un checksum ni edites
+una migración versionada que ya se haya aplicado; crea una migración nueva hacia
+adelante después de revisar el esquema.
 
 Los perfiles locales y de validación deshabilitan estas migraciones MySQL: el
 entorno local administra su esquema con Hibernate y las pruebas usan su esquema H2
 aislado. Esto evita ejecutar DDL de producción sobre bases de prueba.
+
+Para copiar los datos de XAMPP a un esquema TiDB ya preparado, consulta la
+[guía del migrador TiDB](./tidb-data-migration.md). La copia es explícita, no
+destructiva y no sustituye respaldos periódicos ni sincronización continua.
 
 Al terminar Flyway, Hibernate usa `ddl-auto=validate`: comprueba que el esquema
 corresponda a las entidades y falla al arrancar si detecta diferencias. No cambies
@@ -123,16 +156,98 @@ cualquier migración adicional antes de desplegarla.
 
 ## OAuth
 
-Registra en cada proveedor la URL de callback
-`{BASE_URL}/login/oauth2/code/{registrationId}` (por ejemplo,
-`https://app.example.com/login/oauth2/code/google`). Configura las credenciales
-únicamente en el entorno, nunca en `application*.yml`.
+Los proveedores y sus permisos se configuran en `application.yml`, compartido por
+los perfiles local y `prod`: Google (`openid profile email`), GitHub
+(`user:email`), Discord (`identify email`) y Facebook (`email public_profile`).
+Configura las credenciales únicamente en el entorno, nunca en `application*.yml`.
 
-La aplicación solo crea o vincula una cuenta OAuth cuando puede obtener un correo
-que considera verificado. Google requiere `email_verified=true`; GitHub consulta
-`/user/emails` y acepta solo correos verificados; Discord requiere `verified=true`.
-Facebook actualmente también requiere `email_verified=true`. Comprueba con una
-cuenta de prueba y la respuesta real de la aplicación de Facebook que dicho atributo
-se entregue; si no está disponible, ese flujo se rechazará de forma segura y no se
-debe relajar la verificación ni vincular por correo sin diseñar un flujo explícito
-de verificación/confirmación.
+Registra en cada consola la URL exacta de callback que envía la aplicación:
+`{BASE_URL}/login/oauth2/code/{registrationId}`. En Render, Facebook usa
+`https://proaula.onrender.com/login/oauth2/code/facebook`. Meta exige HTTPS y
+descarta el callback local HTTP, por lo que el perfil local puede habilitar HTTPS
+con un certificado de desarrollo confiable para `localhost`. En Windows,
+ejecuta desde la raíz `aula`:
+
+```powershell
+. .\scripts\setup-local-oauth-https.ps1
+.\mvnw.cmd spring-boot:run
+```
+
+El script genera y confía el certificado solo para el usuario actual, crea una
+contraseña aleatoria y la protege con DPAPI para ese usuario, y configura el
+perfil local en la terminal actual. También carga en el proceso las credenciales
+OAuth guardadas en variables de usuario cuando aún no están disponibles en esa
+terminal, sin imprimir sus valores.
+Abre la aplicación en `https://localhost:5679`; registra en cada proveedor que se
+use en local `https://localhost:5679/login/oauth2/code/{registrationId}`. Para
+Facebook, el callback es
+`https://localhost:5679/login/oauth2/code/facebook`. Si cambias `PORT`, usa el
+mismo puerto al registrar los callbacks. La URL HTTP anterior no es válida para
+Facebook Login. `localhost`, `127.0.0.1` y el dominio de Render no son
+intercambiables. La prueba `ExternalProviderLoginPageTest` verifica callbacks
+locales HTTP y HTTPS y los scopes de autorización.
+
+Los callback exactos por proveedor son:
+
+| Proveedor | Local con HTTPS | Render |
+| --- | --- | --- |
+| Google | `https://localhost:5679/login/oauth2/code/google` | `https://proaula.onrender.com/login/oauth2/code/google` |
+| GitHub | `https://localhost:5679/login/oauth2/code/github` | `https://proaula.onrender.com/login/oauth2/code/github` |
+| Discord | `https://localhost:5679/login/oauth2/code/discord` | `https://proaula.onrender.com/login/oauth2/code/discord` |
+| Facebook | `https://localhost:5679/login/oauth2/code/facebook` | `https://proaula.onrender.com/login/oauth2/code/facebook` |
+
+Registra solo los proveedores que tengan credenciales configuradas. Render ya
+termina HTTPS delante de la aplicación; no habilites un certificado TLS propio
+en el contenedor ni cambies sus secretos para resolver callbacks.
+
+### Error de Meta «Invalid Scopes: email»
+
+`email` es un permiso válido de Facebook Login. Meta documenta que los permisos
+`email` y `public_profile` no requieren revisión de la aplicación para el uso
+normal de Facebook Login ([permisos de Facebook Login](https://developers.facebook.com/documentation/facebook-login/web/)).
+Si Meta muestra `Invalid Scopes: email`, rechaza la solicitud antes de volver al
+servidor: no es un error de base de datos, sesión ni de la URL de callback, y la
+aplicación no puede interceptar ni corregir esa pantalla. Comprueba en el panel
+de Meta que `FACEBOOK_CLIENT_ID` identifica la aplicación que estás configurando,
+que esa aplicación tiene el caso de uso/producto **Facebook Login** apropiado y
+que el ID y secreto pertenecen a la misma aplicación. Si está en modo de
+desarrollo, solo sus administradores, desarrolladores, testers y usuarios de
+prueba pueden iniciar sesión.
+
+En la app Bustraker comprobada para este despliegue, `email` y `public_profile`
+se envían desde local y Render; el `client_id` de Render coincide con el
+identificador de la app abierta en Meta, y el caso de uso de Facebook Login está
+añadido. La app aparece sin publicar y Meta indica que faltan datos básicos
+(icono, URL de política de privacidad, eliminación de datos de usuario y
+categoría) para enviarla a revisión. Completa esos requisitos y prueba con una
+cuenta incluida en los roles de la app; no publiques la app solo para intentar
+ocultar el error de scope. La documentación oficial de Meta indica que `email`
+y `public_profile` son permisos válidos de Facebook Login y que no requieren
+revisión para el uso normal ([Facebook Login para web](https://developers.facebook.com/documentation/facebook-login/web/)).
+
+Local y Render usan los mismos scopes del repositorio. Si ambos entornos usan el
+mismo `FACEBOOK_CLIENT_ID`, una corrección de la configuración de esa aplicación
+en Meta aplica a ambos; si usan IDs distintos, revisa cada aplicación por
+separado. Tras corregir el permiso/app ID, registra también los callbacks local
+y Render indicados arriba. No elimines el scope `email` como arreglo: el flujo
+de cuentas necesita el correo del proveedor y rechazará una respuesta que no lo
+incluya.
+
+La aplicación solo crea o vincula una cuenta OAuth cuando obtiene un correo:
+Google requiere `email_verified=true`; GitHub consulta `/user/emails` y acepta solo
+correos verificados; Discord requiere `verified=true` junto con el permiso `email`.
+Facebook usa el correo que Graph API devuelve al conceder el permiso `email`; su
+respuesta `fields=id,name,email` no entrega una propiedad `email_verified`, por lo que
+la aplicación no exige ese atributo inexistente. Facebook no vincula por correo una
+cuenta local preexistente sin esa verificación explícita; si el correo ya pertenece a
+una cuenta distinta, el inicio se rechaza para evitar tomar control de esa cuenta. Si
+Facebook no devuelve correo, el acceso también se rechaza. Los datos opcionales de
+nombre se sustituyen por valores neutros para respetar los campos obligatorios de la
+cuenta local.
+
+Durante el desarrollo, la pantalla de inicio solo muestra proveedores con ID y secreto
+distintos de los valores `placeholder-*`. En Windows, si guardas o cambias variables de
+usuario mientras VS Code está abierto, cierra todas las ventanas de VS Code y ábrelo
+de nuevo para que la aplicación herede el entorno actualizado. El URI de callback
+registrado en cada proveedor debe coincidir exactamente con la URL que envía el
+navegador, incluido `localhost` frente a `127.0.0.1`, puerto y ruta.

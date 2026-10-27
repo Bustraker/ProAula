@@ -77,7 +77,7 @@ public class SecurityConfig {
                 // Rutas completamente públicas
                 .requestMatchers(
                     "/", "/registro-mejorado", "/registro-mejorado.html", "/registro", "/registro/**",
-                    "/solicitar-codigo-admin", "/firebase-messaging-sw.js", "/api/firebase/config",
+                    "/admin/registrar", "/firebase-messaging-sw.js", "/api/firebase/config",
                     "/inicio-de-sesion-mejorado", "/inicio-de-sesion-mejorado.html", "/inicio_de_sesion",
                     "/admin-login", "/admin/verificar-codigo", "/admin/login",
                     "/css/**", "/js/**", "/images/**",
@@ -96,7 +96,7 @@ public class SecurityConfig {
                 // Protege rutas de administración
                 .requestMatchers(
                     "/index_2", "/admin/**", "/reportes", "/gestionar-usuarios",
-                    "/editar-usuario/**", "/eliminar-usuario/**", "/admin-crear-usuario",
+                    "/editar-usuario/**", "/eliminar-usuario/**",
                     "/actualizar-usuario", "/rutas/admin",
                     "/registro-buses", "/actualizarbuses", "/eliminarbuses",
                     "/actualizar-bus/**", "/eliminar-buses",

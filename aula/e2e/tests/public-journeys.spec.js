@@ -1,11 +1,206 @@
 const { test, expect } = require("@playwright/test");
 
+// Mirrors DataSeederService's provisional routes; it is not the verified live catalog.
+const provisionalRouteDefinitions = [
+  {
+    id: "provisional-campestre",
+    nombre: "Campestre - El Socorro - Bocagrande / Castillogrande",
+    barrios: ["El Rodeo", "El Campestre", "El Socorro", "Blas de Lezo", "Bazurto", "Centro", "Bocagrande", "Castillogrande"]
+  },
+  {
+    id: "provisional-pozon",
+    nombre: "El Pozón - Villagrande - Socorro - Centro - Torices",
+    barrios: ["El Pozón", "Villagrande", "San Fernando", "El Socorro", "La Plazuela", "Bazurto", "Centro", "Torices"]
+  },
+  {
+    id: "provisional-ruta-37",
+    nombre: "Ruta 37 - Simón Bolívar - San Fernando - Socorro - Centro",
+    barrios: ["Simón Bolívar", "San Fernando", "El Socorro", "Chambacú", "El Cabrero", "Centro"]
+  },
+  {
+    id: "provisional-ruta-30a",
+    nombre: "Ruta 30A - Nuevo Bosque - Calamares - Centro",
+    barrios: ["Nuevo Bosque", "Calamares", "Bazurto", "Centro"]
+  }
+];
+
+function confirmedSegments(routes) {
+  return routes
+    .filter(route => route.ordenBarriosConfirmado === true && Array.isArray(route.barriosOrdenados))
+    .flatMap(route => route.barriosOrdenados.slice(1).map((destino, index) => ({
+      routeName: route.nombre,
+      origen: route.barriosOrdenados[index],
+      destino
+    })))
+    .filter(segment => segment.origen && segment.destino && segment.origen !== segment.destino);
+}
+
+async function verifyRouteSegments(page, routes) {
+  const segments = confirmedSegments(routes);
+  for (const segment of segments) {
+    await page.locator("#origen").fill(segment.origen);
+    await expect(page.locator("#destino")).toBeEnabled();
+    await page.locator("#destino").fill(segment.destino);
+    await page.locator("#btnPlanificar").click();
+    await expect(
+      page.locator("#rutaDetalle"),
+      `${segment.routeName}: ${segment.origen} → ${segment.destino}`
+    ).toBeVisible();
+    await expect(page.locator("#resumenBusqueda")).toContainText("Mejor opción:");
+  }
+  return segments;
+}
+
+function makeProvisionalRouteFixtures() {
+  const routes = provisionalRouteDefinitions.map(route => ({
+    ...route,
+    barriosOrdenados: [...route.barrios],
+    ordenBarriosConfirmado: true,
+    coordenadasBarrios: Object.fromEntries(route.barrios.map((barrio, index) => [
+      barrio,
+      [10.39 + index * 0.004, -75.56 + index * 0.004]
+    ])),
+    coordenadasEstimadas: [...route.barrios],
+    paradas: [],
+    buses: []
+  }));
+  const neighborhoods = Array.from(new Set(routes.flatMap(route => route.barrios)))
+    .map((nombre, index) => ({
+      nombre,
+      localidad: "Cartagena",
+      latitud: 10.39 + index * 0.002,
+      longitud: -75.56 + index * 0.002,
+      coordenadaEstimada: true
+    }));
+  return { routes, neighborhoods };
+}
+
 async function expectMapTiles(page) {
   await expect(page.locator("#map")).toBeVisible();
   await expect.poll(async () => page.locator("#map img.leaflet-tile").evaluateAll(
     tiles => tiles.some(tile => tile.complete && tile.naturalWidth > 0)
   ), { timeout: 20000 }).toBe(true);
 }
+
+test("every confirmed route segment can be planned in public and private pages", async ({ page }) => {
+  await page.route("https://router.project-osrm.org/**", routeRequest => routeRequest.fulfill({
+    contentType: "application/json",
+    body: JSON.stringify({
+      routes: [{
+        geometry: {
+          type: "LineString",
+          coordinates: [[-75.56, 10.39], [-75.55, 10.41], [-75.54, 10.43]]
+        },
+        distance: 5000,
+        duration: 1200
+      }]
+    })
+  }));
+
+  const publicRoutesResponse = page.waitForResponse(
+    response => response.url().includes("/api/rutas-con-coordenadas") && response.status() === 200
+  );
+  await page.goto("/viajar_public");
+  const publicRoutes = await (await publicRoutesResponse).json();
+  const publicSegments = confirmedSegments(publicRoutes);
+  console.info(
+    `API pública: ${publicRoutes.length} rutas; ${publicSegments.length} tramos consecutivos confirmados.`
+  );
+  test.skip(
+    publicSegments.length === 0,
+    `El entorno validation no expone tramos de rutas verificadas; API devolvió ${publicRoutes.length} rutas.`
+  );
+
+  const publicResults = await verifyRouteSegments(page, publicRoutes);
+
+  const registrationId = Date.now().toString(36);
+  const username = `routes${registrationId}`;
+  const password = "safe-password-26";
+  await page.goto("/registro-mejorado");
+  await page.locator("#nombres").fill("Usuario");
+  await page.locator("#apellidos").fill("Rutas");
+  await page.locator("#username").fill(username);
+  await page.locator("#email").fill(`${username}@example.test`);
+  await page.locator("#password").fill(password);
+  await page.locator("#passwordConfirm").fill(password);
+  await page.locator("#terminos").check();
+  await page.locator("#registroForm button[type=submit]").click();
+  await expect(page).toHaveURL(/\/inicio-de-sesion-mejorado\?registrado=true$/);
+  await page.locator("#username").fill(username);
+  await page.locator("#password").fill(password);
+  await page.locator("#loginForm button[type=submit]").click();
+  await expect(page).toHaveURL(/\/dashboard$/);
+
+  const privateRoutesResponse = page.waitForResponse(
+    response => response.url().includes("/api/rutas-con-coordenadas") && response.status() === 200
+  );
+  await page.goto("/viajar");
+  const privateRoutes = await (await privateRoutesResponse).json();
+  expect(privateRoutes.map(route => route.id)).toEqual(publicRoutes.map(route => route.id));
+  const privateResults = await verifyRouteSegments(page, privateRoutes);
+
+  expect(publicResults).toHaveLength(publicSegments.length);
+  expect(privateResults).toHaveLength(publicSegments.length);
+  console.info(
+    `Planificados ${publicSegments.length} tramos consecutivos en las páginas pública y privada.`
+  );
+});
+
+test("all provisional seed route segments can be planned in public and private pages", async ({ page }) => {
+  test.setTimeout(90_000);
+
+  const { routes, neighborhoods } = makeProvisionalRouteFixtures();
+  await page.route("**/api/barrios/todos", routeRequest => routeRequest.fulfill({
+    contentType: "application/json",
+    body: JSON.stringify(neighborhoods)
+  }));
+  await page.route("**/api/rutas-con-coordenadas", routeRequest => routeRequest.fulfill({
+    contentType: "application/json",
+    body: JSON.stringify(routes)
+  }));
+  await page.route("https://router.project-osrm.org/**", routeRequest => routeRequest.fulfill({
+    contentType: "application/json",
+    body: JSON.stringify({
+      routes: [{
+        geometry: {
+          type: "LineString",
+          coordinates: [[-75.56, 10.39], [-75.55, 10.41], [-75.54, 10.43]]
+        },
+        distance: 5000,
+        duration: 1200
+      }]
+    })
+  }));
+
+  await page.goto("/viajar_public");
+  const publicSegments = await verifyRouteSegments(page, routes);
+
+  const registrationId = Date.now().toString(36);
+  const username = `seedroutes${registrationId}`;
+  const password = "safe-password-26";
+  await page.goto("/registro-mejorado");
+  await page.locator("#nombres").fill("Usuario");
+  await page.locator("#apellidos").fill("Rutas");
+  await page.locator("#username").fill(username);
+  await page.locator("#email").fill(`${username}@example.test`);
+  await page.locator("#password").fill(password);
+  await page.locator("#passwordConfirm").fill(password);
+  await page.locator("#terminos").check();
+  await page.locator("#registroForm button[type=submit]").click();
+  await expect(page).toHaveURL(/\/inicio-de-sesion-mejorado\?registrado=true$/);
+  await page.locator("#username").fill(username);
+  await page.locator("#password").fill(password);
+  await page.locator("#loginForm button[type=submit]").click();
+  await expect(page).toHaveURL(/\/dashboard$/);
+  await page.goto("/viajar");
+  const privateSegments = await verifyRouteSegments(page, routes);
+
+  expect(publicSegments).toHaveLength(22);
+  expect(privateSegments).toHaveLength(22);
+  console.info(
+    `Probados ${routes.length} fixtures provisionales y ${publicSegments.length} tramos por página.`
+  );
+});
 
 test("public navigation loads route data and supports trip planning inputs", async ({ page }) => {
   await page.context().grantPermissions(["geolocation"]);

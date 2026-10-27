@@ -34,7 +34,7 @@
 
     function normalizar(texto) {
         return String(texto == null ? '' : texto).trim().toLowerCase()
-            .normalize('NFD').replace(/\p{Diacritic}/gu, '');
+            .normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/\s+/g, ' ');
     }
 
     function mayuscula(texto) {

@@ -1,4 +1,3 @@
-+
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -12,7 +11,8 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/style_registro.css}">
     <link rel="stylesheet" th:href="@{/css/style_common.css}">
-    <link rel="stylesheet" th:href="@{/css/style_auth.css}">
+    <link rel="stylesheet" th:href="@{/css/style_auth.css(v='20261024-1')}">
+    <link rel="stylesheet" th:href="@{/css/style_auth_experience.css(v='20261024-3')}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" th:href="@{/images/logo.png}" type="image/png">
 </head>
@@ -38,22 +38,59 @@
     <!-- Contenido principal -->
     <main class="hero-section auth-page auth-page--register">
         <div class="container container-sm auth-layout auth-layout--register">
-            <aside class="auth-story" aria-label="Marca Bustraker">
-                <div class="auth-story__brand">
-                    <img th:src="@{/images/logo.png}" alt="">
-                    <span>Bustraker</span>
+            <aside class="auth-story auth-story--register" aria-label="Tu viaje comienza con Bustraker">
+                <div class="auth-story__topline">
+                    <a class="auth-story__brand" th:href="@{/}" aria-label="Bustraker, ir al inicio">
+                        <img th:src="@{/images/logo.png}" alt="">
+                        <span>Bustraker</span>
+                    </a>
+                    <span class="auth-live"><span></span> NUEVO VIAJE</span>
                 </div>
-                <div class="auth-route-art" aria-hidden="true">
-                    <span class="auth-stop auth-stop--start"><i class="fas fa-location-dot"></i></span>
-                    <span class="auth-route-art__line"></span>
-                    <span class="auth-bus"><i class="fas fa-bus"></i></span>
-                    <span class="auth-stop auth-stop--end"><i class="fas fa-location-dot"></i></span>
+                <div class="auth-story__copy">
+                    <p class="auth-kicker">UNA CIUDAD POR DESCUBRIR</p>
+                    <p class="auth-story__headline">Tu próxima historia <span>va en camino.</span></p>
+                    <p>Crea tu cuenta y lleva tus rutas, horarios y viajes en un solo lugar.</p>
+                </div>
+                <div class="auth-scene auth-scene--profile" aria-hidden="true">
+                    <div class="profile-scene__label"><i class="fas fa-user-plus"></i> CREACIÓN DE TU CUENTA</div>
+                    <div class="profile-scene__stage">
+                        <div class="profile-card">
+                            <div class="profile-card__top"><span>PERFIL DE VIAJERO</span><i class="fas fa-ellipsis"></i></div>
+                            <div class="profile-card__identity">
+                                <span class="profile-card__avatar"><i class="fas fa-user"></i><b><i class="fas fa-plus"></i></b></span>
+                                <span class="profile-card__name"><strong>Tu nombre</strong><small>Nuevo viajero Bustraker</small></span>
+                            </div>
+                            <div class="profile-card__details">
+                                <span><i class="fas fa-envelope"></i><b></b><small>Correo electrónico</small></span>
+                                <span><i class="fas fa-lock"></i><b></b><small>Contraseña segura</small></span>
+                            </div>
+                            <div class="profile-card__progress"><span></span></div>
+                        </div>
+                        <div class="profile-complete">
+                            <span class="profile-complete__icon"><i class="fas fa-check"></i></span>
+                            <strong>Perfil listo</strong>
+                            <small>Tu cuenta, tus viajes</small>
+                        </div>
+                    </div>
+                    <div class="profile-steps">
+                        <span class="profile-steps__step profile-steps__step--done"><i class="fas fa-check"></i> DATOS</span>
+                        <b></b>
+                        <span class="profile-steps__step profile-steps__step--done"><i class="fas fa-check"></i> SEGURIDAD</span>
+                        <b></b>
+                        <span class="profile-steps__step profile-steps__step--current"><i class="fas fa-user"></i> PERFIL</span>
+                    </div>
+                </div>
+                <div class="auth-story__bottom">
+                    <span><i class="fas fa-route"></i> Explora a tu manera</span>
+                    <span>EMPIEZA HOY <i class="fas fa-arrow-right"></i></span>
                 </div>
             </aside>
             <section class="auth-content" aria-labelledby="registerTitle">
             <div class="card_animate-slideUp">
                 <div class="card-header">
-                    <h1 id="registerTitle"><i class="fas fa-user-plus" aria-hidden="true"></i> Crear Cuenta</h1>
+                    <span class="auth-card-kicker">TU VIAJE EMPIEZA AQUÍ</span>
+                    <h1 id="registerTitle">Crea tu cuenta</h1>
+                    <p class="auth-card-intro">Solo necesitas unos datos para arrancar.</p>
                 </div>
                 <div class="card-body">
                     <!-- Estado de error -->
@@ -180,40 +217,6 @@
                             </div>
                             <small class="form-text auth-password-feedback" id="passwordConfirmFeedback" aria-live="polite">Repite la contraseña para confirmarla.</small>
                         </div>
-                        </div>
-
-                        <h2 class="auth-form-heading">Tipo de cuenta</h2>
-
-                        <!-- Rol de Usuario -->
-                        <div class="form-group">
-                            <label class="form-label" for="role">
-                                <i class="fas fa-user-tag"></i> Tipo de Cuenta *
-                            </label>
-                                <select id="role" 
-                                    name="role"
-                                    class="form-control" 
-                                    required>
-                                <option value="USER">Usuario Regular</option>
-                                <option value="ADMIN">Administrador</option>
-                            </select>
-                        </div>
-
-                        <!-- Código de invitación ADMIN visible solo si aplica -->
-                        <div class="form-group hidden" id="adminCodeGroup" style="display: none;" aria-live="polite">
-                            <label class="form-label" for="adminCode">
-                                <i class="fas fa-key"></i> Código de invitación ADMIN *
-                            </label>
-                                <input type="text" 
-                                    id="adminCode" 
-                                    name="adminCode"
-                                    class="form-control" 
-                                    placeholder="Ingresa el código enviado a tu correo"
-                                    autocomplete="off"
-                                    maxlength="24">
-                            <small class="form-text">
-                                <a th:href="@{/solicitar-codigo-admin}">Solicitar un código de invitación</a>.
-                                Solo funciona una vez y vence en 24 horas.
-                            </small>
                         </div>
 
                         <!-- Términos y Condiciones -->

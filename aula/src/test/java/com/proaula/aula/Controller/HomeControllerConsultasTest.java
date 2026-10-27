@@ -19,7 +19,6 @@ import org.springframework.ui.ExtendedModelMap;
 import com.proaula.aula.Entity.Bus;
 import com.proaula.aula.Entity.Ruta;
 import com.proaula.aula.Repository.UsuarioRepository;
-import com.proaula.aula.Service.AdminCodeService;
 import com.proaula.aula.Service.BusService;
 import com.proaula.aula.Service.ContactoMensajeService;
 import com.proaula.aula.Service.RutaService;
@@ -38,8 +37,6 @@ class HomeControllerConsultasTest {
     private UsuarioService usuarioService;
     @Mock
     private ViajeService viajeService;
-    @Mock
-    private AdminCodeService adminCodeService;
     @Mock
     private UsuarioRepository usuarioRepository;
     @Mock

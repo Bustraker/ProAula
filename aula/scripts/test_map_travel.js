@@ -13,13 +13,13 @@ const document={readyState:'complete',body,addEventListener(){},getElementById(i
 document.getElementById('origen');
 const avisos=[];
 const L={layerGroup(){const layers=[];return{layers,addTo(){return this},addLayer(layer){layers.push(layer);return this},clearLayers(){layers.length=0},getLayers(){return layers}}},latLngBounds(a){return{extend(){},isValid:()=>true,getBounds(){return this}}},Control:{extend(o){return function(){return{addTo(){return this},onAdd(){return new El('div')},onRemove(){}}}}},DomUtil:{create:()=>new El('d')},DomEvent:{disableClickPropagation(){}},geoJSON(){return{addTo(){return this},getBounds(){return{extend(){},isValid:()=>true}}}},polyline(){return{addTo(){return this},bindPopup(){return this}}},marker(){return{addTo(){return this},bindPopup(){return this},setLatLng(){},getLatLng(){return{}},openPopup(){}}},divIcon:()=>({}),circle(){return{addTo(){return this}}}};
-const barrios=[['Centro',10.42,-75.55],['Bocagrande',10.40,-75.56],['Getsemaní',10.423,-75.545],['Manga',10.41,-75.53],['Crespo',10.44,-75.52],['Olaya',10.40,-75.50]].map(([nombre,latitud,longitud])=>({nombre,latitud,longitud}));
+const barrios=[['Centro',10.42,-75.55],['Bocagrande',10.40,-75.56],['Getsemaní',10.423,-75.545],['Manga',10.41,-75.53],['Crespo',10.44,-75.52],['Olaya',10.40,-75.50],['Olaya ST. Central',10.40,-75.50]].map(([nombre,latitud,longitud])=>({nombre,latitud,longitud}));
 const P=(n,b,o,la,lo)=>({nombre:n,barrio:b,orden:o,latitud:la,longitud:lo,referencia:'Ref '+n});
 const rutas=[
  {id:1,nombre:'Ruta Larga',horaAproximada:'06:30',barrios:['Centro','Getsemaní','Manga','Crespo'],barriosOrdenados:['Centro','Getsemaní','Manga','Crespo'],ordenBarriosConfirmado:true,paradas:[P('P1','Centro',1,10.42,-75.55),P('P2','Getsemaní',2,10.423,-75.545),P('P3','Manga',3,10.41,-75.53),P('P4','Crespo',4,10.44,-75.52)],buses:[{id:1,placa:'abc123',modelo:'2019',color:'Azul'}],coordenadasBarrios:{}},
  {id:2,nombre:'Ruta Corta',horaAproximada:'15:05:00',barrios:['Bocagrande','Centro','Manga'],barriosOrdenados:['Bocagrande','Centro','Manga'],ordenBarriosConfirmado:true,paradas:[],buses:[],coordenadasBarrios:{Centro:[10.42,-75.55],Manga:[10.41,-75.53],Bocagrande:[10.40,-75.56]}},
  {id:3,nombre:'Ruta sin orden',barrios:['Centro','Olaya'],barriosOrdenados:[],ordenBarriosConfirmado:false,paradas:[],buses:[]}];
-const M={CENTRO:[0,0],url:(u)=>u,fetchJSON:async u=>u.includes('barrios')?barrios:u.includes('rutas')?rutas:{features:[]},
+const M={CENTRO:[0,0],url:p=>p,fetchJSON:async u=>u.includes('barrios')?barrios:u.includes('rutas')?rutas:{features:[]},
  crearMapa:()=>({flyTo(){},removeLayer(){},addLayer(){return this},addControl(){return this},removeControl(){return this},setView(){},getZoom:()=>13,on(){},off(){},fitBounds(){},getBounds(){return {extend(){},isValid:()=>true}},getCenter(){return {lat:10.42,lng:-75.55}},invalidateSize(){}}),
  mostrarAviso:(m)=>avisos.push(m),mostrarCargando(){},ocultarCargando(){},ajustarVista(){},crearPin:()=>L.marker(),crearMarcadorParada:()=>L.marker(),crearCapasRuta:()=>({base:L.layerGroup(),linea:L.geoJSON()}),crearFlechasDireccion:()=>L.layerGroup(),vincularFlechas:()=>()=>{},
  obtenerRutaOSRM:async()=>({geometry:{type:'LineString',coordinates:[[-75.55,10.42],[-75.53,10.41]]},distanciaKm:3.2,tiempoMin:11})};
@@ -33,10 +33,10 @@ let fallos=0;const ok=(c,m)=>{console.log((c?'  OK  ':' FALLA ')+m);if(!c)fallos
 (async()=>{
  win.BustrakerTravel.iniciar({privado:false}); await esperar();
  const opts=reg.listaOrigen.children.map(o=>o.value);
- ok(JSON.stringify(opts)===JSON.stringify(['Bocagrande','Centro','Crespo','Getsemaní','Manga','Olaya']),'origen ofrece todos los barrios registrados: '+opts.join(', '));
+ ok(JSON.stringify(opts)===JSON.stringify(['Bocagrande','Centro','Crespo','Getsemaní','Manga','Olaya','Olaya ST. Central']),'origen ofrece todos los barrios registrados: '+opts.join(', '));
  reg.origen.value='centro'; reg.origen.fire('input');
  const dest=reg.listaDestino.children.map(o=>o.value).sort();
- ok(JSON.stringify(dest)===JSON.stringify(['Bocagrande','Crespo','Getsemaní','Manga','Olaya']),'destinos válidos desde Centro: '+dest.join(', '));
+ ok(JSON.stringify(dest)===JSON.stringify(['Bocagrande','Crespo','Getsemaní','Manga','Olaya','Olaya ST. Central']),'destinos válidos desde Centro: '+dest.join(', '));
  ok(reg.destino.disabled===false,'destino se habilita');
  reg.destino.value='Manga'; reg.destino.fire('input'); await esperar();
  reg.btnPlanificar.fire('click'); await esperar();
@@ -64,15 +64,15 @@ let fallos=0;const ok=(c,m)=>{console.log((c?'  OK  ':' FALLA ')+m);if(!c)fallos
  ok(reg.resultados.children.filter(c=>c.tag==='button').length===1 && reg.rutaDetalle.hidden===false,'recomendación de transbordo se selecciona y dibuja');
  reg.origen.value='Manga'; reg.origen.fire('input');
  ok(reg.destino.value==='' && reg.rutaDetalle.hidden===true,'cambiar origen reinicia destino y detalle');
- ok(reg.listaDestino.children.length===5,'desde Manga se pueden elegir todos los otros barrios');
+ ok(reg.listaDestino.children.length===6,'desde Manga se pueden elegir todos los otros barrios');
  reg.origen.value='Crespo'; reg.origen.fire('input');
- ok(reg.destino.disabled===false && reg.listaDestino.children.length===5,'destino disponible aunque el barrio no tenga rutas salientes');
- reg.destino.value='Olaya'; reg.destino.fire('input'); await esperar();
+ ok(reg.destino.disabled===false && reg.listaDestino.children.length===6,'destino disponible aunque el barrio no tenga rutas salientes');
+ reg.destino.value='  OLAYA   ST. CENTRAL  '; reg.destino.fire('input'); await esperar();
+ ok(reg.destino.value==='Olaya ST. Central','resuelve el barrio ignorando mayúsculas y espacios repetidos');
  reg.btnPlanificar.fire('click'); await esperar();
  ok(txt('resultados').includes('No hay combinación de rutas'),'barrio válido sin ruta muestra resultado vacío, no bloquea el destino');
- reg.origen.value='';
- for (const c of 'Olaya') { reg.origen.value+=c; reg.origen.fire('input'); }
- ok(reg.origen.value==='Olaya' && reg.destino.disabled===false,'permite origen en barrio registrado sin servicio confirmado');
+ reg.origen.value='OLAYA   ST. CENTRAL'; reg.origen.fire('input');
+ ok(reg.origen.value==='Olaya ST. Central' && reg.destino.disabled===false,'permite origen con espacios repetidos aunque no tenga servicio confirmado');
  reg.destino.value='';
  for (const c of 'Centro') { reg.destino.value+=c; reg.destino.fire('input'); }
  await esperar();

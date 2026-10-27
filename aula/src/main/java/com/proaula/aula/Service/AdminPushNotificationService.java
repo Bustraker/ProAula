@@ -28,16 +28,23 @@ public class AdminPushNotificationService {
     private final ObjectProvider<FirebaseMessaging> firebaseMessaging;
     private final String approverEmail;
     private final String publicBaseUrl;
+    private final String vapidKey;
 
     public AdminPushNotificationService(
             AdminPushSubscriptionRepository subscriptionRepository,
             ObjectProvider<FirebaseMessaging> firebaseMessaging,
             @Value("${app.admin.approver-email:}") String approverEmail,
-            @Value("${app.public-base-url}") String publicBaseUrl) {
+            @Value("${app.public-base-url}") String publicBaseUrl,
+            @Value("${app.firebase.vapid-key:}") String vapidKey) {
         this.subscriptionRepository = subscriptionRepository;
         this.firebaseMessaging = firebaseMessaging;
         this.approverEmail = approverEmail;
         this.publicBaseUrl = publicBaseUrl;
+        this.vapidKey = vapidKey;
+    }
+
+    public boolean isPushConfigured() {
+        return !vapidKey.isBlank() && firebaseMessaging.getIfAvailable() != null;
     }
 
     @Transactional
@@ -64,20 +71,28 @@ public class AdminPushNotificationService {
             .ifPresent(subscriptionRepository::delete);
     }
 
-    public void notifyPendingRequest(long requestId) {
+    public boolean notifyPendingRequest(long requestId, String applicantFirstName,
+                                        String applicantLastName, String applicantEmail) {
         FirebaseMessaging messaging = firebaseMessaging.getIfAvailable();
-        if (messaging == null) {
+        if (messaging == null || vapidKey.isBlank()) {
             log.warn("Firebase push is not configured; admin request {} was sent by email only.", requestId);
-            return;
+            return false;
         }
 
-        String link = publicBaseUrl.replaceAll("/+$", "") + "/admin/solicitudes-codigo";
-        for (AdminPushSubscription subscription : subscriptionRepository.findAllByAdminEmailIgnoreCase(approverEmail)) {
+        String link = publicBaseUrl.replaceAll("/+$", "") + "/admin/solicitudes-codigo#solicitud-" + requestId;
+        var subscriptions = subscriptionRepository.findAllByAdminEmailIgnoreCase(approverEmail);
+        if (subscriptions.isEmpty()) {
+            log.warn("No Firebase push device is registered for the configured ADMIN approver.");
+            return false;
+        }
+
+        boolean delivered = false;
+        for (AdminPushSubscription subscription : subscriptions) {
             Message message = Message.builder()
                 .setToken(subscription.getDeviceToken())
                 .setNotification(Notification.builder()
-                    .setTitle("Solicitud de acceso ADMIN")
-                    .setBody("Hay una solicitud nueva para revisar.")
+                    .setTitle(requestNotificationTitle())
+                    .setBody(requestNotificationBody(applicantFirstName, applicantLastName, applicantEmail))
                     .build())
                 .putData("link", link)
                 .setWebpushConfig(WebpushConfig.builder()
@@ -86,15 +101,29 @@ public class AdminPushNotificationService {
                 .build();
             try {
                 messaging.send(message);
+                delivered = true;
             } catch (FirebaseMessagingException exception) {
                 log.error("Could not deliver Firebase push for admin request {} (error code {}).",
                     requestId, exception.getMessagingErrorCode(), exception);
-                if (exception.getMessagingErrorCode() == com.google.firebase.messaging.MessagingErrorCode.UNREGISTERED
-                        || exception.getMessagingErrorCode() == com.google.firebase.messaging.MessagingErrorCode.INVALID_ARGUMENT) {
+                if (exception.getMessagingErrorCode()
+                        == com.google.firebase.messaging.MessagingErrorCode.UNREGISTERED) {
                     subscriptionRepository.delete(subscription);
                 }
             }
         }
+        return delivered;
+    }
+
+    static String requestNotificationTitle() {
+        return "Nueva solicitud de acceso ADMIN";
+    }
+
+    static String requestNotificationBody(String applicantFirstName, String applicantLastName,
+                                          String applicantEmail) {
+        return "Nombres: " + applicantFirstName
+            + ". Apellidos: " + applicantLastName
+            + ". Correo: " + applicantEmail
+            + ". Abre el panel para aprobarla o rechazarla.";
     }
 
     private String hash(String value) {

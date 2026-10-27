@@ -85,4 +85,24 @@ class AccountFlowIntegrationTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(header().string("Location", "http://localhost/inicio-de-sesion-mejorado"));
     }
+
+    @Test
+    void publicRegistrationCannotCreateAnAdministratorEvenWhenRoleIsSubmitted() throws Exception {
+        mockMvc.perform(post("/registro")
+                        .with(csrf())
+                        .param("nombres", "Candidato")
+                        .param("apellidos", "Prueba")
+                        .param("username", "adminprobe")
+                        .param("email", "adminprobe@example.test")
+                        .param("password", "safe-password-26")
+                        .param("role", "ADMIN")
+                        .param("adminCode", "forged-admin-code")
+                        .param("terminos", "true"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(header().string("Location", "/inicio-de-sesion-mejorado?registrado=true"));
+
+        Usuario usuario = usuarioRepository.findByUsername("adminprobe");
+        assertThat(usuario).isNotNull();
+        assertThat(usuario.getRole()).isEqualTo("ROLE_USER");
+    }
 }

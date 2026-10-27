@@ -1,12 +1,24 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const roleSelect = document.getElementById('role');
-    const adminCodeGroup = document.getElementById('adminCodeGroup');
-    const adminCodeInput = document.getElementById('adminCode');
     const passwordInput = document.getElementById('password');
     const passwordConfirmInput = document.getElementById('passwordConfirm');
     const passwordStrength = document.querySelector('.auth-strength');
     const passwordStrengthText = document.getElementById('passwordStrengthText');
     const passwordConfirmFeedback = document.getElementById('passwordConfirmFeedback');
+    const registroForm = document.getElementById('registroForm');
+
+    function updateFieldState(field) {
+        if (!field || field.type === 'checkbox') return;
+
+        const hasValue = field.value.trim().length > 0;
+        const isValid = hasValue && field.validity.valid;
+        field.classList.toggle('is-valid', isValid);
+        field.classList.toggle('is-invalid', !isValid);
+        field.setAttribute('aria-invalid', String(!isValid));
+
+        const label = registroForm?.querySelector(`label[for="${field.id}"]`);
+        label?.classList.toggle('is-valid', isValid);
+        label?.classList.toggle('is-invalid', !isValid);
+    }
 
     function updatePasswordStrength() {
         if (!passwordInput || !passwordStrength || !passwordStrengthText) return;
@@ -29,54 +41,50 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!passwordInput || !passwordConfirmInput || !passwordConfirmFeedback) return;
 
         const confirmationValue = passwordConfirmInput.value;
-        const passwordsMatch = confirmationValue.length > 0 && confirmationValue === passwordInput.value;
+        const passwordsMatch = confirmationValue.length > 0
+            && confirmationValue === passwordInput.value
+            && passwordInput.validity.valid;
         const hasMismatch = confirmationValue.length > 0 && !passwordsMatch;
+        const isMissing = !confirmationValue && passwordConfirmInput.dataset.touched === 'true';
 
+        passwordConfirmInput.classList.toggle('is-invalid', hasMismatch || isMissing);
         passwordConfirmInput.classList.toggle('is-valid', passwordsMatch);
-        passwordConfirmInput.classList.toggle('is-invalid', hasMismatch);
-        passwordConfirmInput.setAttribute('aria-invalid', String(hasMismatch));
+        passwordConfirmInput.setAttribute('aria-invalid', String(hasMismatch || isMissing));
+        const confirmLabel = registroForm?.querySelector('label[for="passwordConfirm"]');
+        confirmLabel?.classList.toggle('is-valid', passwordsMatch);
+        confirmLabel?.classList.toggle('is-invalid', hasMismatch || isMissing);
         passwordConfirmFeedback.classList.toggle('is-valid', passwordsMatch);
-        passwordConfirmFeedback.classList.toggle('is-invalid', hasMismatch);
+        passwordConfirmFeedback.classList.toggle('is-invalid', hasMismatch || isMissing);
         passwordConfirmFeedback.textContent = passwordsMatch
             ? 'Las contraseñas coinciden.'
             : hasMismatch
                 ? 'Las contraseñas todavía no coinciden.'
-                : 'Repite la contraseña para confirmarla.';
+                : isMissing
+                    ? 'Este campo es obligatorio.'
+                    : 'Repite la contraseña para confirmarla.';
     }
-
-    function toggleAdminCode() {
-        if (!roleSelect || !adminCodeGroup || !adminCodeInput) return;
-
-        if (roleSelect.value === 'ADMIN') {
-            adminCodeGroup.classList.remove('hidden');
-            adminCodeGroup.style.display = 'block';
-            adminCodeInput.required = true;
-            adminCodeInput.focus();
-        } else {
-            adminCodeGroup.classList.add('hidden');
-            adminCodeGroup.style.display = 'none';
-            adminCodeInput.required = false;
-            adminCodeInput.value = '';
-        }
-    }
-
-    roleSelect?.addEventListener('change', toggleAdminCode);
-    toggleAdminCode();
 
     passwordInput?.addEventListener('input', function() {
+        updateFieldState(passwordInput);
         updatePasswordStrength();
         updatePasswordConfirmation();
     });
-    passwordConfirmInput?.addEventListener('input', updatePasswordConfirmation);
+    passwordConfirmInput?.addEventListener('input', function() {
+        passwordConfirmInput.dataset.touched = 'true';
+        updatePasswordConfirmation();
+    });
 
-    const registroForm = document.getElementById('registroForm');
+    registroForm?.querySelectorAll('input:not([type="checkbox"]):not([type="hidden"])').forEach(function(field) {
+        field.addEventListener('input', function() {
+            if (field !== passwordConfirmInput && field !== passwordInput) updateFieldState(field);
+        });
+    });
+
     if (registroForm) {
         registroForm.addEventListener('submit', function(e) {
             const password = document.getElementById('password').value;
             const passwordConfirm = document.getElementById('passwordConfirm').value;
             const terminos = document.getElementById('terminos').checked;
-            const role = document.getElementById('role').value;
-            const adminCode = document.getElementById('adminCode').value;
 
             if (password !== passwordConfirm) {
                 e.preventDefault();
@@ -89,13 +97,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 e.preventDefault();
                 alert('❌ La contraseña debe tener al menos 6 caracteres.');
                 document.getElementById('password').focus();
-                return false;
-            }
-
-            if (role === 'ADMIN' && adminCode.trim() === '') {
-                e.preventDefault();
-                alert('❌ Solicita e ingresa el código de invitación ADMIN enviado a tu correo.');
-                document.getElementById('adminCode').focus();
                 return false;
             }
 
@@ -113,17 +114,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-
-    document.getElementById('username')?.addEventListener('input', function() {
-        const username = this.value;
-        const minLength = 4;
-        const maxLength = 20;
-        const hasValue = username.length > 0;
-        const isInvalid = hasValue && (username.length < minLength || username.length > maxLength);
-        this.classList.toggle('is-invalid', isInvalid);
-        this.classList.toggle('is-valid', hasValue && !isInvalid);
-        this.setAttribute('aria-invalid', String(isInvalid));
-    });
 
     const card = document.querySelector('.card');
     if (card) {

@@ -23,7 +23,6 @@ import com.proaula.aula.dto.ContactoMensajeDto;
 import com.proaula.aula.dto.BusConsultaDto;
 import com.proaula.aula.dto.BusConsultaMapper;
 import com.proaula.aula.dto.UsuarioFormDto;
-import com.proaula.aula.Service.AdminCodeService;
 import com.proaula.aula.Service.BusService;
 import com.proaula.aula.Service.ContactoMensajeService;
 import com.proaula.aula.Service.RutaService;
@@ -52,7 +51,6 @@ public class HomeController {
     private final RutaService rutaService;
     private final UsuarioService usuarioService;
     private final ViajeService viajeService;
-    private final AdminCodeService adminCodeService;
     private final UsuarioRepository usuarioRepository;
     private final ContactoMensajeService contactoMensajeService;
 
@@ -60,14 +58,12 @@ public class HomeController {
                           RutaService rutaService,
                           UsuarioService usuarioService,
                           ViajeService viajeService,
-                          AdminCodeService adminCodeService,
                           UsuarioRepository usuarioRepository,
                           ContactoMensajeService contactoMensajeService) {
         this.busService = busService;
         this.rutaService = rutaService;
         this.usuarioService = usuarioService;
         this.viajeService = viajeService;
-        this.adminCodeService = adminCodeService;
         this.usuarioRepository = usuarioRepository;
         this.contactoMensajeService = contactoMensajeService;
     }
@@ -92,7 +88,6 @@ public class HomeController {
     @PostMapping("/registro")
     @Transactional
     public String registrar(@ModelAttribute UsuarioFormDto usuarioForm,
-                           @RequestParam(required = false) String adminCode,
                            @RequestParam(required = false) Boolean terminos,
                            Model model) {
         if (Boolean.FALSE.equals(terminos)) {
@@ -122,32 +117,11 @@ public class HomeController {
         usuario.setProvider(usuarioForm.getProvider());
         usuario.setProviderId(usuarioForm.getProviderId());
 
-        String roleIngresado = usuarioForm.getRole() != null ? usuarioForm.getRole().trim().toUpperCase() : "";
-
-        if ("ADMIN".equals(roleIngresado)) {
-            if (adminCode == null || adminCode.trim().isEmpty()) {
-                model.addAttribute(MODEL_ATTR_ERROR, "Debes solicitar y usar un código de invitación ADMIN válido.");
-                model.addAttribute(MODEL_ATTR_USUARIO, usuarioForm);
-                return VIEW_REGISTRO_MEJORADO;
-            }
-            if (!adminCodeService.consumeRegistrationInvite(adminCode.trim(), usuarioForm.getEmail())) {
-                model.addAttribute(MODEL_ATTR_ERROR,
-                    "El código no es válido para este correo, ya fue usado o venció. Solicita uno nuevo.");
-                model.addAttribute(MODEL_ATTR_USUARIO, usuarioForm);
-                return VIEW_REGISTRO_MEJORADO;
-            }
-            usuario.setRole(ROLE_ADMIN);
-        } else {
-            usuario.setRole(ROLE_USER);
-        }
+        usuario.setRole(ROLE_USER);
 
         usuarioService.register(usuario);
 
-        if (ROLE_ADMIN.equals(usuario.getRole())) {
-            return "redirect:/admin-login?registrado=true";
-        } else {
-            return "redirect:/inicio-de-sesion-mejorado?registrado=true";
-        }
+        return "redirect:/inicio-de-sesion-mejorado?registrado=true";
     }
 
     @GetMapping("/index_3")
@@ -235,10 +209,10 @@ public class HomeController {
 
     @GetMapping("/gestionar-usuarios")
     public String gestionarUsuarios(@RequestParam(value = "buscar", defaultValue = "") String buscar, Model model) {
-        return prepararGestionUsuarios(buscar, model, null);
+        return prepararGestionUsuarios(buscar, model);
     }
 
-    private String prepararGestionUsuarios(String buscar, Model model, UsuarioFormDto nuevoUsuario) {
+    private String prepararGestionUsuarios(String buscar, Model model) {
         List<Usuario> cuentas = usuarioService.getAllUsuarios();
         String consulta = buscar == null ? "" : buscar.trim();
         List<Usuario> coincidencias = cuentas;
@@ -276,7 +250,6 @@ public class HomeController {
         model.addAttribute("totalCoincidencias", coincidencias.size());
         model.addAttribute("totalAdministradores", totalAdministradores);
         model.addAttribute("totalUsuarios", cuentas.size() - totalAdministradores);
-        model.addAttribute("nuevoUsuario", nuevoUsuario == null ? new UsuarioFormDto() : nuevoUsuario);
         return VIEW_ADMIN_GESTIONAR_USUARIOS;
     }
 
@@ -335,30 +308,6 @@ public class HomeController {
 
         redirectAttrs.addFlashAttribute(MODEL_ATTR_MENSAJE, "Usuario actualizado correctamente.");
         return REDIRECT_GESTIONAR_USUARIOS;
-    }
-
-    @PostMapping("/admin-crear-usuario")
-    public String crearUsuario(@ModelAttribute UsuarioFormDto usuarioForm, Model model) {
-        if (usuarioService.findByUsername(usuarioForm.getUsername()) != null) {
-            model.addAttribute(MODEL_ATTR_ERROR, "El nombre de usuario ya está en uso");
-            return prepararGestionUsuarios("", model, usuarioForm);
-        }
-
-        if (usuarioRepository.findByEmail(usuarioForm.getEmail()) != null) {
-            model.addAttribute(MODEL_ATTR_ERROR, "El email ya está registrado");
-            return prepararGestionUsuarios("", model, usuarioForm);
-        }
-
-        Usuario usuario = new Usuario();
-        usuario.setUsername(usuarioForm.getUsername());
-        usuario.setPassword(usuarioForm.getPassword());
-        usuario.setNombres(usuarioForm.getNombres());
-        usuario.setApellidos(usuarioForm.getApellidos());
-        usuario.setEmail(usuarioForm.getEmail());
-        usuario.setRole(ROLE_ADMIN);
-
-        usuarioService.register(usuario);
-        return "redirect:/gestionar-usuarios?creado=true";
     }
 
     @GetMapping("/reportes")

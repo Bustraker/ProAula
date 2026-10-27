@@ -249,16 +249,16 @@
                                 <i class="fas fa-route"></i>
                                 <span>
                                     <strong>Ruta:</strong>
-                                    <span th:if="${bus.rutaId != null}">
-                                        <a th:href="@{/ruta/{id}(id=${bus.rutaId})}" class="link-primary" th:text="${bus.rutaNombre != null ? bus.rutaNombre : 'Ver ruta'}">Ruta Centro</a>
+                                    <span th:if="${bus.ruta != null}">
+                                        <a th:href="@{/ruta/{id}(id=${bus.ruta.id})}" class="link-primary" th:text="${bus.ruta.nombre}">Ruta Centro</a>
                                     </span>
-                                    <span th:unless="${bus.rutaId != null}" class="text-gray-500">Sin ruta</span>
+                                    <span th:unless="${bus.ruta != null}" class="text-gray-500">Sin ruta</span>
                                 </span>
                             </div>
                         </div>
                     </div>
                     <div class="ruta-card-footer">
-                        <a th:if="${bus.rutaId != null}" th:href="@{/ruta/{id}(id=${bus.rutaId})}" class="btn btn-primary btn-sm">
+                        <a th:if="${bus.ruta != null}" th:href="@{/ruta/{id}(id=${bus.ruta.id})}" class="btn btn-primary btn-sm">
                             Ver Ruta
                         </a>
                         <span class="badge badge-success">Activo</span>

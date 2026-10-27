@@ -11,7 +11,8 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/style_login.css}">
     <link rel="stylesheet" th:href="@{/css/style_common.css}">
-    <link rel="stylesheet" th:href="@{/css/style_auth.css}">
+    <link rel="stylesheet" th:href="@{/css/style_auth.css(v='20261024-1')}">
+    <link rel="stylesheet" th:href="@{/css/style_auth_experience.css(v='20261024-3')}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" th:href="@{/images/logo.png}" type="image/png">
 </head>
@@ -37,22 +38,59 @@
     <!-- Contenido principal -->
     <main class="hero-section auth-page auth-page--login">
         <div class="container container-sm auth-layout auth-layout--login">
-            <aside class="auth-story" aria-label="Marca Bustraker">
-                <div class="auth-story__brand">
-                    <img th:src="@{/images/logo.png}" alt="">
-                    <span>Bustraker</span>
+            <aside class="auth-story auth-story--login" aria-label="Viaja con Bustraker">
+                <div class="auth-story__topline">
+                    <a class="auth-story__brand" th:href="@{/}" aria-label="Bustraker, ir al inicio">
+                        <img th:src="@{/images/logo.png}" alt="">
+                        <span>Bustraker</span>
+                    </a>
+                    <span class="auth-live"><span></span> MOVILIDAD EN VIVO</span>
                 </div>
-                <div class="auth-route-art" aria-hidden="true">
-                    <span class="auth-stop auth-stop--start"><i class="fas fa-location-dot"></i></span>
-                    <span class="auth-route-art__line"></span>
-                    <span class="auth-bus"><i class="fas fa-bus"></i></span>
-                    <span class="auth-stop auth-stop--end"><i class="fas fa-location-dot"></i></span>
+                <div class="auth-story__copy">
+                    <p class="auth-kicker">TU CIUDAD, A TU RITMO</p>
+                    <p class="auth-story__headline">Cada trayecto empieza <span>aquí.</span></p>
+                    <p>Entra y encuentra una forma más simple de moverte por Cartagena.</p>
+                </div>
+                <div class="auth-scene auth-scene--access" aria-hidden="true">
+                    <div class="access-scene__label"><i class="fas fa-fingerprint"></i> ACCESO PERSONAL Y PROTEGIDO</div>
+                    <div class="access-scene__visual">
+                        <div class="access-credential-card">
+                            <div class="access-credential-card__heading">
+                                <span class="access-avatar"><i class="fas fa-user"></i></span>
+                                <span><strong>Tu cuenta</strong><small>Identidad Bustraker</small></span>
+                                <i class="fas fa-ellipsis"></i>
+                            </div>
+                            <div class="access-credential-card__field">
+                                <small>USUARIO</small>
+                                <span class="access-username"><i class="fas fa-at"></i> tu usuario</span>
+                            </div>
+                            <div class="access-credential-card__field">
+                                <small>CONTRASEÑA</small>
+                                <span class="access-password"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+                            </div>
+                            <div class="access-credential-card__button"><span>ENTRAR A MI CUENTA</span><i class="fas fa-arrow-right"></i></div>
+                        </div>
+                        <div class="access-security">
+                            <div class="access-security__shield">
+                                <i class="fas fa-shield-halved"></i>
+                                <span><i class="fas fa-lock"></i></span>
+                            </div>
+                            <span class="access-security__status"><i class="fas fa-check"></i> IDENTIDAD VERIFICADA</span>
+                        </div>
+                    </div>
+                    <div class="access-scene__caption"><span></span> Un inicio de sesión seguro te lleva de vuelta a tus viajes.</div>
+                </div>
+                <div class="auth-story__bottom">
+                    <span><i class="fas fa-shield-halved"></i> Acceso seguro</span>
+                    <span>HECHO PARA MOVERTE <i class="fas fa-arrow-right"></i></span>
                 </div>
             </aside>
             <section class="auth-content" aria-labelledby="loginTitle">
             <div class="card_animate-slideUp">
                 <div class="card-header">
-                    <h1 id="loginTitle"><i class="fas fa-sign-in-alt" aria-hidden="true"></i> Iniciar Sesión</h1>
+                    <span class="auth-card-kicker">QUÉ BUENO TENERTE DE VUELTA</span>
+                    <h1 id="loginTitle">Inicia sesión</h1>
+                    <p class="auth-card-intro">Continúa tu viaje desde donde lo dejaste.</p>
                 </div>
                 <div class="card-body">
                     <div th:if="${param.oauthError}" class="alert alert-danger" role="alert">
