@@ -1,0 +1,22 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Maven Compile (wrapper)",
+            "type": "process",
+            "command": "${workspaceFolder}\\aula\\mvnw.cmd",
+            "args": [
+                "clean",
+                "compile"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}\\aula"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        }
+    ]
+}

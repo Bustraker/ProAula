@@ -7,8 +7,9 @@
             "cwd": "${workspaceFolder}",
             "mainClass": "com.proaula.aula.AulaApplication",
             "projectName": "aula",
+            "preLaunchTask": "Maven Compile (wrapper)",
             "args": "",
-            "envFile": "${workspaceFolder}/.env"
+            "envFile": "${workspaceFolder}/aula/.env"
         }
     ]
 }
