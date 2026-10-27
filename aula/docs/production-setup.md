@@ -23,10 +23,10 @@ Define estas variables antes de iniciar el proceso:
 | `BOOTSTRAP_ADMIN_USERNAME` | Condicional | Usuario inicial; obligatorio si `BOOTSTRAP_ADMIN_ENABLED=true`. |
 | `BOOTSTRAP_ADMIN_EMAIL` | Condicional | Correo del administrador inicial; obligatorio si `BOOTSTRAP_ADMIN_ENABLED=true`. |
 | `BOOTSTRAP_ADMIN_PASSWORD` | Condicional | Contraseña inicial; obligatorio si `BOOTSTRAP_ADMIN_ENABLED=true`. |
-| `MAIL_USERNAME` | Sí | Cuenta SMTP emisora; puede ser distinta de `ADMIN_APPROVER_EMAIL`. |
-| `MAIL_PASSWORD` | Sí | Contraseña de aplicación SMTP, guardada como secreto. |
-| `ADMIN_APPROVER_EMAIL` | Sí | Correo de la cuenta ADMIN autorizada para aprobar. |
-| `APP_PUBLIC_BASE_URL` | Sí | Origen HTTPS público del backend, sin barra final ni ruta. |
+| `MAIL_USERNAME` | Para el flujo de invitaciones ADMIN | Cuenta SMTP emisora; puede ser distinta de `ADMIN_APPROVER_EMAIL`. |
+| `MAIL_PASSWORD` | Para el flujo de invitaciones ADMIN | Contraseña de aplicación SMTP, guardada como secreto. |
+| `ADMIN_APPROVER_EMAIL` | Para el flujo de invitaciones ADMIN | Correo de la cuenta ADMIN autorizada para aprobar. |
+| `APP_PUBLIC_BASE_URL` | No | Origen HTTPS público del backend; por defecto `https://proaula.onrender.com`. |
 | `FIREBASE_VAPID_KEY` | Sí para push | Clave pública Web Push configurada en Firebase. |
 | `FIREBASE_ADMIN_ENABLED` | Sí para push | Debe ser `true` para enviar notificaciones desde el backend. |
 | `FIREBASE_CREDENTIALS_FILE` | Solo si no hay identidad administrada | Ruta `file:` a credenciales externas al repositorio; vacía cuando se usa ADC. |
@@ -44,11 +44,15 @@ la cuenta SMTP emisora y puede ser diferente del aprobador. Proporciona una
 contraseña de aplicación SMTP vigente mediante `MAIL_PASSWORD`; no la guardes
 en archivos del proyecto.
 
-Los valores de correo, aprobador, URL pública, VAPID y habilitación de Firebase
-son obligatorios para el flujo en el perfil `prod`; dicho perfil no arranca si
-faltan las variables. `ADMIN_APPROVER_EMAIL` es el destinatario y aprobador;
-`MAIL_USERNAME` es el remitente autenticado por SMTP. Sin Firebase Admin o VAPID, la interfaz deshabilita la
-activación de push y solo queda el correo como canal de aviso.
+El perfil `prod` puede arrancar sin correo ni Firebase configurados. Sin
+`MAIL_USERNAME`, `MAIL_PASSWORD` o `ADMIN_APPROVER_EMAIL`, las operaciones de
+invitación, aprobación y rechazo ADMIN que requieren correo fallan con un error
+explícito de configuración; no se envían mensajes. Para habilitar ese flujo,
+configura `ADMIN_APPROVER_EMAIL`, `MAIL_USERNAME` y `MAIL_PASSWORD` en el gestor
+de secretos. `APP_PUBLIC_BASE_URL` usa el origen de Render indicado arriba si no
+se define. Push permanece deshabilitado de forma predeterminada: configura
+`FIREBASE_VAPID_KEY`, `FIREBASE_ADMIN_ENABLED=true` y credenciales Firebase
+válidas para habilitarlo. Sin push configurado, la interfaz no permite activarlo.
 
 Genera `JWT_SECRET` fuera del repositorio, por ejemplo con
 `openssl rand -base64 48`, y guárdalo en el gestor de secretos del entorno. No uses

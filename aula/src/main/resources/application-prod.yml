@@ -4,8 +4,8 @@ spring:
     locations: classpath:db/migration/mysql
     baseline-on-migrate: true
   mail:
-    username: ${MAIL_USERNAME}
-    password: ${MAIL_PASSWORD}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
   datasource:
     url: ${SPRING_DATASOURCE_URL}
     username: ${SPRING_DATASOURCE_USERNAME}
@@ -23,8 +23,8 @@ jwt:
   secret: ${JWT_SECRET}
 app:
   admin:
-    approver-email: ${ADMIN_APPROVER_EMAIL}
-  public-base-url: ${APP_PUBLIC_BASE_URL}
+    approver-email: ${ADMIN_APPROVER_EMAIL:}
+  public-base-url: ${APP_PUBLIC_BASE_URL:https://proaula.onrender.com}
   firebase:
-    vapid-key: ${FIREBASE_VAPID_KEY}
-    admin-enabled: ${FIREBASE_ADMIN_ENABLED}
+    vapid-key: ${FIREBASE_VAPID_KEY:}
+    admin-enabled: ${FIREBASE_ADMIN_ENABLED:false}
