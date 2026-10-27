@@ -121,7 +121,7 @@ public class SecurityConfig {
                     .oidcUserService(customOAuth2UserService::loadOidcUser)
                     .userService(customOAuth2UserService))
                 .successHandler(oauth2LoginSuccessHandler)
-                .failureUrl("/inicio-de-sesion-mejorado?error=true")
+                .failureUrl("/inicio-de-sesion-mejorado?oauthError=true")
             )
             .logout(logout -> logout
                 .logoutUrl("/logout")

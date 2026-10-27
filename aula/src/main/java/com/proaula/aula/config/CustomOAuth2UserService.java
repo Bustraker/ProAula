@@ -70,13 +70,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         return new LocalOidcUser(oidcUser, localUser);
     }
 
-    private OAuth2User processOAuth2User(OAuth2UserRequest userRequest, OAuth2User oauth2User) {
+    OAuth2User processOAuth2User(OAuth2UserRequest userRequest, OAuth2User oauth2User) {
         String registrationId = userRequest.getClientRegistration().getRegistrationId().toLowerCase(Locale.ROOT);
-        String email = getVerifiedEmail(userRequest, oauth2User, registrationId);
+        String email = getProviderEmail(userRequest, oauth2User, registrationId);
 
         if (email == null || email.isBlank()) {
             throw new OAuth2AuthenticationException(
-                "El proveedor OAuth2 no confirmó un correo electrónico verificado");
+                "El proveedor OAuth2 no devolvió un correo electrónico utilizable");
         }
 
         String providerId = getProviderId(oauth2User, registrationId);
@@ -86,8 +86,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         }
         Usuario usuario = usuarioRepository.findByProviderAndProviderId(
             registrationId.toUpperCase(Locale.ROOT), providerId);
-        if (usuario == null) {
+        if (usuario == null && !"facebook".equals(registrationId)) {
             usuario = usuarioRepository.findByEmail(email);
+        }
+        if (usuario == null && "facebook".equals(registrationId)
+                && usuarioRepository.existsByEmail(email)) {
+            throw new OAuth2AuthenticationException(
+                "El correo de Facebook ya pertenece a otra cuenta; inicia sesión con esa cuenta para evitar vincularla sin verificación");
         }
         if (usuario == null) {
             usuario = createUsuarioFromOAuth2User(oauth2User, registrationId, email);
@@ -142,6 +147,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         prefix = prefix.replaceAll("[^A-Za-z0-9]", "");
         if (prefix.isBlank()) {
             prefix = "user";
+        } else if (prefix.length() < 4) {
+            prefix = "user" + prefix;
         }
 
         String username;
@@ -156,7 +163,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         return username;
     }
 
-    private String getVerifiedEmail(OAuth2UserRequest userRequest, OAuth2User user, String registrationId) {
+    private String getProviderEmail(OAuth2UserRequest userRequest, OAuth2User user, String registrationId) {
         String email = user.getAttribute(ATTRIBUTE_EMAIL);
         if (PROVIDER_GITHUB.equals(registrationId)) {
             email = fetchGithubEmail(userRequest);
@@ -168,11 +175,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             if (!Boolean.TRUE.equals(user.getAttribute("verified"))) {
                 return null;
             }
-        } else if ("facebook".equals(registrationId)) {
-            if (!Boolean.TRUE.equals(user.getAttribute("email_verified"))) {
-                return null;
-            }
-        } else {
+        } else if (!"facebook".equals(registrationId)) {
             return null;
         }
         return email == null ? null : email.trim().toLowerCase(Locale.ROOT);
@@ -188,31 +191,35 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private String getFirstName(OAuth2User user, String registrationId) {
         if (PROVIDER_GOOGLE.equals(registrationId)) {
-            return user.getAttribute("given_name");
+            return nonBlankOrDefault(user.getAttribute("given_name"), "Usuario");
         }
         if ("discord".equals(registrationId)) {
             String displayName = user.getAttribute("global_name");
             if (displayName == null || displayName.isBlank()) {
                 displayName = user.getAttribute("username");
             }
-            return displayName != null ? displayName : "Usuario";
+            return nonBlankOrDefault(displayName, "Usuario");
         }
         String name = user.getAttribute("name");
         if (name != null && name.contains(" ")) {
             return name.substring(0, name.lastIndexOf(' '));
         }
-        return name != null ? name : "Usuario";
+        return nonBlankOrDefault(name, "Usuario");
     }
 
     private String getLastName(OAuth2User user, String registrationId) {
         if (PROVIDER_GOOGLE.equals(registrationId)) {
-            return user.getAttribute("family_name");
+            return nonBlankOrDefault(user.getAttribute("family_name"), "No especificado");
         }
         String name = user.getAttribute("name");
         if (name != null && name.contains(" ")) {
             return name.substring(name.lastIndexOf(' ') + 1);
         }
-        return "";
+        return "No especificado";
+    }
+
+    private String nonBlankOrDefault(String value, String defaultValue) {
+        return value == null || value.isBlank() ? defaultValue : value.trim();
     }
 
     private String fetchGithubEmail(OAuth2UserRequest userRequest) {

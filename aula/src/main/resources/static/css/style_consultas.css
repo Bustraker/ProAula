@@ -68,11 +68,11 @@
     gap: 11px;
 }
 
-.directory-brand img,
-.directory-footer-brand img {
-    width: 46px;
-    height: 46px;
+.directory-brand img {
+    width: 210px;
+    height: auto;
     object-fit: contain;
+    flex: 0 0 auto;
 }
 
 .directory-brand > span,
@@ -1465,6 +1465,7 @@
 .directory-footer-brand img {
     width: 35px;
     height: 35px;
+    object-fit: contain;
 }
 
 .directory-footer-brand strong {
@@ -1640,8 +1641,12 @@
     }
 
     .directory-brand img {
-        width: 39px;
-        height: 39px;
+        width: 176px;
+    }
+
+    .directory-footer-brand img {
+        width: 148px;
+        height: 61px;
     }
 
     .directory-brand strong {

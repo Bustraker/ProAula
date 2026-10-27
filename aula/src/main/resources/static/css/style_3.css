@@ -660,10 +660,11 @@ button[type="submit"]:active {
 }
 
 .public-home header img#logo2 {
-    width: 50px;
-    height: 50px;
+    width: 210px;
+    height: auto;
     margin: 0;
     object-fit: contain;
+    flex: 0 0 auto;
 }
 
 .public-home .brand-copy {
@@ -1440,6 +1441,10 @@ button[type="submit"]:active {
 @media (max-width: 700px) {
     .public-home .public-topbar {
         padding: 18px 22px;
+    }
+
+    .public-home header img#logo2 {
+        width: 180px;
     }
 
     .public-home .public-hero {

@@ -2,9 +2,9 @@
 
 ## Perfil y base de datos
 
-Inicia la aplicación con `SPRING_PROFILES_ACTIVE=prod`. El perfil `prod` usa MySQL y
-`spring.jpa.hibernate.ddl-auto=validate`: comprueba que las tablas y columnas ya
-existen y son compatibles, pero no crea ni modifica el esquema.
+Inicia la aplicación con `SPRING_PROFILES_ACTIVE=prod`. El perfil `prod` usa MySQL.
+En el workaround temporal actualmente desplegado, Hibernate no valida ni modifica
+el esquema (`spring.jpa.hibernate.ddl-auto=none`).
 
 Define estas variables antes de iniciar el proceso:
 
@@ -36,11 +36,18 @@ OAuth en el gestor de secretos solo para los proveedores que se vayan a ofrecer:
 
 ## Esquema y despliegue
 
-No hay una migración Flyway/Liquibase versionada en este proyecto. Antes de desplegar,
-aprovisiona o migra la base por un proceso controlado y confirma que su esquema
-corresponda a las entidades actuales. La aplicación fallará al arrancar si `validate`
-detecta diferencias. No cambies `ddl-auto` a `update` en producción para sortear
-errores de esquema; define y revisa las migraciones antes de automatizar cambios.
+**Workaround temporal de Render:** el perfil `prod` tiene Flyway deshabilitado y
+`ddl-auto=none` porque la conexión TiDB se cierra durante el baseline de Flyway. Esto
+permite que Hibernate no rechace el tipo existente de `horario.dias_semana`, pero no
+modifica esa columna y deja de validar todo el esquema. No lo consideres una reparación
+permanente.
+
+La migración preparada
+`src/main/resources/db/migration/mysql/V20261015_02__normalize_horario_days_column.sql`
+convierte `horario.dias_semana` de `SET` a `VARCHAR(255)`. Cuando se confirme que TiDB
+acepta la operación, habilita Flyway en `application-prod.yml`, ejecuta la migración y
+restablece `ddl-auto=validate`. No cambies `ddl-auto` a `update` para ocultar diferencias
+de esquema.
 ## Datos sintéticos de prueba
 
 El perfil local carga las rutas provisionales y sus paradas desde

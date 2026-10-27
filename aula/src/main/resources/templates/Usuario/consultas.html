@@ -8,14 +8,13 @@
     <title>Consulta de buses - Bustraker</title>
     <link rel="stylesheet" th:href="@{/css/style_consultas.css(v='bus-directory-20261007-18')}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="shortcut icon" th:href="@{/images/Bus_icono.png}" type="image/x-icon">
+    <link rel="icon" th:href="@{/images/logo.png}" type="image/png">
 </head>
 <body class="bus-directory-page" th:classappend="${autenticado} ? ' bus-directory-page--authenticated' : ' bus-directory-page--public'">
     <header class="directory-header">
         <div class="directory-topbar">
             <a class="directory-brand" th:href="${autenticado} ? @{/dashboard} : @{/index_3_public}" aria-label="Bustraker, inicio">
-                <img th:src="@{/images/Bus_palmera.png}" alt="">
-                <span><strong>Bustraker</strong><small>Cartagena se mueve</small></span>
+                <img th:src="@{/images/bustraker-logo-full.png}" alt="Bustraker, Cartagena se mueve contigo">
             </a>
             <nav class="directory-primary-nav" aria-label="Navegación principal">
                 <a th:if="${!autenticado}" th:href="@{/index_3_public}">Inicio</a>
@@ -283,8 +282,7 @@
     <footer class="directory-footer">
         <div class="directory-footer-inner">
             <a class="directory-footer-brand" th:href="${autenticado} ? @{/dashboard} : @{/index_3_public}">
-                <img th:src="@{/images/Bus_palmera.png}" alt="">
-                <span><strong>Bustraker</strong><small>Cartagena se mueve</small></span>
+                <img th:src="@{/images/logo.png}" alt="">
             </a>
             <span class="directory-footer-copy" th:text="${autenticado} ? 'Información de movilidad asociada a tu sesión.' : 'Información pública de rutas para una ciudad en movimiento.'">Información pública de rutas para una ciudad en movimiento.</span>
             <a class="directory-footer-home" th:href="${autenticado} ? @{/dashboard} : @{/index_3_public}" th:text="${autenticado} ? 'Panel' : 'Inicio'">Inicio</a>

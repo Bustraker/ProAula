@@ -1,0 +1,2 @@
+ALTER TABLE horario
+    MODIFY COLUMN dias_semana VARCHAR(255) NULL;
