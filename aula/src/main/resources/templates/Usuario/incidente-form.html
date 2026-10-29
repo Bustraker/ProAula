@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#01315f">
+    <title>Reportar incidente - Bustraker</title>
+    <link rel="icon" th:href="@{/images/logo.png}" type="image/png">
+    <link rel="stylesheet" th:href="@{/css/style_common.css}">
+    <link rel="stylesheet" th:href="@{/css/incidentes.css}">
+</head>
+<body class="incident-page">
+<main class="incident-shell">
+    <a class="incident-back" th:href="@{/dashboard}">← Volver al panel</a>
+    <section class="incident-card" aria-labelledby="incident-title">
+        <p class="incident-eyebrow">BUSTRAKER · CARTAGENA</p>
+        <h1 id="incident-title">Reportar un incidente</h1>
+        <p class="incident-intro">Cuéntanos qué ocurrió para informar a la administración.</p>
+
+        <div th:if="${success}" class="incident-alert incident-alert--success" role="status"
+             th:text="${success}">Incidente registrado correctamente.</div>
+        <div th:if="${error}" class="incident-alert incident-alert--error" role="alert"
+             th:text="${error}">No se pudo registrar el incidente.</div>
+
+        <form th:action="@{/incidentes}" th:object="${incidenteForm}" method="post" class="incident-form">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+
+            <div class="incident-field">
+                <label for="tipo">Tipo de incidente <span aria-hidden="true">*</span></label>
+                <select id="tipo" th:field="*{tipo}" required>
+                    <option value="">Selecciona un tipo</option>
+                    <option th:each="tipo : ${tiposIncidente}" th:value="${tipo}"
+                            th:text="${tipo.etiqueta}">Retraso</option>
+                </select>
+                <p class="incident-field-error" th:if="${#fields.hasErrors('tipo')}"
+                   th:errors="*{tipo}">Selecciona el tipo de incidente.</p>
+            </div>
+
+            <div class="incident-field">
+                <label for="rutaId">Ruta afectada <span aria-hidden="true">*</span></label>
+                <select id="rutaId" th:field="*{rutaId}" required>
+                    <option value="">Selecciona una ruta</option>
+                    <option th:each="ruta : ${rutas}" th:value="${ruta.id}"
+                            th:text="${ruta.nombre + (ruta.origen != null && ruta.destino != null ? ' (' + ruta.origen + ' - ' + ruta.destino + ')' : '')}">
+                        Ruta Centro
+                    </option>
+                </select>
+                <p class="incident-field-error" th:if="${#fields.hasErrors('rutaId')}"
+                   th:errors="*{rutaId}">Selecciona la ruta afectada.</p>
+                <p class="incident-help" th:if="${#lists.isEmpty(rutas)}">
+                    No hay rutas disponibles para reportar. Inténtalo más tarde.
+                </p>
+            </div>
+
+            <div class="incident-field">
+                <label for="descripcion">Descripción <span aria-hidden="true">*</span></label>
+                <textarea id="descripcion" th:field="*{descripcion}" rows="6" maxlength="2000"
+                          placeholder="Describe qué ocurrió y dónde..." required></textarea>
+                <p class="incident-field-error" th:if="${#fields.hasErrors('descripcion')}"
+                   th:errors="*{descripcion}">Escribe una descripción del incidente.</p>
+                <p class="incident-help">Máximo 2000 caracteres.</p>
+            </div>
+
+            <button type="submit" class="incident-submit" th:disabled="${#lists.isEmpty(rutas)}">
+                Reportar incidente
+            </button>
+        </form>
+    </section>
+</main>
+</body>
+</html>

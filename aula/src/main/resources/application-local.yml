@@ -13,7 +13,7 @@ spring:
       ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
 app:
   firebase:
-    admin-enabled: ${FIREBASE_ADMIN_ENABLED:true}
+    admin-enabled: ${FIREBASE_ADMIN_ENABLED:false}
     credentials-file: ${FIREBASE_CREDENTIALS_FILE:}
     vapid-key: ${FIREBASE_VAPID_KEY:}
   synthetic-data:
@@ -29,4 +29,4 @@ server:
       cookie:
         secure: ${SESSION_COOKIE_SECURE:false}
 jwt:
-  secret: ${JWT_SECRET}
+  secret: ${JWT_SECRET:${random.uuid}}

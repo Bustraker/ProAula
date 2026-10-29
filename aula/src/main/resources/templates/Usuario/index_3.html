@@ -36,6 +36,9 @@
                     <a th:href="@{/viajar}" class="nav-link">
                         <i class="fas fa-bus"></i> Viajar
                     </a>
+                    <a th:href="@{/incidentes/nuevo}" class="nav-link">
+                        <i class="fas fa-triangle-exclamation"></i> Reportar incidente
+                    </a>
                     <a th:href="@{/consultas}" class="nav-link">
                         <i class="fas fa-search"></i> Consultar Bus
                     </a>
@@ -208,6 +211,13 @@
                         <i class="fas fa-user-cog dashboard-card-icon dashboard-card-icon--danger"></i>
                         <h3>Mi Perfil</h3>
                         <p class="text-gray-600">Gestiona tus datos personales.</p>
+                    </div>
+                </a>
+                <a th:href="@{/incidentes/nuevo}" class="card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-triangle-exclamation dashboard-card-icon dashboard-card-icon--danger"></i>
+                        <h3>Reportar incidente</h3>
+                        <p class="text-gray-600">Informa sobre retrasos, accidentes o fallas del servicio.</p>
                     </div>
                 </a>
             </div>

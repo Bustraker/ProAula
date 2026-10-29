@@ -22,6 +22,7 @@ import com.proaula.aula.Repository.AsignacionRutaBusRepository;
 import com.proaula.aula.Repository.ViajeRepository;
 import com.proaula.aula.Repository.PasajeRepository;
 import com.proaula.aula.Repository.RutaRepository;
+import com.proaula.aula.Repository.IncidenteRepository;
 
 @Service
 public class RutaService {
@@ -48,6 +49,9 @@ public class RutaService {
 
     @Autowired
     private PasajeRepository pasajeRepository;
+
+    @Autowired
+    private IncidenteRepository incidenteRepository;
 
     @Transactional(readOnly = true)
     public List<Ruta> getAllRutas() {
@@ -93,7 +97,7 @@ public class RutaService {
         }
         if (hasRelatedRecords(id)) {
             throw new AulaException(
-                "No se puede eliminar la ruta porque tiene buses, paradas, horarios, asignaciones o historial asociado.",
+                "No se puede eliminar la ruta porque tiene buses, paradas, horarios, asignaciones, incidentes o historial asociado.",
                 "RESOURCE_IN_USE");
         }
         rutaRepository.deleteById(id);
@@ -107,7 +111,8 @@ public class RutaService {
                 || horarioRepository.existsByRuta_Id(id)
                 || asignacionRutaBusRepository.existsByRuta_Id(id)
                 || viajeRepository.existsByRuta_Id(id)
-                || pasajeRepository.existsByRuta_Id(id));
+                || pasajeRepository.existsByRuta_Id(id)
+                || incidenteRepository.existsByRuta_Id(id));
     }
 
     public long count() {

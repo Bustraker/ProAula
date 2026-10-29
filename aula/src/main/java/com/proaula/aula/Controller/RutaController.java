@@ -160,7 +160,7 @@ public class RutaController {
     public String eliminarRuta(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         if (rutaService.hasRelatedRecords(id)) {
             redirectAttributes.addFlashAttribute("errorMessage",
-                "No se puede eliminar la ruta porque tiene buses, paradas o historial asociado.");
+                "No se puede eliminar la ruta porque tiene buses, paradas, incidentes o historial asociado.");
             return "redirect:/rutas/admin?error=relaciones";
         }
         rutaService.deleteRuta(id);

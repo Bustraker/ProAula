@@ -1,0 +1,137 @@
+.incident-page {
+    min-height: 100vh;
+    margin: 0;
+    padding: 2rem 1rem;
+    background: #f3f6fa;
+    color: #172b3a;
+    font-family: Arial, sans-serif;
+}
+
+.incident-shell {
+    width: min(100%, 680px);
+    margin: 0 auto;
+}
+
+.incident-back {
+    display: inline-block;
+    margin: 0 0 1rem;
+    color: #175a83;
+    text-decoration: none;
+}
+
+.incident-card {
+    padding: clamp(1.25rem, 4vw, 2.5rem);
+    border: 1px solid #dce5ed;
+    border-radius: 1rem;
+    background: #fff;
+    box-shadow: 0 12px 32px rgb(23 43 58 / 8%);
+}
+
+.incident-eyebrow {
+    margin: 0 0 .5rem;
+    color: #287c91;
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+}
+
+.incident-card h1 {
+    margin: 0;
+    font-size: clamp(1.7rem, 5vw, 2.3rem);
+}
+
+.incident-intro {
+    margin: .75rem 0 1.5rem;
+    color: #526575;
+}
+
+.incident-form {
+    display: grid;
+    gap: 1.25rem;
+}
+
+.incident-field {
+    display: grid;
+    gap: .45rem;
+}
+
+.incident-field label {
+    font-weight: 700;
+}
+
+.incident-field label span {
+    color: #b42318;
+}
+
+.incident-field select,
+.incident-field textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: .8rem .9rem;
+    border: 1px solid #b9c8d3;
+    border-radius: .55rem;
+    background: #fff;
+    color: inherit;
+    font: inherit;
+}
+
+.incident-field select:focus,
+.incident-field textarea:focus {
+    outline: 3px solid rgb(40 124 145 / 20%);
+    border-color: #287c91;
+}
+
+.incident-field textarea {
+    resize: vertical;
+}
+
+.incident-help {
+    margin: 0;
+    color: #627586;
+    font-size: .88rem;
+}
+
+.incident-field-error {
+    margin: 0;
+    color: #b42318;
+    font-size: .9rem;
+}
+
+.incident-alert {
+    margin: 1rem 0;
+    padding: .85rem 1rem;
+    border-radius: .55rem;
+}
+
+.incident-alert--success {
+    border: 1px solid #9bd5ae;
+    background: #effaf2;
+    color: #176b36;
+}
+
+.incident-alert--error {
+    border: 1px solid #efaaa5;
+    background: #fff3f2;
+    color: #9f2118;
+}
+
+.incident-submit {
+    justify-self: start;
+    padding: .85rem 1.25rem;
+    border: 0;
+    border-radius: .55rem;
+    background: #075985;
+    color: #fff;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.incident-submit:hover:not(:disabled) {
+    background: #064766;
+}
+
+.incident-submit:disabled {
+    cursor: not-allowed;
+    opacity: .55;
+}
