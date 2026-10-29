@@ -99,6 +99,10 @@ public class Incidente {
         return estado;
     }
 
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
+
     public LocalDateTime getFechaReporte() {
         return fechaReporte;
     }

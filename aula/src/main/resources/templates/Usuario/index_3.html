@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -38,6 +38,9 @@
                     </a>
                     <a th:href="@{/incidentes/nuevo}" class="nav-link">
                         <i class="fas fa-triangle-exclamation"></i> Reportar incidente
+                    </a>
+                    <a th:href="@{/incidentes/panel}" class="nav-link" sec:authorize="hasRole('ADMIN')">
+                        <i class="fas fa-list"></i> Panel de incidentes
                     </a>
                     <a th:href="@{/consultas}" class="nav-link">
                         <i class="fas fa-search"></i> Consultar Bus

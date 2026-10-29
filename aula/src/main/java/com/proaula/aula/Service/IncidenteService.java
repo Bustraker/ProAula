@@ -6,15 +6,21 @@ import com.proaula.aula.Entity.Usuario;
 import com.proaula.aula.Repository.IncidenteRepository;
 import com.proaula.aula.Repository.RutaRepository;
 import com.proaula.aula.Repository.UsuarioRepository;
+import com.proaula.aula.dto.IncidentePanelResponse;
 import com.proaula.aula.dto.IncidenteReportRequest;
 import com.proaula.aula.exception.AulaException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 @Service
 public class IncidenteService {
+
+    private static final Set<String> ESTADOS_PERMITIDOS =
+            Set.of("PENDIENTE", "EN_ATENCION", "RESUELTO", "DESCARTADO");
 
     private final IncidenteRepository incidenteRepository;
     private final RutaRepository rutaRepository;
@@ -31,6 +37,21 @@ public class IncidenteService {
     @Transactional(readOnly = true)
     public List<Ruta> getRutas() {
         return rutaRepository.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    public List<IncidentePanelResponse> listar(String tipo, String ruta) {
+        String tipoFiltro = normalizarFiltro(tipo);
+        String rutaFiltro = normalizarFiltro(ruta);
+        return incidenteRepository.findForPanel(tipoFiltro, rutaFiltro).stream()
+                .map(incidente -> new IncidentePanelResponse(
+                        incidente.getId(),
+                        incidente.getRuta() == null ? "General" : incidente.getRuta().getNombre(),
+                        incidente.getTipo(),
+                        incidente.getDescripcion(),
+                        incidente.getFechaReporte(),
+                        incidente.getEstado()))
+                .toList();
     }
 
     @Transactional
@@ -50,6 +71,31 @@ public class IncidenteService {
         incidente.setTitulo(tituloPara(solicitud.getTipo()));
         incidente.setDescripcion(solicitud.getDescripcion().trim());
         return incidenteRepository.saveAndFlush(incidente);
+    }
+
+    @Transactional
+    public Incidente cambiarEstado(Long incidenteId, String estado) {
+        if (incidenteId == null || incidenteId <= 0) {
+            throw new AulaException("El identificador del incidente no es válido.", "VALIDATION_ERROR");
+        }
+        if (estado == null || estado.isBlank()) {
+            throw new AulaException("Indica el estado del incidente.", "VALIDATION_ERROR");
+        }
+
+        String estadoNormalizado = estado.trim().toUpperCase(Locale.ROOT);
+        if (!ESTADOS_PERMITIDOS.contains(estadoNormalizado)) {
+            throw new AulaException("El estado indicado no es válido.", "VALIDATION_ERROR");
+        }
+
+        Incidente incidente = incidenteRepository.findById(incidenteId)
+                .orElseThrow(() -> new AulaException(
+                        "No se encontró el incidente solicitado.", "INCIDENT_NOT_FOUND"));
+        incidente.setEstado(estadoNormalizado);
+        return incidenteRepository.saveAndFlush(incidente);
+    }
+
+    private String normalizarFiltro(String filtro) {
+        return filtro == null || filtro.isBlank() ? null : filtro.trim();
     }
 
     private String tituloPara(IncidenteReportRequest.TipoIncidente tipo) {

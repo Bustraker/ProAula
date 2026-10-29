@@ -32,6 +32,11 @@ public class IncidenteController {
         this.incidenteService = incidenteService;
     }
 
+    @GetMapping("/panel")
+    public String mostrarPanel() {
+        return "incidentes";
+    }
+
     @GetMapping("/nuevo")
     public String mostrarFormulario(Model model) {
         if (!model.containsAttribute("incidenteForm")) {

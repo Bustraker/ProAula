@@ -44,9 +44,12 @@ public class GlobalExceptionHandler {
         logger.warn("AulaException: {}", ex.getMessage());
         boolean conflict = "RESOURCE_IN_USE".equals(ex.getErrorCode())
                 || "EMAIL_ALREADY_EXISTS".equals(ex.getErrorCode());
-        HttpStatus status = conflict ? HttpStatus.CONFLICT : HttpStatus.BAD_REQUEST;
+        HttpStatus status = "INCIDENT_NOT_FOUND".equals(ex.getErrorCode())
+                ? HttpStatus.NOT_FOUND
+                : conflict ? HttpStatus.CONFLICT : HttpStatus.BAD_REQUEST;
         return respond(status, ex.getErrorCode(), ex.getMessage(),
-            conflict ? "error/409" : "error/400", model, request, response, Map.of());
+            conflict ? "error/409" : status == HttpStatus.NOT_FOUND ? "error/404" : "error/400",
+            model, request, response, Map.of());
     }
 
     @ExceptionHandler(AccessDeniedException.class)

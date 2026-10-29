@@ -93,6 +93,8 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/buses/todos", "/api/rutas", "/api/rutas-con-coordenadas",
                     "/api/map/tiles").permitAll()
                 .requestMatchers("/oauth2/complete-password").hasAnyRole("USER", "ADMIN")
+                .requestMatchers(HttpMethod.GET, "/incidentes/panel", "/api/incidentes/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PATCH, "/api/incidentes/**").hasRole("ADMIN")
                 .requestMatchers("/incidentes/**", "/api/incidentes/**").hasAnyRole("USER", "ADMIN")
                 // Protege rutas de administración
                 .requestMatchers(
