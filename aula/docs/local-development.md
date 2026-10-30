@@ -49,8 +49,10 @@ prepara en el esquema de datos local.
 El panel autenticado está disponible en `/incidentes/panel` y consulta
 `GET /api/incidentes`. Se puede filtrar con `tipo` y `ruta`; este último busca
 por nombre o código de ruta, placa o número interno del bus. Por ejemplo:
-`GET /api/incidentes?tipo=RETRASO&ruta=RUT-1`. El panel muestra ruta, tipo,
-descripción, fecha del reporte y estado.
+`GET /api/incidentes?tipo=RETRASO&ruta=RUT-1&page=0&size=20`. La respuesta
+incluye `content`, `page`, `size`, `totalElements`, `totalPages`, `first` y
+`last`; el tamaño debe estar entre 1 y 100. El panel permite recorrer páginas
+y actualizar el estado de cada reporte sin abandonar la vista.
 
 Solo los administradores pueden cambiar el estado con
 `PATCH /api/incidentes/{id}/estado`, usando uno de los valores
@@ -62,8 +64,8 @@ Solo los administradores pueden cambiar el estado con
 }
 ```
 
-La API devuelve el incidente actualizado; responde con `400` ante un estado no
-admitido y `404` cuando el incidente no existe.
+La API devuelve el incidente actualizado; responde con `400` ante un estado o
+parámetro no válido y `404` cuando el incidente no existe.
 
 Para habilitar un proveedor OAuth, copia `.env.example` como `.env` dentro de `aula`
 y completa únicamente las credenciales necesarias. El archivo se carga en el perfil

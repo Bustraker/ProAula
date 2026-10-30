@@ -15,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
@@ -77,6 +78,15 @@ public class GlobalExceptionHandler {
             errors.put(error.getField(), error.getDefaultMessage()));
         return respond(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "Datos de entrada inválidos",
             "error/400", model, request, response, Map.of("fieldErrors", errors));
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public Object handleTypeMismatch(MethodArgumentTypeMismatchException ex, Model model,
+                                     HttpServletRequest request, HttpServletResponse response) {
+        logger.warn("Invalid request value for '{}': {}", ex.getName(), ex.getValue());
+        return respond(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR",
+            "El valor indicado para '" + ex.getName() + "' no es válido.",
+            "error/400", model, request, response, Map.of());
     }
 
     @ExceptionHandler(DataAccessException.class)

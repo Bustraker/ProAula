@@ -1,73 +1,112 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bustraker - Gestión de Incidentes</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0b2942">
+    <meta name="csrf-token" th:content="${_csrf.token}">
+    <meta name="csrf-header" th:content="${_csrf.headerName}">
+    <title>Gestión de incidentes - Bustraker</title>
+    <link rel="icon" th:href="@{/images/logo.png}" type="image/png">
+    <link rel="stylesheet" th:href="@{/css/incidentes-panel.css}">
 </head>
-<body class="bg-light">
+<body class="incident-panel-page">
+<header class="panel-topbar">
+    <a class="panel-brand" th:href="@{/dashboard}" aria-label="Bustraker, volver al panel">
+        <span class="panel-brand-mark" aria-hidden="true">B</span>
+        <span>Bustraker</span>
+    </a>
+    <a class="panel-back" th:href="@{/dashboard}">Volver al panel</a>
+</header>
 
-    <!-- Navbar simple -->
-    <nav class="navbar navbar-dark bg-dark mb-4">
-        <div class="container-fluid">
-            <a class="navbar-brand font-weight-bold" href="#">🚨 Bustraker - Control de Incidentes</a>
-            <a href="/" class="btn btn-outline-light btn-sm">Volver al Inicio</a>
+<main class="panel-shell">
+    <section class="panel-heading" aria-labelledby="panel-title">
+        <div>
+            <p class="panel-eyebrow">OPERACIÓN · CARTAGENA</p>
+            <h1 id="panel-title">Centro de incidentes</h1>
+            <p class="panel-intro">Consulta los reportes y mantén actualizado su estado de atención.</p>
         </div>
-    </nav>
+        <span class="panel-access">Panel administrativo</span>
+    </section>
 
-    <div class="container">
-        <!-- Filtros de Búsqueda (BUS-39) -->
-        <div class="card p-3 mb-4 shadow-sm border-0">
-            <h5 class="card-title text-secondary mb-3"><i class="bi bi-funnel"></i> Filtrar Reportes</h5>
-            <div class="row g-3">
-                <div class="col-md-4">
-                    <label class="form-label font-weight-bold">Tipo de Incidente</label>
-                    <select id="filtroTipo" class="form-select">
-                        <option value="">Todos los tipos</option>
-                        <option value="RETRASO">Retraso de Ruta</option>
-                        <option value="FALLA_SERVICIO">Falla del bus o del servicio</option>
-                        <option value="ACCIDENTE">Accidente / Bloqueo</option>
-                        <option value="RUTA_DESVIADA">Desvío de ruta</option>
-                        <option value="OTRO">Otro</option>
-                    </select>
-                </div>
-                <div class="col-md-5">
-                    <label class="form-label font-weight-bold">Buscar por Ruta o Bus</label>
-                    <input type="text" id="filtroRuta" class="form-control" placeholder="Ej: Bus El Campestre, Ruta 1...">
-                </div>
-                <div class="col-md-3 d-flex align-items-end">
-                    <button class="btn btn-primary w-100 fw-bold" type="button" onclick="filtrarIncidentes()">
-                        <i class="bi bi-search"></i> Buscar
-                    </button>
-                </div>
+    <p id="panelFeedback" class="panel-feedback" role="status" aria-live="polite">
+        Cargando reportes...
+    </p>
+
+    <section class="panel-card filter-card" aria-labelledby="filter-title">
+        <div class="section-heading">
+            <div>
+                <p class="section-kicker">BÚSQUEDA</p>
+                <h2 id="filter-title">Filtrar reportes</h2>
             </div>
+            <span class="filter-hint">Combina los filtros para encontrar un reporte</span>
         </div>
-
-        <!-- Tabla de Incidentes -->
-        <div class="card shadow-sm border-0 p-3">
-            <h5 class="card-title text-secondary mb-3"><i class="bi bi-list-ul"></i> Lista de Incidentes Reportados</h5>
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead class="table-dark">
-                        <tr>
-                            <th># ID</th>
-                            <th>Ruta / Bus</th>
-                            <th>Tipo</th>
-                            <th>Descripción</th>
-                            <th>Fecha y Hora</th>
-                            <th>Estado</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tablaIncidentes" aria-live="polite">
-                        <tr><td colspan="6" class="text-center text-muted">Cargando incidentes...</td></tr>
-                    </tbody>
-                </table>
+        <form id="filtroIncidentes" class="filter-form">
+            <div class="filter-field">
+                <label for="filtroTipo">Tipo de incidente</label>
+                <select id="filtroTipo" name="tipo">
+                    <option value="">Todos los tipos</option>
+                    <option value="RETRASO">Retraso de ruta</option>
+                    <option value="FALLA_SERVICIO">Falla del bus o del servicio</option>
+                    <option value="ACCIDENTE">Accidente o bloqueo</option>
+                    <option value="RUTA_DESVIADA">Desvío de ruta</option>
+                    <option value="OTRO">Otro</option>
+                </select>
             </div>
-        </div>
-    </div>
+            <div class="filter-field filter-field--route">
+                <label for="filtroRuta">Ruta o bus</label>
+                <input id="filtroRuta" name="ruta" type="search"
+                       placeholder="Nombre, código, placa o número interno">
+            </div>
+            <div class="filter-actions">
+                <button class="button button--primary" type="submit">Buscar reportes</button>
+                <button id="limpiarFiltros" class="button button--secondary" type="button">Limpiar</button>
+            </div>
+        </form>
+    </section>
 
-    <script th:src="@{/incidentes.js}"></script>
+    <section class="panel-card reports-card" aria-labelledby="reports-title">
+        <div class="section-heading reports-heading">
+            <div>
+                <p class="section-kicker">SEGUIMIENTO</p>
+                <h2 id="reports-title">Reportes recibidos</h2>
+            </div>
+            <p id="totalIncidentes" class="report-count">—</p>
+        </div>
+
+        <div class="table-scroll">
+            <table class="incident-table">
+                <thead>
+                <tr>
+                    <th scope="col">Reporte</th>
+                    <th scope="col">Tipo</th>
+                    <th scope="col">Ruta</th>
+                    <th scope="col">Fecha</th>
+                    <th scope="col">Estado</th>
+                    <th scope="col">Actualizar</th>
+                </tr>
+                </thead>
+                <tbody id="tablaIncidentes">
+                <tr><td colspan="6" class="table-message">Cargando reportes...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <footer class="table-footer">
+            <p id="resumenPagina" class="page-summary">—</p>
+            <nav class="pagination" aria-label="Paginación de reportes">
+                <button id="paginaAnterior" class="button button--secondary" type="button" disabled>
+                    Anterior
+                </button>
+                <span id="paginaActual" class="page-current">Página 0 de 0</span>
+                <button id="paginaSiguiente" class="button button--secondary" type="button" disabled>
+                    Siguiente
+                </button>
+            </nav>
+        </footer>
+    </section>
+</main>
+
+<script defer th:src="@{/incidentes.js}"></script>
 </body>
 </html>

@@ -11,6 +11,9 @@ import com.proaula.aula.dto.IncidenteReportRequest;
 import com.proaula.aula.exception.AulaException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -75,16 +78,19 @@ class IncidenteServiceTest {
         incidente.setRuta(ruta);
         incidente.setTipo("RETRASO");
         incidente.setDescripcion("Demora en el recorrido");
-        when(incidenteRepository.findForPanel("RETRASO", "Centro")).thenReturn(List.of(incidente));
+        PageRequest pageable = PageRequest.of(0, 20);
+        when(incidenteRepository.findForPanel("RETRASO", "Centro", pageable))
+                .thenReturn(new PageImpl<>(List.of(incidente), pageable, 1));
 
-        List<IncidentePanelResponse> respuesta = incidenteService.listar(" RETRASO ", " Centro ");
+        Page<IncidentePanelResponse> respuesta =
+                incidenteService.listar(" RETRASO ", " Centro ", pageable);
 
-        assertThat(respuesta).singleElement().satisfies(item -> {
+        assertThat(respuesta.getContent()).singleElement().satisfies(item -> {
             assertThat(item.ruta()).isEqualTo("Centro - Manga");
             assertThat(item.tipo()).isEqualTo("RETRASO");
             assertThat(item.descripcion()).isEqualTo("Demora en el recorrido");
         });
-        verify(incidenteRepository).findForPanel("RETRASO", "Centro");
+        verify(incidenteRepository).findForPanel("RETRASO", "Centro", pageable);
     }
 
     @Test

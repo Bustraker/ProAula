@@ -9,6 +9,8 @@ import com.proaula.aula.Repository.UsuarioRepository;
 import com.proaula.aula.dto.IncidentePanelResponse;
 import com.proaula.aula.dto.IncidenteReportRequest;
 import com.proaula.aula.exception.AulaException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,18 +42,17 @@ public class IncidenteService {
     }
 
     @Transactional(readOnly = true)
-    public List<IncidentePanelResponse> listar(String tipo, String ruta) {
+    public Page<IncidentePanelResponse> listar(String tipo, String ruta, Pageable pageable) {
         String tipoFiltro = normalizarFiltro(tipo);
         String rutaFiltro = normalizarFiltro(ruta);
-        return incidenteRepository.findForPanel(tipoFiltro, rutaFiltro).stream()
+        return incidenteRepository.findForPanel(tipoFiltro, rutaFiltro, pageable)
                 .map(incidente -> new IncidentePanelResponse(
                         incidente.getId(),
                         incidente.getRuta() == null ? "General" : incidente.getRuta().getNombre(),
                         incidente.getTipo(),
                         incidente.getDescripcion(),
                         incidente.getFechaReporte(),
-                        incidente.getEstado()))
-                .toList();
+                        incidente.getEstado()));
     }
 
     @Transactional

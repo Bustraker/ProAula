@@ -1,12 +1,6 @@
 package com.proaula.aula.Service;
 
-import java.text.Normalizer;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -19,9 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.proaula.aula.Entity.Ruta;
 import com.proaula.aula.Entity.RutaParada;
 import com.proaula.aula.Entity.Parada;
-import com.proaula.aula.Entity.Horario;
 import com.proaula.aula.exception.AulaException;
-import com.proaula.aula.exception.RutaFueraServicioException;
 import com.proaula.aula.Repository.BusRepository;
 import com.proaula.aula.Repository.ParadaRepository;
 import com.proaula.aula.Repository.RutaParadaRepository;
@@ -96,113 +88,6 @@ public class RutaService {
 
     public Ruta saveRuta(Ruta ruta) {
         return rutaRepository.save(ruta);
-    }
-
-    @Transactional(readOnly = true)
-    public LocalDateTime calcularHoraLlegadaEstimada(Long rutaId, LocalDateTime fechaHoraSalida) {
-        if (rutaId == null || fechaHoraSalida == null) {
-            throw new AulaException("Debe indicar la fecha y hora de salida.", "VALIDATION_ERROR");
-        }
-
-        Ruta ruta = rutaRepository.findById(rutaId)
-            .orElseThrow(() -> new AulaException("La ruta seleccionada no existe.", "ROUTE_NOT_FOUND"));
-        if (ruta.getEstado() != Ruta.Estado.ACTIVA) {
-            throw new RutaFueraServicioException("La ruta está fuera de servicio.");
-        }
-
-        List<Horario> horariosActivos = horarioRepository.findByRutaIdAndEstadoOrderByHoraSalidaAsc(
-            rutaId, Horario.Estado.ACTIVO);
-        if (horariosActivos.isEmpty()) {
-            throw new RutaFueraServicioException(
-                "La ruta no tiene horarios de servicio activos configurados.");
-        }
-
-        Integer duracionMinutos = ruta.getTiempoEstimadoMinutos();
-        if (duracionMinutos == null || duracionMinutos <= 0) {
-            throw new AulaException(
-                "La ruta no tiene un tiempo estimado válido para calcular la llegada.",
-                "ESTIMACION_NO_DISPONIBLE");
-        }
-
-        if (!estaEnHorarioServicio(horariosActivos, fechaHoraSalida, duracionMinutos)) {
-            throw new RutaFueraServicioException(
-                "La ruta está fuera de servicio en la fecha y hora indicadas.");
-        }
-
-        return fechaHoraSalida.plusMinutes(duracionMinutos);
-    }
-
-    private boolean estaEnHorarioServicio(List<Horario> horarios, LocalDateTime fechaHoraSalida,
-                                          int duracionMinutos) {
-        for (int diasAtras = 0; diasAtras <= 1; diasAtras++) {
-            LocalDate fechaServicio = fechaHoraSalida.toLocalDate().minusDays(diasAtras);
-            LocalDateTime inicioServicio = null;
-            LocalDateTime finServicio = null;
-
-            for (Horario horario : horarios) {
-                if (!aplicaEnDia(horario, fechaServicio.getDayOfWeek()) || horario.getHoraSalida() == null) {
-                    continue;
-                }
-
-                LocalDateTime salidaProgramada = fechaServicio.atTime(horario.getHoraSalida());
-                LocalDateTime llegadaProgramada = horario.getHoraLlegada() == null
-                    ? salidaProgramada.plusMinutes(duracionMinutos)
-                    : fechaServicio.atTime(horario.getHoraLlegada());
-                if (!llegadaProgramada.isAfter(salidaProgramada)) {
-                    llegadaProgramada = llegadaProgramada.plusDays(1);
-                }
-
-                if (inicioServicio == null || salidaProgramada.isBefore(inicioServicio)) {
-                    inicioServicio = salidaProgramada;
-                }
-                if (finServicio == null || llegadaProgramada.isAfter(finServicio)) {
-                    finServicio = llegadaProgramada;
-                }
-            }
-
-            if (inicioServicio != null && !fechaHoraSalida.isBefore(inicioServicio)
-                    && !fechaHoraSalida.isAfter(finServicio)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean aplicaEnDia(Horario horario, DayOfWeek dia) {
-        String diasSemana = horario.getDiasSemana();
-        if (diasSemana != null && !diasSemana.isBlank()) {
-            String diaSolicitado = nombreDia(dia);
-            return List.of(diasSemana.split("[,;]")).stream()
-                .map(this::normalizarDia)
-                .anyMatch(diaSolicitado::equals);
-        }
-
-        if (horario.getTipoDia() == null) {
-            return false;
-        }
-        return switch (horario.getTipoDia()) {
-            case HABIL -> dia != DayOfWeek.SATURDAY && dia != DayOfWeek.SUNDAY;
-            case SABADO -> dia == DayOfWeek.SATURDAY;
-            case FESTIVO -> false;
-        };
-    }
-
-    private String nombreDia(DayOfWeek dia) {
-        return switch (dia) {
-            case MONDAY -> "LUNES";
-            case TUESDAY -> "MARTES";
-            case WEDNESDAY -> "MIERCOLES";
-            case THURSDAY -> "JUEVES";
-            case FRIDAY -> "VIERNES";
-            case SATURDAY -> "SABADO";
-            case SUNDAY -> "DOMINGO";
-        };
-    }
-
-    private String normalizarDia(String dia) {
-        return Normalizer.normalize(dia.trim(), Normalizer.Form.NFD)
-            .replaceAll("\\p{M}", "")
-            .toUpperCase(Locale.ROOT);
     }
 
     @Transactional

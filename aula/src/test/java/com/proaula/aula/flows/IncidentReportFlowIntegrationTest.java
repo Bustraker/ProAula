@@ -251,7 +251,27 @@ class IncidentReportFlowIntegrationTest {
                         .with(user(administrador.getUsername()).roles("ADMIN"))
                         .param("ruta", ruta.getNombre()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", org.hamcrest.Matchers.hasSize(2)));
+                .andExpect(jsonPath("$.content", org.hamcrest.Matchers.hasSize(2)))
+                .andExpect(jsonPath("$.totalElements").value(2));
+
+        mockMvc.perform(get("/api/incidentes")
+                        .with(user(administrador.getUsername()).roles("ADMIN"))
+                        .param("ruta", ruta.getNombre())
+                        .param("page", "0")
+                        .param("size", "1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content", org.hamcrest.Matchers.hasSize(1)))
+                .andExpect(jsonPath("$.totalPages").value(2))
+                .andExpect(jsonPath("$.first").value(true));
+
+        mockMvc.perform(get("/api/incidentes")
+                        .with(user(administrador.getUsername()).roles("ADMIN"))
+                        .param("ruta", ruta.getNombre())
+                        .param("page", "1")
+                        .param("size", "1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content", org.hamcrest.Matchers.hasSize(1)))
+                .andExpect(jsonPath("$.last").value(true));
 
         assertThat(incidenteRepository.findAll())
                 .anySatisfy(item -> assertThat(item.getUsuario().getId()).isEqualTo(administrador.getId()));
@@ -312,6 +332,31 @@ class IncidentReportFlowIntegrationTest {
                         .content("""
                                 {"estado":"CANCELADO"}
                                 """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("VALIDATION_ERROR"));
+    }
+
+    @Test
+    void incidentApiRejectsMalformedIdsAndInvalidPagination() throws Exception {
+        mockMvc.perform(patch("/api/incidentes/no-es-numero/estado")
+                        .with(user("incident-admin").roles("ADMIN"))
+                        .with(csrf())
+                        .contentType("application/json")
+                        .content("""
+                                {"estado":"RESUELTO"}
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("VALIDATION_ERROR"));
+
+        mockMvc.perform(get("/api/incidentes")
+                        .with(user("incident-admin").roles("ADMIN"))
+                        .param("page", "-1"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("VALIDATION_ERROR"));
+
+        mockMvc.perform(get("/api/incidentes")
+                        .with(user("incident-admin").roles("ADMIN"))
+                        .param("size", "101"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value("VALIDATION_ERROR"));
     }
