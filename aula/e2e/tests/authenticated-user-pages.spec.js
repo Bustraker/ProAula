@@ -116,3 +116,37 @@ test("authenticated history, route directory, trip planner and contact page are 
   await page.locator(".member-contact-form button[type=submit]").click();
   await expect(page.getByRole("status")).toContainText(/Gracias por tu mensaje/i);
 });
+
+test("authenticated incident report guides entry and handles route availability", async ({ page }) => {
+  await registerAndLogin(page);
+  await page.goto("/incidentes/nuevo");
+
+  await expect(page.getByRole("heading", { name: "Reportar un incidente" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Un buen reporte ayuda" })).toBeVisible();
+  await expect(page.locator(".incident-card")).toHaveCSS("animation-name", "incident-enter");
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  const animationDuration = await page.locator(".incident-card")
+    .evaluate(element => Number.parseFloat(getComputedStyle(element).animationDuration));
+  expect(animationDuration).toBeLessThan(0.001);
+  await page.setViewportSize({ width: 390, height: 844 });
+  const layoutColumns = await page.locator(".incident-layout")
+    .evaluate(element => getComputedStyle(element).gridTemplateColumns.split(" ").length);
+  expect(layoutColumns).toBe(1);
+  await expect(page.locator("#descripcion-contador")).toHaveText("0 / 2000");
+  await page.locator("#descripcion").fill("Retraso reportado desde la aplicación.");
+  await expect(page.locator("#descripcion-contador")).toHaveText("38 / 2000");
+
+  const routeValues = await page.locator("#rutaId option").evaluateAll(options =>
+    options.map(option => option.value).filter(Boolean));
+  if (routeValues.length === 0) {
+    await expect(page.locator("#ruta-ayuda")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Enviar reporte" })).toBeDisabled();
+    return;
+  }
+
+  await page.locator("#tipo").selectOption("RETRASO");
+  await page.locator("#rutaId").selectOption(routeValues[0]);
+  await page.getByRole("button", { name: "Enviar reporte" }).click();
+  await expect(page).toHaveURL(/\/incidentes\/nuevo$/);
+  await expect(page.getByRole("status")).toContainText(/Incidente #\d+ registrado correctamente/i);
+});

@@ -62,7 +62,13 @@ class IncidentReportFlowIntegrationTest {
                 .andExpect(content().string(org.hamcrest.Matchers.containsString(
                         "Reportar un incidente")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString(
-                        "Ruta afectada")));
+                        "Ruta afectada")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString(
+                        "Un buen reporte ayuda")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString(
+                        "/js/incidente-form.js")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString(
+                        "aria-describedby=\"descripcion-ayuda descripcion-contador\"")));
     }
 
     @Test
@@ -77,7 +83,15 @@ class IncidentReportFlowIntegrationTest {
                         .param("rutaId", ruta.getId().toString())
                         .param("descripcion", "El bus presenta un retraso en el recorrido."))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(header().string("Location", "/incidentes/nuevo"));
+                .andExpect(header().string("Location", "/incidentes/nuevo"))
+                .andDo(result -> mockMvc.perform(get("/incidentes/nuevo")
+                                .with(user(usuario.getUsername()).roles("USER"))
+                                .flashAttrs(result.getFlashMap()))
+                        .andExpect(status().isOk())
+                        .andExpect(content().string(org.hamcrest.Matchers.containsString(
+                                "Incidente #")))
+                        .andExpect(content().string(org.hamcrest.Matchers.containsString(
+                                "class=\"incident-alert incident-alert--success\""))));
 
         Incidente incidente = incidenteRepository.findAll().stream()
                 .filter(item -> item.getUsuario().getId().equals(usuario.getId()))
@@ -103,7 +117,11 @@ class IncidentReportFlowIntegrationTest {
                         .param("rutaId", ruta.getId().toString()))
                 .andExpect(status().isOk())
                 .andExpect(content().string(org.hamcrest.Matchers.containsString(
-                        "Escribe una descripción del incidente.")));
+                        "Escribe una descripción del incidente.")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString(
+                        "aria-invalid=\"true\"")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString(
+                        "aria-describedby=\"descripcion-error descripcion-ayuda descripcion-contador\"")));
 
         assertThat(incidenteRepository.findAll())
                 .noneMatch(item -> item.getUsuario().getId().equals(usuario.getId()));
