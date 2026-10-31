@@ -113,13 +113,15 @@ público para crear administradores.
 ## Base de datos y migraciones
 
 Antes del primer despliegue, respalda la base de datos y revisa su esquema y el
-contenido de `flyway_schema_history`. El perfil `prod` ejecuta las migraciones
-de `src/main/resources/db/migration/mysql` con `ddl-auto: validate`; Flyway no
-debe competir con Hibernate para modificar el esquema. No marques una base de
-datos existente como vacía ni ejecutes manualmente una migración ya registrada.
-Estas migraciones actualizan el flujo ADMIN; no crean desde cero todas las
-tablas de la aplicación. La base debe contener previamente el esquema base de
-Bustraker.
+contenido de `flyway_schema_history`. Las migraciones de
+`src/main/resources/db/migration/mysql` son scripts incrementales; el perfil
+`prod` mantiene Flyway deshabilitado temporalmente y `ddl-auto: none` por el
+workaround de TiDB descrito en
+[`production-setup.md`](./production-setup.md). Aplica manualmente las
+migraciones necesarias antes de desplegar; no marques una base existente como
+vacía ni ejecutes una migración que ya se haya registrado. Estos scripts no crean
+desde cero todas las tablas de la aplicación: la base debe contener previamente
+el esquema base de Bustraker.
 Si el esquema ya contiene tablas de solicitudes o códigos de una versión
 anterior, compara sus columnas e índices con las migraciones antes del
 despliegue. Local y las pruebas H2 no validan la compatibilidad con el MySQL de

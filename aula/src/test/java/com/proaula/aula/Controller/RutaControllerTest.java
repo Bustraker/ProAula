@@ -58,7 +58,7 @@ class RutaControllerTest {
 
         rutaController.guardarEdicionRuta(5L, formulario, "Centro, Manga, Crespo");
 
-        verify(rutaService).saveRuta(existente);
+        verify(rutaService).saveRuta(existente, true);
         assertThat(existente.getBarriosOrdenados()).containsExactly("Centro", "Manga", "Crespo");
         assertThat(existente.isOrdenBarriosConfirmado()).isTrue();
         assertThat(existente.getVerificada()).isTrue();

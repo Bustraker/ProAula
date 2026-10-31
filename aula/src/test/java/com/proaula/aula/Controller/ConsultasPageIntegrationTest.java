@@ -83,12 +83,12 @@ class ConsultasPageIntegrationTest {
                 .getContentAsString();
 
         assertThat(publicPage)
-                .contains("id=\"btnPlanificar\"", "id=\"plannerStatus\"", "Mejor ruta para llegar",
-                        "Se recomienda una sola ruta: primero se prioriza una ruta directa",
+                .contains("id=\"btnPlanificar\"", "id=\"plannerStatus\"", "Opciones de ruta para llegar",
+                        "Las opciones se ordenan de menor a mayor número de transbordos",
                         "/css/travel.css?v=map-polish-8",
-                        "/css/map-ui.css?v=map-polish-9",
+                        "/css/map-ui.css?v=trips-2",
                         "/js/map-base.js?v=map-polish-6",
-                        "/js/map-travel.js?v=map-polish-7");
+                        "/js/map-travel.js?v=trips-3");
 
         MockHttpSession session = new MockHttpSession();
         SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
@@ -105,12 +105,12 @@ class ConsultasPageIntegrationTest {
                 .getContentAsString();
 
         assertThat(authenticatedPage)
-                .contains("id=\"btnPlanificar\"", "id=\"plannerStatus\"", "Mejor ruta para llegar",
-                        "Se recomienda una sola ruta: primero se prioriza una ruta directa",
+                .contains("id=\"btnPlanificar\"", "id=\"plannerStatus\"", "Opciones de ruta para llegar",
+                        "Las opciones se ordenan de menor a mayor número de transbordos",
                         "/css/travel.css?v=map-polish-8",
-                        "/css/map-ui.css?v=map-polish-9",
+                        "/css/map-ui.css?v=trips-2",
                         "/js/map-base.js?v=map-polish-6",
-                        "/js/map-travel.js?v=map-polish-7");
+                        "/js/map-travel.js?v=trips-3");
     }
 
     private Bus bus() {

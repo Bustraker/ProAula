@@ -46,7 +46,7 @@ async function verifyRouteSegments(page, routes) {
       page.locator("#rutaDetalle"),
       `${segment.routeName}: ${segment.origen} → ${segment.destino}`
     ).toBeVisible();
-    await expect(page.locator("#resumenBusqueda")).toContainText("Mejor opción:");
+    await expect(page.locator("#resumenBusqueda")).toContainText("Recomendada:");
   }
   return segments;
 }
@@ -623,10 +623,8 @@ test("account registration, login, protected page and logout work in the browser
   await page.locator("#passwordConfirm").fill("safe-password-26");
   await page.locator('[data-password-toggle][aria-controls="passwordConfirm"]').click();
   await expect(page.locator("#passwordConfirm")).toHaveAttribute("type", "text");
-  await page.locator("#role").selectOption("ADMIN");
-  await expect(page.locator("#adminCodeGroup")).toBeVisible();
-  await page.locator("#role").selectOption("USER");
-  await expect(page.locator("#adminCodeGroup")).toBeHidden();
+  await expect(page.locator("#role")).toHaveCount(0);
+  await expect(page.locator("#adminCodeGroup")).toHaveCount(0);
 
   await page.locator("#nombres").fill("Usuario");
   await page.locator("#apellidos").fill("E2E");

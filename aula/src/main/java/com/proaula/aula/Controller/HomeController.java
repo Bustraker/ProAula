@@ -23,9 +23,12 @@ import com.proaula.aula.dto.ContactoMensajeDto;
 import com.proaula.aula.dto.BusConsultaDto;
 import com.proaula.aula.dto.BusConsultaMapper;
 import com.proaula.aula.dto.UsuarioFormDto;
+import com.proaula.aula.Service.AvisoFavoritoService;
 import com.proaula.aula.Service.BusService;
 import com.proaula.aula.Service.ContactoMensajeService;
+import com.proaula.aula.Service.FavoritoService;
 import com.proaula.aula.Service.RutaService;
+import com.proaula.aula.Service.TrayectoFavoritoService;
 import com.proaula.aula.Service.UsuarioService;
 import com.proaula.aula.Service.ViajeService;
 
@@ -53,19 +56,28 @@ public class HomeController {
     private final ViajeService viajeService;
     private final UsuarioRepository usuarioRepository;
     private final ContactoMensajeService contactoMensajeService;
+    private final FavoritoService favoritoService;
+    private final AvisoFavoritoService avisoFavoritoService;
+    private final TrayectoFavoritoService trayectoFavoritoService;
 
     public HomeController(BusService busService,
                           RutaService rutaService,
                           UsuarioService usuarioService,
                           ViajeService viajeService,
                           UsuarioRepository usuarioRepository,
-                          ContactoMensajeService contactoMensajeService) {
+                          ContactoMensajeService contactoMensajeService,
+                          FavoritoService favoritoService,
+                          AvisoFavoritoService avisoFavoritoService,
+                          TrayectoFavoritoService trayectoFavoritoService) {
         this.busService = busService;
         this.rutaService = rutaService;
         this.usuarioService = usuarioService;
         this.viajeService = viajeService;
         this.usuarioRepository = usuarioRepository;
         this.contactoMensajeService = contactoMensajeService;
+        this.favoritoService = favoritoService;
+        this.avisoFavoritoService = avisoFavoritoService;
+        this.trayectoFavoritoService = trayectoFavoritoService;
     }
 
     @GetMapping("/")
@@ -141,6 +153,10 @@ public class HomeController {
         model.addAttribute("busesActivos", rutaService.countActiveBuses());
         model.addAttribute(MODEL_ATTR_BUSES, busService.getAllBuses());
         model.addAttribute(MODEL_ATTR_CONTACTO_MENSAJE, new ContactoMensaje());
+        model.addAttribute("favoritos", favoritoService.listar(username));
+        model.addAttribute("avisosFavoritos", avisoFavoritoService.listar(usuario.getId()));
+        model.addAttribute("avisosFavoritosNoLeidos", avisoFavoritoService.contarNoLeidos(usuario.getId()));
+        model.addAttribute("trayectosFavoritos", trayectoFavoritoService.listar(username));
 
         return VIEW_USUARIO_INDEX_3;
     }

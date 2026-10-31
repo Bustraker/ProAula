@@ -72,6 +72,15 @@ permite que Hibernate no rechace el tipo existente de `horario.dias_semana`, per
 modifica esa columna y deja de validar todo el esquema. No lo consideres una reparación
 permanente.
 
+Las tablas de favoritos y resúmenes de trayectos requieren aplicar, en este orden,
+[`V20261021_01__create_user_favorites.sql`](../src/main/resources/db/migration/mysql/V20261021_01__create_user_favorites.sql)
+y [`V20261030_01__create_favorite_trips.sql`](../src/main/resources/db/migration/mysql/V20261030_01__create_favorite_trips.sql)
+en la base MySQL/TiDB antes de desplegar esta funcionalidad. Como Flyway sigue
+deshabilitado en `application-prod.yml`, esas migraciones no se ejecutarán al arrancar:
+respalda la base, confirma que existan `usuario`, `ruta` y `parada`, y aplica cada
+script una sola vez. No habilites Flyway ni cambies `ddl-auto` como parte de este
+despliegue mientras siga vigente el workaround de conexión.
+
 La migración preparada
 `src/main/resources/db/migration/mysql/V20261015_02__normalize_horario_days_column.sql`
 convierte `horario.dias_semana` de `SET` a `VARCHAR(255)`. Cuando se confirme que TiDB
@@ -121,7 +130,7 @@ deben tratarse como evidencia de comportamiento para entrenar o evaluar modelos.
 
 ## Esquema y despliegue
 
-El perfil `prod` ejecuta las migraciones Flyway en orden:
+Cuando Flyway esté habilitado, los scripts del perfil MySQL se ejecutan en orden:
 
 1. [`V20261015_01__admin_code_approval_flow.sql`](../src/main/resources/db/migration/mysql/V20261015_01__admin_code_approval_flow.sql)
    crea las tablas del flujo.
@@ -132,6 +141,13 @@ El perfil `prod` ejecuta las migraciones Flyway en orden:
    convierte códigos existentes a hashes.
 4. [`V20261017_01__admin_registration_approval.sql`](../src/main/resources/db/migration/mysql/V20261017_01__admin_registration_approval.sql)
    asocia cada código nuevo al correo y a la solicitud aprobada.
+5. [`V20261020_01__admin_request_review_and_code_delivery.sql`](../src/main/resources/db/migration/mysql/V20261020_01__admin_request_review_and_code_delivery.sql)
+   agrega datos para la revisión de solicitudes ADMIN y la entrega del código.
+6. [`V20261021_01__create_user_favorites.sql`](../src/main/resources/db/migration/mysql/V20261021_01__create_user_favorites.sql)
+   crea favoritos de usuarios con claves foráneas a rutas y paradas.
+7. [`V20261030_01__create_favorite_trips.sql`](../src/main/resources/db/migration/mysql/V20261030_01__create_favorite_trips.sql)
+   conserva, por usuario, los resúmenes de trayectos elegidos como favoritos.
+
 Flyway está configurado con `baseline-on-migrate`; antes del primer despliegue
 respalda la base y confirma que el esquema base de Bustraker y
 `horario.dias_semana` existan. Revisa `flyway_schema_history` y las columnas,
@@ -144,6 +160,10 @@ usuario de conexión necesita permiso para crear tablas e índices y modificar
 `horario.dias_semana`. No uses `flyway repair` para ignorar un checksum ni edites
 una migración versionada que ya se haya aplicado; crea una migración nueva hacia
 adelante después de revisar el esquema.
+
+Actualmente Flyway continúa deshabilitado en el perfil `prod` por el workaround de
+Render descrito arriba; la lista indica el orden de los scripts cuando se reactive.
+Hasta entonces, aplica manualmente las migraciones requeridas antes del despliegue.
 
 Los perfiles locales y de validación deshabilitan estas migraciones MySQL: el
 entorno local administra su esquema con Hibernate y las pruebas usan su esquema H2

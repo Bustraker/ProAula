@@ -15,7 +15,7 @@
     <link rel="preconnect" href="https://server.arcgisonline.com" crossorigin>
     <link rel="preconnect" href="https://tile.openstreetmap.org" crossorigin>
     <link rel="stylesheet" th:href="@{/css/travel.css(v='map-polish-8')}">
-    <link rel="stylesheet" th:href="@{/css/map-ui.css(v='map-polish-9')}">
+    <link rel="stylesheet" th:href="@{/css/map-ui.css(v='trips-2')}">
 </head>
 <body>
     <div id="map" role="application" aria-label="Mapa de rutas de Cartagena"></div>
@@ -60,13 +60,16 @@
                     <button id="btnSeguirUbicacion" class="btn btn--secundario" type="button" aria-pressed="false" disabled>
                         <i class="fas fa-location-arrow" aria-hidden="true"></i> Activar GPS
                     </button>
+                    <button id="btnFinalizarTrayecto" class="btn btn--finalizar" type="button" hidden>
+                        <i class="fas fa-flag-checkered" aria-hidden="true"></i> Finalizar trayecto
+                    </button>
                     <button id="btnLimpiar" class="btn btn--texto" type="button">Limpiar</button>
                 </div>
-                <output id="locationStatus" class="estado" aria-live="polite">Al abrir este mapa se solicitará permiso para seguir tu GPS. Tu ubicación solo se muestra en este dispositivo; el GPS del usuario no confirma la posición del bus.</output>
+                <output id="locationStatus" class="estado" aria-live="polite">Al abrir este mapa se solicitará permiso para seguir tu GPS. Solo se envía al servicio de llegadas si eliges “Estoy a bordo · compartir GPS”; tu ubicación no confirma la posición de un bus.</output>
             </section>
 
             <section class="seccion" aria-labelledby="tituloRutas">
-                <h2 id="tituloRutas" class="seccion__titulo">Mejor ruta para llegar</h2>
+                <h2 id="tituloRutas" class="seccion__titulo">Opciones de ruta para llegar</h2>
                 <p id="resumenBusqueda" class="sr-only" aria-live="polite"></p>
                 <div id="resultados" class="resultados"></div>
             </section>
@@ -80,7 +83,9 @@
                     </div>
                     <button id="btnCompartir" class="icon-btn" type="button" title="Copiar enlace de esta consulta" aria-label="Copiar enlace de esta consulta"><i class="fas fa-share-nodes" aria-hidden="true"></i></button>
                 </header>
+                <div id="favoriteActions" class="favorite-actions" aria-label="Guardar rutas en favoritos"></div>
                 <div id="rutaStats" class="mu-stats" role="status"></div>
+                <section id="llegadasRutaPanel" class="arrival-panel" aria-label="Llegadas estimadas" hidden></section>
                 <div class="pestanas" role="tablist" aria-label="Detalle de la ruta">
                     <button id="tabParadas" class="pestana" type="button" role="tab" data-pestana="paradas" aria-controls="panelParadas" aria-selected="true">Paradas <span id="contadorParadas" class="contador">0</span></button>
                     <button id="tabBuses" class="pestana" type="button" role="tab" data-pestana="buses" aria-controls="panelBuses" aria-selected="false" tabindex="-1">Buses <span id="contadorBuses" class="contador">0</span></button>
@@ -103,7 +108,7 @@
             </details>
 
             <footer class="panel-pie">
-                Se recomienda una sola ruta: primero se prioriza una ruta directa; si no existe, menos transbordos y luego menos barrios intermedios. El trazado y su tiempo son estimaciones en auto, no el recorrido ni el tiempo real del bus.
+                Se priorizan menos transbordos, conexiones entre paradas ubicables y la menor distancia en línea recta entre ellas; luego, menos barrios intermedios. Esa distancia no representa una ruta peatonal. El trazado y su tiempo son estimaciones en auto, no el recorrido ni el tiempo real del bus.
                 <a href="https://transcaribe.gov.co/index.php/rutas-sitm/" target="_blank" rel="noopener noreferrer">Mapas oficiales de TransCaribe</a>
             </footer>
         </div>
@@ -111,7 +116,7 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
     <script th:src="@{/js/map-base.js(v='map-polish-6')}"></script>
-    <script th:src="@{/js/map-travel.js(v='map-polish-7')}"></script>
+    <script th:src="@{/js/map-travel.js(v='trips-3')}"></script>
     <script th:src="@{/js/viajar.js}"></script>
 </body>
 </html>

@@ -40,6 +40,9 @@ class IncidenteServiceTest {
     @Mock
     private UsuarioRepository usuarioRepository;
 
+    @Mock
+    private AvisoFavoritoService avisoFavoritoService;
+
     @InjectMocks
     private IncidenteService incidenteService;
 
@@ -68,6 +71,7 @@ class IncidenteServiceTest {
         assertThat(incidente.getDescripcion()).isEqualTo("Colisión en la vía.");
         assertThat(incidente.getEstado()).isEqualTo("PENDIENTE");
         verify(incidenteRepository).saveAndFlush(incidente);
+        verify(avisoFavoritoService).notificarIncidenteNuevo(incidente);
     }
 
     @Test
@@ -129,6 +133,19 @@ class IncidenteServiceTest {
 
         assertThat(resultado.getEstado()).isEqualTo("RESUELTO");
         verify(incidenteRepository).saveAndFlush(incidente);
+        verify(avisoFavoritoService).notificarCambioDeEstado(incidente);
+    }
+
+    @Test
+    void cambiarEstadoDoesNotNotifyWhenStatusIsUnchanged() {
+        Incidente incidente = new Incidente();
+        incidente.setEstado("RESUELTO");
+        when(incidenteRepository.findById(12L)).thenReturn(Optional.of(incidente));
+        when(incidenteRepository.saveAndFlush(incidente)).thenReturn(incidente);
+
+        incidenteService.cambiarEstado(12L, "resuelto");
+
+        verify(avisoFavoritoService, never()).notificarCambioDeEstado(any());
     }
 
     @Test

@@ -2094,3 +2094,408 @@ h6 { font-size: 1rem; }
 .dashboard-motion-ready .container .bus-card {
     animation: none;
 }
+
+.dashboard-page .favoritos-heading {
+    gap: 1rem;
+}
+
+.dashboard-page .favoritos-intro {
+    margin-top: 0.25rem;
+    color: var(--dashboard-muted);
+}
+
+.dashboard-page .favoritos-layout {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.dashboard-page .favoritos-panel {
+    min-width: 0;
+    padding: 1.15rem;
+    border: 1px solid var(--dashboard-border);
+    border-radius: 1rem;
+    background: rgba(5, 17, 31, 0.45);
+}
+
+.dashboard-page .favoritos-panel > h3 {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin-bottom: 0.9rem;
+    color: #e7f1fb;
+    font-size: 1rem;
+}
+
+.dashboard-page .favoritos-lista,
+.dashboard-page .avisos-lista {
+    display: grid;
+    gap: 0.65rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.dashboard-page .favorito-item,
+.dashboard-page .aviso-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 0;
+    padding: 0.8rem;
+    border: 1px solid rgba(125, 170, 211, 0.12);
+    border-radius: 0.8rem;
+    background: rgba(16, 39, 65, 0.55);
+}
+
+.dashboard-page .favorito-item__icono,
+.dashboard-page .aviso-item__icono {
+    display: grid;
+    flex: 0 0 2.5rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    place-items: center;
+    border-radius: 0.75rem;
+    color: #b8e3ff;
+    background: rgba(40, 133, 197, 0.17);
+}
+
+.dashboard-page .favorito-item__contenido,
+.dashboard-page .aviso-item__contenido {
+    display: grid;
+    flex: 1;
+    gap: 0.12rem;
+    min-width: 0;
+}
+
+.dashboard-page .favorito-item__contenido strong,
+.dashboard-page .aviso-item__contenido strong {
+    overflow-wrap: anywhere;
+    color: #f0f6fc;
+}
+
+.dashboard-page .favorito-item__tipo,
+.dashboard-page .favorito-item__contenido small,
+.dashboard-page .aviso-item__contenido p {
+    color: var(--dashboard-muted);
+    font-size: 0.82rem;
+}
+
+.dashboard-page .aviso-item__contenido p {
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+
+.dashboard-page .aviso-item--leido {
+    opacity: 0.72;
+}
+
+.dashboard-page .favorito-quitar,
+.dashboard-page .aviso-marcar-leido {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    min-height: 2.25rem;
+    padding: 0.45rem 0.65rem;
+    border: 1px solid rgba(175, 198, 219, 0.25);
+    border-radius: 0.65rem;
+    color: #c9d9e8;
+    background: rgba(7, 19, 33, 0.5);
+    cursor: pointer;
+}
+
+.dashboard-page .favorito-quitar:hover,
+.dashboard-page .aviso-marcar-leido:hover {
+    border-color: rgba(248, 113, 113, 0.6);
+    color: #fecaca;
+}
+
+.dashboard-page .aviso-marcar-leido:hover {
+    border-color: rgba(98, 214, 165, 0.6);
+    color: #bbf7d0;
+}
+
+.dashboard-page .favorito-quitar:focus-visible,
+.dashboard-page .aviso-marcar-leido:focus-visible {
+    outline: 2px solid #8cc9f2;
+    outline-offset: 2px;
+}
+
+.dashboard-page .avisos-contador {
+    display: inline-grid;
+    min-width: 1.35rem;
+    height: 1.35rem;
+    place-items: center;
+    padding: 0 0.3rem;
+    border-radius: 999px;
+    color: #251707;
+    background: #ffcf78;
+    font-size: 0.72rem;
+}
+
+.dashboard-page .aviso-item__estado {
+    width: fit-content;
+    color: #ffcf78;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.dashboard-page .favoritos-vacio {
+    padding: 1rem 0.5rem;
+}
+
+.dashboard-page .favoritos-feedback {
+    margin-top: 0.75rem;
+    color: #9de5c3;
+    font-size: 0.88rem;
+}
+
+.dashboard-page .favoritos-feedback--error {
+    color: #ffb4b4;
+}
+
+@media (max-width: 768px) {
+    .dashboard-page .favoritos-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-page .favoritos-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+
+.dashboard-page .trayectos-guardados {
+    margin-top: 1.15rem;
+    padding: clamp(1rem, 2.4vw, 1.5rem);
+    border: 1px solid rgba(255, 179, 71, 0.24);
+    border-radius: 1.1rem;
+    background:
+        radial-gradient(ellipse at 2% 0%, rgba(255, 179, 71, 0.1), transparent 38%),
+        linear-gradient(145deg, rgba(6, 25, 45, 0.78), rgba(8, 34, 57, 0.64));
+    box-shadow: inset 0 1px rgba(255, 255, 255, 0.035);
+}
+
+.dashboard-page .trayectos-guardados__cabecera {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    margin-bottom: 1rem;
+}
+
+.dashboard-page .trayectos-guardados__insignia {
+    display: grid;
+    flex: 0 0 2.9rem;
+    width: 2.9rem;
+    height: 2.9rem;
+    place-items: center;
+    border: 1px solid rgba(255, 207, 120, 0.28);
+    border-radius: 0.9rem;
+    color: #ffcf78;
+    background: rgba(255, 179, 71, 0.11);
+    animation: trip-icon-glow 3.2s ease-in-out infinite;
+}
+
+.dashboard-page .trayectos-guardados__cabecera h3 {
+    color: #f0f6fc;
+    font-size: 1.05rem;
+}
+
+.dashboard-page .trayectos-guardados__cabecera p {
+    margin-top: 0.18rem;
+    color: var(--dashboard-muted);
+    font-size: 0.83rem;
+}
+
+.dashboard-page .trayectos-guardados__enlace {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-left: auto;
+    padding: 0.55rem 0.75rem;
+    border: 1px solid rgba(255, 207, 120, 0.28);
+    border-radius: 0.7rem;
+    color: #ffcf78;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background 180ms ease, transform 180ms ease;
+}
+
+.dashboard-page .trayectos-guardados__enlace:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 179, 71, 0.12);
+}
+
+.dashboard-page .trayectos-lista {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+    gap: 0.8rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.dashboard-page .trayecto-guardado {
+    min-width: 0;
+    padding: 1rem;
+    border: 1px solid rgba(131, 171, 205, 0.18);
+    border-radius: 0.95rem;
+    background: linear-gradient(145deg, rgba(17, 47, 76, 0.88), rgba(9, 29, 49, 0.88));
+    box-shadow: 0 8px 20px rgba(2, 13, 26, 0.16);
+    animation: trip-card-enter 440ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    transition: border-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+}
+
+.dashboard-page .trayecto-guardado:nth-child(2) { animation-delay: 70ms; }
+.dashboard-page .trayecto-guardado:nth-child(3) { animation-delay: 140ms; }
+.dashboard-page .trayecto-guardado:nth-child(4) { animation-delay: 210ms; }
+
+.dashboard-page .trayecto-guardado:hover {
+    transform: translateY(-3px);
+    border-color: rgba(255, 207, 120, 0.38);
+    box-shadow: 0 14px 28px rgba(2, 13, 26, 0.25);
+}
+
+.dashboard-page .trayecto-guardado__principal {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+}
+
+.dashboard-page .trayecto-guardado__icono {
+    display: grid;
+    flex: 0 0 2.5rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    place-items: center;
+    border-radius: 0.75rem;
+    color: #ffcf78;
+    background: rgba(255, 179, 71, 0.12);
+}
+
+.dashboard-page .trayecto-guardado__contenido {
+    display: grid;
+    flex: 1;
+    gap: 0.16rem;
+    min-width: 0;
+}
+
+.dashboard-page .trayecto-guardado__contenido strong {
+    overflow-wrap: anywhere;
+    color: #f4f8fc;
+}
+
+.dashboard-page .trayecto-guardado__contenido small,
+.dashboard-page .trayecto-guardado__etiqueta {
+    color: var(--dashboard-muted);
+    font-size: 0.73rem;
+}
+
+.dashboard-page .trayecto-guardado__etiqueta {
+    color: #ffcf78;
+    font-weight: 750;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.dashboard-page .trayecto-guardado__detalle {
+    display: grid;
+    gap: 0.52rem;
+    margin: 0.85rem 0 0 3.2rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(131, 171, 205, 0.14);
+}
+
+.dashboard-page .trayecto-guardado__metrica {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    color: #d7e5f1;
+    font-size: 0.81rem;
+    line-height: 1.45;
+}
+
+.dashboard-page .trayecto-guardado__metrica > i {
+    width: 1rem;
+    margin-top: 0.12rem;
+    color: #8cc9f2;
+    text-align: center;
+}
+
+.dashboard-page .trayecto-guardado__barrios ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin: 0.35rem 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.dashboard-page .trayecto-guardado__barrios li {
+    position: relative;
+    padding: 0.27rem 0.55rem;
+    border: 1px solid rgba(140, 201, 242, 0.18);
+    border-radius: 999px;
+    color: #dceaf6;
+    background: rgba(25, 77, 116, 0.3);
+    font-size: 0.74rem;
+}
+
+.dashboard-page .trayecto-guardado__quitar {
+    align-self: flex-start;
+    min-height: 2rem;
+    padding: 0.35rem 0.5rem;
+    font-size: 0.76rem;
+}
+
+.dashboard-page .trayecto-guardado.is-removing {
+    animation: trip-card-exit 220ms ease-in forwards;
+    pointer-events: none;
+}
+
+@keyframes trip-card-enter {
+    from { opacity: 0; transform: translateY(12px) scale(0.985); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes trip-card-exit {
+    to { opacity: 0; transform: translateX(14px) scale(0.98); }
+}
+
+@keyframes trip-icon-glow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255, 179, 71, 0); }
+    50% { box-shadow: 0 0 0 5px rgba(255, 179, 71, 0.06); }
+}
+
+@media (max-width: 560px) {
+    .dashboard-page .trayectos-guardados__cabecera {
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .dashboard-page .trayectos-guardados__enlace {
+        margin-left: 3.75rem;
+    }
+
+    .dashboard-page .trayecto-guardado__detalle {
+        margin-left: 0;
+    }
+
+    .dashboard-page .trayecto-guardado__quitar span {
+        display: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .dashboard-page .trayectos-guardados *,
+    .dashboard-page .trayectos-guardados *::before,
+    .dashboard-page .trayectos-guardados *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="Registra las coordenadas reales de las paradas para estimar llegadas en Bustraker.">
+    <meta name="theme-color" content="#24191c">
+    <title>Coordenadas de paradas · Bustraker Admin</title>
+    <link rel="stylesheet" th:href="@{/css/style_editar_ruta.css(v='routes-editor-20261005-3')}">
+    <link rel="stylesheet" th:href="@{/css/admin-coordenadas.css(v='1')}">
+    <link rel="stylesheet" th:href="@{/css/logout.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" th:href="@{/images/logo.png}" type="image/png">
+</head>
+<body class="route-editor-page">
+    <div class="route-editor-shell">
+        <aside class="route-editor-sidebar">
+            <a class="route-editor-brand" th:href="@{/index_2}" aria-label="Bustraker, panel de administración">
+                <span class="route-editor-brand__icon"><i class="fas fa-bus" aria-hidden="true"></i></span>
+                <span><strong>Bustraker</strong><small>Centro de operaciones</small></span>
+            </a>
+            <nav class="route-editor-nav" aria-label="Navegación administrativa">
+                <span class="route-editor-nav__label">ADMINISTRACIÓN</span>
+                <a th:href="@{/index_2}" aria-label="Panel principal" title="Panel principal"><i class="fas fa-house" aria-hidden="true"></i><span>Panel principal</span></a>
+                <a th:href="@{/rutas/admin}" aria-label="Gestión de rutas" title="Gestión de rutas"><i class="fas fa-route" aria-hidden="true"></i><span>Gestión de rutas</span></a>
+                <a th:href="@{/editar-ruta}" aria-label="Verificación de recorridos" title="Verificación de recorridos"><i class="fas fa-diagram-project" aria-hidden="true"></i><span>Verificación de recorridos</span></a>
+                <a th:href="@{/admin/coordenadas-paradas}" class="is-current" aria-current="page" aria-label="Coordenadas de paradas" title="Coordenadas de paradas"><i class="fas fa-location-crosshairs" aria-hidden="true"></i><span>Coordenadas de paradas</span></a>
+            </nav>
+            <div class="route-editor-sidebar__bottom">
+                <span class="route-editor-status"><i aria-hidden="true"></i> Sistema operativo</span>
+                <form th:action="@{/logout}" method="post" class="logout-form">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <button type="submit" class="route-editor-logout logout-form__button"><i class="fas fa-arrow-right-from-bracket" aria-hidden="true"></i> Cerrar sesión</button>
+                </form>
+            </div>
+        </aside>
+
+        <main class="route-editor-main coordinates-main">
+            <header class="route-editor-topbar">
+                <div class="route-editor-breadcrumb">
+                    <a th:href="@{/rutas/admin}">Rutas</a>
+                    <i class="fas fa-chevron-right" aria-hidden="true"></i>
+                    <span>Coordenadas de paradas</span>
+                </div>
+                <a class="route-editor-back" th:href="@{/editar-ruta}">
+                    <i class="fas fa-arrow-left" aria-hidden="true"></i><span>Volver a recorridos</span>
+                </a>
+            </header>
+
+            <section class="coordinates-hero" aria-labelledby="coordinatesTitle">
+                <p class="route-editor-eyebrow"><span aria-hidden="true"></span> DATOS OPERATIVOS · CARTAGENA</p>
+                <h1 id="coordinatesTitle">Ubica cada parada.<br><em>Estima con honestidad.</em></h1>
+                <p>Las llegadas solo se calculan cuando existen coordenadas reales de las paradas y reportes GPS recientes de pasajeros.</p>
+            </section>
+
+            <section class="coordinates-panel" aria-labelledby="coordinatesListTitle">
+                <header class="coordinates-panel__header">
+                    <div>
+                        <h2 id="coordinatesListTitle">Coordenadas registradas</h2>
+                        <p th:text="${#lists.size(paradas)} + ' paradas disponibles para revisión'">0 paradas disponibles</p>
+                    </div>
+                    <a class="route-editor-back" th:href="@{/rutas/admin}"><i class="fas fa-route" aria-hidden="true"></i><span>Gestionar rutas</span></a>
+                </header>
+
+                <div th:if="${coordenadasGuardadas}" class="coordinates-alert coordinates-alert--ok" role="status" th:text="${coordenadasGuardadas}"></div>
+                <div th:if="${errorCoordenadas == 'datos'}" class="coordinates-alert coordinates-alert--error" role="alert">
+                    Ingresa latitud y longitud dentro de sus rangos válidos. No se modificaron los datos guardados.
+                </div>
+                <div th:if="${errorCoordenadas == 'parada'}" class="coordinates-alert coordinates-alert--error" role="alert">
+                    No se encontró la parada seleccionada. Actualiza la página e inténtalo de nuevo.
+                </div>
+
+                <p class="coordinates-guidance">
+                    <i class="fas fa-triangle-exclamation" aria-hidden="true"></i>
+                    Registra únicamente la ubicación real de la parada. Puedes capturar el GPS estando físicamente allí o escribir coordenadas verificadas; no uses el centro del barrio como sustituto. La captura GPS requiere permiso del navegador y no se envía hasta guardar el formulario.
+                </p>
+
+                <div th:if="${#lists.isEmpty(paradas)}" class="coordinates-empty">
+                    No hay paradas registradas. Crea y asocia las paradas a sus rutas antes de configurar sus ubicaciones.
+                </div>
+                <div th:unless="${#lists.isEmpty(paradas)}" class="coordinates-table-wrap">
+                    <table class="coordinates-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Ruta y parada</th>
+                                <th scope="col">Ubicación actual</th>
+                                <th scope="col">Registrar ubicación</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="parada : ${paradas}">
+                                <td>
+                                    <strong th:text="${parada.nombre}">Parada</strong>
+                                    <span th:text="${(parada.ruta != null ? parada.ruta.nombre : 'Sin ruta') + (parada.barrio != null ? ' · ' + parada.barrio : '')}">Ruta · Barrio</span>
+                                    <small th:text="${parada.orden != null ? 'Orden ' + parada.orden : 'Orden no definido'}">Orden</small>
+                                </td>
+                                <td>
+                                    <span th:if="${parada.latitud != null and parada.longitud != null}" class="coordinates-state coordinates-state--saved">
+                                        <i class="fas fa-circle-check" aria-hidden="true"></i> Registradas
+                                    </span>
+                                    <span th:unless="${parada.latitud != null and parada.longitud != null}" class="coordinates-state coordinates-state--pending">
+                                        <i class="fas fa-circle-exclamation" aria-hidden="true"></i> Pendientes
+                                    </span>
+                                    <code th:if="${parada.latitud != null and parada.longitud != null}"
+                                          th:text="${#numbers.formatDecimal(parada.latitud, 1, 6) + ', ' + #numbers.formatDecimal(parada.longitud, 1, 6)}">0, 0</code>
+                                    <span th:unless="${parada.latitud != null and parada.longitud != null}" class="coordinates-empty-value">Sin coordenadas</span>
+                                </td>
+                                <td>
+                                    <form class="coordinates-form" method="post"
+                                          th:action="@{/admin/paradas/{id}/coordenadas(id=${parada.id})}">
+                                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                        <div class="coordinates-fields">
+                                            <label th:for="'latitud-' + ${parada.id}">Latitud
+                                                <input th:id="'latitud-' + ${parada.id}" name="latitud" type="number" step="any"
+                                                       min="-90" max="90" required inputmode="decimal"
+                                                       th:value="${parada.latitud}" placeholder="10.423600">
+                                            </label>
+                                            <label th:for="'longitud-' + ${parada.id}">Longitud
+                                                <input th:id="'longitud-' + ${parada.id}" name="longitud" type="number" step="any"
+                                                       min="-180" max="180" required inputmode="decimal"
+                                                       th:value="${parada.longitud}" placeholder="-75.550100">
+                                            </label>
+                                        </div>
+                                        <div class="coordinates-actions">
+                                            <button class="coordinates-gps" type="button" data-coordinates-gps>
+                                                <i class="fas fa-location-crosshairs" aria-hidden="true"></i> Capturar GPS aquí
+                                            </button>
+                                            <button class="coordinates-save" type="submit">
+                                                <i class="fas fa-floppy-disk" aria-hidden="true"></i> Guardar
+                                            </button>
+                                        </div>
+                                        <output class="coordinates-feedback" aria-live="polite"></output>
+                                    </form>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script th:src="@{/js/coordenadas-paradas.js(v='1')}"></script>
+</body>
+</html>

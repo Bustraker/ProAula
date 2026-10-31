@@ -27,13 +27,16 @@ public class IncidenteService {
     private final IncidenteRepository incidenteRepository;
     private final RutaRepository rutaRepository;
     private final UsuarioRepository usuarioRepository;
+    private final AvisoFavoritoService avisoFavoritoService;
 
     public IncidenteService(IncidenteRepository incidenteRepository,
                             RutaRepository rutaRepository,
-                            UsuarioRepository usuarioRepository) {
+                            UsuarioRepository usuarioRepository,
+                            AvisoFavoritoService avisoFavoritoService) {
         this.incidenteRepository = incidenteRepository;
         this.rutaRepository = rutaRepository;
         this.usuarioRepository = usuarioRepository;
+        this.avisoFavoritoService = avisoFavoritoService;
     }
 
     @Transactional(readOnly = true)
@@ -71,7 +74,9 @@ public class IncidenteService {
         incidente.setTipo(solicitud.getTipo().name());
         incidente.setTitulo(tituloPara(solicitud.getTipo()));
         incidente.setDescripcion(solicitud.getDescripcion().trim());
-        return incidenteRepository.saveAndFlush(incidente);
+        Incidente guardado = incidenteRepository.saveAndFlush(incidente);
+        avisoFavoritoService.notificarIncidenteNuevo(guardado);
+        return guardado;
     }
 
     @Transactional
@@ -91,8 +96,13 @@ public class IncidenteService {
         Incidente incidente = incidenteRepository.findById(incidenteId)
                 .orElseThrow(() -> new AulaException(
                         "No se encontró el incidente solicitado.", "INCIDENT_NOT_FOUND"));
+        boolean cambio = !estadoNormalizado.equals(incidente.getEstado());
         incidente.setEstado(estadoNormalizado);
-        return incidenteRepository.saveAndFlush(incidente);
+        Incidente actualizado = incidenteRepository.saveAndFlush(incidente);
+        if (cambio) {
+            avisoFavoritoService.notificarCambioDeEstado(actualizado);
+        }
+        return actualizado;
     }
 
     private String normalizarFiltro(String filtro) {

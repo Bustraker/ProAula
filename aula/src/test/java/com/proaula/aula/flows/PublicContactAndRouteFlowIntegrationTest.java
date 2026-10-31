@@ -10,6 +10,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.List;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -36,6 +38,9 @@ class PublicContactAndRouteFlowIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Autowired
     private ContactoMensajeRepository contactoMensajeRepository;
@@ -85,6 +90,36 @@ class PublicContactAndRouteFlowIntegrationTest {
         ruta.setBarrios(List.of("Centro", "Manga"));
         ruta.setBarriosOrdenados(List.of("Centro", "Manga"));
         Ruta guardada = rutaRepository.saveAndFlush(ruta);
+        addRouteStop(guardada, "Centro ida", 1, 1, RutaParada.Sentido.IDA);
+        addRouteStop(guardada, "Manga ida", 2, 2, RutaParada.Sentido.IDA);
+        addRouteStop(guardada, "Manga vuelta", 3, 1, RutaParada.Sentido.VUELTA);
+        addRouteStop(guardada, "Centro vuelta", 4, 2, RutaParada.Sentido.VUELTA);
+        addRouteStop(guardada, "Parada inactiva", 5, 3, RutaParada.Sentido.IDA, Parada.Estado.INACTIVA);
+
+        String suffix = java.util.UUID.randomUUID().toString().replace("-", "").substring(0, 8);
+        Ruta soloVuelta = new Ruta();
+        soloVuelta.setNombre("Ruta solo vuelta " + suffix);
+        soloVuelta.setVerificada(true);
+        soloVuelta.setBarrios(List.of("Barrio Vuelta A " + suffix, "Barrio Vuelta B " + suffix));
+        soloVuelta.setBarriosOrdenados(soloVuelta.getBarrios());
+        soloVuelta = rutaRepository.saveAndFlush(soloVuelta);
+        addRouteStop(soloVuelta, "Parada exclusiva Vuelta " + suffix, 1, 1, RutaParada.Sentido.VUELTA);
+
+        Ruta rutaLegacy = new Ruta();
+        rutaLegacy.setNombre("Ruta legacy " + suffix);
+        rutaLegacy.setVerificada(true);
+        rutaLegacy.setBarrios(List.of("Barrio legacy A " + suffix, "Barrio legacy B " + suffix));
+        rutaLegacy.setBarriosOrdenados(rutaLegacy.getBarrios());
+        rutaLegacy = rutaRepository.saveAndFlush(rutaLegacy);
+        addLegacyStop(rutaLegacy, "Parada legacy " + suffix, 1);
+
+        Ruta inactiva = new Ruta();
+        inactiva.setNombre("Ruta inactiva " + java.util.UUID.randomUUID());
+        inactiva.setVerificada(true);
+        inactiva.setEstado(Ruta.Estado.INACTIVA);
+        inactiva.setBarrios(List.of("Barrio inactivo A", "Barrio inactivo B"));
+        inactiva.setBarriosOrdenados(inactiva.getBarrios());
+        rutaRepository.saveAndFlush(inactiva);
 
         mockMvc.perform(get("/rutas"))
                 .andExpect(status().isOk())
@@ -94,9 +129,25 @@ class PublicContactAndRouteFlowIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Ruta Integracion Publica")));
 
-        mockMvc.perform(get("/api/rutas-con-coordenadas"))
+        String mapaJson = mockMvc.perform(get("/api/rutas-con-coordenadas"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("Ruta Integracion Publica")));
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Ruta Integracion Publica")))
+                .andReturn().getResponse().getContentAsString();
+        JsonNode rutasEnMapa = objectMapper.readTree(mapaJson);
+        JsonNode rutaEnMapa = buscarRuta(rutasEnMapa, guardada.getId());
+        assertThat(rutaEnMapa).isNotNull();
+        assertThat(rutaEnMapa.path("paradasPorSentido").path("IDA").findValuesAsText("nombre"))
+                .containsExactly("Centro ida", "Manga ida");
+        assertThat(rutaEnMapa.path("paradasPorSentido").path("VUELTA").findValuesAsText("nombre"))
+                .containsExactly("Manga vuelta", "Centro vuelta");
+        JsonNode soloVueltaEnMapa = buscarRuta(rutasEnMapa, soloVuelta.getId());
+        assertThat(soloVueltaEnMapa.path("paradasPorSentido").path("IDA").size()).isZero();
+        assertThat(soloVueltaEnMapa.path("paradasPorSentido").path("VUELTA").findValuesAsText("nombre"))
+                .containsExactly("Parada exclusiva Vuelta " + suffix);
+        JsonNode rutaLegacyEnMapa = buscarRuta(rutasEnMapa, rutaLegacy.getId());
+        assertThat(rutaLegacyEnMapa.path("paradasPorSentido").path("IDA").findValuesAsText("nombre"))
+                .containsExactly("Parada legacy " + suffix);
+        assertThat(mapaJson).doesNotContain("Parada inactiva", "Ruta inactiva");
 
         mockMvc.perform(get("/api/rutas"))
                 .andExpect(status().isOk())
@@ -158,11 +209,17 @@ class PublicContactAndRouteFlowIntegrationTest {
 
     private void addRouteStop(Ruta ruta, String name, int stopOrder, int routeOrder,
                               RutaParada.Sentido sentido) {
+        addRouteStop(ruta, name, stopOrder, routeOrder, sentido, Parada.Estado.ACTIVA);
+    }
+
+    private void addRouteStop(Ruta ruta, String name, int stopOrder, int routeOrder,
+                              RutaParada.Sentido sentido, Parada.Estado estado) {
         Parada parada = new Parada();
         parada.setNombre(name);
         parada.setOrden(stopOrder);
         parada.setBarrio("Barrio de prueba");
         parada.setRuta(ruta);
+        parada.setEstado(estado);
         Parada paradaGuardada = paradaRepository.saveAndFlush(parada);
 
         RutaParada relacion = new RutaParada();
@@ -171,6 +228,24 @@ class PublicContactAndRouteFlowIntegrationTest {
         relacion.setOrden(routeOrder);
         relacion.setSentido(sentido);
         rutaParadaRepository.saveAndFlush(relacion);
+    }
+
+    private void addLegacyStop(Ruta ruta, String name, int stopOrder) {
+        Parada parada = new Parada();
+        parada.setNombre(name);
+        parada.setOrden(stopOrder);
+        parada.setBarrio(ruta.getBarriosOrdenados().get(0));
+        parada.setRuta(ruta);
+        paradaRepository.saveAndFlush(parada);
+    }
+
+    private JsonNode buscarRuta(JsonNode rutas, Long rutaId) {
+        for (JsonNode ruta : rutas) {
+            if (ruta.path("id").asLong() == rutaId) {
+                return ruta;
+            }
+        }
+        return null;
     }
 
     @Test

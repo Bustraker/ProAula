@@ -18,6 +18,8 @@ import com.proaula.aula.Entity.Ruta;
 import com.proaula.aula.Entity.RutaParada;
 import com.proaula.aula.Service.RutaService;
 
+import java.util.Objects;
+
 @Controller
 public class RutaController {
     private static final String ERROR_BARRIOS = "barrios";
@@ -64,10 +66,13 @@ public class RutaController {
         if (barriosOrdenados.stream().distinct().count() < 2) {
             return "redirect:/editar-ruta/" + id + "?error=barrios";
         }
+        boolean cambio = !Objects.equals(rutaExistente.getBarrios(), barriosOrdenados)
+                || !Objects.equals(rutaExistente.getBarriosOrdenados(), barriosOrdenados)
+                || !Objects.equals(rutaExistente.getVerificada(), Boolean.TRUE.equals(ruta.getVerificada()));
         rutaExistente.setBarrios(new ArrayList<>(barriosOrdenados));
         rutaExistente.setBarriosOrdenados(barriosOrdenados);
         rutaExistente.setVerificada(Boolean.TRUE.equals(ruta.getVerificada()));
-        rutaService.saveRuta(rutaExistente);
+        rutaService.saveRuta(rutaExistente, cambio);
         return "redirect:/editar-ruta";
     }
 

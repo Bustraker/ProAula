@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="app-context-path" th:content="@{/}">
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
     <meta name="description" content="Dashboard del usuario - Bustraker">
     <meta name="theme-color" content="#01315f">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -192,6 +195,157 @@
             </div>
         </section>
 
+        <section class="section" id="favoritos-section">
+            <div class="d-flex justify-between align-center mb-3 favoritos-heading">
+                <div>
+                    <h2><i class="fas fa-star"></i> Tus favoritos</h2>
+                    <p class="favoritos-intro">Guarda tus rutas y paradas habituales para encontrarlas más rápido.</p>
+                </div>
+                <a th:href="@{/viajar}" class="btn btn-outline btn-sm">
+                    Explorar rutas <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            <div class="favoritos-layout">
+                <section class="favoritos-panel" aria-labelledby="favoritosTitulo">
+                    <h3 id="favoritosTitulo">Rutas y paradas guardadas</h3>
+                    <div id="favoritosVacio" class="dashboard-empty-state favoritos-vacio"
+                         th:if="${#lists.isEmpty(favoritos)}">
+                        <span class="empty-state-icon"><i class="fas fa-bookmark"></i></span>
+                        <div>
+                            <h3>Aún no tienes favoritos</h3>
+                            <p>En el planificador, usa la estrella para guardar una ruta o una parada.</p>
+                        </div>
+                    </div>
+                    <ul id="listaFavoritos" class="favoritos-lista" th:if="${not #lists.isEmpty(favoritos)}">
+                        <li class="favorito-item" th:each="favorito : ${favoritos}">
+                            <div class="favorito-item__icono" aria-hidden="true">
+                                <i th:class="${favorito.tipo == 'RUTA' ? 'fas fa-route' : 'fas fa-location-dot'}"></i>
+                            </div>
+                            <div class="favorito-item__contenido">
+                                <span class="favorito-item__tipo"
+                                      th:text="${favorito.tipo == 'RUTA' ? 'Ruta' : 'Parada'}">Ruta</span>
+                                <strong th:text="${favorito.nombre}">Ruta Centro</strong>
+                                <small th:if="${favorito.tipo == 'PARADA' and favorito.rutaNombre != null}"
+                                       th:text="${favorito.rutaNombre + (favorito.barrio != null ? ' · ' + favorito.barrio : '')}">
+                                    Ruta asociada · barrio
+                                </small>
+                            </div>
+                            <button type="button" class="favorito-quitar" th:attr="data-favorito-id=${favorito.id},
+                                aria-label=${'Quitar ' + favorito.nombre + ' de favoritos'}">
+                                <i class="fas fa-trash-can" aria-hidden="true"></i>
+                                <span>Quitar</span>
+                            </button>
+                        </li>
+                    </ul>
+                </section>
+
+                <section class="favoritos-panel avisos-panel" aria-labelledby="avisosFavoritosTitulo">
+                    <h3 id="avisosFavoritosTitulo">
+                        Avisos de tus rutas
+                        <span id="avisosFavoritosNoLeidos" class="avisos-contador"
+                              th:if="${avisosFavoritosNoLeidos > 0}"
+                              th:text="${avisosFavoritosNoLeidos}">0</span>
+                    </h3>
+                    <div class="dashboard-empty-state favoritos-vacio" th:if="${#lists.isEmpty(avisosFavoritos)}">
+                        <span class="empty-state-icon"><i class="fas fa-bell"></i></span>
+                        <div>
+                            <h3>Sin avisos recientes</h3>
+                            <p>Te mostraremos aquí los incidentes y sus actualizaciones de tus rutas favoritas.</p>
+                        </div>
+                    </div>
+                    <ul class="avisos-lista" th:if="${not #lists.isEmpty(avisosFavoritos)}">
+                        <li class="aviso-item" th:each="aviso : ${avisosFavoritos}"
+                            th:classappend="${aviso.leido ? ' aviso-item--leido' : ''}">
+                            <div class="aviso-item__icono" aria-hidden="true">
+                                <i class="fas fa-triangle-exclamation"></i>
+                            </div>
+                            <div class="aviso-item__contenido">
+                                <strong th:text="${aviso.titulo}">Incidente reportado</strong>
+                                <p th:text="${aviso.mensaje}">Información del aviso</p>
+                                <span class="aviso-item__estado" th:if="${not aviso.leido}">Nuevo</span>
+                            </div>
+                            <button type="button" class="aviso-marcar-leido"
+                                    th:if="${not aviso.leido}" th:attr="data-aviso-id=${aviso.id}"
+                                    th:aria-label="${'Marcar como leído: ' + aviso.titulo}">
+                                <i class="fas fa-check" aria-hidden="true"></i>
+                            </button>
+                        </li>
+                    </ul>
+                </section>
+            </div>
+            <section class="trayectos-guardados" aria-labelledby="trayectosGuardadosTitulo">
+                <div class="trayectos-guardados__cabecera">
+                    <span class="trayectos-guardados__insignia" aria-hidden="true">
+                        <i class="fas fa-route"></i>
+                    </span>
+                    <div>
+                        <h3 id="trayectosGuardadosTitulo">Trayectos que guardaste</h3>
+                        <p>Resúmenes de recorridos que completaste y elegiste conservar.</p>
+                    </div>
+                    <a th:href="@{/viajar}" class="trayectos-guardados__enlace">
+                        Planificar <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                    </a>
+                </div>
+                <div id="trayectosVacio" class="dashboard-empty-state favoritos-vacio"
+                     th:if="${#lists.isEmpty(trayectosFavoritos)}">
+                    <span class="empty-state-icon"><i class="fas fa-map"></i></span>
+                    <div>
+                        <h3>Aún no has guardado trayectos</h3>
+                        <p>Al llegar a tu destino podrás revisar el resumen y guardarlo aquí.</p>
+                    </div>
+                </div>
+                <ul id="listaTrayectosFavoritos" class="trayectos-lista"
+                    th:if="${not #lists.isEmpty(trayectosFavoritos)}">
+                    <li class="trayecto-guardado" th:each="trayecto : ${trayectosFavoritos}">
+                        <div class="trayecto-guardado__principal">
+                            <span class="trayecto-guardado__icono" aria-hidden="true">
+                                <i class="fas fa-location-arrow"></i>
+                            </span>
+                            <div class="trayecto-guardado__contenido">
+                                <span class="trayecto-guardado__etiqueta">Trayecto guardado</span>
+                                <strong th:text="${trayecto.origen + ' → ' + trayecto.destino}">
+                                    Centro → Manga
+                                </strong>
+                                <small th:text="${#temporals.format(trayecto.fechaGuardado, 'dd/MM/yyyy · HH:mm')}">
+                                    30/10/2026 · 12:00
+                                </small>
+                            </div>
+                            <button type="button" class="favorito-quitar trayecto-guardado__quitar"
+                                    th:attr="data-trayecto-id=${trayecto.id},
+                                    aria-label=${'Quitar trayecto entre ' + trayecto.origen + ' y ' + trayecto.destino}">
+                                <i class="fas fa-trash-can" aria-hidden="true"></i>
+                                <span>Quitar</span>
+                            </button>
+                        </div>
+                        <div class="trayecto-guardado__detalle">
+                            <div class="trayecto-guardado__metrica">
+                                <i class="fas fa-route" aria-hidden="true"></i>
+                                <span th:text="${#strings.listJoin(trayecto.rutas, ' · ')}">Ruta Centro</span>
+                            </div>
+                            <div class="trayecto-guardado__metrica" th:if="${trayecto.distanciaEstimadaKm != null}">
+                                <i class="fas fa-ruler" aria-hidden="true"></i>
+                                <span th:text="${#numbers.formatDecimal(trayecto.distanciaEstimadaKm, 1, 1) + ' km estimados'}">
+                                    4.2 km estimados
+                                </span>
+                            </div>
+                            <div class="trayecto-guardado__metrica" th:if="${trayecto.tiempoEstimadoAutoMin != null}">
+                                <i class="fas fa-clock" aria-hidden="true"></i>
+                                <span th:text="${'~' + trayecto.tiempoEstimadoAutoMin + ' min en auto (referencia)'}">
+                                    ~12 min en auto (referencia)
+                                </span>
+                            </div>
+                            <div class="trayecto-guardado__barrios">
+                                <span class="trayecto-guardado__etiqueta">Barrios recorridos</span>
+                                <ol>
+                                    <li th:each="barrio : ${trayecto.barrios}" th:text="${barrio}">Centro</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </section>
+        </section>
+
         <section class="section">
             <h2 class="mb-3"><i class="fas fa-bolt"></i> Atajos</h2>
             <div class="dashboard-grid">
@@ -335,5 +489,6 @@
     </div>
 
     <script th:src="@{/js/dashboard.js}"></script>
+    <script th:src="@{/js/dashboard-favorites.js(v='trips-1')}"></script>
 </body>
 </html>

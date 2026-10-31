@@ -53,6 +53,9 @@ public class RutaService {
     @Autowired
     private IncidenteRepository incidenteRepository;
 
+    @Autowired
+    private AvisoFavoritoService avisoFavoritoService;
+
     @Transactional(readOnly = true)
     public List<Ruta> getAllRutas() {
         List<Ruta> rutas = rutaRepository.findAll();
@@ -88,6 +91,15 @@ public class RutaService {
 
     public Ruta saveRuta(Ruta ruta) {
         return rutaRepository.save(ruta);
+    }
+
+    @Transactional
+    public Ruta saveRuta(Ruta ruta, boolean notificarCambio) {
+        Ruta guardada = rutaRepository.save(ruta);
+        if (notificarCambio && guardada.getId() != null) {
+            avisoFavoritoService.notificarCambioDeRuta(guardada);
+        }
+        return guardada;
     }
 
     @Transactional

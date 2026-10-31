@@ -145,6 +145,94 @@
     line-height: 1.5;
 }
 
+/* ---------- Llegadas observadas por pasajeros ---------- */
+.arrival-panel {
+    display: grid;
+    gap: 12px;
+    margin-top: 16px;
+    padding: 16px;
+    border: 1px solid rgba(55, 200, 186, 0.24);
+    border-radius: 16px;
+    color: #ecf5f3;
+    background: linear-gradient(145deg, rgba(20, 78, 76, 0.32), rgba(7, 20, 24, 0.72));
+    box-shadow: 0 12px 30px rgba(0, 8, 10, 0.24);
+    animation: mu-entrada 340ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.arrival-panel[hidden] { display: none; }
+.arrival-panel__title { margin: 0; color: #d7fff6; font-size: 1.05rem; }
+.arrival-panel__note, .arrival-panel__consent {
+    margin: 0;
+    color: #b7cfcc;
+    font-size: 0.8rem;
+    line-height: 1.55;
+}
+.arrival-panel__consent {
+    padding-top: 10px;
+    border-top: 1px solid rgba(132, 181, 177, 0.16);
+    color: #91aaa8;
+}
+.arrival-card {
+    display: grid;
+    gap: 10px;
+    padding: 13px;
+    border: 1px solid rgba(132, 181, 177, 0.18);
+    border-radius: 12px;
+    background: rgba(3, 14, 17, 0.48);
+    animation: mu-entrada 300ms ease both;
+}
+.arrival-card__header, .arrival-card__actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+.arrival-card__title { margin: 0; font-size: 0.93rem; }
+.arrival-card__direction {
+    min-width: 92px;
+    padding: 7px 9px;
+    border: 1px solid rgba(113, 168, 164, 0.3);
+    border-radius: 8px;
+    color: #ecf5f3;
+    background: rgba(7, 20, 24, 0.9);
+}
+.arrival-card__direction:disabled { opacity: 0.6; }
+.arrival-card__status, .arrival-card__sharing {
+    margin: 0;
+    color: #b7cfcc;
+    font-size: 0.78rem;
+    line-height: 1.5;
+}
+.arrival-card__status--ready { color: #8ce2c1; }
+.arrival-card__status--error { color: #ffaaa5; }
+.arrival-card__list { display: grid; gap: 7px; margin: 0; padding: 0; list-style: none; }
+.arrival-card__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 10px;
+    border-radius: 9px;
+    background: rgba(55, 200, 186, 0.08);
+}
+.arrival-card__stop, .arrival-card__time { display: grid; gap: 3px; }
+.arrival-card__stop strong { font-size: 0.8rem; }
+.arrival-card__stop small, .arrival-card__time small { color: #91aaa8; font-size: 0.68rem; }
+.arrival-card__time { color: #a7f3d0; font-size: 0.88rem; font-weight: 750; text-align: right; }
+.arrival-card__time small { font-weight: 500; }
+.arrival-card__share { width: auto; margin: 0; white-space: normal; }
+.arrival-card__share[aria-pressed="true"] { border-color: rgba(248, 113, 113, 0.5); }
+
+@media (max-width: 480px) {
+    .arrival-panel { padding: 12px; }
+    .arrival-card { padding: 10px; }
+    .arrival-card__actions { align-items: stretch; flex-direction: column; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .arrival-panel, .arrival-card { animation-duration: 0.01ms !important; }
+}
+
 /* ---------- Avisos (toasts) e indicador de carga ---------- */
 .mu-avisos {
     position: fixed;
@@ -506,6 +594,368 @@
 @media (prefers-reduced-motion: reduce) {
     .mu-mini-calles *, .mu-mini-oscuro *, .mu-mini-claro *, .mu-mini-sat *, .mu-mini-osm * { animation: none !important; }
     .mu-estilos__menu, .mu-estilo { transition: none !important; }
+}
+
+.favorite-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.7rem;
+}
+
+.favorite-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    min-height: 36px;
+    padding: 0.45rem 0.75rem;
+    border: 1px solid rgba(146, 180, 191, 0.32);
+    border-radius: 9px;
+    color: #d7e8e9;
+    background: rgba(15, 37, 43, 0.9);
+    font: 650 0.78rem/1.2 Inter, system-ui, sans-serif;
+    cursor: pointer;
+    transition: color 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+
+.favorite-button:hover,
+.favorite-button:focus-visible {
+    border-color: rgba(255, 207, 120, 0.72);
+    color: #fff3d4;
+    outline: none;
+}
+
+.favorite-button--active {
+    border-color: rgba(255, 207, 120, 0.58);
+    color: #ffcf78;
+    background: rgba(125, 88, 30, 0.2);
+}
+
+.favorite-button:disabled {
+    cursor: wait;
+    opacity: 0.72;
+}
+
+.parada > .favorite-button {
+    margin: 0 0 0.35rem 44px;
+}
+
+.btn--finalizar {
+    border-color: #f3b34c !important;
+    color: #17283b !important;
+    background: linear-gradient(135deg, #ffd17a, #ffb347) !important;
+    font-weight: 750 !important;
+    box-shadow: 0 7px 20px rgba(255, 179, 71, 0.2);
+}
+
+.btn--finalizar:hover,
+.btn--finalizar:focus-visible {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 24px rgba(255, 179, 71, 0.28);
+}
+
+.btn--finalizar[hidden] {
+    display: none !important;
+}
+
+.trip-dialog {
+    width: min(560px, calc(100vw - 28px));
+    max-width: none;
+    max-height: min(88vh, 760px);
+    margin: auto;
+    padding: 0;
+    overflow: auto;
+    border: 1px solid rgba(140, 180, 214, 0.34);
+    border-radius: 22px;
+    color: #18314b;
+    background: #fff;
+    box-shadow: 0 28px 90px rgba(0, 15, 32, 0.38);
+}
+
+.trip-dialog[open] {
+    animation: trip-dialog-enter 300ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.trip-dialog::backdrop {
+    background: rgba(3, 17, 33, 0.66);
+    backdrop-filter: blur(5px);
+}
+
+.trip-dialog__contenido {
+    display: grid;
+    gap: 1rem;
+    padding: clamp(1.2rem, 4vw, 1.8rem);
+}
+
+.trip-dialog__cabecera {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+}
+
+.trip-dialog__icono {
+    display: grid;
+    flex: 0 0 3rem;
+    width: 3rem;
+    height: 3rem;
+    place-items: center;
+    border-radius: 1rem;
+    color: #fff;
+    background: linear-gradient(145deg, #246396, #01315f);
+    box-shadow: 0 8px 18px rgba(1, 49, 95, 0.2);
+    font-size: 1.15rem;
+}
+
+.trip-dialog__icono--exito {
+    color: #173a2c;
+    background: linear-gradient(145deg, #d7f6e5, #9de5c3);
+}
+
+.trip-dialog__eyebrow {
+    color: #58728d;
+    font: 800 0.68rem/1.2 Inter, system-ui, sans-serif;
+    letter-spacing: 0.12em;
+}
+
+.trip-dialog h2 {
+    margin: 0.22rem 0 0;
+    color: #10243b;
+    font: 800 clamp(1.2rem, 4vw, 1.55rem)/1.2 Inter, system-ui, sans-serif;
+    letter-spacing: -0.035em;
+}
+
+.trip-dialog__intro {
+    margin: 0;
+    color: #50647a;
+    font: 500 0.92rem/1.6 Inter, system-ui, sans-serif;
+}
+
+.trip-dialog__ruta {
+    margin: 0;
+    padding: 0.75rem 0.9rem;
+    border: 1px solid #d9e7f2;
+    border-radius: 0.8rem;
+    color: #01315f;
+    background: #f3f8fc;
+    font: 750 0.98rem/1.4 Inter, system-ui, sans-serif;
+}
+
+.trip-dialog__datos {
+    display: grid;
+    grid-template-columns: minmax(115px, 0.75fr) minmax(0, 1.5fr);
+    gap: 0.62rem 0.9rem;
+    margin: 0;
+    padding: 1rem;
+    border: 1px solid #e1eaf2;
+    border-radius: 0.9rem;
+    background: #fbfdff;
+    font: 500 0.84rem/1.45 Inter, system-ui, sans-serif;
+}
+
+.trip-dialog__datos dt {
+    color: #61758a;
+    font-weight: 650;
+}
+
+.trip-dialog__datos dd {
+    margin: 0;
+    color: #18314b;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+.trip-dialog__barrios {
+    display: grid;
+    gap: 0.55rem;
+    color: #18314b;
+    font: 700 0.83rem/1.4 Inter, system-ui, sans-serif;
+}
+
+.trip-dialog__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.trip-dialog__chip {
+    padding: 0.33rem 0.62rem;
+    border: 1px solid #d5e5f2;
+    border-radius: 999px;
+    color: #16446b;
+    background: #f1f7fc;
+    font: 650 0.76rem/1.25 Inter, system-ui, sans-serif;
+}
+
+.trip-dialog__pregunta {
+    margin: 0;
+    color: #18314b;
+    font: 750 0.98rem/1.45 Inter, system-ui, sans-serif;
+}
+
+.trip-dialog__acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+}
+
+.trip-dialog__accion {
+    display: inline-flex;
+    flex: 1 1 180px;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 46px;
+    padding: 0.7rem 0.9rem;
+    border: 1px solid transparent;
+    border-radius: 0.8rem;
+    cursor: pointer;
+    font: 750 0.86rem/1.2 Inter, system-ui, sans-serif;
+    transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+
+.trip-dialog__accion:hover,
+.trip-dialog__accion:focus-visible {
+    transform: translateY(-1px);
+    outline: 3px solid rgba(36, 99, 150, 0.18);
+    outline-offset: 2px;
+}
+
+.trip-dialog__accion--principal {
+    color: #fff;
+    background: linear-gradient(135deg, #01315f, #246396);
+    box-shadow: 0 8px 18px rgba(1, 49, 95, 0.19);
+}
+
+.trip-dialog__contenido--resumen .trip-dialog__accion--principal {
+    color: #17283b;
+    background: linear-gradient(135deg, #ffd17a, #ffb347);
+    box-shadow: 0 8px 18px rgba(255, 179, 71, 0.2);
+}
+
+.trip-dialog__accion--secundaria {
+    border-color: #d7e2eb;
+    color: #3d546c;
+    background: #fff;
+}
+
+.trip-dialog__accion:disabled {
+    cursor: wait;
+    opacity: 0.72;
+    transform: none;
+}
+
+.trip-dialog__feedback {
+    margin: 0;
+    color: #08744a;
+    font: 650 0.83rem/1.45 Inter, system-ui, sans-serif;
+}
+
+.trip-dialog__feedback--error {
+    color: #b42318;
+}
+
+.trip-dialog__dashboard {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    color: #16598d;
+    font: 700 0.82rem/1.4 Inter, system-ui, sans-serif;
+    text-decoration: none;
+}
+
+.trip-dialog__dashboard[hidden] {
+    display: none;
+}
+
+@keyframes trip-dialog-enter {
+    from { opacity: 0; transform: translateY(12px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (max-width: 520px) {
+    .trip-dialog__datos {
+        grid-template-columns: 1fr;
+        gap: 0.2rem;
+    }
+
+    .trip-dialog__datos dd:not(:last-child) {
+        margin-bottom: 0.45rem;
+    }
+
+    .trip-dialog__acciones {
+        flex-direction: column;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .trip-dialog[open] {
+        animation: none;
+    }
+
+    .trip-dialog__accion,
+    .btn--finalizar {
+        transition: none;
+    }
+}
+
+.paradas-sin-mapa {
+    margin-top: 1rem;
+    padding: 0.85rem;
+    border: 1px solid rgba(146, 180, 191, 0.2);
+    border-radius: 10px;
+    background: rgba(8, 24, 29, 0.52);
+}
+
+.paradas-sin-mapa h3 {
+    margin: 0;
+    color: #ecf5f3;
+    font-size: 0.9rem;
+}
+
+.paradas-sin-mapa > .nota {
+    margin: 0.35rem 0 0.7rem;
+}
+
+.paradas-sin-mapa__lista {
+    display: grid;
+    gap: 0.55rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.paradas-sin-mapa__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.65rem;
+    padding: 0.65rem;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.035);
+}
+
+.paradas-sin-mapa__datos {
+    display: grid;
+    gap: 0.15rem;
+    min-width: 0;
+}
+
+.paradas-sin-mapa__datos strong {
+    color: #ecf5f3;
+    font-size: 0.84rem;
+}
+
+.paradas-sin-mapa__datos small {
+    color: #a7bfbe;
+    font-size: 0.73rem;
+}
+
+@media (max-width: 520px) {
+    .paradas-sin-mapa__item {
+        align-items: flex-start;
+        flex-direction: column;
+    }
 }
 /* ensure SVGs and icons are above decorative layers */
 .mu-estilo__muestra svg { position: relative; z-index: 2; width: 100%; height: 100%; }

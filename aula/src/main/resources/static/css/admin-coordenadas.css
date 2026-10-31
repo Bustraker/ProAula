@@ -1,0 +1,134 @@
+.coordinates-main { min-width: 0; }
+
+.coordinates-hero {
+    margin: 18px 0 24px;
+    padding: clamp(24px, 5vw, 48px);
+    border: 1px solid rgba(164, 213, 203, 0.18);
+    border-radius: 22px;
+    background:
+        radial-gradient(circle at 88% 18%, rgba(52, 200, 178, 0.19), transparent 30%),
+        linear-gradient(135deg, rgba(28, 54, 53, 0.92), rgba(24, 25, 30, 0.96));
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+}
+
+.coordinates-hero h1 {
+    margin: 12px 0;
+    color: #f1f8f6;
+    font-size: clamp(2rem, 5vw, 3.4rem);
+    line-height: 1.05;
+}
+
+.coordinates-hero h1 em { color: #78dfcc; font-style: normal; }
+.coordinates-hero > p:last-child { max-width: 680px; color: #b7cfca; line-height: 1.65; }
+
+.coordinates-panel {
+    overflow: hidden;
+    border: 1px solid rgba(164, 213, 203, 0.17);
+    border-radius: 18px;
+    background: rgba(15, 23, 26, 0.9);
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.18);
+}
+
+.coordinates-panel__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 22px 24px;
+    border-bottom: 1px solid rgba(164, 213, 203, 0.13);
+}
+
+.coordinates-panel__header h2 { margin: 0 0 5px; color: #f1f8f6; font-size: 1.2rem; }
+.coordinates-panel__header p { margin: 0; color: #a4bbb7; font-size: 0.85rem; }
+
+.coordinates-guidance {
+    display: flex;
+    gap: 10px;
+    margin: 18px 24px;
+    padding: 13px 15px;
+    border: 1px solid rgba(241, 198, 107, 0.24);
+    border-radius: 12px;
+    color: #e8d6a8;
+    background: rgba(241, 198, 107, 0.07);
+    font-size: 0.84rem;
+    line-height: 1.6;
+}
+
+.coordinates-guidance i { margin-top: 3px; color: #f1c66b; }
+.coordinates-alert { margin: 18px 24px; padding: 12px 14px; border-radius: 10px; font-size: 0.88rem; }
+.coordinates-alert--ok { color: #a7f3d0; background: rgba(34, 197, 94, 0.1); }
+.coordinates-alert--error { color: #fecaca; background: rgba(239, 68, 68, 0.12); }
+.coordinates-empty { padding: 28px 24px; color: #b7cfca; }
+.coordinates-table-wrap { overflow-x: auto; }
+.coordinates-table { width: 100%; border-collapse: collapse; }
+.coordinates-table th {
+    padding: 11px 16px;
+    color: #8eb6ad;
+    background: rgba(255, 255, 255, 0.025);
+    font-size: 0.68rem;
+    letter-spacing: 0.09em;
+    text-align: left;
+    text-transform: uppercase;
+}
+.coordinates-table td {
+    min-width: 190px;
+    padding: 16px;
+    border-top: 1px solid rgba(164, 213, 203, 0.1);
+    color: #ecf5f3;
+    vertical-align: top;
+}
+.coordinates-table td:first-child { min-width: 210px; }
+.coordinates-table td:last-child { min-width: 370px; }
+.coordinates-table td > strong, .coordinates-table td > span, .coordinates-table td > small {
+    display: block;
+    margin-bottom: 5px;
+}
+.coordinates-table td > span, .coordinates-table td > small { color: #9eb4b1; font-size: 0.78rem; }
+.coordinates-table code { color: #b4e8d8; font-size: 0.78rem; }
+.coordinates-state { font-weight: 700; }
+.coordinates-state--saved { color: #84ddb8 !important; }
+.coordinates-state--pending { color: #f0c66f !important; }
+.coordinates-empty-value { font-style: italic; }
+.coordinates-form { display: grid; gap: 9px; }
+.coordinates-fields { display: grid; grid-template-columns: repeat(2, minmax(120px, 1fr)); gap: 9px; }
+.coordinates-fields label { display: grid; gap: 5px; color: #a9bfbb; font-size: 0.72rem; }
+.coordinates-fields input {
+    width: 100%;
+    min-height: 38px;
+    padding: 7px 9px;
+    border: 1px solid rgba(164, 213, 203, 0.22);
+    border-radius: 8px;
+    color: #f1f8f6;
+    background: rgba(3, 10, 12, 0.58);
+    font: inherit;
+}
+.coordinates-fields input:focus-visible { outline: 2px solid #78dfcc; outline-offset: 2px; }
+.coordinates-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.coordinates-actions button {
+    min-height: 36px;
+    padding: 7px 10px;
+    border: 1px solid rgba(164, 213, 203, 0.24);
+    border-radius: 8px;
+    color: #e7f3f0;
+    background: rgba(255, 255, 255, 0.045);
+    font: inherit;
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 1.2;
+    cursor: pointer;
+    transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+.coordinates-actions button:hover { transform: translateY(-1px); border-color: #78dfcc; background: rgba(55, 200, 186, 0.1); }
+.coordinates-actions .coordinates-save { color: #08251e; background: #78dfcc; border-color: transparent; }
+.coordinates-feedback { min-height: 1em; color: #a9d8c8; font-size: 0.72rem; }
+
+@media (max-width: 700px) {
+    .coordinates-panel__header { align-items: flex-start; flex-direction: column; padding: 18px; }
+    .coordinates-guidance, .coordinates-alert { margin: 14px 18px; }
+    .coordinates-table th, .coordinates-table td { padding: 12px; }
+    .coordinates-table td:last-child { min-width: 310px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .coordinates-actions button { transition: none; }
+}
