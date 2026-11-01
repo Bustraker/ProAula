@@ -1,9 +1,8 @@
 package com.proaula.aula.Controller;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.nio.charset.StandardCharsets;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.slf4j.Logger;
@@ -20,6 +19,8 @@ import com.proaula.aula.Service.UsuarioService;
 import com.proaula.aula.config.JwtTokenProvider;
 import com.proaula.aula.dto.UsuarioRegistroRequest;
 import com.proaula.aula.dto.UsuarioRegistroResponse;
+import com.proaula.aula.dto.UsuarioLoginRequest;
+import com.proaula.aula.exception.AulaException;
 import jakarta.validation.Valid;
 
 @RestController
@@ -28,14 +29,21 @@ import jakarta.validation.Valid;
 public class UsuarioController {
     private static final Logger log = LoggerFactory.getLogger(UsuarioController.class);
 
-    @Autowired
-    private UsuarioService usuarioService;
+    private final UsuarioService usuarioService;
+    private final JwtTokenProvider jwtTokenProvider;
 
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
+    public UsuarioController(UsuarioService usuarioService, JwtTokenProvider jwtTokenProvider) {
+        this.usuarioService = usuarioService;
+        this.jwtTokenProvider = jwtTokenProvider;
+    }
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody UsuarioRegistroRequest request) {
+        if (request.password() == null
+                || request.password().getBytes(StandardCharsets.UTF_8).length > 72) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "La contraseña no puede superar 72 bytes en UTF-8."));
+        }
         if (usuarioService.existsByUsername(request.username())) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(Map.of("error", "El nombre de usuario ya está en uso"));
@@ -60,10 +68,15 @@ public class UsuarioController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, Object>> login(@RequestBody Map<String, String> credentials) {
+    public ResponseEntity<Map<String, Object>> login(@Valid @RequestBody UsuarioLoginRequest credentials) {
+        if (credentials.password() == null
+                || credentials.password().getBytes(StandardCharsets.UTF_8).length > 72) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "Credenciales no válidas."));
+        }
         try {
-            String username = credentials != null ? credentials.get("username") : null;
-            String password = credentials != null ? credentials.get("password") : null;
+            String username = credentials.username();
+            String password = credentials.password();
             Usuario user = usuarioService.login(username, password);
             if (user != null) {
                 String token = jwtTokenProvider.generateTokenFromUsername(
@@ -74,24 +87,28 @@ public class UsuarioController {
                         ? "Admin Menu: Full CRUD"
                         : "User Menu: View Info";
 
-                Map<String, Object> response = new HashMap<>();
-                Map<String, Object> safeUser = new HashMap<>();
-                safeUser.put("id", user.getId());
-                safeUser.put("username", user.getUsername());
-                safeUser.put("email", user.getEmail());
-                safeUser.put("role", user.getRole());
-                safeUser.put("nombres", user.getNombres());
-                safeUser.put("apellidos", user.getApellidos());
-
-                response.put("user", safeUser);
-                response.put("menu", menu);
-                response.put("token", token);
+                Map<String, Object> safeUser = Map.of(
+                        "id", user.getId(),
+                        "username", user.getUsername(),
+                        "email", user.getEmail(),
+                        "role", user.getRole(),
+                        "nombres", user.getNombres(),
+                        "apellidos", user.getApellidos());
+                Map<String, Object> response = Map.of(
+                        "user", safeUser,
+                        "menu", menu,
+                        "token", token);
                 return ResponseEntity.ok(response);
             }
-            return ResponseEntity.status(401).body(Map.of("error", "Invalid credentials"));
-        } catch (Exception e) {
-            log.warn("Error de autenticación para usuario: {}", credentials != null ? credentials.get("username") : null, e);
-            return ResponseEntity.status(401).body(Map.of("error", "Invalid credentials"));
+            return respuestaCredencialesInvalidas();
+        } catch (AulaException ex) {
+            log.debug("Intento de inicio de sesión rechazado.");
+            return respuestaCredencialesInvalidas();
         }
+    }
+
+    private ResponseEntity<Map<String, Object>> respuestaCredencialesInvalidas() {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of("error", "Usuario o contraseña incorrectos."));
     }
 }

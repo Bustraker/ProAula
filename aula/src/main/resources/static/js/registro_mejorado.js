@@ -25,13 +25,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const passwordValue = passwordInput.value;
         const strengthChecks = [
-            passwordValue.length >= 6,
+            passwordValue.length >= 12,
             passwordValue.length >= 10,
             /[a-z]/i.test(passwordValue) && /\d/.test(passwordValue),
             /[^a-z\d]/i.test(passwordValue)
         ];
         const strengthLevel = strengthChecks.filter(Boolean).length;
-        const strengthLabels = ['Mínimo 6 caracteres', 'Básica', 'Aceptable', 'Segura', 'Muy segura'];
+        const strengthLabels = ['Mínimo 12 caracteres', 'Básica', 'Aceptable', 'Segura', 'Muy segura'];
 
         passwordStrength.dataset.level = passwordValue ? String(strengthLevel) : '0';
         passwordStrengthText.textContent = passwordValue ? strengthLabels[strengthLevel] : strengthLabels[0];
@@ -93,9 +93,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 return false;
             }
 
-            if (password.length < 6) {
+            if (password.length < 12) {
                 e.preventDefault();
-                alert('❌ La contraseña debe tener al menos 6 caracteres.');
+                alert('❌ La contraseña debe tener al menos 12 caracteres.');
                 document.getElementById('password').focus();
                 return false;
             }

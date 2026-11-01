@@ -117,6 +117,7 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+            .addFilterAfter(new AuthenticationRateLimitFilter(), JwtAuthenticationFilter.class)
             .formLogin(form -> form
                 .loginPage("/inicio-de-sesion-mejorado")
                 .loginProcessingUrl("/login")

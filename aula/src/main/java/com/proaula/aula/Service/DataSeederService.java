@@ -13,7 +13,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.nio.charset.StandardCharsets;
 import java.text.Normalizer;
 import java.util.Locale;
 import java.util.Set;
@@ -92,9 +91,7 @@ public class DataSeederService implements CommandLineRunner {
             return;
         }
         if (isBlank(bootstrapAdminUsername) || isBlank(bootstrapAdminEmail)
-                || isBlank(bootstrapAdminPassword) || isBlank(adminApproverEmail)
-                || bootstrapAdminPassword.length() < 12 || bootstrapAdminPassword.length() > 72
-                || bootstrapAdminPassword.getBytes(StandardCharsets.UTF_8).length > 72) {
+                || !PasswordPolicy.isValidNewPassword(bootstrapAdminPassword) || isBlank(adminApproverEmail)) {
             throw new IllegalStateException(
                 "El aprovisionamiento requiere usuario, correo aprobador y contraseña segura (12 a 72 bytes UTF-8)");
         }

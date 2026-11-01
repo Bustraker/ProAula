@@ -6,6 +6,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.validation.BindingResult;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -13,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Comparator;
 import java.util.Locale;
+import java.nio.charset.StandardCharsets;
 
 import com.proaula.aula.Entity.Bus;
 import com.proaula.aula.Entity.ContactoMensaje;
@@ -99,10 +102,30 @@ public class HomeController {
 
     @PostMapping("/registro")
     @Transactional
-    public String registrar(@ModelAttribute UsuarioFormDto usuarioForm,
+    public String registrar(@Valid @ModelAttribute("usuarioForm") UsuarioFormDto usuarioForm,
+                           BindingResult bindingResult,
+                           @RequestParam(required = false) String passwordConfirm,
                            @RequestParam(required = false) Boolean terminos,
                            Model model) {
-        if (Boolean.FALSE.equals(terminos)) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute(MODEL_ATTR_ERROR, "Revisa los datos ingresados y corrige los campos marcados.");
+            model.addAttribute(MODEL_ATTR_USUARIO, usuarioForm);
+            return VIEW_REGISTRO_MEJORADO;
+        }
+
+        if (passwordConfirm == null || !usuarioForm.getPassword().equals(passwordConfirm)) {
+            model.addAttribute(MODEL_ATTR_ERROR, "Las contraseñas no coinciden.");
+            model.addAttribute(MODEL_ATTR_USUARIO, usuarioForm);
+            return VIEW_REGISTRO_MEJORADO;
+        }
+
+        if (usuarioForm.getPassword().getBytes(StandardCharsets.UTF_8).length > 72) {
+            model.addAttribute(MODEL_ATTR_ERROR, "La contraseña no puede superar 72 bytes en UTF-8.");
+            model.addAttribute(MODEL_ATTR_USUARIO, usuarioForm);
+            return VIEW_REGISTRO_MEJORADO;
+        }
+
+        if (!Boolean.TRUE.equals(terminos)) {
             model.addAttribute(MODEL_ATTR_ERROR, "Debes aceptar los términos y condiciones para registrarte");
             model.addAttribute(MODEL_ATTR_USUARIO, usuarioForm);
             return VIEW_REGISTRO_MEJORADO;
@@ -123,11 +146,11 @@ public class HomeController {
         Usuario usuario = new Usuario();
         usuario.setUsername(usuarioForm.getUsername());
         usuario.setPassword(usuarioForm.getPassword());
-        usuario.setNombres(usuarioForm.getNombres());
-        usuario.setApellidos(usuarioForm.getApellidos());
+        usuario.setNombres(usuarioForm.getNombres().trim());
+        usuario.setApellidos(usuarioForm.getApellidos().trim());
         usuario.setEmail(usuarioForm.getEmail());
-        usuario.setProvider(usuarioForm.getProvider());
-        usuario.setProviderId(usuarioForm.getProviderId());
+        usuario.setProvider("LOCAL");
+        usuario.setProviderId(null);
 
         usuario.setRole(ROLE_USER);
 

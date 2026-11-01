@@ -104,6 +104,11 @@
                         <span>Usuario o contraseña incorrectos.</span>
                     </div>
 
+                    <div th:if="${param.rateLimited}" class="alert alert-danger" role="alert">
+                        <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
+                        <span>Se alcanzó el límite de intentos. Espera un minuto antes de volver a intentarlo.</span>
+                    </div>
+
                     <!-- Estado de éxito -->
                     <div th:if="${param.registrado}" class="alert alert-success" role="status">
                         <i class="fas fa-check-circle"></i>
@@ -127,9 +132,10 @@
                                     class="form-control" 
                                     placeholder="Ingresa tu nombre de usuario"
                                     autocomplete="username"
+                                    minlength="4"
+                                    maxlength="20"
                                     required
-                                    autofocus
-                                    th:value="${param.username}">
+                                    autofocus>
                         </div>
 
                         <!-- Contraseña -->
@@ -144,6 +150,7 @@
                                         class="form-control" 
                                         placeholder="••••••••"
                                         autocomplete="current-password"
+                                        maxlength="72"
                                         required>
                                 <button type="button" class="auth-password-toggle" data-password-toggle data-show-label="Mostrar contraseña" data-hide-label="Ocultar contraseña" aria-controls="password" aria-label="Mostrar contraseña" aria-pressed="false" title="Mostrar contraseña">
                                     <i class="fas fa-eye" aria-hidden="true"></i>

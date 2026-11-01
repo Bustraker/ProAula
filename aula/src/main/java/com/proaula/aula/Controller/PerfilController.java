@@ -6,6 +6,7 @@ import com.proaula.aula.Entity.Usuario;
 import com.proaula.aula.Entity.Viaje;
 import com.proaula.aula.Service.UsuarioService;
 import com.proaula.aula.Service.ViajeService;
+import com.proaula.aula.Service.PasswordPolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -135,8 +136,8 @@ public class PerfilController {
                 return "redirect:/perfil";
             }
 
-            if (passwordNuevo.length() < 6) {
-                redirectAttributes.addFlashAttribute("error", "❌ La contraseña debe tener al menos 6 caracteres");
+            if (!PasswordPolicy.isValidNewPassword(passwordNuevo)) {
+                redirectAttributes.addFlashAttribute("error", "❌ " + PasswordPolicy.ERROR_MESSAGE);
                 return "redirect:/perfil";
             }
 

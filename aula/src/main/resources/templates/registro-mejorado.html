@@ -94,6 +94,10 @@
                 </div>
                 <div class="card-body">
                     <!-- Estado de error -->
+                    <div th:if="${param.rateLimited}" class="alert alert-danger" role="alert">
+                        <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
+                        <span>Se alcanzó el límite de intentos. Espera un minuto antes de volver a intentarlo.</span>
+                    </div>
                     <div th:if="${error}" class="alert alert-danger" role="alert">
                         <i class="fas fa-exclamation-triangle"></i>
                         <span th:text="${error}">Error en el registro</span>
@@ -113,6 +117,7 @@
                                         name="nombres"
                                         class="form-control" 
                                         placeholder="Tus nombres"
+                                        maxlength="80"
                                         required
                                         autofocus>
                             </div>
@@ -126,6 +131,7 @@
                                         name="apellidos"
                                         class="form-control" 
                                         placeholder="Tus apellidos"
+                                        maxlength="80"
                                         required>
                             </div>
                         </div>
@@ -143,6 +149,7 @@
                                     placeholder="Elige un nombre de usuario"
                                     autocomplete="username"
                                     aria-describedby="usernameHelp"
+                                    pattern="[A-Za-z0-9._-]{4,20}"
                                     minlength="4"
                                     maxlength="20"
                                     required>
@@ -162,6 +169,7 @@
                                     class="form-control" 
                                     placeholder="tu@email.com"
                                     autocomplete="email"
+                                    maxlength="254"
                                     required>
                         </div>
                         </div>
@@ -182,7 +190,8 @@
                                         placeholder="Crea una contraseña"
                                         autocomplete="new-password"
                                         aria-describedby="passwordStrengthText"
-                                        minlength="6"
+                                        minlength="12"
+                                        maxlength="72"
                                         required>
                                 <button type="button" class="auth-password-toggle" data-password-toggle data-show-label="Mostrar contraseña" data-hide-label="Ocultar contraseña" aria-controls="password" aria-label="Mostrar contraseña" aria-pressed="false" title="Mostrar contraseña">
                                     <i class="fas fa-eye" aria-hidden="true"></i>
@@ -193,7 +202,7 @@
                                 <span class="auth-strength__bar"></span>
                                 <span class="auth-strength__bar"></span>
                                 <span class="auth-strength__bar"></span>
-                                <small class="auth-strength__label" id="passwordStrengthText" aria-live="polite">Mínimo 6 caracteres</small>
+                                <small class="auth-strength__label" id="passwordStrengthText" aria-live="polite">Mínimo 12 caracteres</small>
                             </div>
                         </div>
 
@@ -210,6 +219,7 @@
                                         placeholder="Repite tu contraseña"
                                         autocomplete="new-password"
                                         aria-describedby="passwordConfirmFeedback"
+                                        maxlength="72"
                                         required>
                                 <button type="button" class="auth-password-toggle" data-password-toggle data-show-label="Mostrar confirmación de contraseña" data-hide-label="Ocultar confirmación de contraseña" aria-controls="passwordConfirm" aria-label="Mostrar confirmación de contraseña" aria-pressed="false" title="Mostrar confirmación de contraseña">
                                     <i class="fas fa-eye" aria-hidden="true"></i>

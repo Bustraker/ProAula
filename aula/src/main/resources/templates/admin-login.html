@@ -81,6 +81,10 @@
                     <i class="fas fa-circle-exclamation" aria-hidden="true"></i>
                     <span th:text="${param.error[0]}">Credenciales inválidas</span>
                 </div>
+                <div th:if="${param.rateLimited}" class="alert alert-error" role="alert">
+                    <i class="fas fa-circle-exclamation" aria-hidden="true"></i>
+                    <span>Se alcanzó el límite de intentos. Espera un minuto antes de volver a intentarlo.</span>
+                </div>
                 <div th:if="${verified}" class="alert alert-success" role="status">
                     <i class="fas fa-circle-check" aria-hidden="true"></i>
                     <span>Código verificado. Ingresa tus credenciales.</span>
@@ -133,14 +137,14 @@
                         <label for="newPassword">Contraseña</label>
                         <div class="input-wrapper">
                             <span class="input-icon"><i class="fas fa-lock" aria-hidden="true"></i></span>
-                            <input type="password" id="newPassword" name="password" placeholder="Crea una contraseña segura" autocomplete="new-password" minlength="8" maxlength="72" required>
+                            <input type="password" id="newPassword" name="password" placeholder="Crea una contraseña segura" autocomplete="new-password" minlength="12" maxlength="72" required>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="passwordConfirm">Confirmar contraseña</label>
                         <div class="input-wrapper">
                             <span class="input-icon"><i class="fas fa-lock" aria-hidden="true"></i></span>
-                            <input type="password" id="passwordConfirm" name="passwordConfirm" placeholder="Repite la contraseña" autocomplete="new-password" minlength="8" maxlength="72" required>
+                            <input type="password" id="passwordConfirm" name="passwordConfirm" placeholder="Repite la contraseña" autocomplete="new-password" minlength="12" maxlength="72" required>
                         </div>
                     </div>
                     <button type="submit" class="btn-login"><span>Crear cuenta ADMIN</span><i class="fas fa-arrow-right" aria-hidden="true"></i></button>
@@ -151,14 +155,14 @@
                         <label for="username">Usuario</label>
                         <div class="input-wrapper">
                             <span class="input-icon"><i class="fas fa-user" aria-hidden="true"></i></span>
-                            <input type="text" id="username" name="username" placeholder="Nombre de usuario" autocomplete="username" required autofocus>
+                            <input type="text" id="username" name="username" placeholder="Nombre de usuario" autocomplete="username" minlength="4" maxlength="20" required autofocus>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="password">Contraseña</label>
                         <div class="input-wrapper">
                             <span class="input-icon"><i class="fas fa-lock" aria-hidden="true"></i></span>
-                            <input type="password" id="password" name="password" placeholder="Ingresa tu contraseña" autocomplete="current-password" required>
+                            <input type="password" id="password" name="password" placeholder="Ingresa tu contraseña" autocomplete="current-password" maxlength="72" required>
                             <button type="button" class="password-toggle js-toggle-password" data-target="#password" aria-label="Mostrar contraseña" aria-pressed="false" title="Mostrar contraseña">
                                 <i class="fas fa-eye" aria-hidden="true"></i>
                             </button>

@@ -22,6 +22,7 @@ import static org.mockito.Mockito.when;
 
 import com.proaula.aula.dto.UsuarioRegistroRequest;
 import com.proaula.aula.dto.UsuarioRegistroResponse;
+import com.proaula.aula.dto.UsuarioLoginRequest;
 import org.mockito.ArgumentCaptor;
 @ExtendWith(MockitoExtension.class)
 class UsuarioControllerTest {
@@ -50,10 +51,8 @@ class UsuarioControllerTest {
         when(jwtTokenProvider.generateTokenFromUsername(eq("alice"), anyCollection()))
             .thenReturn("jwt-token");
 
-        ResponseEntity<Map<String, Object>> response = usuarioController.login(Map.of(
-            "username", "alice",
-            "password", "secret"
-        ));
+        ResponseEntity<Map<String, Object>> response =
+                usuarioController.login(new UsuarioLoginRequest("alice", "secret"));
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();

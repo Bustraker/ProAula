@@ -214,7 +214,7 @@
                         <div class="profile-input-wrap profile-input-wrap--password">
                             <i class="fas fa-lock" aria-hidden="true"></i>
                             <input type="password" id="passwordNuevo" name="passwordNuevo"
-                                   placeholder="Al menos 6 caracteres" minlength="6"
+                                   placeholder="Entre 12 y 72 caracteres" minlength="12" maxlength="72"
                                    autocomplete="new-password" aria-describedby="passwordHint passwordMatch" required>
                             <button type="button" class="profile-password-toggle" data-password-toggle
                                     aria-controls="passwordNuevo" aria-label="Mostrar nueva contraseña"
@@ -222,14 +222,15 @@
                                 <i class="fas fa-eye" aria-hidden="true"></i>
                             </button>
                         </div>
-                        <span id="passwordHint" class="profile-field-hint">Debe contener al menos 6 caracteres.</span>
+                        <span id="passwordHint" class="profile-field-hint">Debe contener entre 12 y 72 caracteres.</span>
                     </div>
                     <div class="profile-field">
                         <label for="passwordConfirmar">Confirma la nueva contraseña</label>
                         <div class="profile-input-wrap profile-input-wrap--password">
                             <i class="fas fa-lock" aria-hidden="true"></i>
                             <input type="password" id="passwordConfirmar" name="passwordConfirmar"
-                                   placeholder="Repite la nueva contraseña" autocomplete="new-password"
+                                   placeholder="Repite la nueva contraseña" minlength="12" maxlength="72"
+                                   autocomplete="new-password"
                                    aria-describedby="passwordMatch" required>
                             <button type="button" class="profile-password-toggle" data-password-toggle
                                     aria-controls="passwordConfirmar" aria-label="Mostrar confirmación de contraseña"

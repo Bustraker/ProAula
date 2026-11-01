@@ -31,6 +31,35 @@ Define estas variables antes de iniciar el proceso:
 | `FIREBASE_ADMIN_ENABLED` | Sí para push | Debe ser `true` para enviar notificaciones desde el backend. |
 | `FIREBASE_CREDENTIALS_FILE` | Solo si no hay identidad administrada | Ruta `file:` a credenciales externas al repositorio; vacía cuando se usa ADC. |
 
+## Render y conexiones seguras
+
+El `Dockerfile` activa `SPRING_PROFILES_ACTIVE=prod`. Si Render despliega con
+comandos nativos en vez de construir el Dockerfile, configura esa variable como
+`prod` en el Environment del servicio; el perfil `local` usa una base de datos
+local y no es apropiado para producción. Mantén `SESSION_COOKIE_SECURE=true` y
+define los secretos requeridos en Render Environment, nunca en el repositorio.
+
+El perfil de producción usa el manejo nativo de cabeceras reenviadas de Tomcat
+para reconocer el HTTPS y la IP del cliente detrás del proxy de Render. La
+aplicación depende de que el servicio solo reciba tráfico público a través del
+proxy de Render; no expongas directamente el puerto del contenedor ni confíes
+en cabeceras reenviadas desde un proxy adicional no controlado. Spring Security
+mantiene sus encabezados de seguridad predeterminados, incluidos HSTS,
+protección contra framing y `nosniff`.
+
+La conexión a MySQL/TiDB exige TLS con verificación de certificado y nombre de
+host (`sslMode=VERIFY_IDENTITY`). Usa el hostname TLS del clúster TiDB Cloud en
+`SPRING_DATASOURCE_URL` y conserva las credenciales en las variables secretas
+de Render. Una URL privada o un certificado que no coincida con el hostname
+hará que la conexión falle, en lugar de degradar silenciosamente a texto claro.
+
+El limitador de autenticación vive en memoria del proceso. El manejo de proxy
+del perfil `prod` permite usar la IP del cliente reenviada por Render, pero el
+límite se reinicia al reiniciar el servicio y cada instancia tiene contadores
+independientes. Para escalar horizontalmente, traslada el límite a un almacén
+compartido o gateway con límites por IP y cuenta; no asumas protección global
+de intentos mientras siga siendo local.
+
 Flyway debe permanecer habilitado en producción: `application-prod.yml` lo
 activa explícitamente para que ejecute las migraciones antes de la validación de
 Hibernate. Si el servicio no inicia y el log salta directamente a Hibernate sin

@@ -11,10 +11,14 @@ spring:
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      data-source-properties:
+        sslMode: VERIFY_IDENTITY
   jpa:
     hibernate:
       ddl-auto: none
 server:
+  forward-headers-strategy: native
   servlet:
     session:
       cookie:

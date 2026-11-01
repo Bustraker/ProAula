@@ -189,11 +189,7 @@ public class AdminCodeRequestService {
         if (usuarioRepository.existsByEmail(request.getEmail())) {
             throw new IllegalArgumentException("Ya existe una cuenta con ese correo electrónico.");
         }
-        if (password == null || password.length() < 8 || password.length() > 72
-                || password.getBytes(StandardCharsets.UTF_8).length > 72) {
-            throw new IllegalArgumentException(
-                "La contraseña debe tener al menos 8 caracteres y no superar 72 bytes en UTF-8.");
-        }
+        PasswordPolicy.validateNewPassword(password);
 
         Usuario usuario = new Usuario();
         usuario.setUsername(normalizedUsername);
