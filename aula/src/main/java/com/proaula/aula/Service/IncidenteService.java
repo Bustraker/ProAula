@@ -45,10 +45,11 @@ public class IncidenteService {
     }
 
     @Transactional(readOnly = true)
-    public Page<IncidentePanelResponse> listar(String tipo, String ruta, Pageable pageable) {
+    public Page<IncidentePanelResponse> listar(String tipo, String ruta, String estado, Pageable pageable) {
         String tipoFiltro = normalizarFiltro(tipo);
         String rutaFiltro = normalizarFiltro(ruta);
-        return incidenteRepository.findForPanel(tipoFiltro, rutaFiltro, pageable)
+        String estadoFiltro = normalizarEstadoFiltro(estado);
+        return incidenteRepository.findForPanel(tipoFiltro, rutaFiltro, estadoFiltro, pageable)
                 .map(incidente -> new IncidentePanelResponse(
                         incidente.getId(),
                         incidente.getRuta() == null ? "General" : incidente.getRuta().getNombre(),
@@ -107,6 +108,18 @@ public class IncidenteService {
 
     private String normalizarFiltro(String filtro) {
         return filtro == null || filtro.isBlank() ? null : filtro.trim();
+    }
+
+    private String normalizarEstadoFiltro(String estado) {
+        if (estado == null || estado.isBlank()) {
+            return null;
+        }
+
+        String estadoNormalizado = estado.trim().toUpperCase(Locale.ROOT);
+        if (!ESTADOS_PERMITIDOS.contains(estadoNormalizado)) {
+            throw new AulaException("El estado indicado no es válido.", "VALIDATION_ERROR");
+        }
+        return estadoNormalizado;
     }
 
     private String tituloPara(IncidenteReportRequest.TipoIncidente tipo) {

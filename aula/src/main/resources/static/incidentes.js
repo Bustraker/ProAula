@@ -19,6 +19,7 @@ let solicitudActiva;
 const elementos = {
     formulario: document.getElementById('filtroIncidentes'),
     tipo: document.getElementById('filtroTipo'),
+    estado: document.getElementById('filtroEstado'),
     ruta: document.getElementById('filtroRuta'),
     tabla: document.getElementById('tablaIncidentes'),
     feedback: document.getElementById('panelFeedback'),
@@ -43,6 +44,9 @@ async function cargarIncidentes(pagina = 0) {
     if (elementos.tipo.value) {
         parametros.set('tipo', elementos.tipo.value);
     }
+    if (elementos.estado.value) {
+        parametros.set('estado', elementos.estado.value);
+    }
     if (elementos.ruta.value.trim()) {
         parametros.set('ruta', elementos.ruta.value.trim());
     }
@@ -59,6 +63,9 @@ async function cargarIncidentes(pagina = 0) {
         if (!Array.isArray(datos.content)) {
             throw new Error('El servidor devolvió un formato de respuesta inesperado.');
         }
+        if (pagina > 0 && (datos.totalPages === 0 || pagina >= datos.totalPages)) {
+            return cargarIncidentes(Math.max(datos.totalPages - 1, 0));
+        }
 
         renderizarIncidentes(datos.content);
         actualizarPaginacion(datos);
@@ -72,15 +79,17 @@ async function cargarIncidentes(pagina = 0) {
                     datos.totalElements === 1 ? 'reporte encontrado' : 'reportes encontrados'
                 }.`
         );
+        return true;
     } catch (error) {
         if (error.name === 'AbortError') {
-            return;
+            return false;
         }
         console.error('Error al cargar los incidentes:', error);
         elementos.tabla.replaceChildren(crearFilaMensaje('No fue posible cargar los reportes.', true));
         elementos.total.textContent = '—';
         actualizarPaginacion({ page: 0, totalPages: 0, totalElements: 0, size: TAMANO_PAGINA });
         mostrarFeedback(error.message || 'No fue posible cargar los reportes. Inténtalo de nuevo.', 'error');
+        return false;
     }
 }
 
@@ -204,6 +213,15 @@ async function actualizarEstado(id, selector, boton, celdaEstado) {
         celdaEstado.replaceChildren(crearEtiquetaEstado(datos.estado));
         boton.textContent = 'Guardado';
         mostrarFeedback(`Estado del reporte #${id} actualizado correctamente.`, 'success');
+        if (elementos.estado.value && elementos.estado.value !== datos.estado) {
+            const listaActualizada = await cargarIncidentes(paginaActual);
+            if (listaActualizada) {
+                mostrarFeedback(
+                    `Estado del reporte #${id} actualizado. La lista se ajustó al filtro de estado.`,
+                    'success'
+                );
+            }
+        }
     } catch (error) {
         boton.disabled = selector.value === selector.dataset.savedStatus;
         boton.textContent = 'Guardar';

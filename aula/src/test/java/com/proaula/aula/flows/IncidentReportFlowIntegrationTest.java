@@ -251,7 +251,11 @@ class IncidentReportFlowIntegrationTest {
                 .andExpect(status().is3xxRedirection());
         mockMvc.perform(get("/incidentes/panel")
                         .with(user(administrador.getUsername()).roles("ADMIN")))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString(
+                        "id=\"filtroEstado\"")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString(
+                        "value=\"EN_ATENCION\">En atención")));
 
         mockMvc.perform(post("/api/incidentes")
                         .with(user(administrador.getUsername()).roles("ADMIN"))
@@ -293,6 +297,36 @@ class IncidentReportFlowIntegrationTest {
 
         assertThat(incidenteRepository.findAll())
                 .anySatisfy(item -> assertThat(item.getUsuario().getId()).isEqualTo(administrador.getId()));
+    }
+
+    @Test
+    void administratorCanFilterIncidentsByStatusAndRoute() throws Exception {
+        Usuario reportero = createUser();
+        Ruta rutaSeleccionada = createRoute();
+        Ruta otraRuta = createRoute();
+        createIncident(reportero, rutaSeleccionada, "RESUELTO");
+        createIncident(reportero, rutaSeleccionada, "PENDIENTE");
+        createIncident(reportero, otraRuta, "RESUELTO");
+
+        mockMvc.perform(get("/api/incidentes")
+                        .with(user("incident-admin").roles("ADMIN"))
+                        .param("estado", " resuelto ")
+                        .param("ruta", rutaSeleccionada.getNombre())
+                        .param("page", "0")
+                        .param("size", "1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content", org.hamcrest.Matchers.hasSize(1)))
+                .andExpect(jsonPath("$.content[0].ruta").value(rutaSeleccionada.getNombre()))
+                .andExpect(jsonPath("$.content[0].estado").value("RESUELTO"))
+                .andExpect(jsonPath("$.totalElements").value(1))
+                .andExpect(jsonPath("$.totalPages").value(1));
+
+        mockMvc.perform(get("/api/incidentes")
+                        .with(user("incident-admin").roles("ADMIN"))
+                        .param("estado", "RESUELTO"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content", org.hamcrest.Matchers.hasSize(2)))
+                .andExpect(jsonPath("$.totalElements").value(2));
     }
 
     @Test
@@ -377,6 +411,12 @@ class IncidentReportFlowIntegrationTest {
                         .param("size", "101"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value("VALIDATION_ERROR"));
+
+        mockMvc.perform(get("/api/incidentes")
+                        .with(user("incident-admin").roles("ADMIN"))
+                        .param("estado", "CANCELADO"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("VALIDATION_ERROR"));
     }
 
     private Usuario createUser() {
@@ -399,5 +439,16 @@ class IncidentReportFlowIntegrationTest {
         ruta.setDestino("Manga");
         ruta.setVerificada(true);
         return rutaRepository.saveAndFlush(ruta);
+    }
+
+    private Incidente createIncident(Usuario reportero, Ruta ruta, String estado) {
+        Incidente incidente = new Incidente();
+        incidente.setUsuario(reportero);
+        incidente.setRuta(ruta);
+        incidente.setTipo("ACCIDENTE");
+        incidente.setTitulo("Accidente reportado");
+        incidente.setDescripcion("Incidente para prueba de filtrado.");
+        incidente.setEstado(estado);
+        return incidenteRepository.saveAndFlush(incidente);
     }
 }

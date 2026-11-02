@@ -39,6 +39,7 @@ public class IncidenteRestController {
     public IncidentePageResponse listar(
             @RequestParam(required = false) String tipo,
             @RequestParam(required = false) String ruta,
+            @RequestParam(required = false) String estado,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         if (page < 0 || size < 1 || size > MAX_TAMANO_PAGINA) {
@@ -49,7 +50,7 @@ public class IncidenteRestController {
         }
 
         Page<IncidentePanelResponse> resultado =
-                incidenteService.listar(tipo, ruta, PageRequest.of(page, size));
+                incidenteService.listar(tipo, ruta, estado, PageRequest.of(page, size));
         return new IncidentePageResponse(
                 resultado.getContent(),
                 resultado.getNumber(),

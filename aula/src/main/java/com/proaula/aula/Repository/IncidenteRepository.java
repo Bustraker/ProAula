@@ -14,6 +14,7 @@ public interface IncidenteRepository extends JpaRepository<Incidente, Long> {
             select incidente from Incidente incidente
             left join fetch incidente.ruta ruta
             where (:tipo is null or :tipo = '' or incidente.tipo = :tipo)
+              and (:estado is null or :estado = '' or incidente.estado = :estado)
               and (:ruta is null or :ruta = ''
                    or lower(ruta.nombre) like lower(concat('%', :ruta, '%'))
                    or lower(ruta.codigo) like lower(concat('%', :ruta, '%'))
@@ -28,6 +29,7 @@ public interface IncidenteRepository extends JpaRepository<Incidente, Long> {
                     select count(incidente) from Incidente incidente
                     left join incidente.ruta ruta
                     where (:tipo is null or :tipo = '' or incidente.tipo = :tipo)
+                      and (:estado is null or :estado = '' or incidente.estado = :estado)
                       and (:ruta is null or :ruta = ''
                            or lower(ruta.nombre) like lower(concat('%', :ruta, '%'))
                            or lower(ruta.codigo) like lower(concat('%', :ruta, '%'))
@@ -40,5 +42,6 @@ public interface IncidenteRepository extends JpaRepository<Incidente, Long> {
     Page<Incidente> findForPanel(
             @Param("tipo") String tipo,
             @Param("ruta") String ruta,
+            @Param("estado") String estado,
             Pageable pageable);
 }

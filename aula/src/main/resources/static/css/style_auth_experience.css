@@ -1678,8 +1678,9 @@ body.auth-body {
     border-color: #a9c7df;
 }
 
-.auth-form-heading {
+.auth-page--register .auth-form-heading {
     color: #193c5e;
+    background: transparent;
     border-color: #e3eaf0;
     border-left-color: #ffb347;
 }
