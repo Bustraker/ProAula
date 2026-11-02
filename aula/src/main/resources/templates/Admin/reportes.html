@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="app-context-path" th:content="@{/}">
     <meta name="theme-color" content="#24191c">
-    <meta name="description" content="Informes del inventario de flota, cuentas y rutas de Bustraker">
+    <meta name="description" content="Indicadores de flota, rutas, actividad e incidentes de Bustraker">
     <title>Reportes - Bustraker Admin</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" th:href="@{/images/logo.png}" type="image/png">
-    <link rel="stylesheet" th:href="@{/css/reportes.css(v='reports-20261005-6')}">
+    <link rel="stylesheet" th:href="@{/css/reportes.css(v='reports-dashboard-1')}">
 </head>
 <body class="admin-reports">
     <div class="reports-shell">
@@ -47,7 +48,7 @@
                     <div class="reports-heading__copy">
                         <span class="reports-eyebrow"><span></span> ANÁLISIS DEL SISTEMA</span>
                         <h1 id="reportsTitle">Reportes</h1>
-                        <p>Consulta el inventario de flota y la composición actual de Bustraker.</p>
+                        <p>Indicadores reales de operación, actividad, flota y atención de incidentes.</p>
                     </div>
                     <svg class="reports-analytics-visual" viewBox="0 0 520 270" aria-hidden="true" focusable="false">
                         <defs>
@@ -131,7 +132,7 @@
                     </svg>
                     <div class="reports-heading__context">
                         <span class="reports-heading__context-icon"><i class="fas fa-layer-group" aria-hidden="true"></i></span>
-                        <span><strong>Corte actual</strong><small>Indicadores del inventario</small></span>
+                        <span><strong>Datos del sistema</strong><small id="reportsDataState">Cargando indicadores…</small></span>
                     </div>
                 </section>
 
@@ -144,9 +145,9 @@
                     </article>
                     <article class="reports-metric reports-metric--routes">
                         <span class="reports-metric__icon"><i class="fas fa-route" aria-hidden="true"></i></span>
-                        <span class="reports-metric__label">Rutas disponibles</span>
-                        <strong class="reports-metric__value" th:text="${totalRutas}">0</strong>
-                        <span class="reports-metric__note">Rutas registradas</span>
+                        <span class="reports-metric__label">Rutas activas</span>
+                        <strong id="metricActiveRoutes" class="reports-metric__value" th:text="${totalRutas}">0</strong>
+                        <span class="reports-metric__note">Rutas habilitadas en el sistema</span>
                     </article>
                     <article class="reports-metric reports-metric--accounts">
                         <span class="reports-metric__icon"><i class="fas fa-users" aria-hidden="true"></i></span>
@@ -156,10 +157,87 @@
                     </article>
                     <article class="reports-metric reports-metric--matches">
                         <span class="reports-metric__icon"><i class="fas fa-filter" aria-hidden="true"></i></span>
-                        <span class="reports-metric__label">Buses encontrados</span>
-                        <strong class="reports-metric__value" th:text="${buses != null ? buses.size() : 0}">0</strong>
-                        <span class="reports-metric__note">Coincidencias del filtro actual</span>
+                        <span class="reports-metric__label">Incidentes por atender</span>
+                        <strong id="metricOpenIncidents" class="reports-metric__value">—</strong>
+                        <span class="reports-metric__note">Pendientes o en atención</span>
                     </article>
+                </section>
+
+                <section class="reports-dashboard" aria-label="Análisis operativo">
+                    <div class="reports-dashboard__heading">
+                        <div>
+                            <span class="reports-section-heading__eyebrow">INDICADORES OPERATIVOS</span>
+                            <h2>Panorama del servicio</h2>
+                            <p>Gráficos construidos con los registros guardados en la aplicación.</p>
+                        </div>
+                        <label class="reports-period" for="activityPeriod">
+                            Periodo
+                            <select id="activityPeriod">
+                                <option value="12">12 meses</option>
+                                <option value="6">6 meses</option>
+                                <option value="3">3 meses</option>
+                            </select>
+                        </label>
+                    </div>
+                    <p id="reportsSyntheticNotice" class="reports-data-notice" hidden></p>
+                    <p id="reportsError" class="reports-data-error" role="alert" hidden></p>
+                    <div class="reports-charts">
+                        <article class="reports-chart-card reports-chart-card--wide">
+                            <div class="reports-chart-card__heading">
+                                <div><h3>Actividad mensual</h3><p>Viajes registrados en la bitácora e incidentes recibidos</p></div>
+                                <span class="reports-chart-card__icon"><i class="fas fa-chart-column" aria-hidden="true"></i></span>
+                            </div>
+                            <div id="chartActivity" class="reports-chart-view" aria-live="polite">
+                                <p class="reports-chart-empty">Cargando actividad…</p>
+                            </div>
+                        </article>
+                        <article class="reports-chart-card">
+                            <div class="reports-chart-card__heading">
+                                <div><h3>Estado de la flota</h3><p>Disponibilidad registrada de los buses</p></div>
+                                <span class="reports-chart-card__icon"><i class="fas fa-bus" aria-hidden="true"></i></span>
+                            </div>
+                            <div id="chartFleet" class="reports-chart-view" aria-live="polite">
+                                <p class="reports-chart-empty">Cargando flota…</p>
+                            </div>
+                        </article>
+                        <article class="reports-chart-card">
+                            <div class="reports-chart-card__heading">
+                                <div><h3>Incidentes por tipo</h3><p>Motivos reportados por los usuarios</p></div>
+                                <span class="reports-chart-card__icon"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i></span>
+                            </div>
+                            <div id="chartIncidentTypes" class="reports-chart-view" aria-live="polite">
+                                <p class="reports-chart-empty">Cargando incidentes…</p>
+                            </div>
+                        </article>
+                        <article class="reports-chart-card">
+                            <div class="reports-chart-card__heading">
+                                <div><h3>Rutas con más viajes registrados</h3><p>Viajes guardados en la bitácora</p></div>
+                                <span class="reports-chart-card__icon"><i class="fas fa-route" aria-hidden="true"></i></span>
+                            </div>
+                            <div id="chartRoutes" class="reports-chart-view" aria-live="polite">
+                                <p class="reports-chart-empty">Cargando rutas…</p>
+                            </div>
+                        </article>
+                        <article class="reports-chart-card">
+                            <div class="reports-chart-card__heading">
+                                <div><h3>Ocupación reportada</h3><p>Último nivel registrado para cada bus</p></div>
+                                <span class="reports-chart-card__icon"><i class="fas fa-people-group" aria-hidden="true"></i></span>
+                            </div>
+                            <div id="chartOccupancy" class="reports-chart-view" aria-live="polite">
+                                <p class="reports-chart-empty">Cargando ocupación…</p>
+                            </div>
+                        </article>
+                        <article class="reports-chart-card">
+                            <div class="reports-chart-card__heading">
+                                <div><h3>Estado de las rutas</h3><p>Activas, inactivas y verificadas; una ruta puede aparecer en ambas categorías</p></div>
+                                <span class="reports-chart-card__icon"><i class="fas fa-circle-check" aria-hidden="true"></i></span>
+                            </div>
+                            <div id="chartRouteStates" class="reports-chart-view" aria-live="polite">
+                                <p class="reports-chart-empty">Cargando estado de rutas…</p>
+                            </div>
+                        </article>
+                    </div>
+                    <p id="reportsUpdatedAt" class="reports-updated" aria-live="polite"></p>
                 </section>
 
                 <div class="reports-layout">
@@ -257,6 +335,7 @@
             </div>
         </main>
     </div>
+    <script th:src="@{/js/reports-dashboard.js(v='reports-dashboard-1')}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const bars = Array.from(document.querySelectorAll('.reports-chart__bar'));
@@ -272,7 +351,7 @@
                 return;
             }
 
-            const counters = Array.from(document.querySelectorAll('.reports-metric__value, .reports-chart__meta strong'));
+            const counters = Array.from(document.querySelectorAll('.reports-chart__meta strong'));
             counters.forEach((counter) => {
                 const target = Number(counter.textContent.replace(/[^\d.-]/g, ''));
                 if (!Number.isFinite(target) || target <= 0) {

@@ -13,16 +13,18 @@
     <link rel="icon" th:href="@{/images/logo.png}" type="image/png">
     <link rel="stylesheet" th:href="@{/css/index.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" th:href="@{/css/style-index-landing.css}">
+    <link rel="stylesheet" th:href="@{/css/style-index-landing.css(v='admin-access-gate-1')}">
 </head>
 <body class="landing-page">
     <main class="landing-main">
         <div class="landing-frame">
             <header class="landing-header">
-                <a class="landing-brand" th:href="@{/}" aria-label="Bustraker, inicio">
+                <button class="landing-brand" id="openAdminGate" type="button"
+                        aria-label="Bustraker, abrir acceso administrativo" aria-haspopup="dialog"
+                        aria-controls="adminAccessGate" title="Bustraker">
                     <img th:src="@{/images/logo.png}" alt="">
                     <span><strong>Bustraker</strong><small>Movilidad en Cartagena</small></span>
-                </a>
+                </button>
                 <nav class="landing-nav" aria-label="Acceso a la cuenta">
                     <a th:href="@{/inicio-de-sesion-mejorado}">Iniciar sesión</a>
                     <a class="landing-nav-register" th:href="@{/registro-mejorado}">Crear cuenta</a>
@@ -100,13 +102,14 @@
             </footer>
         </div>
 
-        <aside class="landing-admin-access">
-            <button class="admin-btn" id="LoginAdminBtn" type="button" aria-label="Abrir acceso administrativo" title="Panel de administrador">
-                <img th:src="@{/images/Admin.png}" alt="">
-                <span>Acceso administrativo</span>
-            </button>
-        </aside>
     </main>
+
+    <dialog id="adminAccessGate" class="landing-admin-gate" aria-label="Acceso administrativo">
+        <button class="admin-btn admin-btn--center" id="LoginAdminBtn" type="button">
+            <img th:src="@{/images/Admin.png}" alt="" aria-hidden="true">
+            <span>Acceso administrativo</span>
+        </button>
+    </dialog>
 
     <!-- Modal Admin -->
     <dialog id="modalAdmin" class="modal-admin" aria-labelledby="modalAdminTitle" aria-describedby="modalAdminDescription">
@@ -136,6 +139,6 @@
         </div>
     </dialog>
 
-    <script th:src="@{/js/index.js}"></script>
+    <script th:src="@{/js/index.js(v='admin-access-gate-1')}"></script>
 </body>
 </html>

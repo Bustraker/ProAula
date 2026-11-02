@@ -1,7 +1,10 @@
 const modal = document.getElementById('modalAdmin');
+const gate = document.getElementById('adminAccessGate');
+const gateTrigger = document.getElementById('openAdminGate');
 const openBtn = document.getElementById('LoginAdminBtn');
 const closeBtn = document.getElementById('closeModalAdmin');
 const continueBtn = document.getElementById('continueAdmin');
+let handingOffToAdminModal = false;
 
 function setModalOpen(isOpen) {
     if (!modal) return;
@@ -15,9 +18,28 @@ function setModalOpen(isOpen) {
     }
 }
 
-if (openBtn && modal) {
+if (gateTrigger && gate) {
+    gateTrigger.addEventListener('click', function() {
+        if (!gate.open) {
+            gate.showModal();
+        }
+    });
+}
+
+if (openBtn && modal && gate) {
     openBtn.addEventListener('click', function() {
+        handingOffToAdminModal = true;
+        gate.close();
         setModalOpen(true);
+    });
+}
+
+if (gate && gateTrigger) {
+    gate.addEventListener('close', function() {
+        if (!handingOffToAdminModal) {
+            gateTrigger.focus();
+        }
+        handingOffToAdminModal = false;
     });
 }
 
@@ -41,7 +63,7 @@ window.addEventListener('keydown', function(event) {
 
 if (modal && openBtn) {
     modal.addEventListener('close', function() {
-        openBtn.focus();
+        gateTrigger?.focus();
     });
 }
 

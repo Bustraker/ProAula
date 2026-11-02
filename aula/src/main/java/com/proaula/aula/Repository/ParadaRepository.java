@@ -11,6 +11,7 @@ import java.util.List;
 @Repository
 public interface ParadaRepository extends JpaRepository<Parada, Long> {
     boolean existsByRuta_Id(Long rutaId);
+    long countByEstado(Parada.Estado estado);
     List<Parada> findByRuta_IdOrderByOrdenAsc(Long rutaId);
 
     @EntityGraph(attributePaths = "ruta")

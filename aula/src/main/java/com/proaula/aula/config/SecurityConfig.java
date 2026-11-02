@@ -75,6 +75,8 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.DELETE, "/api/buses/**").hasRole("ADMIN")
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/favoritos/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers(HttpMethod.POST, "/api/modelos/retrasos/riesgo").permitAll()
+                .requestMatchers("/api/modelos/**").hasAnyRole("USER", "ADMIN")
                 .requestMatchers(HttpMethod.GET, "/api/llegadas/**").permitAll()
                 .requestMatchers("/api/llegadas/**").hasAnyRole("USER", "ADMIN")
                 // Rutas completamente públicas

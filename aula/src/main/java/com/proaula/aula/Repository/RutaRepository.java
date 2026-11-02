@@ -12,6 +12,10 @@ import java.util.Optional;
 public interface RutaRepository extends JpaRepository<Ruta, Long> {
     // Operaciones CRUD automáticas
     Optional<Ruta> findByCodigo(String codigo);
+
+    long countByEstado(Ruta.Estado estado);
+
+    long countByVerificadaTrue();
     
     @EntityGraph(attributePaths = "paradas")
     List<Ruta> findAllByVerificadaTrue();

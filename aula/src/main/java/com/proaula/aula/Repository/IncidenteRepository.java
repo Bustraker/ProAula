@@ -1,5 +1,8 @@
 package com.proaula.aula.Repository;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 import com.proaula.aula.Entity.Incidente;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -9,6 +12,33 @@ import org.springframework.data.repository.query.Param;
 
 public interface IncidenteRepository extends JpaRepository<Incidente, Long> {
     boolean existsByRuta_Id(Long rutaId);
+
+    long countByEstadoIgnoreCase(String estado);
+
+    @Query("""
+            select incidente.tipo, count(incidente)
+            from Incidente incidente
+            group by incidente.tipo
+            order by count(incidente) desc
+            """)
+    List<Object[]> contarPorTipo();
+
+    @Query("""
+            select incidente.estado, count(incidente)
+            from Incidente incidente
+            group by incidente.estado
+            order by count(incidente) desc
+            """)
+    List<Object[]> contarPorEstado();
+
+    @Query("""
+            select year(incidente.fechaReporte), month(incidente.fechaReporte), count(incidente)
+            from Incidente incidente
+            where incidente.fechaReporte >= :inicio and incidente.fechaReporte < :fin
+            group by year(incidente.fechaReporte), month(incidente.fechaReporte)
+            """)
+    List<Object[]> contarPorMes(
+            @Param("inicio") LocalDateTime inicio, @Param("fin") LocalDateTime fin);
 
     @Query(value = """
             select incidente from Incidente incidente

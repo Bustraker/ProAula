@@ -125,6 +125,8 @@
             tramos: [], activo: null, pestana: 'paradas',
             items: [],              // paradas/puntos del tramo activo
             solicitud: 0,
+            colaRiesgo: [],
+            solicitudesRiesgoActivas: 0,
             controlador: null,
             trayecto: null, barriosTrayecto: [],
             ubicacion: null, seguimiento: null,
@@ -1001,6 +1003,11 @@
                     : ' · directa') +
                 '. Se priorizan menos transbordos, conexiones con paradas ubicables y menor distancia en línea recta entre paradas; luego, menos barrios intermedios. Esa distancia no representa una ruta peatonal. El mapa muestra la opción seleccionada; su tiempo es una estimación en auto, no el tiempo real del bus.';
             el.resultados.appendChild(h('p', 'resultados__resumen', el.resumenBusqueda.textContent));
+            el.resultados.appendChild(h(
+                'p',
+                'resultados__riesgo-nota',
+                'Riesgo demostrativo con datos sintéticos: usa la hora actual, demanda simulada y una duración de referencia (5 min por barrio recorrido + 0,5 min por parada). No incluye semáforos, tráfico ni retrasos reales; no es una predicción operativa.'
+            ));
 
             estado.tramos.forEach(function (tramo, indice) {
                 el.resultados.appendChild(crearTarjetaTramo(tramo, indice));
@@ -1048,7 +1055,107 @@
                 meta.appendChild(item);
             });
             tarjeta.appendChild(meta);
+
+            var indicadorRiesgo = h('output', 'tramo__riesgo');
+            indicadorRiesgo.setAttribute('aria-live', 'polite');
+            indicadorRiesgo.setAttribute('aria-label', 'Probabilidad demostrativa de retraso mayor a diez minutos');
+            tarjeta.appendChild(indicadorRiesgo);
+            mostrarRiesgoRetraso(tramo, indicadorRiesgo);
+            solicitarRiesgoRetraso(tramo);
             return tarjeta;
+        }
+
+        function mostrarRiesgoRetraso(tramo, indicador) {
+            if (tramo.riesgoRetraso) {
+                indicador.textContent = 'Demo · probabilidad de retraso >10 min: ' +
+                    Math.round(tramo.riesgoRetraso.probabilidadRetraso * 100) + '%';
+                indicador.classList.remove('tramo__riesgo--error');
+            } else if (tramo.errorRiesgoRetraso) {
+                indicador.textContent = 'Probabilidad no disponible';
+                indicador.title = 'El servicio de predicciones no respondió. No se muestra un valor de reemplazo.';
+                indicador.classList.add('tramo__riesgo--error');
+            } else {
+                indicador.textContent = 'Calculando riesgo demostrativo…';
+            }
+            tramo.indicadorRiesgo = indicador;
+        }
+
+        function solicitarRiesgoRetraso(tramo) {
+            if (tramo.riesgoRetraso || tramo.errorRiesgoRetraso || tramo.riesgoEnCola) return;
+            tramo.riesgoEnCola = true;
+            estado.colaRiesgo.push(tramo);
+            procesarColaRiesgo();
+        }
+
+        function procesarColaRiesgo() {
+            while (estado.solicitudesRiesgoActivas < 3 && estado.colaRiesgo.length) {
+                ejecutarPrediccionRiesgo(estado.colaRiesgo.shift());
+            }
+        }
+
+        function ejecutarPrediccionRiesgo(tramo) {
+            estado.solicitudesRiesgoActivas++;
+            predecirRiesgoDemostrativo(tramo).then(function (respuesta) {
+                tramo.riesgoRetraso = respuesta;
+                if (tramo.indicadorRiesgo) mostrarRiesgoRetraso(tramo, tramo.indicadorRiesgo);
+            }).catch(function (error) {
+                console.error('No se pudo calcular el riesgo demostrativo de retraso:', error);
+                tramo.errorRiesgoRetraso = true;
+                if (tramo.indicadorRiesgo) mostrarRiesgoRetraso(tramo, tramo.indicadorRiesgo);
+            }).finally(function () {
+                estado.solicitudesRiesgoActivas--;
+                procesarColaRiesgo();
+            });
+        }
+
+        function construirSolicitudRiesgo(tramo) {
+            var ahora = new Date();
+            var hora = ahora.getHours();
+            var dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+            var esDiaLaboral = ahora.getDay() >= 1 && ahora.getDay() <= 5;
+            var horaPicoManana = hora >= 6 && hora <= 9;
+            var horaPicoTarde = hora >= 16 && hora <= 19;
+            var demanda = 25 + (horaPicoManana ? 18 : 0) +
+                (horaPicoTarde ? 22 : 0) + (esDiaLaboral ? 9 : 0);
+            var barriosRecorridos = Math.max(1, tramo.barrios.length - 1);
+            var duracionReferencia = Math.max(20, Math.min(90, Math.round(
+                barriosRecorridos * 5 + tramo.paradas * 0.5
+            )));
+
+            return {
+                ruta: tramo.tramos.map(function (parte) { return String(parte.ruta.id); }).join('-').slice(0, 100),
+                diaSemana: dias[ahora.getDay()],
+                horaSalida: hora,
+                duracionPlanificadaMin: duracionReferencia,
+                indiceDemandaPronosticada: Math.min(100, demanda)
+            };
+        }
+
+        async function predecirRiesgoDemostrativo(tramo) {
+            var csrf = encabezadosCSRF();
+            if (!csrf) throw new Error('No se pudo validar la sesión para consultar el modelo.');
+
+            var controlador = new AbortController();
+            var temporizador = setTimeout(function () { controlador.abort(); }, 10000);
+            try {
+                var respuesta = await fetch(M.url('/api/modelos/retrasos/riesgo'), {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: Object.assign({ 'Content-Type': 'application/json' }, csrf),
+                    body: JSON.stringify(construirSolicitudRiesgo(tramo)),
+                    signal: controlador.signal
+                });
+                if (!respuesta.ok) throw new Error('El servicio de modelos respondió HTTP ' + respuesta.status + '.');
+
+                var datos = await respuesta.json();
+                if (!datos || !Number.isFinite(datos.probabilidadRetraso)
+                    || datos.probabilidadRetraso < 0 || datos.probabilidadRetraso > 1) {
+                    throw new Error('El servicio de modelos devolvió una probabilidad inválida.');
+                }
+                return datos;
+            } finally {
+                clearTimeout(temporizador);
+            }
         }
 
         /* ===================== SELECCIÓN Y DIBUJO ===================== */

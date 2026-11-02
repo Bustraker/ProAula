@@ -105,6 +105,8 @@ jwt:
 carto:
   api-key: ${CARTO_API_KEY:}
 app:
+  models:
+    base-url: ${MODELS_API_BASE_URL:http://localhost:8000}
   admin:
     approver-email: ${ADMIN_APPROVER_EMAIL:}
   public-base-url: ${APP_PUBLIC_BASE_URL:http://localhost:${PORT:5679}}

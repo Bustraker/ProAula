@@ -14,6 +14,10 @@ import java.util.Optional;
 public interface BusRepository extends JpaRepository<Bus, Long> {
     // Operaciones CRUD automáticas
 
+    long countByEstado(Bus.Estado estado);
+
+    long countByNivelOcupacionActual(Bus.NivelOcupacion nivelOcupacionActual);
+
     @EntityGraph(attributePaths = {"ruta", "agencia"})
     @Query("SELECT b FROM Bus b")
     List<Bus> findAllWithDetails();
