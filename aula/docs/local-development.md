@@ -69,21 +69,22 @@ parámetro no válido y `404` cuando el incidente no existe.
 
 Para habilitar un proveedor OAuth, copia `.env.example` como `.env` dentro de `aula`
 y completa únicamente las credenciales necesarias. El archivo se carga en el perfil
-`local` y está excluido de Git. Google y GitHub usan la URI de callback de Spring
-`{baseUrl}/login/oauth2/code/{registrationId}`; `{baseUrl}` corresponde al esquema,
-host y puerto con los que abriste la aplicación. Si arrancas con `run-local.cmd`,
-la URL local es HTTP y debes registrar en Google Cloud
+`local` y está excluido de Git. La URI de callback se fija con
+`APP_PUBLIC_BASE_URL`, para que no cambie según el esquema detectado en cada
+petición. Si arrancas con `run-local.cmd`, su valor predeterminado es
+`http://localhost:5679`; registra en Google Cloud
 `http://localhost:5679/login/oauth2/code/google`.
 
 Si arrancas con HTTPS usando
 [`setup-local-oauth-https.ps1`](../scripts/setup-local-oauth-https.ps1), abre
 `https://localhost:5679` y registra
 `https://localhost:5679/login/oauth2/code/google`. Para Facebook, siempre inicia
-con HTTPS y registra `https://localhost:5679/login/oauth2/code/facebook`. En todos
-los casos, el callback registrado debe coincidir exactamente con la URL usada,
-incluyendo `http`/`https`, `localhost` (no `127.0.0.1`) y el puerto. Puedes registrar
-ambas URI de Google si alternas entre HTTP y HTTPS. No es necesario añadir el origen
-a **Authorized JavaScript origins** para este flujo OAuth del servidor. Sin
+con HTTPS y registra `https://localhost:5679/login/oauth2/code/facebook`. La URI
+registrada debe coincidir exactamente con `APP_PUBLIC_BASE_URL`, incluyendo
+`http`/`https`, `localhost` (no `127.0.0.1`) y el puerto; usa el mismo host para
+abrir la aplicación y recibir el callback. Puedes registrar ambas URI de Google si
+alternas entre HTTP y HTTPS. No es necesario añadir el origen a **Authorized
+JavaScript origins** para este flujo OAuth del servidor. Sin
 credenciales válidas, esos botones no aparecen en el formulario de acceso.
 
 Para la inicialización local y los datos sintéticos, consulta

@@ -219,8 +219,10 @@ los perfiles local y `prod`: Google (`openid profile email`), GitHub
 (`user:email`), Discord (`identify email`) y Facebook (`email public_profile`).
 Configura las credenciales únicamente en el entorno, nunca en `application*.yml`.
 
-Registra en cada consola la URL exacta de callback que envía la aplicación:
-`{BASE_URL}/login/oauth2/code/{registrationId}`. En Render, Facebook usa
+La app construye los callbacks desde `APP_PUBLIC_BASE_URL` más
+`/login/oauth2/code/{registrationId}`, sin inferir esquema o host de cada petición.
+En Render, `APP_PUBLIC_BASE_URL` predeterminado es `https://proaula.onrender.com`.
+Registra en cada consola la URI exacta correspondiente al proveedor. Facebook usa
 `https://proaula.onrender.com/login/oauth2/code/facebook`. Meta exige HTTPS y
 descarta el callback local HTTP, por lo que el perfil local puede habilitar HTTPS
 con un certificado de desarrollo confiable para `localhost`. En Windows,
@@ -236,9 +238,10 @@ contraseña aleatoria y la protege con DPAPI para ese usuario, y configura el
 perfil local en la terminal actual. También carga en el proceso las credenciales
 OAuth guardadas en variables de usuario cuando aún no están disponibles en esa
 terminal, sin imprimir sus valores.
-Abre la aplicación en `https://localhost:5679`; registra en cada proveedor que se
-use en local `https://localhost:5679/login/oauth2/code/{registrationId}`. Para
-Facebook, el callback es
+Abre la aplicación en `https://localhost:5679`; el script configura
+`APP_PUBLIC_BASE_URL=https://localhost:5679`. Registra en cada proveedor que se use
+en local `https://localhost:5679/login/oauth2/code/{registrationId}`. Para Facebook,
+el callback es
 `https://localhost:5679/login/oauth2/code/facebook`. Si cambias `PORT`, usa el
 mismo puerto al registrar los callbacks. La URL HTTP anterior no es válida para
 Facebook Login. `localhost`, `127.0.0.1` y el dominio de Render no son
@@ -247,12 +250,12 @@ locales HTTP y HTTPS y los scopes de autorización.
 
 Los callback exactos por proveedor son:
 
-| Proveedor | Local con HTTPS | Render |
-| --- | --- | --- |
-| Google | `https://localhost:5679/login/oauth2/code/google` | `https://proaula.onrender.com/login/oauth2/code/google` |
-| GitHub | `https://localhost:5679/login/oauth2/code/github` | `https://proaula.onrender.com/login/oauth2/code/github` |
-| Discord | `https://localhost:5679/login/oauth2/code/discord` | `https://proaula.onrender.com/login/oauth2/code/discord` |
-| Facebook | `https://localhost:5679/login/oauth2/code/facebook` | `https://proaula.onrender.com/login/oauth2/code/facebook` |
+| Proveedor | Local HTTP (`run-local.cmd`) | Local HTTPS (script) | Render |
+| --- | --- | --- | --- |
+| Google | `http://localhost:5679/login/oauth2/code/google` | `https://localhost:5679/login/oauth2/code/google` | `https://proaula.onrender.com/login/oauth2/code/google` |
+| GitHub | `http://localhost:5679/login/oauth2/code/github` | `https://localhost:5679/login/oauth2/code/github` | `https://proaula.onrender.com/login/oauth2/code/github` |
+| Discord | `http://localhost:5679/login/oauth2/code/discord` | `https://localhost:5679/login/oauth2/code/discord` | `https://proaula.onrender.com/login/oauth2/code/discord` |
+| Facebook | No soportado; requiere HTTPS | `https://localhost:5679/login/oauth2/code/facebook` | `https://proaula.onrender.com/login/oauth2/code/facebook` |
 
 Registra solo los proveedores que tengan credenciales configuradas. Render ya
 termina HTTPS delante de la aplicación; no habilites un certificado TLS propio

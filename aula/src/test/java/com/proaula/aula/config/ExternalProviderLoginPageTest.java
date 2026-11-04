@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @SpringBootTest(properties = {
+    "app.public-base-url=http://localhost:5679",
     "spring.security.oauth2.client.registration.google.client-id=placeholder-google-test",
     "spring.security.oauth2.client.registration.google.client-secret=placeholder-google-test",
     "spring.security.oauth2.client.registration.github.client-id=test-github-client",
@@ -82,53 +83,53 @@ class ExternalProviderLoginPageTest {
     }
 
     @Test
-    void configuredProvidersRedirectToAuthorizationEndpointsWithLocalCallbacks() throws Exception {
+    void configuredProvidersUseTheConfiguredCanonicalLocalCallbacks() throws Exception {
         assertAuthorizationRedirect(
             "/oauth2/authorization/google",
             "accounts.google.com",
-            "http://localhost/login/oauth2/code/google",
+            "http://localhost:5679/login/oauth2/code/google",
             "openid profile email");
         assertAuthorizationRedirect(
             "/oauth2/authorization/github",
             "github.com",
-            "http://localhost/login/oauth2/code/github",
+            "http://localhost:5679/login/oauth2/code/github",
             "user:email");
         assertAuthorizationRedirect(
             "/oauth2/authorization/discord",
             "discord.com",
-            "http://localhost/login/oauth2/code/discord",
+            "http://localhost:5679/login/oauth2/code/discord",
             "identify email");
         assertAuthorizationRedirect(
             "/oauth2/authorization/facebook",
             "www.facebook.com",
-            "http://localhost/login/oauth2/code/facebook",
+            "http://localhost:5679/login/oauth2/code/facebook",
             "email public_profile");
     }
 
     @Test
-    void configuredProvidersRedirectToHttpsCallbacksWhenLocalApplicationUsesHttps() throws Exception {
+    void configuredCallbacksDoNotChangeBasedOnIncomingRequestScheme() throws Exception {
         assertAuthorizationRedirect(
             "/oauth2/authorization/google",
             "accounts.google.com",
-            "https://localhost:5679/login/oauth2/code/google",
+            "http://localhost:5679/login/oauth2/code/google",
             "openid profile email",
             true);
         assertAuthorizationRedirect(
             "/oauth2/authorization/github",
             "github.com",
-            "https://localhost:5679/login/oauth2/code/github",
+            "http://localhost:5679/login/oauth2/code/github",
             "user:email",
             true);
         assertAuthorizationRedirect(
             "/oauth2/authorization/discord",
             "discord.com",
-            "https://localhost:5679/login/oauth2/code/discord",
+            "http://localhost:5679/login/oauth2/code/discord",
             "identify email",
             true);
         assertAuthorizationRedirect(
             "/oauth2/authorization/facebook",
             "www.facebook.com",
-            "https://localhost:5679/login/oauth2/code/facebook",
+            "http://localhost:5679/login/oauth2/code/facebook",
             "email public_profile",
             true);
     }
