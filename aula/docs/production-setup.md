@@ -102,13 +102,15 @@ modifica esa columna y deja de validar todo el esquema. No lo consideres una rep
 permanente.
 
 Las tablas de favoritos y resúmenes de trayectos requieren aplicar, en este orden,
-[`V20261021_01__create_user_favorites.sql`](../src/main/resources/db/migration/mysql/V20261021_01__create_user_favorites.sql)
-y [`V20261030_01__create_favorite_trips.sql`](../src/main/resources/db/migration/mysql/V20261030_01__create_favorite_trips.sql)
+[`V20261021_01__create_user_favorites.sql`](../src/main/resources/db/migration/mysql/V20261021_01__create_user_favorites.sql),
+[`V20261030_01__create_favorite_trips.sql`](../src/main/resources/db/migration/mysql/V20261030_01__create_favorite_trips.sql) y
+[`V20261101_01__align_favorite_creation_timestamp.sql`](../src/main/resources/db/migration/mysql/V20261101_01__align_favorite_creation_timestamp.sql)
 en la base MySQL/TiDB antes de desplegar esta funcionalidad. Como Flyway sigue
 deshabilitado en `application-prod.yml`, esas migraciones no se ejecutarán al arrancar:
 respalda la base, confirma que existan `usuario`, `ruta` y `parada`, y aplica cada
-script una sola vez. No habilites Flyway ni cambies `ddl-auto` como parte de este
-despliegue mientras siga vigente el workaround de conexión.
+script en ese orden. La migración de fecha puede volver a ejecutarse y conserva
+`created_at` como valor inicial cuando está disponible. No habilites Flyway ni cambies
+`ddl-auto` como parte de este despliegue mientras siga vigente el workaround de conexión.
 
 La migración preparada
 `src/main/resources/db/migration/mysql/V20261015_02__normalize_horario_days_column.sql`
@@ -176,6 +178,9 @@ Cuando Flyway esté habilitado, los scripts del perfil MySQL se ejecutan en orde
    crea favoritos de usuarios con claves foráneas a rutas y paradas.
 7. [`V20261030_01__create_favorite_trips.sql`](../src/main/resources/db/migration/mysql/V20261030_01__create_favorite_trips.sql)
    conserva, por usuario, los resúmenes de trayectos elegidos como favoritos.
+8. [`V20261101_01__align_favorite_creation_timestamp.sql`](../src/main/resources/db/migration/mysql/V20261101_01__align_favorite_creation_timestamp.sql)
+   agrega `favorito.fecha_creacion` en esquemas anteriores, conserva el valor de
+   `created_at` si existe y crea el índice requerido por las consultas de favoritos.
 
 Flyway está configurado con `baseline-on-migrate`; antes del primer despliegue
 respalda la base y confirma que el esquema base de Bustraker y

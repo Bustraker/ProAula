@@ -18,6 +18,17 @@ app:
     vapid-key: ${FIREBASE_VAPID_KEY:}
   synthetic-data:
     enabled: ${SYNTHETIC_DATA_ENABLED:true}
+  admin:
+    approver-email: ${ADMIN_APPROVER_EMAIL:admin.demo@proaula.local}
+  demo-accounts:
+    enabled: ${DEMO_ACCOUNTS_ENABLED:true}
+    user-username: ${DEMO_USER_USERNAME:usuario_demo}
+    user-email: ${DEMO_USER_EMAIL:usuario.demo@proaula.local}
+    user-password: ${DEMO_USER_PASSWORD:UsuarioDemo#2026}
+    admin-username: ${DEMO_ADMIN_USERNAME:admin_demo}
+    admin-email: ${DEMO_ADMIN_EMAIL:admin.demo@proaula.local}
+    admin-password: ${DEMO_ADMIN_PASSWORD:AdminDemo#2026!}
+    admin-code: ${DEMO_ADMIN_CODE:Local-Admin-Access-2026!}
 server:
   ssl:
     enabled: ${LOCAL_HTTPS_ENABLED:false}

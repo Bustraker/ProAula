@@ -3,8 +3,11 @@
 
     var COLORS = ['#9f3444', '#477e71', '#c1874c', '#657aa4', '#a96f84', '#7b8791'];
     var SVG_NS = 'http://www.w3.org/2000/svg';
+    var REFRESH_INTERVAL_MS = 15000;
     var dashboard;
     var period = 12;
+    var refreshTimer;
+    var loading = false;
 
     document.addEventListener('DOMContentLoaded', function () {
         dashboard = {
@@ -23,6 +26,13 @@
         dashboard.period.addEventListener('change', function () {
             period = Number(dashboard.period.value);
             if (dashboard.data) drawActivity(dashboard.data.actividadMensual);
+        });
+        document.addEventListener('visibilitychange', function () {
+            if (document.hidden) {
+                window.clearTimeout(refreshTimer);
+                return;
+            }
+            loadDashboard();
         });
         loadDashboard();
     });
@@ -65,6 +75,9 @@
     }
 
     async function loadDashboard() {
+        if (loading) return;
+        loading = true;
+        window.clearTimeout(refreshTimer);
         dashboard.error.hidden = true;
         dashboard.state.textContent = 'Actualizando…';
         try {
@@ -94,6 +107,11 @@
             retry.addEventListener('click', loadDashboard);
             dashboard.error.appendChild(retry);
             dashboard.error.hidden = false;
+        } finally {
+            loading = false;
+            if (!document.hidden) {
+                refreshTimer = window.setTimeout(loadDashboard, REFRESH_INTERVAL_MS);
+            }
         }
     }
 
@@ -126,7 +144,7 @@
         dashboard.updated.textContent = 'Actualizado ' + new Intl.DateTimeFormat('es-CO', {
             dateStyle: 'medium',
             timeStyle: 'short'
-        }).format(new Date());
+        }).format(new Date()) + ' · actualización automática cada 15 s';
     }
 
     function drawActivity(months) {

@@ -29,6 +29,7 @@ test("analytics dashboard renders live indicators and filters monthly activity",
     rutasMasConsultadas: [{ nombre: "Ruta Centro", cantidad: 7 }],
     actividadMensual: months
   };
+  let requestCount = 0;
   const containers = [
     "chartActivity", "chartFleet", "chartIncidentTypes", "chartRoutes",
     "chartOccupancy", "chartRouteStates"
@@ -44,11 +45,19 @@ test("analytics dashboard renders live indicators and filters monthly activity",
     ${containers.map(id => `<div id="${id}"></div>`).join("")}
   `;
 
-  await page.route("**/api/admin/reportes/indicadores", route => route.fulfill({
-    contentType: "application/json",
-    body: JSON.stringify(indicators)
-  }));
+  await page.route("**/api/admin/reportes/indicadores", route => {
+    requestCount += 1;
+    const responseIndicators = {
+      ...indicators,
+      totalUsuarios: requestCount > 1 ? 9 : indicators.totalUsuarios
+    };
+    return route.fulfill({
+      contentType: "application/json",
+      body: JSON.stringify(responseIndicators)
+    });
+  });
   await page.goto("/viajar_public");
+  await page.clock.install();
   await page.setContent(pageMarkup);
   await page.addScriptTag({
     path: path.resolve(__dirname, "../../src/main/resources/static/js/reports-dashboard.js")
@@ -63,6 +72,11 @@ test("analytics dashboard renders live indicators and filters monthly activity",
   await expect(page.locator("#chartRouteStates .reports-bar-row")).toHaveCount(3);
   await expect(page.locator("#metricOpenIncidents")).toHaveText("2");
   await expect(page.locator("#reportsSyntheticNotice")).toBeVisible();
+
+  await page.clock.fastForward(15000);
+  await expect(page.locator(".reports-metric--accounts .reports-metric__value")).toHaveText("9");
+  await expect.poll(() => requestCount).toBe(2);
+  await expect(page.locator("#reportsUpdatedAt")).toContainText("actualización automática cada 15 s");
 
   await page.locator("#activityPeriod").selectOption("6");
   await expect(page.locator(".reports-activity-month-label")).toHaveCount(6);

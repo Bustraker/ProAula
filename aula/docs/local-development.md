@@ -15,7 +15,7 @@ nombre en `.env` o antes de ejecutar el script. Por ejemplo, cambia `DB_NAME` en
 `.env` al nombre que creaste en phpMyAdmin. Para usar `.env`, cópialo primero desde
 `.env.example`; está excluido de Git. La aplicación conserva MySQL; no usa una base
 H2.
-Abre `http://localhost:3465`.
+Abre `http://localhost:5679`.
 
 Si `JWT_SECRET` no está definido, el perfil local genera una clave aleatoria al
 iniciar. Los tokens de acceso dejan de ser válidos al reiniciar la aplicación. Si
@@ -70,8 +70,13 @@ parámetro no válido y `404` cuando el incidente no existe.
 Para habilitar un proveedor OAuth, copia `.env.example` como `.env` dentro de `aula`
 y completa únicamente las credenciales necesarias. El archivo se carga en el perfil
 `local` y está excluido de Git. Registra en el proveedor la URL de callback local:
-`http://localhost:3465/login/oauth2/code/github` (sustituye `github` por el proveedor
-configurado).
+`http://localhost:5679/login/oauth2/code/{registrationId}` (reemplaza
+`{registrationId}` por `google`, `github` o `discord`, según el proveedor). El
+puerto debe coincidir con `PORT` y la URL con la que abres la aplicación. Para
+Facebook, inicia el perfil local con HTTPS y registra
+`https://localhost:5679/login/oauth2/code/facebook`; sigue los pasos y el script
+`setup-local-oauth-https.ps1` de
+[`production-setup.md`](production-setup.md#oauth).
 Sin credenciales válidas, esos botones no aparecen en el formulario de acceso.
 
 Para la inicialización local y los datos sintéticos, consulta

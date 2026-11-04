@@ -70,6 +70,23 @@ ruta del archivo, no la clave privada.
 La clave pública VAPID de Web Push se configura localmente; en otros entornos
 usa `FIREBASE_VAPID_KEY`. La API key del SDK web no sustituye esa clave.
 
+Al iniciar con el perfil `local` se crean o actualizan estas cuentas de prueba
+en la base configurada. Sus contraseñas se restablecen a los valores locales al
+iniciar la aplicación; no son credenciales para producción:
+
+| Tipo | Usuario | Contraseña | Código ADMIN |
+| --- | --- | --- | --- |
+| Usuario | `usuario_demo` | `UsuarioDemo#2026` | — |
+| Administrador | `admin_demo` | `AdminDemo#2026!` | `Local-Admin-Access-2026!` |
+
+Para entrar como administrador, abre `/admin-login`, verifica primero el código
+ADMIN y luego inicia sesión con la cuenta. El sembrado de estas cuentas y este
+código solo se activa con el perfil `local` (no con `prod`); puedes desactivarlo con
+`DEMO_ACCOUNTS_ENABLED=false` o personalizar sus valores con las variables
+`DEMO_USER_*`, `DEMO_ADMIN_*` y `DEMO_ADMIN_CODE`. El aprobador local usa por
+defecto el correo `admin.demo@proaula.local`; puedes cambiarlo con
+`ADMIN_APPROVER_EMAIL`.
+
 ## Despliegue de producción
 
 La aplicación no activa `prod` automáticamente. Configura
