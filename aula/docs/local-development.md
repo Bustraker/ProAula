@@ -87,6 +87,12 @@ alternas entre HTTP y HTTPS. No es necesario añadir el origen a **Authorized
 JavaScript origins** para este flujo OAuth del servidor. Sin
 credenciales válidas, esos botones no aparecen en el formulario de acceso.
 
+Para arrancar directamente en HTTPS, detén cualquier instancia local que ya use
+el puerto 5679 y ejecuta `.\run-local-https.cmd` desde esta carpeta. El lanzador
+prepara el certificado local confiable, establece las variables de OAuth y abre
+la aplicación en `https://localhost:5679`. Usa `.\run-local.cmd` para el modo HTTP
+habitual; Facebook Login no funciona en ese modo.
+
 Para la inicialización local y los datos sintéticos, consulta
 [`production-setup.md`](production-setup.md). El perfil de producción y Render no
 dependen de `DB_NAME` ni se modifican con este ajuste.

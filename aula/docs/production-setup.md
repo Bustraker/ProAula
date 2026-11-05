@@ -60,12 +60,13 @@ independientes. Para escalar horizontalmente, traslada el límite a un almacén
 compartido o gateway con límites por IP y cuenta; no asumas protección global
 de intentos mientras siga siendo local.
 
-Flyway debe permanecer habilitado en producción: `application-prod.yml` lo
-activa explícitamente para que ejecute las migraciones antes de la validación de
-Hibernate. Si el servicio no inicia y el log salta directamente a Hibernate sin
-mostrar actividad de Flyway, revisa las variables del servicio en Render y
-elimina `SPRING_FLYWAY_ENABLED=false` si está definida; una variable de entorno
-puede anular el archivo de perfil.
+Por el workaround temporal de TiDB descrito abajo, Flyway permanece deshabilitado
+en `application-prod.yml`; no establezcas `SPRING_FLYWAY_ENABLED=true` sin probar
+antes el baseline y las migraciones pendientes contra una copia de la base. Antes
+del sembrado inicial, producción ejecuta de forma idempotente las migraciones
+`V20261017_01` y `V20261020_01` para alinear las columnas de códigos y solicitudes
+ADMIN. El usuario de la base necesita permisos para modificar esas tablas. Las
+migraciones de horarios y favoritos siguen el procedimiento manual indicado abajo.
 
 En desarrollo y producción, configura `ADMIN_APPROVER_EMAIL` mediante el entorno
 y asegúrate de que pertenezca a la cuenta ADMIN aprobadora. `MAIL_USERNAME` es
