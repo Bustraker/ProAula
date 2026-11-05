@@ -24,7 +24,6 @@ import com.proaula.aula.Entity.Viaje;
 import com.proaula.aula.Repository.UsuarioRepository;
 import com.proaula.aula.dto.ContactoMensajeDto;
 import com.proaula.aula.dto.BusConsultaDto;
-import com.proaula.aula.dto.BusConsultaMapper;
 import com.proaula.aula.dto.UsuarioFormDto;
 import com.proaula.aula.Service.AvisoFavoritoService;
 import com.proaula.aula.Service.BusService;
@@ -383,10 +382,7 @@ public class HomeController {
         boolean autenticado = authentication != null
                 && authentication.isAuthenticated()
                 && !(authentication instanceof AnonymousAuthenticationToken);
-        List<Bus> todosLosBuses = busService.getAllBuses();
-        List<BusConsultaDto> buses = autenticado
-                ? BusConsultaMapper.authenticatedBuses(todosLosBuses)
-                : BusConsultaMapper.publicRoutes(todosLosBuses);
+        List<BusConsultaDto> buses = busService.getBusConsultations(autenticado);
         long rutasConBuses = buses.stream()
                 .map(bus -> bus.getRutaNombre())
                 .filter(nombre -> nombre != null && !nombre.isBlank())
