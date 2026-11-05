@@ -21,6 +21,7 @@ public class ProductionAdminSchemaBootstrapService implements ApplicationRunner 
 
     private static final Logger log = LoggerFactory.getLogger(ProductionAdminSchemaBootstrapService.class);
     private static final String[] ADMIN_SCHEMA_MIGRATIONS = {
+        "classpath:db/seed/prod-admin-schema-bootstrap.sql",
         "classpath:db/migration/mysql/V20261017_01__admin_registration_approval.sql",
         "classpath:db/migration/mysql/V20261020_01__admin_request_review_and_code_delivery.sql"
     };

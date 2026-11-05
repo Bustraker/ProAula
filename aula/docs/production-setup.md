@@ -63,10 +63,11 @@ de intentos mientras siga siendo local.
 Por el workaround temporal de TiDB descrito abajo, Flyway permanece deshabilitado
 en `application-prod.yml`; no establezcas `SPRING_FLYWAY_ENABLED=true` sin probar
 antes el baseline y las migraciones pendientes contra una copia de la base. Antes
-del sembrado inicial, producción ejecuta de forma idempotente las migraciones
-`V20261017_01` y `V20261020_01` para alinear las columnas de códigos y solicitudes
-ADMIN. El usuario de la base necesita permisos para modificar esas tablas. Las
-migraciones de horarios y favoritos siguen el procedimiento manual indicado abajo.
+del sembrado inicial, producción crea si faltan las tablas ADMIN base y ejecuta
+de forma idempotente las migraciones `V20261017_01` y `V20261020_01` para alinear
+las columnas de códigos y solicitudes ADMIN. El usuario de la base necesita
+permisos para crear y modificar esas tablas. Las migraciones de horarios y
+favoritos siguen el procedimiento manual indicado abajo.
 
 En desarrollo y producción, configura `ADMIN_APPROVER_EMAIL` mediante el entorno
 y asegúrate de que pertenezca a la cuenta ADMIN aprobadora. `MAIL_USERNAME` es
