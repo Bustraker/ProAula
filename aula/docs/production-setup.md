@@ -65,9 +65,11 @@ en `application-prod.yml`; no establezcas `SPRING_FLYWAY_ENABLED=true` sin proba
 antes el baseline y las migraciones pendientes contra una copia de la base. Antes
 del sembrado inicial, producción crea si faltan las tablas ADMIN base y ejecuta
 de forma idempotente las migraciones `V20261017_01` y `V20261020_01` para alinear
-las columnas de códigos y solicitudes ADMIN. El usuario de la base necesita
-permisos para crear y modificar esas tablas. Las migraciones de horarios y
-favoritos siguen el procedimiento manual indicado abajo.
+las columnas de códigos y solicitudes ADMIN. También crea de forma idempotente
+la tabla de trayectos favoritos y alinea la fecha de creación de favoritos. El
+usuario de la base necesita permisos para crear y modificar esas tablas. La
+tabla base `favorito` y las migraciones de horarios siguen el procedimiento
+manual indicado abajo.
 
 En desarrollo y producción, configura `ADMIN_APPROVER_EMAIL` mediante el entorno
 y asegúrate de que pertenezca a la cuenta ADMIN aprobadora. `MAIL_USERNAME` es
@@ -107,19 +109,17 @@ permite que Hibernate no rechace el tipo existente de `horario.dias_semana`, per
 modifica esa columna y deja de validar todo el esquema. No lo consideres una reparación
 permanente.
 
-Las tablas base de favoritos y resúmenes de trayectos requieren aplicar manualmente,
-en este orden,
+La tabla base de favoritos requiere aplicar manualmente
 [`V20261021_01__create_user_favorites.sql`](../src/main/resources/db/migration/mysql/V20261021_01__create_user_favorites.sql)
-y
-[`V20261030_01__create_favorite_trips.sql`](../src/main/resources/db/migration/mysql/V20261030_01__create_favorite_trips.sql)
 en la base MySQL/TiDB. Confirma que existan `usuario`, `ruta` y `parada` antes de
-crear las tablas. Como Flyway sigue deshabilitado en `application-prod.yml`, la
-aplicación ejecuta al arrancar
+crear esa tabla. Como Flyway sigue deshabilitado en `application-prod.yml`, la
+aplicación ejecuta al arrancar, de forma idempotente,
+[`V20261030_01__create_favorite_trips.sql`](../src/main/resources/db/migration/mysql/V20261030_01__create_favorite_trips.sql)
+para crear la tabla de trayectos favoritos, y después
 [`V20261101_01__align_favorite_creation_timestamp.sql`](../src/main/resources/db/migration/mysql/V20261101_01__align_favorite_creation_timestamp.sql)
-después del bootstrap ADMIN. Esta migración agrega `favorito.fecha_creacion` si
-falta, conserva `created_at` cuando está disponible y puede volver a ejecutarse.
-No habilites Flyway ni cambies `ddl-auto` mientras siga vigente el workaround de
-conexión.
+para alinear la fecha de favoritos. Ambas migraciones pueden volver a ejecutarse
+sin recrear la tabla ni perder datos. No habilites Flyway ni cambies `ddl-auto`
+mientras siga vigente el workaround de conexión.
 
 La migración preparada
 `src/main/resources/db/migration/mysql/V20261015_02__normalize_horario_days_column.sql`
