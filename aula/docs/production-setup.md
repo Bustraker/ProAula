@@ -107,16 +107,19 @@ permite que Hibernate no rechace el tipo existente de `horario.dias_semana`, per
 modifica esa columna y deja de validar todo el esquema. No lo consideres una reparación
 permanente.
 
-Las tablas de favoritos y resúmenes de trayectos requieren aplicar, en este orden,
-[`V20261021_01__create_user_favorites.sql`](../src/main/resources/db/migration/mysql/V20261021_01__create_user_favorites.sql),
-[`V20261030_01__create_favorite_trips.sql`](../src/main/resources/db/migration/mysql/V20261030_01__create_favorite_trips.sql) y
+Las tablas base de favoritos y resúmenes de trayectos requieren aplicar manualmente,
+en este orden,
+[`V20261021_01__create_user_favorites.sql`](../src/main/resources/db/migration/mysql/V20261021_01__create_user_favorites.sql)
+y
+[`V20261030_01__create_favorite_trips.sql`](../src/main/resources/db/migration/mysql/V20261030_01__create_favorite_trips.sql)
+en la base MySQL/TiDB. Confirma que existan `usuario`, `ruta` y `parada` antes de
+crear las tablas. Como Flyway sigue deshabilitado en `application-prod.yml`, la
+aplicación ejecuta al arrancar
 [`V20261101_01__align_favorite_creation_timestamp.sql`](../src/main/resources/db/migration/mysql/V20261101_01__align_favorite_creation_timestamp.sql)
-en la base MySQL/TiDB antes de desplegar esta funcionalidad. Como Flyway sigue
-deshabilitado en `application-prod.yml`, esas migraciones no se ejecutarán al arrancar:
-respalda la base, confirma que existan `usuario`, `ruta` y `parada`, y aplica cada
-script en ese orden. La migración de fecha puede volver a ejecutarse y conserva
-`created_at` como valor inicial cuando está disponible. No habilites Flyway ni cambies
-`ddl-auto` como parte de este despliegue mientras siga vigente el workaround de conexión.
+después del bootstrap ADMIN. Esta migración agrega `favorito.fecha_creacion` si
+falta, conserva `created_at` cuando está disponible y puede volver a ejecutarse.
+No habilites Flyway ni cambies `ddl-auto` mientras siga vigente el workaround de
+conexión.
 
 La migración preparada
 `src/main/resources/db/migration/mysql/V20261015_02__normalize_horario_days_column.sql`
@@ -202,8 +205,8 @@ una migración versionada que ya se haya aplicado; crea una migración nueva hac
 adelante después de revisar el esquema.
 
 Actualmente Flyway continúa deshabilitado en el perfil `prod` por el workaround de
-Render descrito arriba; la lista indica el orden de los scripts cuando se reactive.
-Hasta entonces, aplica manualmente las migraciones requeridas antes del despliegue.
+Render descrito arriba; los scripts enumerados indican las migraciones que se
+aplican manualmente o mediante el bootstrap específico de producción.
 
 Los perfiles locales y de validación deshabilitan estas migraciones MySQL: el
 entorno local administra su esquema con Hibernate y las pruebas usan su esquema H2

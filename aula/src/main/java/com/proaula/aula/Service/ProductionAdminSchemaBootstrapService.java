@@ -20,10 +20,11 @@ import java.nio.charset.StandardCharsets;
 public class ProductionAdminSchemaBootstrapService implements ApplicationRunner {
 
     private static final Logger log = LoggerFactory.getLogger(ProductionAdminSchemaBootstrapService.class);
-    private static final String[] ADMIN_SCHEMA_MIGRATIONS = {
+    private static final String[] PRODUCTION_SCHEMA_MIGRATIONS = {
         "classpath:db/seed/prod-admin-schema-bootstrap.sql",
         "classpath:db/migration/mysql/V20261017_01__admin_registration_approval.sql",
-        "classpath:db/migration/mysql/V20261020_01__admin_request_review_and_code_delivery.sql"
+        "classpath:db/migration/mysql/V20261020_01__admin_request_review_and_code_delivery.sql",
+        "classpath:db/migration/mysql/V20261101_01__align_favorite_creation_timestamp.sql"
     };
 
     private final DataSource dataSource;
@@ -36,13 +37,13 @@ public class ProductionAdminSchemaBootstrapService implements ApplicationRunner 
 
     @Override
     public void run(ApplicationArguments args) {
-        for (String migration : ADMIN_SCHEMA_MIGRATIONS) {
+        for (String migration : PRODUCTION_SCHEMA_MIGRATIONS) {
             ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
             populator.setSqlScriptEncoding(StandardCharsets.UTF_8.name());
             populator.setContinueOnError(false);
             populator.addScript(resourceLoader.getResource(migration));
             DatabasePopulatorUtils.execute(populator, dataSource);
         }
-        log.info("Se verificó y alineó el esquema de solicitudes y códigos ADMIN.");
+        log.info("Se verificaron y alinearon los esquemas de ADMIN y favoritos.");
     }
 }
