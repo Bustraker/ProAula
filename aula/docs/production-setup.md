@@ -80,10 +80,14 @@ El perfil `prod` puede arrancar sin correo ni Firebase configurados. Sin
 invitación, aprobación y rechazo ADMIN que requieren correo fallan con un error
 explícito de configuración; no se envían mensajes. Para habilitar ese flujo,
 configura `ADMIN_APPROVER_EMAIL`, `MAIL_USERNAME` y `MAIL_PASSWORD` en el gestor
-de secretos. `APP_PUBLIC_BASE_URL` usa el origen de Render indicado arriba si no
-se define. Push permanece deshabilitado de forma predeterminada: configura
-`FIREBASE_VAPID_KEY`, `FIREBASE_ADMIN_ENABLED=true` y credenciales Firebase
-válidas para habilitarlo. Sin push configurado, la interfaz no permite activarlo.
+de secretos. El health general del servicio no incluye SMTP porque es una
+integración opcional y sus credenciales pueden no estar configuradas; esto no
+oculta errores al enviar correos ni reemplaza la configuración requerida para
+las invitaciones ADMIN. `APP_PUBLIC_BASE_URL` usa el origen de Render indicado
+arriba si no se define. Push permanece deshabilitado de forma predeterminada:
+configura `FIREBASE_VAPID_KEY`, `FIREBASE_ADMIN_ENABLED=true` y credenciales
+Firebase válidas para habilitarlo. Sin push configurado, la interfaz no permite
+activarlo.
 
 Genera `JWT_SECRET` fuera del repositorio, por ejemplo con
 `openssl rand -base64 48`, y guárdalo en el gestor de secretos del entorno. No uses

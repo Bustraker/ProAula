@@ -17,6 +17,10 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
+management:
+  health:
+    mail:
+      enabled: false
 server:
   forward-headers-strategy: native
   servlet:
