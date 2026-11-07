@@ -118,8 +118,12 @@ aplicación ejecuta al arrancar, de forma idempotente,
 para crear la tabla de trayectos favoritos, y después
 [`V20261101_01__align_favorite_creation_timestamp.sql`](../src/main/resources/db/migration/mysql/V20261101_01__align_favorite_creation_timestamp.sql)
 para alinear la fecha de favoritos. Ambas migraciones pueden volver a ejecutarse
-sin recrear la tabla ni perder datos. No habilites Flyway ni cambies `ddl-auto`
-mientras siga vigente el workaround de conexión.
+sin recrear la tabla ni perder datos. También aplica
+[`V20261106_01__enhance_notificacion_table.sql`](../src/main/resources/db/migration/mysql/V20261106_01__enhance_notificacion_table.sql):
+crea la tabla si aún no existe y, si ya contiene notificaciones, añade las columnas
+de canal y fecha, completa los valores históricos e incorpora los índices sin
+borrar filas. No habilites Flyway ni cambies `ddl-auto` mientras siga vigente el
+workaround de conexión.
 
 La migración preparada
 `src/main/resources/db/migration/mysql/V20261015_02__normalize_horario_days_column.sql`

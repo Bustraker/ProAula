@@ -73,8 +73,9 @@ test("authenticated profile updates identity and validates password changes", as
   await page.locator('form[action="/perfil/cambiar-password"] button[type=submit]').click();
   await expect(page.getByRole("status")).toContainText(/Contraseña cambiada exitosamente/i);
 
+  page.once("dialog", dialog => dialog.accept());
   await page.locator('form[action="/logout"] button[type="submit"]').click();
-  await expect(page).toHaveURL(/\/$/);
+  await expect(page).toHaveURL(/\/inicio-de-sesion-mejorado\?logout=true$/);
   await page.goto("/inicio-de-sesion-mejorado");
   await page.locator("#username").fill(username);
   await page.locator("#password").fill("new-safe-password-27");

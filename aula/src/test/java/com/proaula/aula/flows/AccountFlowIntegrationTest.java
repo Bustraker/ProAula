@@ -83,7 +83,7 @@ class AccountFlowIntegrationTest {
 
         MvcResult logoutResult = mockMvc.perform(post("/logout").session(session).with(csrf()))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(header().string("Location", "/"))
+                .andExpect(header().string("Location", "/inicio-de-sesion-mejorado?logout=true"))
                 .andReturn();
         assertThat(logoutResult.getResponse().getHeaders("Set-Cookie").toString())
                 .contains("JWT_TOKEN=");

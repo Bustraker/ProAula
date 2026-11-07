@@ -27,6 +27,9 @@ class AvisoFavoritoServiceTest {
     @Mock
     private NotificacionRepository notificacionRepository;
 
+    @Mock
+    private NotificacionService notificacionService;
+
     @InjectMocks
     private AvisoFavoritoService avisoFavoritoService;
 
@@ -45,14 +48,11 @@ class AvisoFavoritoServiceTest {
 
         avisoFavoritoService.notificarIncidenteNuevo(incidente);
 
-        @SuppressWarnings("unchecked")
-        ArgumentCaptor<Iterable<com.proaula.aula.Entity.Notificacion>> captor =
-                ArgumentCaptor.forClass(Iterable.class);
-        verify(notificacionRepository).saveAll(captor.capture());
-        var notificacion = captor.getValue().iterator().next();
-        assertThat(notificacion.getUsuario()).isSameAs(usuario);
-        assertThat(notificacion.getTipo()).isEqualTo(AvisoFavoritoService.TIPO);
-        assertThat(notificacion.getMensaje()).contains("Centro - Manga", "Demora en el servicio");
-        assertThat(notificacion.getLeido()).isFalse();
+        verify(notificacionService).enviarNotificacion(
+                org.mockito.ArgumentMatchers.eq(usuario),
+                org.mockito.ArgumentMatchers.eq("Retraso reportado"),
+                org.mockito.ArgumentMatchers.contains("Demora en el servicio"),
+                org.mockito.ArgumentMatchers.eq(AvisoFavoritoService.TIPO)
+        );
     }
 }

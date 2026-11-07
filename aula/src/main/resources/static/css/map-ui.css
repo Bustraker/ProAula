@@ -596,6 +596,768 @@
     .mu-estilos__menu, .mu-estilo { transition: none !important; }
 }
 
+/* ==========================================================================
+   BUSTRAKER PRO · MARCADORES MODERNOS, POPUPS Y SISTEMA SONORO / ACCESIBLE
+   ========================================================================== */
+
+/* ---------- Pines de Origen (A) y Destino (B) 3D con Radar de Pulso ---------- */
+.bp-pin-contenedor {
+    background: transparent !important;
+    border: none !important;
+}
+
+.bp-pin-wrapper {
+    position: relative;
+    width: 42px;
+    height: 54px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.45));
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.bp-pin-wrapper:hover {
+    transform: scale(1.12) translateY(-4px);
+}
+
+.bp-pin {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    border: 2.5px solid #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+.bp-pin-icon {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: rotate(45deg);
+    color: #ffffff;
+    font-size: 0.95rem;
+}
+
+.bp-pin-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #0f172a;
+    color: #38bdf8;
+    border: 1.5px solid #ffffff;
+    font-size: 0.68rem;
+    font-weight: 900;
+    display: grid;
+    place-items: center;
+    transform: rotate(45deg);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+}
+
+.bp-pin-wrapper--origen .bp-pin {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.bp-pin-wrapper--origen .bp-pin-badge {
+    color: #34d399;
+}
+
+.bp-pin-wrapper--destino .bp-pin {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+}
+
+.bp-pin-wrapper--destino .bp-pin-badge {
+    color: #f87171;
+}
+
+/* Radar de Pulso en el pavimento */
+.bp-pin-pulse {
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 24px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(16, 185, 129, 0.4);
+    animation: bp-radar-pulse 2s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+    z-index: 1;
+}
+
+.bp-pin-wrapper--destino .bp-pin-pulse {
+    background: rgba(239, 68, 68, 0.45);
+}
+
+@keyframes bp-radar-pulse {
+    0% {
+        transform: translateX(-50%) scale(0.6);
+        opacity: 0.9;
+    }
+    100% {
+        transform: translateX(-50%) scale(2.8);
+        opacity: 0;
+    }
+}
+
+/* ---------- Nodos de Transporte (Paradas, Transbordos, Barrios) ---------- */
+.bp-stop-contenedor {
+    background: transparent !important;
+    border: none !important;
+}
+
+.bp-stop {
+    position: relative;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #ffffff;
+    color: #ffffff;
+    background: #0284c7;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
+    transition: transform 0.16s ease, box-shadow 0.16s ease;
+    cursor: pointer;
+}
+
+.bp-stop:hover {
+    transform: scale(1.22);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+    z-index: 1000 !important;
+}
+
+.bp-stop__icon {
+    font-size: 0.72rem;
+}
+
+.bp-stop__badge {
+    position: absolute;
+    bottom: -5px;
+    right: -5px;
+    min-width: 17px;
+    height: 17px;
+    padding: 0 3px;
+    border-radius: 999px;
+    background: #0f172a;
+    border: 1.5px solid #ffffff;
+    color: #f8fafc;
+    font-size: 0.62rem;
+    font-weight: 800;
+    display: grid;
+    place-items: center;
+}
+
+/* Estilos según tipo */
+.bp-stop--parada {
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+}
+
+.bp-stop--transbordo {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    border-color: #fef08a;
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.35), 0 4px 12px rgba(0,0,0,0.4);
+}
+
+.bp-stop--transbordo .bp-stop__badge {
+    background: #78350f;
+    color: #fde68a;
+    border-color: #fde68a;
+}
+
+.bp-stop--barrio {
+    border-radius: 8px;
+    transform: rotate(45deg);
+    background: linear-gradient(135deg, #64748b 0%, #475569 100%);
+    border-style: dashed;
+}
+
+.bp-stop--barrio .bp-stop__icon,
+.bp-stop--barrio .bp-stop__badge {
+    transform: rotate(-45deg);
+}
+
+/* ---------- Marcador Interactivo de Clic en el Mapa ---------- */
+.mu-click-marker-wrap {
+    position: relative;
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+}
+
+.mu-click-dot {
+    position: relative;
+    z-index: 2;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #06b6d4, #0891b2);
+    border: 2px solid #ffffff;
+    color: #ffffff;
+    display: grid;
+    place-items: center;
+    font-size: 0.85rem;
+    box-shadow: 0 4px 14px rgba(6, 182, 212, 0.5);
+}
+
+.mu-click-pulse {
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 2px solid #06b6d4;
+    animation: mu-click-expand 1.6s ease-out infinite;
+    pointer-events: none;
+}
+
+@keyframes mu-click-expand {
+    0% { transform: scale(0.6); opacity: 1; }
+    100% { transform: scale(2.2); opacity: 0; }
+}
+
+/* ---------- Popups Profesionales de Tránsito ---------- */
+.leaflet-popup-content-wrapper {
+    padding: 0 !important;
+    border-radius: 14px !important;
+    background: rgba(8, 22, 27, 0.98) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(55, 200, 186, 0.28) !important;
+    box-shadow: 0 16px 36px rgba(0, 8, 12, 0.6) !important;
+    overflow: hidden;
+    color: #ecf5f3 !important;
+}
+
+.leaflet-popup-content {
+    margin: 0 !important;
+    line-height: 1.4 !important;
+    min-width: 260px;
+    max-width: 320px;
+}
+
+.leaflet-popup-tip {
+    background: rgba(8, 22, 27, 0.98) !important;
+    border: 1px solid rgba(55, 200, 186, 0.28) !important;
+}
+
+.mu-popup--pro {
+    display: flex;
+    flex-direction: column;
+}
+
+.mu-popup__banner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: linear-gradient(90deg, rgba(55, 200, 186, 0.2), rgba(8, 22, 27, 0.4));
+    border-bottom: 1px solid rgba(55, 200, 186, 0.2);
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #38bdf8;
+}
+
+.mu-popup__banner--origen {
+    background: linear-gradient(90deg, rgba(16, 185, 129, 0.28), rgba(8, 22, 27, 0.4));
+    border-bottom-color: rgba(16, 185, 129, 0.35);
+    color: #6ee7b7;
+}
+
+.mu-popup__banner--destino {
+    background: linear-gradient(90deg, rgba(239, 68, 68, 0.28), rgba(8, 22, 27, 0.4));
+    border-bottom-color: rgba(239, 68, 68, 0.35);
+    color: #fca5a5;
+}
+
+.mu-popup__banner--transbordo {
+    background: linear-gradient(90deg, rgba(245, 158, 11, 0.28), rgba(8, 22, 27, 0.4));
+    border-bottom-color: rgba(245, 158, 11, 0.35);
+    color: #fde68a;
+}
+
+.mu-popup__banner--click {
+    background: linear-gradient(90deg, rgba(6, 182, 212, 0.28), rgba(8, 22, 27, 0.4));
+    border-bottom-color: rgba(6, 182, 212, 0.35);
+    color: #67e8f9;
+}
+
+.mu-popup__num {
+    margin-left: auto;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 2px 7px;
+    border-radius: 99px;
+    font-size: 0.68rem;
+    color: #ecf5f3;
+}
+
+.mu-popup__body {
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.mu-popup__title {
+    font-size: 0.98rem;
+    font-weight: 800;
+    color: #ffffff;
+}
+
+.mu-popup__meta {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 4px;
+}
+
+.mu-popup__meta-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 0.76rem;
+    color: #94a3b8;
+}
+
+.mu-popup__meta-item i {
+    color: #38bdf8;
+    width: 14px;
+    text-align: center;
+}
+
+.mu-popup__transfer-alert {
+    margin-top: 6px;
+    padding: 7px 10px;
+    border-radius: 8px;
+    background: rgba(245, 158, 11, 0.15);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    color: #fde68a;
+    font-size: 0.74rem;
+    line-height: 1.4;
+}
+
+.mu-popup__actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    padding: 10px 14px 12px;
+    border-top: 1px solid rgba(148, 163, 184, 0.12);
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.mu-popup__btn-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 7px 8px;
+    border-radius: 8px;
+    border: 1px solid rgba(55, 200, 186, 0.3);
+    background: rgba(55, 200, 186, 0.12);
+    color: #ecf5f3;
+    font: 700 0.74rem Inter, system-ui, sans-serif;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.mu-popup__btn-action:hover {
+    background: rgba(55, 200, 186, 0.28);
+    border-color: #38bdf8;
+}
+
+.mu-popup__btn--orig:hover {
+    background: rgba(16, 185, 129, 0.25);
+    border-color: #10b981;
+}
+
+.mu-popup__btn--dest:hover {
+    background: rgba(239, 68, 68, 0.25);
+    border-color: #ef4444;
+}
+
+.mu-popup__btn-speak {
+    grid-column: 1 / -1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    background: rgba(245, 158, 11, 0.14);
+    color: #fde68a;
+    font: 700 0.76rem Inter, system-ui, sans-serif;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.mu-popup__btn-speak:hover {
+    background: rgba(245, 158, 11, 0.3);
+}
+
+/* ---------- Botón de Asistente de Voz / Guía en Panel ---------- */
+.btn--asistente-voz {
+    width: 100%;
+    margin-top: 12px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #b45309, #d97706);
+    color: #ffffff;
+    font-size: 0.86rem;
+    font-weight: 700;
+    box-shadow: 0 4px 14px rgba(217, 119, 6, 0.3);
+    cursor: pointer;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: filter 0.15s, transform 0.15s;
+}
+
+.btn--asistente-voz:hover {
+    filter: brightness(1.12);
+    transform: translateY(-1px);
+}
+
+/* ---------- Toasts de Notificación en Vivo ---------- */
+.notif-toast-container {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 3000;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: min(390px, calc(100vw - 32px));
+    pointer-events: none;
+}
+
+.notif-toast {
+    pointer-events: auto;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: rgba(8, 22, 27, 0.98);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(55, 200, 186, 0.35);
+    border-left: 5px solid #14b8a6;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.55);
+    color: #ecf5f3;
+    animation: notif-slide-in 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.notif-toast--alerta {
+    border-left-color: #ef4444;
+}
+
+.notif-toast--alerta .notif-toast__icon {
+    color: #f87171;
+    background: rgba(239, 68, 68, 0.15);
+}
+
+.notif-toast__icon {
+    flex: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: rgba(20, 184, 166, 0.16);
+    color: #2dd4bf;
+    display: grid;
+    place-items: center;
+    font-size: 1.1rem;
+}
+
+.notif-toast__body {
+    flex: 1;
+    min-width: 0;
+}
+
+.notif-toast__title {
+    display: block;
+    font-size: 0.92rem;
+    font-weight: 800;
+    color: #ffffff;
+    margin-bottom: 3px;
+}
+
+.notif-toast__msg {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #cbd5e1;
+    line-height: 1.45;
+}
+
+.notif-toast__time {
+    display: block;
+    margin-top: 6px;
+    font-size: 0.68rem;
+    color: #64748b;
+}
+
+.notif-toast__actions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-left: 4px;
+}
+
+.notif-toast__btn-read,
+.notif-toast__btn-close {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    background: rgba(255, 255, 255, 0.04);
+    color: #94a3b8;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: background 0.15s, color 0.15s;
+}
+
+.notif-toast__btn-read:hover {
+    background: rgba(16, 185, 129, 0.25);
+    color: #34d399;
+}
+
+.notif-toast__btn-close:hover {
+    background: rgba(239, 68, 68, 0.2);
+    color: #f87171;
+}
+
+.notif-toast--fadeout {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
+    transition: opacity 0.24s ease, transform 0.24s ease;
+}
+
+@keyframes notif-slide-in {
+    0% { opacity: 0; transform: translateY(-16px) scale(0.95); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ---------- Drawer / Panel Desplegable de Notificaciones ---------- */
+.notif-drawer {
+    position: fixed;
+    top: 72px;
+    right: 18px;
+    z-index: 2500;
+    width: min(390px, calc(100vw - 28px));
+    max-height: calc(100vh - 90px);
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(155deg, rgba(8, 22, 27, 0.98), rgba(4, 15, 18, 0.98));
+    border: 1px solid rgba(55, 200, 186, 0.3);
+    border-radius: 16px;
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    overflow: hidden;
+    animation: notif-slide-in 0.25s ease both;
+}
+
+.notif-drawer[hidden] {
+    display: none !important;
+}
+
+.notif-drawer__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+    background: linear-gradient(90deg, rgba(55, 200, 186, 0.12), transparent);
+}
+
+.notif-drawer__title {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #ffffff;
+}
+
+.notif-drawer__title i {
+    color: #38bdf8;
+}
+
+.notif-drawer__list {
+    padding: 12px 14px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 400px;
+}
+
+.notif-drawer__empty {
+    text-align: center;
+    padding: 28px 16px;
+    color: #94a3b8;
+}
+
+.notif-drawer__empty i {
+    font-size: 2rem;
+    margin-bottom: 8px;
+    color: #475569;
+}
+
+.notif-drawer__empty strong {
+    display: block;
+    color: #cbd5e1;
+    font-size: 0.92rem;
+}
+
+.notif-drawer__empty p {
+    font-size: 0.78rem;
+    margin: 6px 0 0;
+}
+
+.notif-drawer__item {
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(148, 163, 184, 0.14);
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    transition: background 0.15s;
+}
+
+.notif-drawer__item:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.notif-drawer__item--leido {
+    opacity: 0.65;
+}
+
+.notif-drawer__item-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #38bdf8;
+}
+
+.notif-drawer__item-channel {
+    color: #64748b;
+    font-size: 0.68rem;
+}
+
+.notif-drawer__item-title {
+    font-size: 0.88rem;
+    color: #ffffff;
+}
+
+.notif-drawer__item-msg {
+    margin: 0;
+    font-size: 0.78rem;
+    color: #94a3b8;
+    line-height: 1.4;
+}
+
+.notif-drawer__item-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.notif-btn-speak,
+.notif-btn-mark {
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    background: rgba(255, 255, 255, 0.04);
+    color: #cbd5e1;
+    font-size: 0.72rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.notif-btn-speak:hover {
+    background: rgba(245, 158, 11, 0.2);
+    color: #fde68a;
+    border-color: #f59e0b;
+}
+
+.notif-btn-mark:hover {
+    background: rgba(16, 185, 129, 0.2);
+    color: #6ee7b7;
+    border-color: #10b981;
+}
+
+.notif-drawer__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-top: 1px solid rgba(148, 163, 184, 0.15);
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.notif-btn-footer {
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(55, 200, 186, 0.25);
+    background: transparent;
+    color: #38bdf8;
+    font-size: 0.76rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.notif-btn-footer:hover {
+    background: rgba(55, 200, 186, 0.15);
+}
+
+/* Badge de notificaciones */
+.icon-btn--notif {
+    position: relative;
+}
+
+.notif-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    border-radius: 999px;
+    background: #ef4444;
+    color: #ffffff;
+    font-size: 0.65rem;
+    font-weight: 900;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(239, 68, 68, 0.6);
+    border: 1.5px solid #071419;
+}
+
 .favorite-actions {
     display: flex;
     flex-wrap: wrap;
@@ -1145,4 +1907,766 @@
     .estado-viaje__estado--movimiento::before, .mu-aviso, .mu-spinner { animation: none !important; }
     .mu-aviso--salida { transition: none !important; }
     .mu-estilos__menu, .mu-estilo { transition: none !important; }
+}
+
+/* ==========================================================================
+   BUSTRAKER PRO · MARCADORES MODERNOS, POPUPS Y SISTEMA SONORO / ACCESIBLE
+   ========================================================================== */
+
+/* ---------- Pines de Origen (A) y Destino (B) 3D con Radar de Pulso ---------- */
+.bp-pin-contenedor {
+    background: transparent !important;
+    border: none !important;
+}
+
+.bp-pin-wrapper {
+    position: relative;
+    width: 42px;
+    height: 54px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.45));
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.bp-pin-wrapper:hover {
+    transform: scale(1.12) translateY(-4px);
+}
+
+.bp-pin {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    border: 2.5px solid #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+.bp-pin-icon {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: rotate(45deg);
+    color: #ffffff;
+    font-size: 0.95rem;
+}
+
+.bp-pin-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #0f172a;
+    color: #38bdf8;
+    border: 1.5px solid #ffffff;
+    font-size: 0.68rem;
+    font-weight: 900;
+    display: grid;
+    place-items: center;
+    transform: rotate(45deg);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+}
+
+.bp-pin-wrapper--origen .bp-pin {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.bp-pin-wrapper--origen .bp-pin-badge {
+    color: #34d399;
+}
+
+.bp-pin-wrapper--destino .bp-pin {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+}
+
+.bp-pin-wrapper--destino .bp-pin-badge {
+    color: #f87171;
+}
+
+/* Radar de Pulso en el pavimento */
+.bp-pin-pulse {
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 24px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(16, 185, 129, 0.4);
+    animation: bp-radar-pulse 2s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+    z-index: 1;
+}
+
+.bp-pin-wrapper--destino .bp-pin-pulse {
+    background: rgba(239, 68, 68, 0.45);
+}
+
+@keyframes bp-radar-pulse {
+    0% {
+        transform: translateX(-50%) scale(0.6);
+        opacity: 0.9;
+    }
+    100% {
+        transform: translateX(-50%) scale(2.8);
+        opacity: 0;
+    }
+}
+
+/* ---------- Nodos de Transporte (Paradas, Transbordos, Barrios) ---------- */
+.bp-stop-contenedor {
+    background: transparent !important;
+    border: none !important;
+}
+
+.bp-stop {
+    position: relative;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #ffffff;
+    color: #ffffff;
+    background: #0284c7;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
+    transition: transform 0.16s ease, box-shadow 0.16s ease;
+    cursor: pointer;
+}
+
+.bp-stop:hover {
+    transform: scale(1.22);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+    z-index: 1000 !important;
+}
+
+.bp-stop__icon {
+    font-size: 0.72rem;
+}
+
+.bp-stop__badge {
+    position: absolute;
+    bottom: -5px;
+    right: -5px;
+    min-width: 17px;
+    height: 17px;
+    padding: 0 3px;
+    border-radius: 999px;
+    background: #0f172a;
+    border: 1.5px solid #ffffff;
+    color: #f8fafc;
+    font-size: 0.62rem;
+    font-weight: 800;
+    display: grid;
+    place-items: center;
+}
+
+/* Estilos según tipo */
+.bp-stop--parada {
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+}
+
+.bp-stop--transbordo {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    border-color: #fef08a;
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.35), 0 4px 12px rgba(0,0,0,0.4);
+}
+
+.bp-stop--transbordo .bp-stop__badge {
+    background: #78350f;
+    color: #fde68a;
+    border-color: #fde68a;
+}
+
+.bp-stop--barrio {
+    border-radius: 8px;
+    transform: rotate(45deg);
+    background: linear-gradient(135deg, #64748b 0%, #475569 100%);
+    border-style: dashed;
+}
+
+.bp-stop--barrio .bp-stop__icon,
+.bp-stop--barrio .bp-stop__badge {
+    transform: rotate(-45deg);
+}
+
+/* ---------- Marcador Interactivo de Clic en el Mapa ---------- */
+.mu-click-marker-wrap {
+    position: relative;
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+}
+
+.mu-click-dot {
+    position: relative;
+    z-index: 2;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #06b6d4, #0891b2);
+    border: 2px solid #ffffff;
+    color: #ffffff;
+    display: grid;
+    place-items: center;
+    font-size: 0.85rem;
+    box-shadow: 0 4px 14px rgba(6, 182, 212, 0.5);
+}
+
+.mu-click-pulse {
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 2px solid #06b6d4;
+    animation: mu-click-expand 1.6s ease-out infinite;
+    pointer-events: none;
+}
+
+@keyframes mu-click-expand {
+    0% { transform: scale(0.6); opacity: 1; }
+    100% { transform: scale(2.2); opacity: 0; }
+}
+
+/* ---------- Popups Profesionales de Tránsito ---------- */
+.leaflet-popup-content-wrapper {
+    padding: 0 !important;
+    border-radius: 14px !important;
+    background: rgba(8, 22, 27, 0.98) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(55, 200, 186, 0.28) !important;
+    box-shadow: 0 16px 36px rgba(0, 8, 12, 0.6) !important;
+    overflow: hidden;
+    color: #ecf5f3 !important;
+}
+
+.leaflet-popup-content {
+    margin: 0 !important;
+    line-height: 1.4 !important;
+    min-width: 260px;
+    max-width: 320px;
+}
+
+.leaflet-popup-tip {
+    background: rgba(8, 22, 27, 0.98) !important;
+    border: 1px solid rgba(55, 200, 186, 0.28) !important;
+}
+
+.mu-popup--pro {
+    display: flex;
+    flex-direction: column;
+}
+
+.mu-popup__banner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: linear-gradient(90deg, rgba(55, 200, 186, 0.2), rgba(8, 22, 27, 0.4));
+    border-bottom: 1px solid rgba(55, 200, 186, 0.2);
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #38bdf8;
+}
+
+.mu-popup__banner--origen {
+    background: linear-gradient(90deg, rgba(16, 185, 129, 0.28), rgba(8, 22, 27, 0.4));
+    border-bottom-color: rgba(16, 185, 129, 0.35);
+    color: #6ee7b7;
+}
+
+.mu-popup__banner--destino {
+    background: linear-gradient(90deg, rgba(239, 68, 68, 0.28), rgba(8, 22, 27, 0.4));
+    border-bottom-color: rgba(239, 68, 68, 0.35);
+    color: #fca5a5;
+}
+
+.mu-popup__banner--transbordo {
+    background: linear-gradient(90deg, rgba(245, 158, 11, 0.28), rgba(8, 22, 27, 0.4));
+    border-bottom-color: rgba(245, 158, 11, 0.35);
+    color: #fde68a;
+}
+
+.mu-popup__banner--click {
+    background: linear-gradient(90deg, rgba(6, 182, 212, 0.28), rgba(8, 22, 27, 0.4));
+    border-bottom-color: rgba(6, 182, 212, 0.35);
+    color: #67e8f9;
+}
+
+.mu-popup__num {
+    margin-left: auto;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 2px 7px;
+    border-radius: 99px;
+    font-size: 0.68rem;
+    color: #ecf5f3;
+}
+
+.mu-popup__body {
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.mu-popup__title {
+    font-size: 0.98rem;
+    font-weight: 800;
+    color: #ffffff;
+}
+
+.mu-popup__meta {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 4px;
+}
+
+.mu-popup__meta-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 0.76rem;
+    color: #94a3b8;
+}
+
+.mu-popup__meta-item i {
+    color: #38bdf8;
+    width: 14px;
+    text-align: center;
+}
+
+.mu-popup__transfer-alert {
+    margin-top: 6px;
+    padding: 7px 10px;
+    border-radius: 8px;
+    background: rgba(245, 158, 11, 0.15);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    color: #fde68a;
+    font-size: 0.74rem;
+    line-height: 1.4;
+}
+
+.mu-popup__actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    padding: 10px 14px 12px;
+    border-top: 1px solid rgba(148, 163, 184, 0.12);
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.mu-popup__btn-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 7px 8px;
+    border-radius: 8px;
+    border: 1px solid rgba(55, 200, 186, 0.3);
+    background: rgba(55, 200, 186, 0.12);
+    color: #ecf5f3;
+    font: 700 0.74rem Inter, system-ui, sans-serif;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.mu-popup__btn-action:hover {
+    background: rgba(55, 200, 186, 0.28);
+    border-color: #38bdf8;
+}
+
+.mu-popup__btn--orig:hover {
+    background: rgba(16, 185, 129, 0.25);
+    border-color: #10b981;
+}
+
+.mu-popup__btn--dest:hover {
+    background: rgba(239, 68, 68, 0.25);
+    border-color: #ef4444;
+}
+
+.mu-popup__btn-speak {
+    grid-column: 1 / -1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    background: rgba(245, 158, 11, 0.14);
+    color: #fde68a;
+    font: 700 0.76rem Inter, system-ui, sans-serif;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.mu-popup__btn-speak:hover {
+    background: rgba(245, 158, 11, 0.3);
+}
+
+/* ---------- Botón de Asistente de Voz / Guía en Panel ---------- */
+.btn--asistente-voz {
+    width: 100%;
+    margin-top: 12px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #b45309, #d97706);
+    color: #ffffff;
+    font-size: 0.86rem;
+    font-weight: 700;
+    box-shadow: 0 4px 14px rgba(217, 119, 6, 0.3);
+    cursor: pointer;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: filter 0.15s, transform 0.15s;
+}
+
+.btn--asistente-voz:hover {
+    filter: brightness(1.12);
+    transform: translateY(-1px);
+}
+
+/* ---------- Toasts de Notificación en Vivo ---------- */
+.notif-toast-container {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 3000;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: min(390px, calc(100vw - 32px));
+    pointer-events: none;
+}
+
+.notif-toast {
+    pointer-events: auto;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: rgba(8, 22, 27, 0.98);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(55, 200, 186, 0.35);
+    border-left: 5px solid #14b8a6;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.55);
+    color: #ecf5f3;
+    animation: notif-slide-in 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.notif-toast--alerta {
+    border-left-color: #ef4444;
+}
+
+.notif-toast--alerta .notif-toast__icon {
+    color: #f87171;
+    background: rgba(239, 68, 68, 0.15);
+}
+
+.notif-toast__icon {
+    flex: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: rgba(20, 184, 166, 0.16);
+    color: #2dd4bf;
+    display: grid;
+    place-items: center;
+    font-size: 1.1rem;
+}
+
+.notif-toast__body {
+    flex: 1;
+    min-width: 0;
+}
+
+.notif-toast__title {
+    display: block;
+    font-size: 0.92rem;
+    font-weight: 800;
+    color: #ffffff;
+    margin-bottom: 3px;
+}
+
+.notif-toast__msg {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #cbd5e1;
+    line-height: 1.45;
+}
+
+.notif-toast__time {
+    display: block;
+    margin-top: 6px;
+    font-size: 0.68rem;
+    color: #64748b;
+}
+
+.notif-toast__actions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-left: 4px;
+}
+
+.notif-toast__btn-read,
+.notif-toast__btn-close {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    background: rgba(255, 255, 255, 0.04);
+    color: #94a3b8;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: background 0.15s, color 0.15s;
+}
+
+.notif-toast__btn-read:hover {
+    background: rgba(16, 185, 129, 0.25);
+    color: #34d399;
+}
+
+.notif-toast__btn-close:hover {
+    background: rgba(239, 68, 68, 0.2);
+    color: #f87171;
+}
+
+.notif-toast--fadeout {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
+    transition: opacity 0.24s ease, transform 0.24s ease;
+}
+
+@keyframes notif-slide-in {
+    0% { opacity: 0; transform: translateY(-16px) scale(0.95); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ---------- Drawer / Panel Desplegable de Notificaciones ---------- */
+.notif-drawer {
+    position: fixed;
+    top: 72px;
+    right: 18px;
+    z-index: 2500;
+    width: min(390px, calc(100vw - 28px));
+    max-height: calc(100vh - 90px);
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(155deg, rgba(8, 22, 27, 0.98), rgba(4, 15, 18, 0.98));
+    border: 1px solid rgba(55, 200, 186, 0.3);
+    border-radius: 16px;
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    overflow: hidden;
+    animation: notif-slide-in 0.25s ease both;
+}
+
+.notif-drawer[hidden] {
+    display: none !important;
+}
+
+.notif-drawer__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+    background: linear-gradient(90deg, rgba(55, 200, 186, 0.12), transparent);
+}
+
+.notif-drawer__title {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #ffffff;
+}
+
+.notif-drawer__title i {
+    color: #38bdf8;
+}
+
+.notif-drawer__list {
+    padding: 12px 14px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 400px;
+}
+
+.notif-drawer__empty {
+    text-align: center;
+    padding: 28px 16px;
+    color: #94a3b8;
+}
+
+.notif-drawer__empty i {
+    font-size: 2rem;
+    margin-bottom: 8px;
+    color: #475569;
+}
+
+.notif-drawer__empty strong {
+    display: block;
+    color: #cbd5e1;
+    font-size: 0.92rem;
+}
+
+.notif-drawer__empty p {
+    font-size: 0.78rem;
+    margin: 6px 0 0;
+}
+
+.notif-drawer__item {
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(148, 163, 184, 0.14);
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    transition: background 0.15s;
+}
+
+.notif-drawer__item:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.notif-drawer__item--leido {
+    opacity: 0.65;
+}
+
+.notif-drawer__item-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #38bdf8;
+}
+
+.notif-drawer__item-channel {
+    color: #64748b;
+    font-size: 0.68rem;
+}
+
+.notif-drawer__item-title {
+    font-size: 0.88rem;
+    color: #ffffff;
+}
+
+.notif-drawer__item-msg {
+    margin: 0;
+    font-size: 0.78rem;
+    color: #94a3b8;
+    line-height: 1.4;
+}
+
+.notif-drawer__item-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.notif-btn-speak,
+.notif-btn-mark {
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    background: rgba(255, 255, 255, 0.04);
+    color: #cbd5e1;
+    font-size: 0.72rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.notif-btn-speak:hover {
+    background: rgba(245, 158, 11, 0.2);
+    color: #fde68a;
+    border-color: #f59e0b;
+}
+
+.notif-btn-mark:hover {
+    background: rgba(16, 185, 129, 0.2);
+    color: #6ee7b7;
+    border-color: #10b981;
+}
+
+.notif-drawer__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-top: 1px solid rgba(148, 163, 184, 0.15);
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.notif-btn-footer {
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(55, 200, 186, 0.25);
+    background: transparent;
+    color: #38bdf8;
+    font-size: 0.76rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.notif-btn-footer:hover {
+    background: rgba(55, 200, 186, 0.15);
+}
+
+/* Badge de notificaciones */
+.icon-btn--notif {
+    position: relative;
+}
+
+.notif-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    border-radius: 999px;
+    background: #ef4444;
+    color: #ffffff;
+    font-size: 0.65rem;
+    font-weight: 900;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(239, 68, 68, 0.6);
+    border: 1.5px solid #071419;
 }

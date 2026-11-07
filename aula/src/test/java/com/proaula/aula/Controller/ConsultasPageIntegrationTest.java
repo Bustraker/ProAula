@@ -3,7 +3,6 @@ package com.proaula.aula.Controller;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-import java.time.LocalTime;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -19,8 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.proaula.aula.Entity.Bus;
-import com.proaula.aula.Entity.Ruta;
+import com.proaula.aula.dto.BusConsultaDto;
 import com.proaula.aula.Service.BusService;
 
 @SpringBootTest
@@ -36,7 +34,9 @@ class ConsultasPageIntegrationTest {
 
     @Test
     void publicPageRendersOnlyRoutesAndNeighborhoods() throws Exception {
-        when(busService.getAllBuses()).thenReturn(List.of(bus()));
+        when(busService.getBusConsultations(false)).thenReturn(List.of(
+                new BusConsultaDto(null, null, null, null, null, "Ruta Centro",
+                        List.of("Centro", "Getsemaní"), null, null)));
 
         String page = mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/consultas"))
                 .andReturn()
@@ -52,7 +52,10 @@ class ConsultasPageIntegrationTest {
 
     @Test
     void authenticatedPageShowsPrivateBusInformationWithoutLoginLink() throws Exception {
-        when(busService.getAllBuses()).thenReturn(List.of(bus()));
+        when(busService.getBusConsultations(true)).thenReturn(List.of(
+                new BusConsultaDto(44L, "ABC123", "Bus Urbano Test", "Azul",
+                        "Conductora Confidencial", "Ruta Centro",
+                        List.of("Centro", "Getsemaní"), "07:30", true)));
         MockHttpSession session = new MockHttpSession();
         SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
         securityContext.setAuthentication(new UsernamePasswordAuthenticationToken(
@@ -69,9 +72,10 @@ class ConsultasPageIntegrationTest {
 
         assertThat(page)
                 .contains("bus-directory-page--authenticated", "content=\"#101715\"",
-                        "ABC123", "Conductora Confidencial", "Iniciar sesión", "07:30", "Verificada")
+                        "ABC123", "Conductora Confidencial", "Mi cuenta", "07:30", "Verificada")
                 .doesNotContain("bus-directory-page--public")
-                .contains("href=\"/inicio-de-sesion-mejorado\"");
+                .contains("href=\"/dashboard\"")
+                .doesNotContain("href=\"/inicio-de-sesion-mejorado\"");
     }
 
     @Test
@@ -84,11 +88,10 @@ class ConsultasPageIntegrationTest {
 
         assertThat(publicPage)
                 .contains("id=\"btnPlanificar\"", "id=\"plannerStatus\"", "Opciones de ruta para llegar",
-                        "Las opciones se ordenan de menor a mayor número de transbordos",
-                        "/css/travel.css?v=map-polish-8",
+                        "/css/travel.css?v=map-polish-9",
                         "/css/map-ui.css?v=trips-2",
                         "/js/map-base.js?v=map-polish-6",
-                        "/js/map-travel.js?v=trips-3");
+                        "/js/map-travel.js?v=trips-5");
 
         MockHttpSession session = new MockHttpSession();
         SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
@@ -106,28 +109,9 @@ class ConsultasPageIntegrationTest {
 
         assertThat(authenticatedPage)
                 .contains("id=\"btnPlanificar\"", "id=\"plannerStatus\"", "Opciones de ruta para llegar",
-                        "Las opciones se ordenan de menor a mayor número de transbordos",
-                        "/css/travel.css?v=map-polish-8",
+                        "/css/travel.css?v=map-polish-9",
                         "/css/map-ui.css?v=trips-2",
                         "/js/map-base.js?v=map-polish-6",
-                        "/js/map-travel.js?v=trips-3");
-    }
-
-    private Bus bus() {
-        Ruta ruta = new Ruta();
-        ruta.setId(21L);
-        ruta.setNombre("Ruta Centro");
-        ruta.setBarrios(List.of("Centro", "Getsemaní"));
-        ruta.setHoraAproximada(LocalTime.of(7, 30));
-        ruta.setVerificada(true);
-
-        Bus bus = new Bus();
-        bus.setId(44L);
-        bus.setPlaca("ABC123");
-        bus.setModelo("Bus Urbano Test");
-        bus.setColor("Azul");
-        bus.setConductor("Conductora Confidencial");
-        bus.setRuta(ruta);
-        return bus;
+                        "/js/map-travel.js?v=trips-5");
     }
 }

@@ -75,6 +75,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.DELETE, "/api/buses/**").hasRole("ADMIN")
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/favoritos/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/api/notificaciones/**").hasAnyRole("USER", "ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/modelos/retrasos/riesgo").permitAll()
                 .requestMatchers("/api/modelos/**").hasAnyRole("USER", "ADMIN")
                 .requestMatchers(HttpMethod.GET, "/api/llegadas/**").permitAll()
@@ -137,7 +138,7 @@ public class SecurityConfig {
             )
             .logout(logout -> logout
                 .logoutUrl("/logout")
-                .logoutSuccessUrl("/")
+                .logoutSuccessUrl("/inicio-de-sesion-mejorado?logout=true")
                 .invalidateHttpSession(true)
                 .deleteCookies("JSESSIONID", "BustrakerSession", "JWT_TOKEN")
                 .permitAll()

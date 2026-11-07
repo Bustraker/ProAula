@@ -36,7 +36,7 @@
                 <a th:href="@{/viajar}" class="nav-link">
                     <i class="fas fa-bus" aria-hidden="true"></i> Viajar
                 </a>
-                <form th:action="@{/logout}" method="post" class="logout-form">
+                <form th:action="@{/logout}" method="post" class="logout-form" onsubmit="return confirm('¿Cerrar sesión de ProAula? El proveedor externo podría mantener tu sesión activa.');">
                     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                     <button type="submit" class="nav-link nav-link--outline logout-form__button">
                     <i class="fas fa-arrow-right-from-bracket" aria-hidden="true"></i> Cerrar sesión

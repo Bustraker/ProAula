@@ -1,5 +1,42 @@
 # Informe de verificación de runtime
 
+## Regresión de limpieza — 2026-11-06
+
+**Objetivo:** comprobar que la eliminación del `package-lock.json` vacío y de siete hojas CSS sin referencias no afecta las funciones existentes.
+
+### Veredicto de esta ejecución
+
+```yaml
+environment:
+  docker: UNAVAILABLE — no hay comando docker disponible
+  node: AVAILABLE — v26.7.0
+  playwright: AVAILABLE — 1.64.0; Chromium verificado con `playwright install chromium`
+  infra-tier: FALLBACK(embedded/in-memory) — pruebas Java usan el perfil validation con H2
+  browser-tier: PRIMARY(Playwright) — disponible, pero no ejecutado porque falló el intento inicial de build/lanzamiento de Java
+startup: FAIL — `debugJavaApplication` devolvió Maven build exit_code 1; `mvnw.cmd test-compile` posterior pasó (exit_code 0), pero no se reintentó el lanzamiento
+integration: PASS — exit_code: 0; suite Java 155/155 y flujos de integración 39/39
+e2e: UNVERIFIED — exit_code: n/a; Playwright no se ejecutó al no quedar una aplicación Java iniciada
+overall: FAIL — pruebas Java, Python y lógica de rutas pasaron, pero el arranque falló y la UI en navegador queda sin validar
+```
+
+### Evidencia
+
+| Comprobación | Resultado |
+|---|---|
+| `mvnw.cmd test` | **PASS**, código 0; 155 pruebas, 0 fallos y 0 errores. |
+| `mvnw.cmd -Dtest=*FlowIntegrationTest test` | **PASS**, código 0; 39 pruebas, 0 fallos y 0 errores. |
+| `mvnw.cmd test-compile` | **PASS**, código 0. |
+| `Modelos: python -m unittest discover -s tests -v` | **PASS**; 9 pruebas. |
+| API Python en ejecución: salud, métricas, recomendación de ruta y validación de entrada | **PASS**; respuestas 200/422 esperadas. |
+| `node scripts/test_map_travel.js` | **PASS**; todos los escenarios del planificador, incluidos resultados directos y transbordos. |
+| `node --check` | **PASS** para 25 archivos JavaScript de frontend y E2E. |
+| Referencias locales CSS/JS en plantillas | **PASS**; todos los recursos referenciados existen y ninguno de los siete CSS eliminados tiene referencias en `src`. |
+| `git diff --check` | **PASS**. |
+| `debugJavaApplication` | **FAIL**, el lanzador reportó Maven build exit 1 sin detalle de compilación. No se repitió el arranque; el build independiente `test-compile` y las pruebas sí pasaron. |
+| Playwright E2E | **UNVERIFIED**; se omitió por el fallo de arranque anterior. |
+
+Las pruebas Java y Python usan datos de validación/sintéticos y no sustituyen una prueba de integración con MySQL; Docker no está disponible. La prueba visual de navegador queda pendiente, por lo que este resultado no afirma que el E2E esté confirmado.
+
 **Generado:** 2026-10-30T15:43:00-05:00
 **Proyecto:** `ProAula/aula`
 **Alcance:** llegadas estimadas, controles de acceso, interfaz de viaje y pruebas existentes relacionadas.

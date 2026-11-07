@@ -20,11 +20,14 @@ public class AvisoFavoritoService {
 
     private final FavoritoRepository favoritoRepository;
     private final NotificacionRepository notificacionRepository;
+    private final NotificacionService notificacionService;
 
     public AvisoFavoritoService(FavoritoRepository favoritoRepository,
-                                NotificacionRepository notificacionRepository) {
+                                NotificacionRepository notificacionRepository,
+                                NotificacionService notificacionService) {
         this.favoritoRepository = favoritoRepository;
         this.notificacionRepository = notificacionRepository;
+        this.notificacionService = notificacionService;
     }
 
     @Transactional
@@ -90,22 +93,9 @@ public class AvisoFavoritoService {
     }
 
     private void notificarUsuariosDeRuta(Ruta ruta, String titulo, String mensaje) {
-        List<Notificacion> avisos = favoritoRepository
-                .findDistinctUsuariosByRutaFavorita(ruta.getId()).stream()
-                .map(usuario -> crearNotificacion(usuario, titulo, mensaje))
-                .toList();
-        if (!avisos.isEmpty()) {
-            notificacionRepository.saveAll(avisos);
+        List<Usuario> usuarios = favoritoRepository.findDistinctUsuariosByRutaFavorita(ruta.getId());
+        for (Usuario usuario : usuarios) {
+            notificacionService.enviarNotificacion(usuario, titulo, mensaje, TIPO);
         }
-    }
-
-    private Notificacion crearNotificacion(Usuario usuario, String titulo, String mensaje) {
-        Notificacion notificacion = new Notificacion();
-        notificacion.setUsuario(usuario);
-        notificacion.setTitulo(titulo);
-        notificacion.setMensaje(mensaje);
-        notificacion.setTipo(TIPO);
-        notificacion.setLeido(false);
-        return notificacion;
     }
 }

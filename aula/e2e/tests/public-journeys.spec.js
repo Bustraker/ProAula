@@ -351,7 +351,7 @@ test("a trip draws its route and clearly labels approximate neighborhood coordin
   await expect(page.locator("#rutaDetalle")).toBeVisible();
   await expect(page.getByText(/ubicaciones aproximadas de barrio/i)).toBeVisible();
   await expect(page.locator("#map .leaflet-overlay-pane path.leaflet-interactive")).not.toHaveCount(0);
-  await expect(page.locator("#map .mu-tooltip").filter({ hasText: "Ubicación aproximada" })).toBeVisible();
+  await expect(page.locator("#map .mu-tooltip--origen")).toContainText("Aproximada");
   await expect(page.locator("#rutaStats")).toContainText("4.2 km");
 });
 
@@ -429,11 +429,12 @@ test("a transfer itinerary lists every registered stop in route order without in
 
   const panel = page.locator("#panelInfo");
   await expect(panel).toContainText("Transbordo en Centro");
-  await expect(panel).toContainText("Toma Ruta A");
-  await expect(panel).toContainText("Toma Ruta B");
+  await expect(panel).toContainText("Aborda en Terminal del Origen");
+  await expect(panel).toContainText("Aborda en Parada del Centro sur");
   await expect(panel).toContainText("Parada del Centro norte");
   await expect(panel).toContainText("Parada del Centro sur");
-  await expect(panel).toContainText("No se puede confirmar la caminata porque faltan coordenadas");
+  await expect(panel).toContainText("sin coordenadas");
+  await expect(panel).not.toContainText(/caminata|camina|metros de distancia/i);
   await expect(panel.locator(".itinerario-paradas")).toHaveCount(2);
   const routeAStops = panel.locator(".itinerario-paradas").nth(0).locator("li");
   await expect(routeAStops).toHaveCount(3);
@@ -627,7 +628,7 @@ test("account registration, login, protected page and logout work in the browser
   await expect(page.locator("#adminCodeGroup")).toHaveCount(0);
 
   await page.locator("#nombres").fill("Usuario");
-  await page.locator("#apellidos").fill("E2E");
+  await page.locator("#apellidos").fill("Prueba");
   await page.locator("#username").fill(username);
   await page.locator("#email").fill(email);
   await page.locator("#password").fill("safe-password-26");
@@ -655,8 +656,9 @@ test("account registration, login, protected page and logout work in the browser
 
   await page.goto("/dashboard");
   await expect(page.getByRole("heading", { name: /Hola, Usuario/i })).toBeVisible();
+  page.once("dialog", dialog => dialog.accept());
   await page.locator('form[action="/logout"] button[type="submit"]').click();
-  await expect(page).toHaveURL(/\/$/);
+  await expect(page).toHaveURL(/\/inicio-de-sesion-mejorado\?logout=true$/);
   await page.goto("/dashboard");
   await expect(page).toHaveURL(/\/inicio-de-sesion-mejorado/);
 });

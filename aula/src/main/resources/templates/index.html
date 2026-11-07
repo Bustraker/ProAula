@@ -13,7 +13,7 @@
     <link rel="icon" th:href="@{/images/logo.png}" type="image/png">
     <link rel="stylesheet" th:href="@{/css/index.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" th:href="@{/css/style-index-landing.css(v='admin-access-gate-1')}">
+    <link rel="stylesheet" th:href="@{/css/style-index-landing.css(v='admin-access-gate-2')}">
 </head>
 <body class="landing-page">
     <main class="landing-main">
@@ -105,10 +105,62 @@
     </main>
 
     <dialog id="adminAccessGate" class="landing-admin-gate" aria-label="Acceso administrativo">
-        <button class="admin-btn admin-btn--center" id="LoginAdminBtn" type="button">
-            <img th:src="@{/images/Admin.png}" alt="" aria-hidden="true">
-            <span>Acceso administrativo</span>
-        </button>
+        <section class="admin-access-stage" aria-label="Centro de acceso administrativo">
+            <div class="admin-access-stage__topline" aria-hidden="true">
+                <span class="admin-access-stage__signal"><i></i> CANAL PRIVADO</span>
+                <span class="admin-access-stage__coordinates">CTG · 10.3910° N / 75.4794° O</span>
+            </div>
+            <svg class="admin-access-blueprint" viewBox="0 0 640 400" aria-hidden="true" focusable="false">
+                <ellipse class="admin-access-blueprint__orbit admin-access-blueprint__orbit--outer"
+                         cx="320" cy="200" rx="278" ry="145"></ellipse>
+                <ellipse class="admin-access-blueprint__orbit admin-access-blueprint__orbit--middle"
+                         cx="320" cy="200" rx="226" ry="116"></ellipse>
+                <ellipse class="admin-access-blueprint__orbit admin-access-blueprint__orbit--inner"
+                         cx="320" cy="200" rx="172" ry="88"></ellipse>
+                <g class="admin-access-blueprint__tilt">
+                    <ellipse class="admin-access-blueprint__orbit admin-access-blueprint__orbit--dash"
+                             cx="320" cy="200" rx="246" ry="97"></ellipse>
+                    <circle class="admin-access-blueprint__beacon admin-access-blueprint__beacon--mint"
+                            cx="72" cy="200" r="3"></circle>
+                    <circle class="admin-access-blueprint__beacon admin-access-blueprint__beacon--gold"
+                            cx="566" cy="200" r="3"></circle>
+                </g>
+                <path class="admin-access-blueprint__circuit"
+                      d="M75 132h72l23 23h56m339 113h-75l-24-24h-47M172 70v38l26 26m271 126v42l-27 27M255 55v30l18 18m112 214v28l22 22"></path>
+                <path class="admin-access-blueprint__circuit admin-access-blueprint__circuit--flow"
+                      d="M75 132h72l23 23h56m339 113h-75l-24-24h-47M172 70v38l26 26m271 126v42l-27 27M255 55v30l18 18m112 214v28l22 22"></path>
+                <circle class="admin-access-blueprint__node" cx="75" cy="132" r="3"></circle>
+                <circle class="admin-access-blueprint__node" cx="566" cy="268" r="3"></circle>
+                <circle class="admin-access-blueprint__node" cx="172" cy="70" r="3"></circle>
+                <circle class="admin-access-blueprint__node" cx="471" cy="338" r="3"></circle>
+                <path class="admin-access-blueprint__crosshair" d="M320 30v22m0 296v22M120 200h22m356 0h22"></path>
+            </svg>
+            <span class="admin-access-stage__corner admin-access-stage__corner--tl" aria-hidden="true"></span>
+            <span class="admin-access-stage__corner admin-access-stage__corner--tr" aria-hidden="true"></span>
+            <span class="admin-access-stage__corner admin-access-stage__corner--bl" aria-hidden="true"></span>
+            <span class="admin-access-stage__corner admin-access-stage__corner--br" aria-hidden="true"></span>
+            <div class="admin-access-stage__side-note admin-access-stage__side-note--left" aria-hidden="true">
+                <span>01</span><i></i><span>IDENTIDAD</span>
+            </div>
+            <div class="admin-access-stage__side-note admin-access-stage__side-note--right" aria-hidden="true">
+                <span>02</span><i></i><span>OPERACIONES</span>
+            </div>
+            <button class="admin-btn admin-btn--center" id="LoginAdminBtn" type="button">
+                <span class="admin-btn__sigil" aria-hidden="true">
+                    <img th:src="@{/images/Admin.png}" alt="">
+                    <i class="admin-btn__sigil-orbit"></i>
+                </span>
+                <span class="admin-btn__copy">
+                    <strong>Acceso administrativo</strong>
+                    <small>CENTRO DE OPERACIONES</small>
+                </span>
+                <span class="admin-btn__arrow" aria-hidden="true"><i class="fas fa-arrow-right"></i></span>
+            </button>
+            <div class="admin-access-stage__footline" aria-hidden="true">
+                <span>BUSTRAKER <i>///</i> CONTROL DE MOVILIDAD</span>
+                <span class="admin-access-stage__status"><i></i> SISTEMA PROTEGIDO</span>
+            </div>
+        </section>
     </dialog>
 
     <!-- Modal Admin -->

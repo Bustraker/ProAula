@@ -1,0 +1,1113 @@
+/*
+ * Bustraker · detail-pro.css
+ * Estilos para la vista de detalle de viaje profesional (público y privado).
+ * Incluye: Hero Card, Stats, Tabs, Timeline, Buses, Info, Simulador HUD.
+ */
+
+/* ═══════════════════════════════════════════════
+   VARIABLES DETALLE
+══════════════════════════════════════════════ */
+:root {
+    --det-acento:  #37c8ba;
+    --det-origen:  #22c55e;
+    --det-destino: #ef4444;
+    --det-bg:      rgba(6, 18, 24, 0.97);
+    --det-sup:     rgba(13, 32, 38, 0.95);
+    --det-borde:   rgba(86, 191, 181, 0.22);
+    --det-sombra:  0 24px 64px rgba(0, 10, 15, 0.52);
+    --sim-verde:   #10b981;
+    --sim-azul:    #3b82f6;
+    --radio-det:   16px;
+}
+
+/* ═══════════════════════════════════════════════
+   HERO CARD – cabecera del detalle
+══════════════════════════════════════════════ */
+.det-hero {
+    position: relative;
+    overflow: hidden;
+    padding: 18px 18px 14px;
+    border-radius: var(--radio-det);
+    background: linear-gradient(145deg,
+        rgba(14, 44, 50, 0.97),
+        rgba(6, 18, 24, 0.95));
+    border: 1px solid var(--det-borde);
+    box-shadow: var(--det-sombra);
+    animation: det-hero-in 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.det-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(ellipse 60% 40% at 90% 0%, rgba(55, 200, 186, 0.14), transparent),
+        radial-gradient(ellipse 40% 60% at 10% 100%, rgba(37, 99, 235, 0.07), transparent);
+    pointer-events: none;
+}
+
+/* Fila de badges de ruta */
+.det-hero__rutas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.det-hero__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.69rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    background: rgba(55, 200, 186, 0.15);
+    border: 1px solid rgba(55, 200, 186, 0.3);
+    color: var(--det-acento);
+    white-space: nowrap;
+}
+.det-hero__badge i { font-size: 0.6rem; }
+
+/* Fila origen → destino */
+.det-hero__od {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.det-hero__pill {
+    flex: 1;
+    min-width: 0;
+    padding: 7px 12px;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.det-hero__pill--a {
+    background: rgba(34, 197, 94, 0.14);
+    border: 1px solid rgba(34, 197, 94, 0.28);
+    color: #86efac;
+}
+.det-hero__pill--b {
+    background: rgba(239, 68, 68, 0.14);
+    border: 1px solid rgba(239, 68, 68, 0.28);
+    color: #fca5a5;
+}
+.det-hero__pill span.etiq {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    font-size: 0.63rem;
+    font-weight: 900;
+    margin-right: 6px;
+}
+.det-hero__pill--a span.etiq { background: var(--det-origen); color: #fff; }
+.det-hero__pill--b span.etiq { background: var(--det-destino); color: #fff; }
+
+.det-hero__flecha {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    color: rgba(55, 200, 186, 0.6);
+    font-size: 0.65rem;
+    flex-shrink: 0;
+}
+.det-hero__flecha i { font-size: 1rem; color: rgba(55, 200, 186, 0.5); }
+
+/* Fila meta (hora, transbordo) */
+.det-hero__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+.det-hero__tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 9px;
+    border-radius: 8px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #bbd0ce;
+}
+.det-hero__tag i { color: var(--det-acento); font-size: 0.6rem; }
+.det-hero__tag--directo { border-color: rgba(34, 197, 94, 0.2); color: #86efac; }
+.det-hero__tag--transbordo { border-color: rgba(234, 179, 8, 0.25); color: #fde68a; }
+
+/* Acciones hero (compartir, favoritos) */
+.det-hero__acciones {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+}
+
+/* ═══════════════════════════════════════════════
+   STATS CARDS – 4 métricas
+══════════════════════════════════════════════ */
+.det-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin: 12px 0;
+}
+.det-stats--4 { grid-template-columns: repeat(4, 1fr); }
+
+.det-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 11px 8px;
+    border-radius: 12px;
+    background: rgba(13, 33, 40, 0.75);
+    border: 1px solid rgba(86, 191, 181, 0.14);
+    text-align: center;
+    transition: transform 200ms ease, border-color 200ms ease;
+}
+.det-stat:hover { transform: translateY(-1px); border-color: rgba(55, 200, 186, 0.28); }
+
+.det-stat__icono {
+    display: grid;
+    place-items: center;
+    width: 32px; height: 32px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    background: rgba(55, 200, 186, 0.1);
+    border: 1px solid rgba(55, 200, 186, 0.15);
+    color: var(--det-acento);
+    margin-bottom: 2px;
+}
+.det-stat__icono--dist  { background: rgba(59, 130, 246, 0.12); border-color: rgba(59, 130, 246, 0.2); color: #93c5fd; }
+.det-stat__icono--time  { background: rgba(234, 179, 8, 0.1);  border-color: rgba(234, 179, 8, 0.2); color: #fde68a; }
+.det-stat__icono--stops { background: rgba(55, 200, 186, 0.1); border-color: rgba(55, 200, 186, 0.2); color: var(--det-acento); }
+.det-stat__icono--fare  { background: rgba(34, 197, 94, 0.1);  border-color: rgba(34, 197, 94, 0.2); color: #86efac; }
+
+.det-stat__valor {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: #f0fbf8;
+    letter-spacing: -0.03em;
+    line-height: 1;
+}
+.det-stat__etiq {
+    font-size: 0.63rem;
+    font-weight: 600;
+    color: #7ba5a0;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+.det-stat--cargando .det-stat__valor {
+    width: 36px; height: 14px;
+    border-radius: 4px;
+    background: linear-gradient(90deg,
+        rgba(55,200,186,0.1) 25%,
+        rgba(55,200,186,0.2) 50%,
+        rgba(55,200,186,0.1) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s infinite;
+}
+
+/* ═══════════════════════════════════════════════
+   BOTÓN VOZ ITINERARIO (accesibilidad)
+══════════════════════════════════════════════ */
+.btn--asistente-voz {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 9px 14px;
+    margin: 10px 0 4px;
+    border: 1px solid rgba(55, 200, 186, 0.22);
+    border-radius: 10px;
+    background: rgba(55, 200, 186, 0.08);
+    color: var(--det-acento);
+    font: 600 0.8rem/1.2 inherit;
+    cursor: pointer;
+    transition: background 180ms ease, border-color 180ms ease;
+}
+.btn--asistente-voz:hover {
+    background: rgba(55, 200, 186, 0.15);
+    border-color: rgba(55, 200, 186, 0.4);
+}
+
+/* ═══════════════════════════════════════════════
+   PESTAÑAS PRO
+══════════════════════════════════════════════ */
+.pestanas {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    padding: 5px;
+    border-radius: 13px;
+    background: rgba(3, 12, 18, 0.6);
+    border: 1px solid rgba(86, 191, 181, 0.1);
+    margin: 12px 0 0;
+}
+
+.pestana {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 8px 4px 6px;
+    border-radius: 9px;
+    font-size: 0.69rem;
+    font-weight: 700;
+    color: #6b8c88;
+    letter-spacing: 0.03em;
+    transition: all 220ms ease;
+    border: 1px solid transparent;
+    cursor: pointer;
+    background: transparent;
+}
+.pestana i { font-size: 0.85rem; }
+.pestana:hover { color: #cce8e3; background: rgba(255,255,255,0.03); }
+.pestana--activa {
+    color: #eafff9;
+    background: linear-gradient(180deg,
+        rgba(43, 155, 138, 0.26),
+        rgba(22, 97, 90, 0.18));
+    border-color: rgba(55, 200, 186, 0.22);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.05);
+}
+.pestana .contador {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 16px;
+    padding: 0 4px;
+    border-radius: 8px;
+    font-size: 0.6rem;
+    font-weight: 800;
+    background: rgba(55, 200, 186, 0.15);
+    color: #9af0dd;
+}
+
+/* ═══════════════════════════════════════════════
+   TIMELINE DE PARADAS (mejorado)
+══════════════════════════════════════════════ */
+.linea-tiempo { padding: 4px 0 0; }
+
+.parada {
+    position: relative;
+    display: flex;
+    gap: 0;
+    align-items: flex-start;
+    padding: 0;
+    list-style: none;
+}
+
+/* Línea vertical conectora */
+.parada:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 24px;
+    top: 36px;
+    bottom: -4px;
+    width: 2px;
+    background: linear-gradient(180deg,
+        rgba(55, 200, 186, 0.45) 0%,
+        rgba(55, 200, 186, 0.08) 100%);
+    border-radius: 1px;
+}
+.parada:not(:last-child)::before { display: none; }
+
+/* Boton de parada */
+.parada__boton {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    width: 100%;
+    padding: 8px 10px 10px 0;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+    transition: background 200ms ease, padding-left 200ms cubic-bezier(0.2,0.8,0.2,1);
+}
+.parada__boton:hover { background: rgba(55, 200, 186, 0.06); padding-left: 6px; }
+
+/* Punto numerado */
+.parada__punto {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    font-size: 0.68rem;
+    font-weight: 900;
+    color: #fff;
+    border: 2px solid rgba(255,255,255,0.18);
+    background: linear-gradient(145deg, #1e8a7d, #0d5852);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3), 0 0 0 4px rgba(55,200,186,0.07);
+    position: relative;
+    z-index: 1;
+}
+
+.parada--origen .parada__punto {
+    background: linear-gradient(145deg, #22c55e, #15803d);
+    border-color: rgba(134, 239, 172, 0.35);
+    box-shadow: 0 4px 14px rgba(34,197,94,0.25), 0 0 0 5px rgba(34,197,94,0.08);
+}
+.parada--destino .parada__punto {
+    background: linear-gradient(145deg, #ef4444, #991b1b);
+    border-color: rgba(252, 165, 165, 0.35);
+    box-shadow: 0 4px 14px rgba(239,68,68,0.25), 0 0 0 5px rgba(239,68,68,0.08);
+}
+
+/* Texto de parada */
+.parada__texto {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    padding-top: 6px;
+}
+.parada__texto strong {
+    display: block;
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: #ecf7f4;
+    line-height: 1.3;
+}
+.parada__texto small {
+    display: block;
+    font-size: 0.7rem;
+    color: #7da5a0;
+    line-height: 1.4;
+}
+
+/* Chips dentro de parada */
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 7px;
+    border-radius: 20px;
+    font-size: 0.63rem;
+    font-weight: 700;
+    border: 1px solid rgba(90, 212, 190, 0.2);
+    background: rgba(30, 100, 88, 0.3);
+    color: #a7f3d0;
+    white-space: nowrap;
+    margin-top: 3px;
+}
+.chip--origen   { background: rgba(22,126,79,0.22); border-color: rgba(34,197,94,0.25); color: #86efac; }
+.chip--destino  { background: rgba(153,27,27,0.22); border-color: rgba(239,68,68,0.25); color: #fca5a5; }
+.chip--transbordo { background: rgba(120,80,0,0.28); border-color: rgba(234,179,8,0.3); color: #fde68a; }
+.chip--transbordo-larga { background: rgba(180,30,10,0.22); border-color: rgba(239,68,68,0.28); color: #fca5a5; }
+.chip--transbordo-incompleto { background: rgba(80,80,80,0.22); border-color: rgba(148,163,184,0.2); color: #cbd5e1; }
+
+/* Caminata info */
+.paso-caminata { font-size: 0.68rem; color: #c4986e; font-style: italic; margin-top: 2px; }
+
+/* ═══════════════════════════════════════════════
+   BUSES – tarjetas profesionales
+══════════════════════════════════════════════ */
+.buses { display: flex; flex-direction: column; gap: 10px; }
+
+.bus-card {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 13px 14px;
+    border-radius: 14px;
+    background: linear-gradient(145deg,
+        rgba(13, 36, 42, 0.9),
+        rgba(7, 20, 26, 0.88));
+    border: 1px solid rgba(86, 191, 181, 0.14);
+    transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+    animation: bus-card-in 350ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.bus-card:hover {
+    transform: translateY(-1px);
+    border-color: rgba(55, 200, 186, 0.28);
+    box-shadow: 0 10px 24px rgba(0,0,0,0.22);
+}
+.bus-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--bus-color, var(--det-acento));
+    border-radius: 3px 0 0 3px;
+}
+
+/* Icono de bus */
+.bus-card__avatar {
+    display: grid;
+    place-items: center;
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    color: #fff;
+    flex-shrink: 0;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: color-mix(in srgb, var(--bus-color, #1e8a7d) 25%, rgba(5,18,24,0.9));
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+/* Cuerpo de tarjeta bus */
+.bus-card__cuerpo { flex: 1; min-width: 0; }
+.bus-card__ruta { font-size: 0.65rem; color: #6b8c88; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 4px; }
+.bus-card__placa {
+    font-size: 1.0rem;
+    font-weight: 900;
+    color: #f0fbf8;
+    letter-spacing: 0.08em;
+    font-variant-numeric: tabular-nums;
+}
+.bus-card__modelo { font-size: 0.72rem; color: #8ba8a4; margin-top: 2px; }
+
+/* Chip de color */
+.bus-card__color-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 8px;
+    border-radius: 8px;
+    font-size: 0.63rem;
+    font-weight: 700;
+    margin-top: 4px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.05);
+    color: #bbd0ce;
+}
+.bus-card__color-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--bus-color, #37c8ba);
+    display: inline-block;
+}
+
+/* Tarjeta conductor (solo modo privado) */
+.bus-card__conductor {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 8px;
+    padding: 7px 10px;
+    border-radius: 10px;
+    background: rgba(55, 200, 186, 0.06);
+    border: 1px solid rgba(55, 200, 186, 0.12);
+}
+.bus-card__conductor-avatar {
+    display: grid;
+    place-items: center;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #1e8a7d, #0d5852);
+    border: 2px solid rgba(55,200,186,0.3);
+    font-size: 0.75rem;
+    color: #fff;
+    flex-shrink: 0;
+}
+.bus-card__conductor-info { flex: 1; min-width: 0; }
+.bus-card__conductor-nombre { font-size: 0.78rem; font-weight: 700; color: #d4ede9; }
+.bus-card__conductor-cargo { font-size: 0.63rem; color: #6b8c88; }
+
+/* Amenidades (iconos de servicio) */
+.bus-card__amenidades {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 7px;
+}
+.bus-card__amen {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-size: 0.63rem;
+    font-weight: 600;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.09);
+    color: #9bb5b2;
+}
+
+/* Login CTA (modo público) */
+.bus-login-cta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 20px 16px;
+    border-radius: 14px;
+    background: radial-gradient(ellipse at 50% 0%, rgba(55,200,186,0.09), transparent 70%),
+        rgba(6, 18, 24, 0.7);
+    border: 1px dashed rgba(55,200,186,0.22);
+    text-align: center;
+    margin-top: 4px;
+}
+.bus-login-cta i { font-size: 1.6rem; color: var(--det-acento); }
+.bus-login-cta strong { font-size: 0.84rem; color: #d4ede9; }
+.bus-login-cta p { font-size: 0.72rem; color: #7ba5a0; margin: 0; }
+.bus-login-cta a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 18px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #0f766e, #14b8a6);
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: filter 180ms ease;
+}
+.bus-login-cta a:hover { filter: brightness(1.12); }
+
+/* ═══════════════════════════════════════════════
+   INFO / ITINERARIO
+══════════════════════════════════════════════ */
+.info-seccion { margin-bottom: 16px; }
+.info-seccion__titulo {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #6b8c88;
+    margin-bottom: 10px;
+}
+.info-seccion__titulo i { color: var(--det-acento); font-size: 0.75rem; }
+
+/* Cards de tarifas / horarios / frecuencia */
+.info-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-bottom: 12px;
+}
+.info-card {
+    padding: 11px 12px;
+    border-radius: 12px;
+    background: rgba(13, 33, 40, 0.75);
+    border: 1px solid rgba(86, 191, 181, 0.12);
+}
+.info-card__label {
+    display: block;
+    font-size: 0.62rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: #6b8c88;
+    margin-bottom: 4px;
+}
+.info-card__valor {
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: #d4ede9;
+    line-height: 1.2;
+}
+.info-card__sub {
+    font-size: 0.63rem;
+    color: #7ba5a0;
+    margin-top: 2px;
+}
+.info-card--tarifa .info-card__valor { color: #86efac; }
+.info-card--hora .info-card__valor   { color: #fde68a; }
+.info-card--frec .info-card__valor   { color: var(--det-acento); }
+.info-card--acc .info-card__valor    { color: #c4b5fd; }
+
+/* Pasos del itinerario mejorados */
+.itinerario-pasos { display: flex; flex-direction: column; gap: 10px; padding: 0; }
+.itinerario-paso {
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: linear-gradient(145deg,
+        rgba(14, 37, 44, 0.75),
+        rgba(7, 20, 26, 0.72));
+    border: 1px solid rgba(86,191,181,0.1);
+}
+.itinerario-paso__numero {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: rgba(55,200,186,0.15);
+    border: 1px solid rgba(55,200,186,0.25);
+    color: var(--det-acento);
+    font-size: 0.65rem;
+    font-weight: 900;
+    margin-right: 7px;
+    flex-shrink: 0;
+}
+.itinerario-paso__ruta { font-size: 0.8rem; font-weight: 700; color: #d4ede9; margin-bottom: 5px; }
+.itinerario-paso__tramo { font-size: 0.72rem; color: #7ba5a0; margin-bottom: 4px; }
+.itinerario-paso__detalle { font-size: 0.7rem; color: #9bb5b2; }
+
+/* Barrios chips */
+.info-barrios { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 12px; }
+.info-barrio-chip {
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    background: rgba(13,40,48,0.7);
+    border: 1px solid rgba(86,191,181,0.12);
+    color: #a7c8c4;
+}
+
+/* Nota legal */
+.nota {
+    font-size: 0.69rem;
+    color: #6b8c88;
+    line-height: 1.6;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: rgba(0,0,0,0.2);
+    border: 1px solid rgba(255,255,255,0.04);
+    margin-top: 8px;
+}
+
+/* ═══════════════════════════════════════════════
+   SIMULADOR HUD (solo modo privado)
+══════════════════════════════════════════════ */
+.simulador-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 11px 16px;
+    margin: 10px 0 6px;
+    border-radius: 12px;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    background: rgba(16, 185, 129, 0.08);
+    color: #6ee7b7;
+    font: 700 0.84rem/1.2 inherit;
+    cursor: pointer;
+    transition: all 200ms ease;
+}
+.simulador-trigger:hover {
+    background: rgba(16, 185, 129, 0.15);
+    border-color: rgba(16, 185, 129, 0.5);
+    box-shadow: 0 0 20px rgba(16,185,129,0.1);
+}
+.simulador-trigger--activo {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.3);
+    color: #fca5a5;
+}
+.simulador-trigger--activo:hover {
+    background: rgba(239, 68, 68, 0.17);
+    border-color: rgba(239, 68, 68, 0.5);
+}
+.simulador-trigger i { font-size: 1rem; }
+
+/* HUD del simulador */
+.simulador-hud {
+    overflow: hidden;
+    border-radius: 14px;
+    background: linear-gradient(145deg,
+        rgba(5, 20, 28, 0.98),
+        rgba(8, 25, 32, 0.96));
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(16,185,129,0.06);
+    animation: hud-entrada 400ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    margin-bottom: 10px;
+}
+
+.simulador-hud__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 14px;
+    background: linear-gradient(90deg, rgba(16,185,129,0.12), transparent);
+    border-bottom: 1px solid rgba(16,185,129,0.15);
+}
+.simulador-hud__dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--sim-verde);
+    box-shadow: 0 0 8px rgba(16,185,129,0.6);
+    animation: pulso-sim 1.5s ease-in-out infinite;
+}
+.simulador-hud__titulo {
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #6ee7b7;
+}
+.simulador-hud__velocidad {
+    margin-left: auto;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #a7f3d0;
+    background: rgba(16,185,129,0.1);
+    border: 1px solid rgba(16,185,129,0.2);
+    padding: 2px 8px;
+    border-radius: 8px;
+}
+
+/* Barra de progreso */
+.simulador-hud__barra-wrap {
+    padding: 10px 14px 4px;
+}
+.simulador-hud__barra-track {
+    height: 6px;
+    border-radius: 3px;
+    background: rgba(255,255,255,0.07);
+    overflow: hidden;
+}
+.simulador-hud__barra-fill {
+    height: 100%;
+    border-radius: 3px;
+    background: linear-gradient(90deg, #10b981, #34d399);
+    transition: width 1s ease;
+    box-shadow: 0 0 10px rgba(16,185,129,0.4);
+}
+.simulador-hud__barra-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.6rem;
+    color: #4b7c72;
+    margin-top: 4px;
+    padding: 0 2px;
+}
+
+/* Métricas en vivo */
+.simulador-hud__metricas {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: rgba(255,255,255,0.04);
+    border-top: 1px solid rgba(16,185,129,0.1);
+    border-bottom: 1px solid rgba(16,185,129,0.1);
+}
+.simulador-hud__metrica {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 10px 6px;
+    background: rgba(5, 18, 25, 0.95);
+}
+.simulador-hud__metrica-val {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #a7f3d0;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+}
+.simulador-hud__metrica-lbl {
+    font-size: 0.58rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: #3b6e62;
+}
+
+/* Próxima parada */
+.simulador-hud__proxima {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 14px;
+}
+.simulador-hud__proxima-icono {
+    display: grid;
+    place-items: center;
+    width: 34px; height: 34px;
+    border-radius: 10px;
+    background: rgba(16,185,129,0.1);
+    border: 1px solid rgba(16,185,129,0.2);
+    color: var(--sim-verde);
+    font-size: 0.85rem;
+    flex-shrink: 0;
+}
+.simulador-hud__proxima-info { flex: 1; min-width: 0; }
+.simulador-hud__proxima-label { font-size: 0.6rem; font-weight: 700; color: #3b6e62; text-transform: uppercase; letter-spacing: 0.08em; }
+.simulador-hud__proxima-nombre { font-size: 0.82rem; font-weight: 700; color: #d4ede9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.simulador-hud__proxima-dist { font-size: 0.65rem; color: #6b8c88; margin-top: 1px; }
+
+/* Controles simulador */
+.simulador-hud__controles {
+    display: flex;
+    gap: 6px;
+    padding: 10px 14px;
+    border-top: 1px solid rgba(255,255,255,0.04);
+}
+.simulador-hud__ctrl {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 7px 10px;
+    border-radius: 9px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.04);
+    color: #9bb5b2;
+    transition: all 180ms ease;
+}
+.simulador-hud__ctrl:hover { background: rgba(255,255,255,0.08); color: #d4ede9; }
+.simulador-hud__ctrl--play {
+    border-color: rgba(16,185,129,0.3);
+    background: rgba(16,185,129,0.1);
+    color: #6ee7b7;
+}
+.simulador-hud__ctrl--play:hover { background: rgba(16,185,129,0.18); border-color: rgba(16,185,129,0.5); }
+
+/* Velocidad selector */
+.simulador-hud__speed {
+    display: flex;
+    gap: 4px;
+    padding: 6px 14px 10px;
+    justify-content: center;
+}
+.simulador-hud__speed-btn {
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.03);
+    color: #6b8c88;
+    transition: all 160ms ease;
+}
+.simulador-hud__speed-btn--activo {
+    border-color: rgba(16,185,129,0.4);
+    background: rgba(16,185,129,0.14);
+    color: #6ee7b7;
+}
+
+/* Alerta de parada próxima */
+.simulador-alerta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background: rgba(234, 179, 8, 0.1);
+    border-top: 1px solid rgba(234, 179, 8, 0.2);
+    color: #fde68a;
+    font-size: 0.72rem;
+    font-weight: 700;
+    animation: alerta-flash 600ms ease infinite alternate;
+}
+.simulador-alerta i { font-size: 0.9rem; }
+
+/* Fin de simulación */
+.simulador-fin {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 20px;
+    text-align: center;
+}
+.simulador-fin__check {
+    font-size: 2.5rem;
+    color: var(--sim-verde);
+    animation: check-pop 500ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.simulador-fin__titulo { font-size: 0.95rem; font-weight: 800; color: #d4ede9; }
+.simulador-fin__sub { font-size: 0.72rem; color: #6b8c88; }
+
+/* ═══════════════════════════════════════════════
+   MARCADOR BUS SIMULADO (en el mapa)
+══════════════════════════════════════════════ */
+.bp-bus-simulado-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.bp-bus-simulado {
+    display: grid;
+    place-items: center;
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #10b981, #059669);
+    border: 3px solid rgba(255,255,255,0.9);
+    color: #fff;
+    font-size: 1rem;
+    box-shadow: 0 4px 16px rgba(16,185,129,0.5), 0 0 0 6px rgba(16,185,129,0.15);
+    z-index: 1;
+    animation: bus-bounce 1.2s ease-in-out infinite;
+}
+.bp-bus-simulado-pulse {
+    position: absolute;
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    border: 2px solid rgba(16,185,129,0.5);
+    animation: pulse-radar 2s ease-out infinite;
+}
+
+/* ═══════════════════════════════════════════════
+   ANIMACIONES
+══════════════════════════════════════════════ */
+@keyframes det-hero-in {
+    0%  { opacity: 0; transform: translateY(12px) scale(0.98); }
+    100%{ opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes bus-card-in {
+    0%  { opacity: 0; transform: translateX(-8px); }
+    100%{ opacity: 1; transform: translateX(0); }
+}
+@keyframes hud-entrada {
+    0%  { opacity: 0; transform: translateY(10px) scale(0.98); }
+    100%{ opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes pulso-sim {
+    0%, 100% { box-shadow: 0 0 6px rgba(16,185,129,0.5); }
+    50%       { box-shadow: 0 0 14px rgba(16,185,129,0.9); }
+}
+@keyframes pulse-radar {
+    0%  { transform: scale(1); opacity: 0.7; }
+    100%{ transform: scale(2.5); opacity: 0; }
+}
+@keyframes bus-bounce {
+    0%, 100%{ transform: translateY(0); }
+    50%     { transform: translateY(-3px); }
+}
+@keyframes alerta-flash {
+    0%  { background: rgba(234,179,8,0.08); }
+    100%{ background: rgba(234,179,8,0.18); }
+}
+@keyframes check-pop {
+    0%  { transform: scale(0); opacity: 0; }
+    80% { transform: scale(1.15); }
+    100%{ transform: scale(1); opacity: 1; }
+}
+@keyframes shimmer {
+    0%  { background-position: 200% 0; }
+    100%{ background-position: -200% 0; }
+}
+
+/* ═══════════════════════════════════════════════
+   PARADAS SIN COORDENADAS
+══════════════════════════════════════════════ */
+.paradas-sin-mapa { margin-top: 14px; }
+.paradas-sin-mapa h3 { font-size: 0.75rem; color: #9bb5b2; margin-bottom: 6px; }
+.paradas-sin-mapa__lista { display: flex; flex-direction: column; gap: 6px; }
+.paradas-sin-mapa__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 7px 10px;
+    border-radius: 9px;
+    background: rgba(10,26,32,0.6);
+    border: 1px solid rgba(86,191,181,0.08);
+    font-size: 0.72rem;
+    color: #9bb5b2;
+}
+.paradas-sin-mapa__datos { flex: 1; min-width: 0; }
+.paradas-sin-mapa__datos strong { display: block; color: #c4dbd6; font-size: 0.78rem; }
+.paradas-sin-mapa__datos small { color: #6b8c88; font-size: 0.65rem; }
+
+/* ═══════════════════════════════════════════════
+   ESTADO VACÍO
+══════════════════════════════════════════════ */
+.estado-vacio {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 24px 16px;
+    text-align: center;
+    border-radius: 14px;
+    background: radial-gradient(ellipse at 50% 0%,rgba(55,200,186,0.07),transparent 70%),
+        rgba(5,16,22,0.5);
+    border: 1px dashed rgba(86,191,181,0.14);
+}
+.estado-vacio__icono {
+    display: grid;
+    place-items: center;
+    width: 44px; height: 44px;
+    border-radius: 14px;
+    background: rgba(55,200,186,0.1);
+    border: 1px solid rgba(55,200,186,0.18);
+    color: var(--det-acento);
+    font-size: 1.1rem;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+}
+.estado-vacio strong { font-size: 0.88rem; color: #c4dbd6; }
+.estado-vacio p { font-size: 0.74rem; color: #6b8c88; max-width: 28ch; margin: 0; line-height: 1.5; }
+
+/* ═══════════════════════════════════════════════
+   BOTÓN FAVORITO
+══════════════════════════════════════════════ */
+.favorite-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #6b8c88;
+    background: transparent;
+    border: 1px solid rgba(86,191,181,0.12);
+    cursor: pointer;
+    transition: all 180ms ease;
+}
+.favorite-button:hover { color: var(--det-acento); border-color: rgba(55,200,186,0.3); }
+.favorite-button--active { color: #fbbf24; border-color: rgba(251,191,36,0.3); }
+.favorite-button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ═══════════════════════════════════════════════
+   ESQUELETO DE CARGA
+══════════════════════════════════════════════ */
+.skel {
+    border-radius: 8px;
+    background: linear-gradient(90deg,
+        rgba(55,200,186,0.06) 25%,
+        rgba(55,200,186,0.12) 50%,
+        rgba(55,200,186,0.06) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s infinite;
+}
+.skel--h3 { height: 16px; width: 60%; margin-bottom: 10px; }
+.skel--line { height: 11px; margin-bottom: 6px; }
+.skel--line:nth-child(2) { width: 80%; }
+.skel--line:nth-child(3) { width: 55%; }
+
+/* ═══════════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════════ */
+@media (max-width: 700px) {
+    .det-stats { grid-template-columns: repeat(2, 1fr); }
+    .info-cards { grid-template-columns: repeat(2, 1fr); }
+    .simulador-hud__metricas { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 360px) {
+    .det-stats { grid-template-columns: 1fr 1fr; }
+    .bus-card__amenidades { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .simulador-hud, .bus-card, .det-hero,
+    .bp-bus-simulado, .bp-bus-simulado-pulse,
+    .simulador-hud__dot { animation: none !important; }
+}

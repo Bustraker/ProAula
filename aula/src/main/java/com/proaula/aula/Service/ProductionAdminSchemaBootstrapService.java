@@ -25,7 +25,8 @@ public class ProductionAdminSchemaBootstrapService implements ApplicationRunner 
         "classpath:db/migration/mysql/V20261017_01__admin_registration_approval.sql",
         "classpath:db/migration/mysql/V20261020_01__admin_request_review_and_code_delivery.sql",
         "classpath:db/migration/mysql/V20261030_01__create_favorite_trips.sql",
-        "classpath:db/migration/mysql/V20261101_01__align_favorite_creation_timestamp.sql"
+        "classpath:db/migration/mysql/V20261101_01__align_favorite_creation_timestamp.sql",
+        "classpath:db/migration/mysql/V20261106_01__enhance_notificacion_table.sql"
     };
 
     private final DataSource dataSource;
@@ -45,6 +46,6 @@ public class ProductionAdminSchemaBootstrapService implements ApplicationRunner 
             populator.addScript(resourceLoader.getResource(migration));
             DatabasePopulatorUtils.execute(populator, dataSource);
         }
-        log.info("Se verificaron y alinearon los esquemas de ADMIN, favoritos y trayectos favoritos.");
+        log.info("Se verificaron y alinearon los esquemas de ADMIN, favoritos, trayectos y notificaciones.");
     }
 }

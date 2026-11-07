@@ -679,8 +679,7 @@ public class SyntheticDataSeederService implements ApplicationRunner {
                 tipo VARCHAR(10) NOT NULL,
                 ruta_id BIGINT,
                 parada_id BIGINT,
-                etiqueta VARCHAR(100),
-                created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                fecha_creacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 UNIQUE (usuario_id, ruta_id),
                 UNIQUE (usuario_id, parada_id),
                 FOREIGN KEY (usuario_id) REFERENCES usuario(id),
@@ -731,7 +730,7 @@ public class SyntheticDataSeederService implements ApplicationRunner {
                 "total_consultas", "reportes_ocupacion_baja", "reportes_ocupacion_media",
                 "reportes_ocupacion_alta", "promedio_ocupacion", "nivel_demanda_estimado",
                 "datos_suficientes", "fuente_datos"),
-            "favorito", Set.of("usuario_id", "tipo", "ruta_id", "parada_id", "etiqueta", "created_at"),
+            "favorito", Set.of("usuario_id", "tipo", "ruta_id", "parada_id", "fecha_creacion"),
             "incidente", Set.of("usuario_id", "ruta_id", "bus_id", "tipo", "titulo",
                 "descripcion", "estado", "fecha_reporte", "fecha_resolucion", "comentario_admin"),
             "reporte_ocupacion", Set.of("bus_id", "usuario_id", "nivel", "cantidad_pasajeros",
@@ -937,25 +936,25 @@ public class SyntheticDataSeederService implements ApplicationRunner {
             Ruta route = routes.isEmpty() ? null : routes.get(i % routes.size());
             if (route != null) {
                 rows.add(new Object[] {customer.getId(), "RUTA", route.getId(), null,
-                    "Ruta frecuente", Timestamp.valueOf(LocalDate.now().minusDays(i % 90).atStartOfDay())});
+                    Timestamp.valueOf(LocalDate.now().minusDays(i % 90).atStartOfDay())});
                 List<Parada> routeStops = stops.stream()
                     .filter(stop -> stop.getRuta() != null && stop.getRuta().getId().equals(route.getId()))
                     .collect(Collectors.toList());
                 if (!routeStops.isEmpty()) {
                     Parada stop = routeStops.get(i % routeStops.size());
                     rows.add(new Object[] {customer.getId(), "PARADA", null, stop.getId(),
-                        "Parada habitual", Timestamp.valueOf(LocalDate.now().minusDays(i % 90).atStartOfDay())});
+                        Timestamp.valueOf(LocalDate.now().minusDays(i % 90).atStartOfDay())});
                 }
             } else if (!stops.isEmpty()) {
                 Parada stop = stops.get(i % stops.size());
                 rows.add(new Object[] {customer.getId(), "PARADA", null, stop.getId(),
-                    "Parada habitual", Timestamp.valueOf(LocalDate.now().minusDays(i % 90).atStartOfDay())});
+                    Timestamp.valueOf(LocalDate.now().minusDays(i % 90).atStartOfDay())});
             }
         }
         if (!rows.isEmpty()) {
             jdbcTemplate.batchUpdate(
-                "INSERT INTO favorito (usuario_id, tipo, ruta_id, parada_id, etiqueta, created_at) "
-                    + "VALUES (?, ?, ?, ?, ?, ?)", rows);
+                "INSERT INTO favorito (usuario_id, tipo, ruta_id, parada_id, fecha_creacion) "
+                    + "VALUES (?, ?, ?, ?, ?)", rows);
         }
     }
 

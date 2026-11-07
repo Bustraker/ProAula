@@ -16,6 +16,7 @@
     <link rel="preconnect" href="https://tile.openstreetmap.org" crossorigin>
     <link rel="stylesheet" th:href="@{/css/travel.css(v='map-polish-9')}">
     <link rel="stylesheet" th:href="@{/css/map-ui.css(v='trips-2')}">
+    <link rel="stylesheet" th:href="@{/css/detail-pro.css(v='det-pro-1')}">
 </head>
 <body>
     <div id="map" role="application" aria-label="Mapa de rutas de Cartagena"></div>
@@ -27,6 +28,7 @@
                 <span class="panel-kicker">BUSTRAKER · CARTAGENA · PÚBLICO</span>
                 <h1><i class="fas fa-route" aria-hidden="true"></i> Consulta de rutas</h1>
             </div>
+            <button id="btnAudioAccesible" class="icon-btn" type="button" aria-label="Asistente de voz accesible para personas con discapacidad visual" title="Voz y sonido: ACTIVADOS"><i class="fas fa-volume-high" aria-hidden="true"></i></button>
             <a class="icon-btn" th:href="@{/index_3_public}" title="Volver al inicio" aria-label="Volver al inicio"><i class="fas fa-house" aria-hidden="true"></i></a>
             <button id="btnPanel" class="icon-btn" type="button" aria-expanded="true" aria-label="Minimizar el panel"><i class="fas fa-chevron-down" aria-hidden="true"></i></button>
         </header>
@@ -83,9 +85,9 @@
                 <div id="rutaStats" class="mu-stats" role="status"></div>
                 <section id="llegadasRutaPanel" class="arrival-panel" aria-label="Llegadas estimadas" hidden></section>
                 <div class="pestanas" role="tablist" aria-label="Detalle de la ruta">
-                    <button id="tabParadas" class="pestana" type="button" role="tab" data-pestana="paradas" aria-controls="panelParadas" aria-selected="true">Paradas <span id="contadorParadas" class="contador">0</span></button>
-                    <button id="tabBuses" class="pestana" type="button" role="tab" data-pestana="buses" aria-controls="panelBuses" aria-selected="false" tabindex="-1">Buses <span id="contadorBuses" class="contador">0</span></button>
-                    <button id="tabInfo" class="pestana" type="button" role="tab" data-pestana="info" aria-controls="panelInfo" aria-selected="false" tabindex="-1">Información</button>
+                    <button id="tabParadas" class="pestana" type="button" role="tab" data-pestana="paradas" aria-controls="panelParadas" aria-selected="true"><i class="fas fa-map-pin" aria-hidden="true"></i> Paradas <span id="contadorParadas" class="contador">0</span></button>
+                    <button id="tabBuses" class="pestana" type="button" role="tab" data-pestana="buses" aria-controls="panelBuses" aria-selected="false" tabindex="-1"><i class="fas fa-bus" aria-hidden="true"></i> Buses <span id="contadorBuses" class="contador">0</span></button>
+                    <button id="tabInfo" class="pestana" type="button" role="tab" data-pestana="info" aria-controls="panelInfo" aria-selected="false" tabindex="-1"><i class="fas fa-circle-info" aria-hidden="true"></i> Información</button>
                 </div>
                 <div id="panelParadas" class="pestana-panel" role="tabpanel" aria-labelledby="tabParadas"></div>
                 <div id="panelBuses" class="pestana-panel" role="tabpanel" aria-labelledby="tabBuses" hidden></div>
@@ -110,9 +112,12 @@
         </div>
     </main>
 
+    <!-- Región ARIA para personas con discapacidad visual -->
+    <div id="srAudioAlert" role="alert" aria-live="assertive" class="sr-only"></div>
+
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
     <script th:src="@{/js/map-base.js(v='map-polish-6')}"></script>
-    <script th:src="@{/js/map-travel.js(v='trips-4')}"></script>
+    <script th:src="@{/js/map-travel.js(v='trips-5')}"></script>
     <script th:src="@{/js/viajar_public.js}"></script>
 </body>
 </html>

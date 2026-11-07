@@ -25,9 +25,13 @@
                 <a th:if="${autenticado}" th:href="@{/perfil}"><i class="fas fa-user" aria-hidden="true"></i> Perfil</a>
                 <a th:href="@{/consultas}" aria-current="page">Consulta de buses</a>
             </nav>
-            <a class="directory-signin" th:href="@{/inicio-de-sesion-mejorado}">
+            <a class="directory-signin" th:if="${!autenticado}" th:href="@{/inicio-de-sesion-mejorado}">
                 <i class="fas fa-arrow-right-to-bracket" aria-hidden="true"></i>
                 <span>Iniciar sesión</span>
+            </a>
+            <a class="directory-signin" th:if="${autenticado}" th:href="@{/dashboard}">
+                <i class="fas fa-house" aria-hidden="true"></i>
+                <span>Mi cuenta</span>
             </a>
         </div>
 

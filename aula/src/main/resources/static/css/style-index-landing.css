@@ -629,6 +629,254 @@
     place-items: center;
 }
 
+.landing-page .admin-access-stage {
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    width: min(640px, calc(100vw - 64px));
+    height: min(400px, calc(100vh - 64px));
+    min-height: 340px;
+    place-items: center;
+    border: 1px solid rgba(147, 195, 207, 0.16);
+    border-radius: 22px;
+    background:
+        radial-gradient(ellipse at 50% 49%, rgba(19, 62, 74, 0.25), transparent 49%),
+        linear-gradient(145deg, rgba(7, 21, 32, 0.32), rgba(7, 14, 24, 0.12));
+    box-shadow:
+        inset 0 1px rgba(235, 248, 255, 0.055),
+        0 28px 90px rgba(0, 0, 0, 0.12);
+    animation: admin-stage-arrive 650ms cubic-bezier(0.18, 0.78, 0.24, 1) both;
+}
+
+.landing-page .admin-access-stage__topline,
+.landing-page .admin-access-stage__footline {
+    position: absolute;
+    z-index: 2;
+    right: 27px;
+    left: 27px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    color: rgba(183, 210, 218, 0.67);
+    font-family: "Segoe UI", Arial, sans-serif;
+    font-size: 9px;
+    font-weight: 650;
+    letter-spacing: 0.16em;
+}
+
+.landing-page .admin-access-stage__topline {
+    top: 24px;
+}
+
+.landing-page .admin-access-stage__footline {
+    bottom: 23px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(163, 195, 205, 0.13);
+    font-size: 8px;
+    letter-spacing: 0.12em;
+}
+
+.landing-page .admin-access-stage__footline > span:first-child i {
+    padding: 0 5px;
+    color: #e8b477;
+    font-style: normal;
+}
+
+.landing-page .admin-access-stage__signal,
+.landing-page .admin-access-stage__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.landing-page .admin-access-stage__signal i,
+.landing-page .admin-access-stage__status i {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #75d4c8;
+    box-shadow: 0 0 10px rgba(117, 212, 200, 0.7);
+    animation: admin-signal-breathe 2.4s ease-in-out infinite;
+}
+
+.landing-page .admin-access-stage__status i {
+    width: 5px;
+    height: 5px;
+    background: #edbd78;
+    box-shadow: 0 0 9px rgba(237, 189, 120, 0.62);
+    animation-delay: 0.8s;
+}
+
+.landing-page .admin-access-stage__coordinates {
+    color: rgba(160, 191, 201, 0.47);
+    font-size: 8px;
+    letter-spacing: 0.12em;
+}
+
+.landing-page .admin-access-blueprint {
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+.landing-page .admin-access-blueprint__orbit {
+    fill: none;
+    stroke: rgba(124, 184, 193, 0.16);
+    stroke-width: 0.8;
+}
+
+.landing-page .admin-access-blueprint__orbit--outer {
+    stroke: rgba(137, 182, 191, 0.16);
+    stroke-dasharray: 1 8;
+    animation: admin-orbit-drift 34s linear infinite;
+}
+
+.landing-page .admin-access-blueprint__orbit--middle {
+    stroke: rgba(135, 195, 196, 0.13);
+    stroke-dasharray: 3 12;
+    animation: admin-orbit-drift 27s linear infinite reverse;
+}
+
+.landing-page .admin-access-blueprint__orbit--inner {
+    stroke: rgba(220, 178, 126, 0.13);
+    stroke-dasharray: 1 7;
+}
+
+.landing-page .admin-access-blueprint__orbit--dash {
+    stroke: rgba(117, 212, 200, 0.22);
+    stroke-dasharray: 34 8 2 8;
+    animation: admin-orbit-drift 21s linear infinite;
+}
+
+.landing-page .admin-access-blueprint__tilt {
+    transform-box: view-box;
+    transform-origin: center;
+    animation: admin-orbit-tilt 46s linear infinite;
+}
+
+.landing-page .admin-access-blueprint__circuit {
+    fill: none;
+    stroke: rgba(135, 186, 194, 0.2);
+    stroke-width: 0.85;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.landing-page .admin-access-blueprint__circuit--flow {
+    stroke: rgba(117, 212, 200, 0.66);
+    stroke-dasharray: 2 28;
+    stroke-width: 1.15;
+    animation: admin-circuit-flow 7.5s linear infinite;
+}
+
+.landing-page .admin-access-blueprint__node {
+    fill: #102b35;
+    stroke: rgba(117, 212, 200, 0.73);
+    stroke-width: 1.1;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: admin-node-pulse 2.8s ease-in-out infinite;
+}
+
+.landing-page .admin-access-blueprint__node:nth-of-type(2) {
+    animation-delay: 0.55s;
+}
+
+.landing-page .admin-access-blueprint__node:nth-of-type(3) {
+    animation-delay: 1.1s;
+}
+
+.landing-page .admin-access-blueprint__node:nth-of-type(4) {
+    animation-delay: 1.65s;
+}
+
+.landing-page .admin-access-blueprint__beacon {
+    fill: #75d4c8;
+    filter: drop-shadow(0 0 5px rgba(117, 212, 200, 0.9));
+}
+
+.landing-page .admin-access-blueprint__beacon--gold {
+    fill: #edbd78;
+    filter: drop-shadow(0 0 5px rgba(237, 189, 120, 0.9));
+}
+
+.landing-page .admin-access-blueprint__crosshair {
+    fill: none;
+    stroke: rgba(190, 213, 215, 0.2);
+    stroke-width: 0.8;
+    stroke-linecap: round;
+}
+
+.landing-page .admin-access-stage__corner {
+    position: absolute;
+    z-index: 1;
+    width: 24px;
+    height: 24px;
+    border-color: rgba(117, 212, 200, 0.48);
+    border-style: solid;
+}
+
+.landing-page .admin-access-stage__corner--tl {
+    top: -1px;
+    left: 22px;
+    border-width: 1px 0 0 1px;
+    border-top-left-radius: 8px;
+}
+
+.landing-page .admin-access-stage__corner--tr {
+    top: -1px;
+    right: 22px;
+    border-width: 1px 1px 0 0;
+    border-top-right-radius: 8px;
+}
+
+.landing-page .admin-access-stage__corner--bl {
+    bottom: -1px;
+    left: 22px;
+    border-width: 0 0 1px 1px;
+    border-bottom-left-radius: 8px;
+}
+
+.landing-page .admin-access-stage__corner--br {
+    right: 22px;
+    bottom: -1px;
+    border-width: 0 1px 1px 0;
+    border-bottom-right-radius: 8px;
+}
+
+.landing-page .admin-access-stage__side-note {
+    position: absolute;
+    z-index: 1;
+    top: 50%;
+    display: grid;
+    justify-items: center;
+    gap: 10px;
+    color: rgba(175, 201, 208, 0.5);
+    font-size: 7px;
+    font-weight: 700;
+    letter-spacing: 0.19em;
+    writing-mode: vertical-rl;
+    transform: translateY(-50%);
+}
+
+.landing-page .admin-access-stage__side-note--left {
+    left: 18px;
+}
+
+.landing-page .admin-access-stage__side-note--right {
+    right: 18px;
+}
+
+.landing-page .admin-access-stage__side-note i {
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(180deg, transparent, rgba(117, 212, 200, 0.65), transparent);
+}
+
 .landing-page .admin-btn {
     display: inline-flex;
     min-height: 42px;
@@ -652,32 +900,191 @@
 }
 
 .landing-page .admin-btn--center {
-    min-width: min(250px, calc(100vw - 64px));
-    min-height: 58px;
-    justify-content: center;
-    gap: 11px;
-    padding: 9px 20px 9px 12px;
-    border-color: rgba(223, 184, 195, 0.48);
-    background: linear-gradient(145deg, #34202a, #20171d);
+    position: relative;
+    isolation: isolate;
+    width: min(380px, calc(100vw - 104px));
+    min-height: 82px;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 12px 17px 12px 14px;
+    overflow: hidden;
+    border-color: rgba(133, 198, 198, 0.52);
+    border-radius: 15px;
+    background:
+        radial-gradient(ellipse at 12% 0%, rgba(82, 157, 155, 0.2), transparent 48%),
+        linear-gradient(145deg, #152a32, #101b25 72%, #171a24);
     box-shadow:
-        0 18px 56px rgba(0, 0, 0, 0.58),
-        0 0 0 1px rgba(255, 255, 255, 0.04),
-        0 0 34px rgba(171, 75, 96, 0.18);
-    font-size: 14px;
-    font-weight: 650;
+        0 22px 65px rgba(0, 0, 0, 0.56),
+        0 0 0 5px rgba(117, 212, 200, 0.045),
+        0 0 34px rgba(70, 180, 164, 0.17),
+        inset 0 1px rgba(229, 248, 246, 0.16);
+    animation: admin-button-breathe 4.8s ease-in-out infinite;
+}
+
+.landing-page .admin-btn--center::before {
+    position: absolute;
+    z-index: -1;
+    inset: 3px;
+    border: 1px solid rgba(202, 231, 227, 0.1);
+    border-radius: 11px;
+    content: "";
+    pointer-events: none;
+}
+
+.landing-page .admin-btn--center::after {
+    position: absolute;
+    z-index: 2;
+    top: -60%;
+    bottom: -60%;
+    left: -45%;
+    width: 30%;
+    background: linear-gradient(90deg, transparent, rgba(208, 250, 239, 0.14), transparent);
+    content: "";
+    pointer-events: none;
+    transform: skewX(-20deg);
+    animation: admin-button-sweep 6.5s 1s ease-in-out infinite;
 }
 
 .landing-page .admin-btn--center:hover {
-    transform: translateY(-2px) scale(1.015);
-    background: linear-gradient(145deg, #472633, #291a21);
+    transform: translateY(-3px) scale(1.025);
+    border-color: rgba(149, 229, 211, 0.82);
+    background:
+        radial-gradient(ellipse at 12% 0%, rgba(95, 188, 171, 0.25), transparent 48%),
+        linear-gradient(145deg, #1a3940, #12232d 72%, #1c202a);
 }
 
-.landing-page .admin-btn img {
-    display: block;
-    width: 29px;
-    height: 29px;
+.landing-page .admin-btn__sigil {
+    position: relative;
+    width: 51px;
+    height: 51px;
+    display: grid;
+    flex: 0 0 51px;
+    place-items: center;
+    border: 1px solid rgba(117, 212, 200, 0.3);
+    border-radius: 13px;
+    background:
+        radial-gradient(circle, rgba(117, 212, 200, 0.12), transparent 68%),
+        rgba(6, 19, 28, 0.62);
+    box-shadow: inset 0 0 18px rgba(117, 212, 200, 0.08);
+}
+
+.landing-page .admin-btn__sigil img {
+    z-index: 1;
+    width: 35px;
+    height: 35px;
+    border-radius: 0;
+    box-shadow: none;
+    filter: drop-shadow(0 0 7px rgba(117, 212, 200, 0.28));
+}
+
+.landing-page .admin-btn__sigil-orbit {
+    position: absolute;
+    inset: -5px;
+    border: 1px solid transparent;
+    border-top-color: rgba(117, 212, 200, 0.88);
+    border-right-color: rgba(237, 189, 120, 0.5);
+    border-radius: 16px;
+    animation: admin-sigil-orbit 8s linear infinite;
+}
+
+.landing-page .admin-btn__copy {
+    min-width: 0;
+    display: grid;
+    flex: 1 1 auto;
+    gap: 5px;
+    text-align: left;
+}
+
+.landing-page .admin-btn__copy strong {
+    color: #f3f6f5;
+    font-size: 15px;
+    font-weight: 650;
+    letter-spacing: 0.01em;
+    line-height: 1.2;
+}
+
+.landing-page .admin-btn__copy small {
+    color: #91b9b8;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+}
+
+.landing-page .admin-btn__arrow {
+    width: 31px;
+    height: 31px;
+    display: grid;
+    flex: 0 0 31px;
+    place-items: center;
+    color: #e9c18b;
+    border: 1px solid rgba(233, 193, 139, 0.27);
     border-radius: 50%;
-    object-fit: contain;
+    background: rgba(233, 193, 139, 0.07);
+    transition: color 180ms ease, background 180ms ease, transform 180ms ease;
+}
+
+.landing-page .admin-btn--center:hover .admin-btn__arrow {
+    color: #17252a;
+    background: #e9c18b;
+    transform: translateX(2px);
+}
+
+.landing-page .admin-access-stage:has(.admin-btn--center:focus-visible) .admin-access-stage__corner {
+    border-color: rgba(237, 189, 120, 0.75);
+}
+
+@keyframes admin-stage-arrive {
+    from { opacity: 0; transform: scale(0.96) translateY(8px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes admin-orbit-drift {
+    to { stroke-dashoffset: -120; }
+}
+
+@keyframes admin-orbit-tilt {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes admin-circuit-flow {
+    to { stroke-dashoffset: -180; }
+}
+
+@keyframes admin-node-pulse {
+    0%, 100% { opacity: 0.48; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.45); }
+}
+
+@keyframes admin-signal-breathe {
+    0%, 100% { opacity: 0.56; }
+    50% { opacity: 1; }
+}
+
+@keyframes admin-button-breathe {
+    0%, 100% {
+        box-shadow:
+            0 22px 65px rgba(0, 0, 0, 0.56),
+            0 0 0 5px rgba(117, 212, 200, 0.04),
+            0 0 28px rgba(70, 180, 164, 0.13),
+            inset 0 1px rgba(229, 248, 246, 0.14);
+    }
+    50% {
+        box-shadow:
+            0 25px 72px rgba(0, 0, 0, 0.6),
+            0 0 0 8px rgba(117, 212, 200, 0.065),
+            0 0 43px rgba(70, 180, 164, 0.23),
+            inset 0 1px rgba(229, 248, 246, 0.2);
+    }
+}
+
+@keyframes admin-button-sweep {
+    0%, 16% { left: -45%; opacity: 0; }
+    24% { opacity: 1; }
+    48%, 100% { left: 125%; opacity: 0; }
+}
+
+@keyframes admin-sigil-orbit {
+    to { transform: rotate(360deg); }
 }
 
 @keyframes landing-arrive {
@@ -824,6 +1231,77 @@
 
     .landing-page .landing-description {
         font-size: 13px;
+    }
+
+    .landing-page .landing-admin-gate {
+        padding: 16px;
+    }
+
+    .landing-page .admin-access-stage {
+        width: calc(100vw - 32px);
+        height: min(360px, calc(100vh - 40px));
+        min-height: 300px;
+        border-radius: 17px;
+    }
+
+    .landing-page .admin-access-stage__topline,
+    .landing-page .admin-access-stage__footline {
+        right: 18px;
+        left: 18px;
+        font-size: 7px;
+        letter-spacing: 0.1em;
+    }
+
+    .landing-page .admin-access-stage__coordinates {
+        font-size: 6px;
+        letter-spacing: 0.06em;
+    }
+
+    .landing-page .admin-access-stage__side-note {
+        display: none;
+    }
+
+    .landing-page .admin-access-stage__corner--tl,
+    .landing-page .admin-access-stage__corner--bl {
+        left: 15px;
+    }
+
+    .landing-page .admin-access-stage__corner--tr,
+    .landing-page .admin-access-stage__corner--br {
+        right: 15px;
+    }
+
+    .landing-page .admin-btn--center {
+        width: min(360px, calc(100vw - 64px));
+        min-height: 76px;
+        gap: 10px;
+        padding: 10px 12px;
+    }
+
+    .landing-page .admin-btn__sigil {
+        width: 44px;
+        height: 44px;
+        flex-basis: 44px;
+    }
+
+    .landing-page .admin-btn__sigil img {
+        width: 31px;
+        height: 31px;
+    }
+
+    .landing-page .admin-btn__copy strong {
+        font-size: 13px;
+    }
+
+    .landing-page .admin-btn__copy small {
+        font-size: 7px;
+        letter-spacing: 0.12em;
+    }
+
+    .landing-page .admin-btn__arrow {
+        width: 27px;
+        height: 27px;
+        flex-basis: 27px;
     }
 
 }

@@ -28,7 +28,7 @@
                 <a th:href="@{/mensajes_contacto}"><i class="fas fa-envelope"></i> Mensajes</a>
                 <a th:href="@{/rutas/admin}"><i class="fas fa-route"></i> Rutas</a>
                 <a th:href="@{/registro-buses}"><i class="fas fa-bus"></i> Buses</a>
-                <form th:action="@{/logout}" method="post" class="logout-form">
+                <form th:action="@{/logout}" method="post" class="logout-form" onsubmit="return confirm('¿Cerrar sesión de ProAula? El proveedor externo podría mantener tu sesión activa.');">
                     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                     <button type="submit" class="logout-form__button"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</button>
                 </form>
