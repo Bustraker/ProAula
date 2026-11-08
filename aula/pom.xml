@@ -127,6 +127,18 @@
         </dependency>
     </dependencies>
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+            <resource>
+                <directory>src</directory>
+                <targetPath>data</targetPath>
+                <includes>
+                    <include>Barrios_Oficiales_Distrito_de_Cartagena_de_Indias_20261107.xml</include>
+                </includes>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

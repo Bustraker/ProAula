@@ -91,7 +91,7 @@ class ConsultasPageIntegrationTest {
                         "/css/travel.css?v=map-polish-9",
                         "/css/map-ui.css?v=trips-2",
                         "/js/map-base.js?v=map-polish-6",
-                        "/js/map-travel.js?v=trips-5");
+                        "/js/map-travel.js?v=trips-6");
 
         MockHttpSession session = new MockHttpSession();
         SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
@@ -112,6 +112,6 @@ class ConsultasPageIntegrationTest {
                         "/css/travel.css?v=map-polish-9",
                         "/css/map-ui.css?v=trips-2",
                         "/js/map-base.js?v=map-polish-6",
-                        "/js/map-travel.js?v=trips-5");
+                        "/js/map-travel.js?v=trips-6");
     }
 }

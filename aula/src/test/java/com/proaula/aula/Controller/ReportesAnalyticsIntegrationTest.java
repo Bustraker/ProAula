@@ -37,6 +37,11 @@ class ReportesAnalyticsIntegrationTest {
                 .andExpect(jsonPath("$.flotaPorOcupacion").isMap())
                 .andExpect(jsonPath("$.rutasPorEstado").isMap())
                 .andExpect(jsonPath("$.incidentesPorTipo").isArray())
+                .andExpect(jsonPath("$.prioridadCoberturaBarrios").isMap())
+                .andExpect(jsonPath("$.prioridadCoberturaBarrios.nombreModelo")
+                        .value("Prioridad potencial de revisión de cobertura"))
+                .andExpect(jsonPath("$.prioridadCoberturaBarrios.versionModelo").value("1.0"))
+                .andExpect(jsonPath("$.prioridadCoberturaBarrios.barriosPrioritarios").isArray())
                 .andExpect(jsonPath("$.datosSinteticosConfigurados").value(false));
     }
 
@@ -46,6 +51,8 @@ class ReportesAnalyticsIntegrationTest {
         mockMvc.perform(get("/reportes"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("id=\"chartActivity\"")))
+                .andExpect(content().string(containsString("id=\"coveragePriorityChart\"")))
+                .andExpect(content().string(containsString("Barrios para revisar cobertura")))
                 .andExpect(content().string(containsString("reports-dashboard.js")))
                 .andExpect(content().string(containsString("Rutas con más viajes registrados")));
     }

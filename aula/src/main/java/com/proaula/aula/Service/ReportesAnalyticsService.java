@@ -21,6 +21,7 @@ import com.proaula.aula.Repository.RutaRepository;
 import com.proaula.aula.Repository.UsuarioRepository;
 import com.proaula.aula.Repository.ViajeRepository;
 import com.proaula.aula.dto.ReportesAnalyticsResponse;
+import com.proaula.aula.dto.modelos.PrioridadCoberturaResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +40,7 @@ public class ReportesAnalyticsService {
     private final PasajeRepository pasajeRepository;
     private final IncidenteRepository incidenteRepository;
     private final FavoritoRepository favoritoRepository;
+    private final ModeloPrioridadCoberturaService modeloPrioridadCoberturaService;
     private final boolean datosSinteticosConfigurados;
 
     public ReportesAnalyticsService(
@@ -50,6 +52,7 @@ public class ReportesAnalyticsService {
             PasajeRepository pasajeRepository,
             IncidenteRepository incidenteRepository,
             FavoritoRepository favoritoRepository,
+            ModeloPrioridadCoberturaService modeloPrioridadCoberturaService,
             @Value("${app.synthetic-data.enabled:false}") boolean datosSinteticosConfigurados) {
         this.busRepository = busRepository;
         this.rutaRepository = rutaRepository;
@@ -59,6 +62,7 @@ public class ReportesAnalyticsService {
         this.pasajeRepository = pasajeRepository;
         this.incidenteRepository = incidenteRepository;
         this.favoritoRepository = favoritoRepository;
+        this.modeloPrioridadCoberturaService = modeloPrioridadCoberturaService;
         this.datosSinteticosConfigurados = datosSinteticosConfigurados;
     }
 
@@ -81,6 +85,8 @@ public class ReportesAnalyticsService {
                 .toList();
         List<ReportesAnalyticsResponse.ActividadMensual> actividadMensual =
             construirActividadMensual();
+        PrioridadCoberturaResponse prioridadCoberturaBarrios =
+            modeloPrioridadCoberturaService.analizarCobertura(datosSinteticosConfigurados);
 
         return new ReportesAnalyticsResponse(
             busRepository.count(),
@@ -103,7 +109,8 @@ public class ReportesAnalyticsService {
             incidentesPorEstado,
             incidentesPorTipo,
             rutasMasConsultadas,
-            actividadMensual);
+            actividadMensual,
+            prioridadCoberturaBarrios);
     }
 
     private Map<String, Long> distribucionFlota() {

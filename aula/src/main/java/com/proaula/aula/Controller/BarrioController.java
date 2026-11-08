@@ -1,5 +1,6 @@
 package com.proaula.aula.Controller;
 
+import com.proaula.aula.Service.BarrioContextoService;
 import com.proaula.aula.Service.BarrioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,9 @@ public class BarrioController {
     
     @Autowired
     private BarrioService barrioService;
+
+    @Autowired
+    private BarrioContextoService barrioContextoService;
     
     /**
      * Obtiene todos los barrios con coordenadas
@@ -31,6 +35,7 @@ public class BarrioController {
             mapa.put("longitud", barrio.getLongitud());
             mapa.put("localidad", barrio.getLocalidad());
             mapa.put("coordenadaEstimada", !barrioService.tieneCoordenadaShapefile(barrio.getNombre()));
+            incluirContexto(mapa, barrio.getNombre());
             barrios.add(mapa);
         });
         
@@ -63,8 +68,15 @@ public class BarrioController {
                 mapa.put("longitud", barrio.getLongitud());
                 mapa.put("localidad", barrio.getLocalidad());
                 mapa.put("coordenadaEstimada", !barrioService.tieneCoordenadaShapefile(barrio.getNombre()));
+                incluirContexto(mapa, barrio.getNombre());
                 return ResponseEntity.ok(mapa);
             })
             .orElse(ResponseEntity.notFound().build());
+    }
+
+    private void incluirContexto(Map<String, Object> respuesta, String nombreBarrio) {
+        respuesta.put("contextoDisponible", barrioContextoService.disponible());
+        barrioContextoService.obtenerPorNombre(nombreBarrio)
+            .ifPresent(contexto -> respuesta.put("contexto", contexto));
     }
 }

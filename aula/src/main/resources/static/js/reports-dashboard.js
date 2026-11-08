@@ -17,6 +17,13 @@
             routes: document.getElementById('chartRoutes'),
             occupancy: document.getElementById('chartOccupancy'),
             routeStates: document.getElementById('chartRouteStates'),
+            coverageHigh: document.getElementById('coverageHighCount'),
+            coverageMedium: document.getElementById('coverageMediumCount'),
+            coverageLow: document.getElementById('coverageLowCount'),
+            coverageUnservedPopulation: document.getElementById('coverageUnservedPopulation'),
+            coverageNotice: document.getElementById('coverageModelNotice'),
+            coverageChart: document.getElementById('coveragePriorityChart'),
+            coverageTable: document.getElementById('coveragePriorityTable'),
             state: document.getElementById('reportsDataState'),
             notice: document.getElementById('reportsSyntheticNotice'),
             error: document.getElementById('reportsError'),
@@ -92,7 +99,9 @@
 
             var data = await response.json();
             if (!data || !Array.isArray(data.actividadMensual)
-                || !data.flotaPorEstado || !data.incidentesPorTipo) {
+                || !data.flotaPorEstado || !data.incidentesPorTipo
+                || !data.prioridadCoberturaBarrios
+                || !Array.isArray(data.prioridadCoberturaBarrios.barriosPrioritarios)) {
                 throw new Error('El servidor devolvió un formato de indicadores no válido.');
             }
 
@@ -140,6 +149,7 @@
         drawCategories(dashboard.routeStates, Object.keys(data.rutasPorEstado || {}).map(function (name) {
             return { nombre: name, cantidad: data.rutasPorEstado[name] };
         }), 'No hay rutas registradas.', 'reports-bar-list--route-states');
+        drawCoveragePriority(data.prioridadCoberturaBarrios);
         drawIncidentStates(data.incidentesPorEstado);
         dashboard.updated.textContent = 'Actualizado ' + new Intl.DateTimeFormat('es-CO', {
             dateStyle: 'medium',
@@ -328,5 +338,135 @@
             legend.appendChild(row);
         });
         dashboard.incidents.appendChild(legend);
+    }
+
+    function drawCoveragePriority(model) {
+        dashboard.coverageHigh.textContent =
+            Number(model.barriosPrioridadAlta || 0).toLocaleString('es-CO');
+        dashboard.coverageMedium.textContent =
+            Number(model.barriosPrioridadMedia || 0).toLocaleString('es-CO');
+        dashboard.coverageLow.textContent =
+            Number(model.barriosPrioridadBaja || 0).toLocaleString('es-CO');
+        dashboard.coverageUnservedPopulation.textContent =
+            Number(model.poblacionEnBarriosSinRutaVerificada || 0).toLocaleString('es-CO');
+        dashboard.coverageNotice.textContent = [
+            model.nombreModelo + ' · versión ' + model.versionModelo + '.',
+            model.metodo,
+            model.advertencia,
+            'Barrios analizados: ' + Number(model.totalBarriosAnalizados || 0).toLocaleString('es-CO') + '.'
+        ].filter(Boolean).join(' ');
+
+        drawCoverageChart(dashboard.coverageChart, model.barriosPrioritarios);
+        drawCoverageTable(dashboard.coverageTable, model.barriosPrioritarios);
+    }
+
+    function drawCoverageChart(container, neighborhoods) {
+        var values = (neighborhoods || []).slice(0, 10).filter(function (item) {
+            return item && Number.isFinite(Number(item.indicePrioridad));
+        });
+        if (!values.length) {
+            showEmpty(container, 'No hay suficientes datos territoriales y rutas verificadas para calcular el índice.');
+            return;
+        }
+
+        var list = element('div', 'reports-priority-list');
+        values.forEach(function (item, index) {
+            var score = Math.max(0, Math.min(100, Number(item.indicePrioridad)));
+            var row = element('div', 'reports-priority-row');
+            var meta = element('div', 'reports-priority-row__meta');
+            var rank = element('span', 'reports-priority-row__rank', String(index + 1).padStart(2, '0'));
+            var name = element('span', 'reports-priority-row__name', item.barrio || 'Barrio sin nombre');
+            var scoreLabel = element('strong', 'reports-priority-row__score',
+                score.toLocaleString('es-CO', { maximumFractionDigits: 1 }));
+            var track = element('div', 'reports-priority-track');
+            var bar = element('span', 'reports-priority-fill reports-priority-fill--' +
+                String(item.nivelPrioridad || 'BAJA').toLowerCase());
+            bar.style.width = score + '%';
+            bar.title = (item.barrio || 'Barrio') + ': ' +
+                score.toLocaleString('es-CO', { maximumFractionDigits: 1 }) + ' puntos · ' +
+                (item.nivelPrioridad || 'BAJA');
+            track.appendChild(bar);
+            meta.appendChild(rank);
+            meta.appendChild(name);
+            meta.appendChild(scoreLabel);
+            row.appendChild(meta);
+            row.appendChild(track);
+            list.appendChild(row);
+        });
+        replace(container, list);
+    }
+
+    function drawCoverageTable(container, neighborhoods) {
+        var values = (neighborhoods || []).slice(0, 15);
+        if (!values.length) {
+            showEmpty(container, 'No hay barrios disponibles para mostrar.');
+            return;
+        }
+
+        var table = element('table', 'reports-priority-table');
+        var head = element('thead');
+        var header = element('tr');
+        ['Barrio', 'Población', 'Rutas', 'Paradas con ubicación', 'Índice / 100', 'Factores'].forEach(function (label) {
+            var cell = element('th', null, label);
+            cell.scope = 'col';
+            header.appendChild(cell);
+        });
+        head.appendChild(header);
+        table.appendChild(head);
+
+        var body = element('tbody');
+        values.forEach(function (item) {
+            var row = element('tr');
+            var name = element('td', 'reports-priority-table__name');
+            name.appendChild(element('strong', null, item.barrio || 'Barrio sin nombre'));
+            if (item.localidad) name.appendChild(element('small', null, item.localidad));
+
+            var population = item.poblacionRegistrada == null
+                ? NaN : Number(item.poblacionRegistrada);
+            var populationCell = element('td', null,
+                Number.isFinite(population) ? population.toLocaleString('es-CO') : 'Sin dato');
+            var routes = Number(item.rutasActivasVerificadas) || 0;
+            var routeCell = element('td', null, routes.toLocaleString('es-CO'));
+            routeCell.title = routes === 0
+                ? 'No aparece en rutas activas verificadas.'
+                : routes + ' rutas activas verificadas incluyen este barrio.';
+
+            var georeferenced = Number(item.paradasActivasGeorreferenciadas) || 0;
+            var totalStops = Number(item.paradasActivasRegistradas) || 0;
+            var stopsCell = element('td', null, georeferenced.toLocaleString('es-CO') +
+                ' / ' + totalStops.toLocaleString('es-CO'));
+            stopsCell.title = 'Paradas activas con coordenadas / paradas activas registradas.';
+
+            var score = Number(item.indicePrioridad);
+            var scoreCell = element('td');
+            var badge = element('span', 'reports-priority-badge reports-priority-badge--' +
+                String(item.nivelPrioridad || 'BAJA').toLowerCase(),
+                Number.isFinite(score) ? score.toLocaleString('es-CO', { maximumFractionDigits: 1 }) +
+                    ' · ' + (item.nivelPrioridad || 'BAJA') : 'Sin dato');
+            scoreCell.appendChild(badge);
+
+            var factorsCell = element('td');
+            var factors = element('details', 'reports-priority-details');
+            factors.appendChild(element('summary', null, 'Ver factores'));
+            var factorList = element('ul', 'reports-priority-factors');
+            (Array.isArray(item.factores) ? item.factores : []).forEach(function (factor) {
+                factorList.appendChild(element('li', null, factor));
+            });
+            factors.appendChild(factorList);
+            factorsCell.appendChild(factors);
+
+            row.appendChild(name);
+            row.appendChild(populationCell);
+            row.appendChild(routeCell);
+            row.appendChild(stopsCell);
+            row.appendChild(scoreCell);
+            row.appendChild(factorsCell);
+            body.appendChild(row);
+        });
+        table.appendChild(body);
+
+        var wrapper = element('div', 'reports-priority-table-scroll');
+        wrapper.appendChild(table);
+        replace(container, wrapper);
     }
 }());

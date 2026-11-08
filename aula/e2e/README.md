@@ -11,8 +11,10 @@ npm test
 Playwright starts the Spring Boot application on port `3466` with an isolated
 in-memory H2 database and a validation-only schema. No production database or
 credentials are used. The browser journeys cover public route planning's
-empty-state behavior, public contact submission, and user registration,
-login, protected-page access, and logout.
+empty-state behavior, public contact submission, authenticated voice settings
+(including Colombian voice preference and persistence), and user registration,
+login, protected-page access, and logout. Public route planning intentionally
+does not expose synthesized-voice controls or playback.
 
 The related MockMvc journeys can be run from the project root:
 

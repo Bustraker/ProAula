@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" th:href="@{/images/logo.png}" type="image/png">
-    <link rel="stylesheet" th:href="@{/css/reportes.css(v='reports-dashboard-1')}">
+    <link rel="stylesheet" th:href="@{/css/reportes.css(v='reports-dashboard-2')}">
 </head>
 <body class="admin-reports">
     <div class="reports-shell">
@@ -240,6 +240,71 @@
                     <p id="reportsUpdatedAt" class="reports-updated" aria-live="polite"></p>
                 </section>
 
+                <section class="reports-dashboard reports-coverage" aria-labelledby="coverageTitle">
+                    <div class="reports-dashboard__heading">
+                        <div>
+                            <span class="reports-section-heading__eyebrow">MODELO TERRITORIAL · APOYO A DECISIONES</span>
+                            <h2 id="coverageTitle">Barrios para revisar cobertura</h2>
+                            <p>Ordena barrios por población registrada, rutas verificadas y paradas activas georreferenciadas.</p>
+                        </div>
+                        <span class="reports-coverage__badge"><i class="fas fa-compass" aria-hidden="true"></i> Índice explicable · 0–100</span>
+                    </div>
+
+                    <div class="reports-coverage-kpis" aria-label="Resumen del modelo territorial">
+                        <article class="reports-coverage-kpi reports-coverage-kpi--high">
+                            <span>Prioridad alta</span>
+                            <strong id="coverageHighCount">—</strong>
+                            <small>barrios para validar</small>
+                        </article>
+                        <article class="reports-coverage-kpi reports-coverage-kpi--medium">
+                            <span>Prioridad media</span>
+                            <strong id="coverageMediumCount">—</strong>
+                            <small>barrios para revisar</small>
+                        </article>
+                        <article class="reports-coverage-kpi reports-coverage-kpi--low">
+                            <span>Prioridad baja</span>
+                            <strong id="coverageLowCount">—</strong>
+                            <small>según datos disponibles</small>
+                        </article>
+                        <article class="reports-coverage-kpi reports-coverage-kpi--population">
+                            <span>Población sin ruta verificada</span>
+                            <strong id="coverageUnservedPopulation">—</strong>
+                            <small>suma de población registrada</small>
+                        </article>
+                    </div>
+
+                    <p id="coverageModelNotice" class="reports-data-notice" role="note"></p>
+
+                    <div class="reports-coverage-grid">
+                        <article class="reports-chart-card">
+                            <div class="reports-chart-card__heading">
+                                <div>
+                                    <h3>Mayores prioridades de revisión</h3>
+                                    <p>Los primeros 10 barrios del índice; más puntos indican mayor prioridad de revisión, no más pasajeros.</p>
+                                </div>
+                                <span class="reports-chart-card__icon"><i class="fas fa-arrow-up-wide-short" aria-hidden="true"></i></span>
+                            </div>
+                            <div id="coveragePriorityChart" class="reports-coverage-chart" aria-live="polite">
+                                <p class="reports-chart-empty">Calculando prioridades…</p>
+                            </div>
+                            <div class="reports-coverage-scale"><span>0 · Menor</span><span>100 · Mayor</span></div>
+                        </article>
+
+                        <article class="reports-chart-card reports-coverage-table-card">
+                            <div class="reports-chart-card__heading">
+                                <div>
+                                    <h3>Detalle para la toma de decisiones</h3>
+                                    <p>Hasta 15 barrios; cada fila muestra por qué se asignó la prioridad.</p>
+                                </div>
+                                <span class="reports-chart-card__icon"><i class="fas fa-table-list" aria-hidden="true"></i></span>
+                            </div>
+                            <div id="coveragePriorityTable" class="reports-coverage-table-wrap" aria-live="polite">
+                                <p class="reports-chart-empty">Cargando detalle territorial…</p>
+                            </div>
+                        </article>
+                    </div>
+                </section>
+
                 <div class="reports-layout">
                     <section class="reports-inventory" aria-labelledby="inventoryTitle">
                         <div class="reports-section-heading">
@@ -335,7 +400,7 @@
             </div>
         </main>
     </div>
-    <script th:src="@{/js/reports-dashboard.js(v='reports-dashboard-1')}"></script>
+    <script th:src="@{/js/reports-dashboard.js(v='reports-dashboard-2')}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const bars = Array.from(document.querySelectorAll('.reports-chart__bar'));

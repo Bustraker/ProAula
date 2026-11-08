@@ -401,10 +401,6 @@
                     if (global.BustrakerNotificaciones && global.BustrakerNotificaciones.hablar) {
                         global.BustrakerNotificaciones.chime();
                         global.BustrakerNotificaciones.hablar(texto, true);
-                    } else if (global.speechSynthesis) {
-                        var u = new SpeechSynthesisUtterance(texto);
-                        u.lang = 'es-CO';
-                        global.speechSynthesis.speak(u);
                     }
                 });
             }
@@ -483,9 +479,9 @@
             '<div class="mu-popup__body"><strong>' + escapeHtml(nombre) + '</strong>' +
             (nota ? '<p class="mu-popup__nota">' + escapeHtml(nota) + '</p>' : '') +
             '</div>' +
-            '<div class="mu-popup__actions">' +
+            (global.BustrakerNotificaciones ? '<div class="mu-popup__actions">' +
             '  <button type="button" class="mu-popup__btn-speak" data-speak="' + escapeHtml(titulo + ': ' + nombre) + '"><i class="fas fa-volume-high"></i> Escuchar por voz</button>' +
-            '</div></div>';
+            '</div>' : '') + '</div>';
     }
 
     /** Pin 3D profesional con radar de pulso y diseño de navegación. */
@@ -526,9 +522,9 @@
             '    <strong class="mu-popup__title">' + escapeHtml(nombre) + '</strong>' +
             '    ' + (nota ? '<p class="mu-popup__nota"><i class="fas fa-circle-info"></i> ' + escapeHtml(nota) + '</p>' : '') +
             '  </div>' +
-            '  <div class="mu-popup__actions">' +
+            (global.BustrakerNotificaciones ? '  <div class="mu-popup__actions">' +
             '    <button type="button" class="mu-popup__btn-speak" data-speak="' + escapeHtml(textoHablar) + '"><i class="fas fa-volume-high"></i> Escuchar por voz</button>' +
-            '  </div>' +
+            '  </div>' : '') +
             '</div>';
 
         return L.marker([lat, lng], { icon: icono, riseOnHover: true, keyboard: true, title: titulo + ': ' + nombre })
@@ -602,7 +598,7 @@
             '  <div class="mu-popup__actions">' +
             '    <button type="button" class="mu-popup__btn-action mu-popup__btn--orig" data-set-origin="' + escapeHtml(datos.barrio || nombreLimpio) + '"><i class="fas fa-play"></i> Origen (A)</button>' +
             '    <button type="button" class="mu-popup__btn-action mu-popup__btn--dest" data-set-dest="' + escapeHtml(datos.barrio || nombreLimpio) + '"><i class="fas fa-flag"></i> Destino (B)</button>' +
-            '    <button type="button" class="mu-popup__btn-speak" data-speak="' + escapeHtml(textoHablar) + '"><i class="fas fa-volume-high"></i> Escuchar</button>' +
+            (global.BustrakerNotificaciones ? '    <button type="button" class="mu-popup__btn-speak" data-speak="' + escapeHtml(textoHablar) + '"><i class="fas fa-volume-high"></i> Escuchar</button>' : '') +
             '  </div>' +
             '</div>';
 

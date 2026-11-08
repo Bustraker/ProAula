@@ -2,6 +2,7 @@ package com.proaula.aula.dto;
 
 import java.util.List;
 import java.util.Map;
+import com.proaula.aula.dto.modelos.PrioridadCoberturaResponse;
 
 public record ReportesAnalyticsResponse(
     long totalBuses,
@@ -23,7 +24,8 @@ public record ReportesAnalyticsResponse(
     Map<String, Long> incidentesPorEstado,
     List<Categoria> incidentesPorTipo,
     List<Categoria> rutasMasConsultadas,
-    List<ActividadMensual> actividadMensual
+    List<ActividadMensual> actividadMensual,
+    PrioridadCoberturaResponse prioridadCoberturaBarrios
 ) {
     public record Categoria(String nombre, long cantidad) {
     }

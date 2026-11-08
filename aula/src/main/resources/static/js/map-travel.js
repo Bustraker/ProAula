@@ -307,7 +307,7 @@
                 '  <div class="mu-popup__actions">' +
                 '    <button type="button" class="mu-popup__btn-action mu-popup__btn--orig" data-set-origin="' + M.escapeHtml(nombreLugar) + '"><i class="fas fa-play"></i> Fijar como Origen (A)</button>' +
                 '    <button type="button" class="mu-popup__btn-action mu-popup__btn--dest" data-set-dest="' + M.escapeHtml(nombreLugar) + '"><i class="fas fa-flag"></i> Fijar como Destino (B)</button>' +
-                '    <button type="button" class="mu-popup__btn-speak" data-speak="' + M.escapeHtml(textoVoz) + '"><i class="fas fa-volume-high"></i> Escuchar</button>' +
+                (global.BustrakerNotificaciones ? '    <button type="button" class="mu-popup__btn-speak" data-speak="' + M.escapeHtml(textoVoz) + '"><i class="fas fa-volume-high"></i> Escuchar</button>' : '') +
                 '  </div>' +
                 '</div>';
 
@@ -441,7 +441,9 @@
                 if (!n) return;
                 estado.barrios.push({
                     nombre: b.nombre, nombreN: n, lat: lat, lng: lng,
-                    coordenadaEstimada: b.coordenadaEstimada === true
+                    coordenadaEstimada: b.coordenadaEstimada === true,
+                    contextoDisponible: b.contextoDisponible === true,
+                    contexto: b.contexto || null
                 });
                 if (Number.isFinite(lat) && Number.isFinite(lng)) estado.coordenadas[n] = { lat: lat, lng: lng };
             });
@@ -809,15 +811,21 @@
         }
 
         function limpiarMensajePlanificador() {
-            el.plannerStatus.textContent = '';
-            el.plannerStatus.classList.remove('estado--error');
+            el.plannerStatus.textContent = 'Selecciona el origen y el destino para comparar rutas, transbordos y tiempos estimados.';
+            el.plannerStatus.classList.remove('estado--error', 'estado--warning', 'estado--ok');
+            el.plannerStatus.classList.add('estado--info');
             el.origen.removeAttribute('aria-invalid');
             el.destino.removeAttribute('aria-invalid');
         }
 
-        function mostrarErrorPlanificador(mensaje, campo) {
+        function mostrarEstadoPlanificador(mensaje, tipo) {
             el.plannerStatus.textContent = mensaje;
-            el.plannerStatus.classList.add('estado--error');
+            el.plannerStatus.classList.remove('estado--error', 'estado--warning', 'estado--ok', 'estado--info');
+            if (tipo) el.plannerStatus.classList.add('estado--' + tipo);
+        }
+
+        function mostrarErrorPlanificador(mensaje, campo) {
+            mostrarEstadoPlanificador(mensaje, 'error');
             if (campo) {
                 campo.setAttribute('aria-invalid', 'true');
                 campo.focus();
@@ -1111,6 +1119,7 @@
             el.resumenBusqueda.textContent = '';
 
             if (!estado.origen) {
+                mostrarEstadoPlanificador('Selecciona el origen y el destino para comparar rutas, transbordos y tiempos estimados.', 'info');
                 el.resultados.appendChild(estado.rutas.length
                     ? estadoVacio('fas fa-map-location-dot', 'Planifica tu viaje',
                         'Elige tu barrio de origen y destino para ver las rutas verificadas, sus paradas y los buses asignados.')
@@ -1119,14 +1128,17 @@
                 return;
             }
             if (!estado.destino) {
+                mostrarEstadoPlanificador('Listo: ya tienes el origen. Elige el destino para ver las opciones recomendadas.', 'info');
                 el.resultados.appendChild(estadoVacio('fas fa-location-dot', 'Ahora elige el destino',
                     'Te mostraremos las rutas disponibles ordenadas por transbordos y caminatas de conexión. La primera opción será la recomendada; selecciona otra para ver su recorrido en el mapa.'));
                 return;
             }
             if (!estado.tramos.length) {
+                var mensaje = 'No existe una combinación de rutas verificadas desde ' + mayuscula(nombreVisible(estado.origen)) +
+                    ' hasta ' + mayuscula(nombreVisible(estado.destino)) + '. Revisa el sentido del recorrido o prueba otra combinación.';
+                mostrarEstadoPlanificador(mensaje, 'warning');
                 var vacio = estadoVacio('fas fa-circle-xmark', 'No hay combinación de rutas',
-                    'No existe una combinación de rutas verificadas desde ' + mayuscula(nombreVisible(estado.origen)) +
-                    ' hasta ' + mayuscula(nombreVisible(estado.destino)) + '. Prueba con otros barrios o revisa el sentido del recorrido.');
+                    'No existe una combinación disponible con la información verificada del sistema para ese recorrido. Esto puede significar que la ruta no está confirmada, que el sentido no coincide o que el destino no se puede conectar con el origen.');
                 if (buscarTramos(estado.destino, estado.origen).length) {
                     var inverso = h('button', 'btn btn--secundario', 'Ver el sentido contrario');
                     inverso.type = 'button';
@@ -1142,7 +1154,7 @@
             var nombreRutas = recomendada.tramos.map(function (parte) {
                 return nombreRutaEnSentido(parte.ruta);
             }).join(' → ');
-            el.resumenBusqueda.textContent = estado.tramos.length + (estado.tramos.length === 1
+            var resumen = estado.tramos.length + (estado.tramos.length === 1
                 ? ' opción disponible. ' : ' opciones disponibles. ') +
                 'Recomendada: ' + nombreRutas + ' · ' +
                 barriosIntermedios + (barriosIntermedios === 1 ? ' barrio intermedio' : ' barrios intermedios') +
@@ -1151,18 +1163,18 @@
                         (recomendada.transbordos === 1 ? ' transbordo' : ' transbordos')
                     : ' · directa') +
                 '. Se priorizan menos transbordos, conexiones con paradas ubicables y menor distancia en línea recta entre paradas; luego, menos barrios intermedios. Esa distancia no representa una ruta peatonal. El mapa muestra la opción seleccionada; su tiempo es una estimación en auto, no el tiempo real del bus.';
-            el.resultados.appendChild(h('p', 'resultados__resumen', el.resumenBusqueda.textContent));
+            el.resumenBusqueda.textContent = resumen;
+            mostrarEstadoPlanificador('Se muestran ' + estado.tramos.length + ' opciones para este recorrido. La recomendación seleccionada es ' + nombreRutas + '.', 'ok');
+            el.resultados.appendChild(h('p', 'resultados__resumen', resumen));
             el.resultados.appendChild(h(
                 'p',
                 'resultados__riesgo-nota',
                 'Riesgo demostrativo con datos sintéticos: usa la hora actual, demanda simulada y una duración de referencia (5 min por barrio recorrido + 0,5 min por parada). No incluye semáforos, tráfico ni retrasos reales; no es una predicción operativa.'
             ));
-
             estado.tramos.forEach(function (tramo, indice) {
                 el.resultados.appendChild(crearTarjetaTramo(tramo, indice));
             });
         }
-
         function crearTarjetaTramo(tramo, indice) {
             var activa = estado.activo === tramo;
             var tarjeta = h('button', 'tramo' + (activa ? ' tramo--activo' : ''));
@@ -2288,14 +2300,12 @@
             var panel = el.panelInfo;
             vaciar(panel);
 
-            // ── Cards de información general ──────────────────
-            var secCards = h('div', 'info-seccion');
-            var titCards = h('div', 'info-seccion__titulo');
-            titCards.appendChild(icono('fas fa-circle-info'));
-            titCards.appendChild(document.createTextNode(' Información del servicio'));
-            secCards.appendChild(titCards);
+            var secContexto = h('div', 'info-seccion');
+            var titContexto = h('div', 'info-seccion__titulo');
+            titContexto.appendChild(icono('fas fa-map-location-dot'));
+            titContexto.appendChild(document.createTextNode(' Contexto territorial del viaje'));
+            secContexto.appendChild(titContexto);
 
-            var cards = h('div', 'info-cards');
             function infoCard(cls, label, valor, sub) {
                 var c = h('div', 'info-card ' + cls);
                 c.appendChild(h('span', 'info-card__label', label));
@@ -2303,12 +2313,75 @@
                 if (sub) c.appendChild(h('div', 'info-card__sub', sub));
                 return c;
             }
-            cards.appendChild(infoCard('info-card--tarifa', 'Tarifa', '$3.000', 'Tarifa ordinaria COP'));
-            cards.appendChild(infoCard('info-card--hora',   'Horario', '5:00 – 22:30', 'Lun–Sáb aprox.'));
-            cards.appendChild(infoCard('info-card--frec',   'Frecuencia', '8–12 min', 'Entre unidades'));
-            cards.appendChild(infoCard('info-card--acc',    'Accesibilidad', '♿ Parcial', 'Según unidad'));
-            secCards.appendChild(cards);
-            panel.appendChild(secCards);
+
+            var primerTramo = tramo.tramos[0];
+            var ultimoTramo = tramo.tramos[tramo.tramos.length - 1];
+            var zonas = [
+                { tipo: 'Origen', nombre: primerTramo.barrios[0] },
+                { tipo: 'Destino', nombre: ultimoTramo.barrios[ultimoTramo.barrios.length - 1] }
+            ];
+            var formatoEntero = new Intl.NumberFormat('es-CO');
+            var formatoDecimal = new Intl.NumberFormat('es-CO', { maximumFractionDigits: 1 });
+            zonas.forEach(function (zona) {
+                var zonaDatos = estado.barrios.find(function (barrio) {
+                    return barrio.nombreN === normalizar(zona.nombre);
+                });
+                var encabezado = h('div', 'info-seccion__titulo', zona.tipo + ' · ' + mayuscula(zona.nombre));
+                secContexto.appendChild(encabezado);
+
+                if (!zonaDatos || !zonaDatos.contexto) {
+                    var sinDatos = !zonaDatos
+                        ? 'No hay una ficha de barrio cargada para este extremo del viaje.'
+                        : zonaDatos.contextoDisponible
+                            ? 'Este barrio no aparece en la tabla oficial aportada.'
+                            : 'No se pudieron cargar los datos territoriales en este momento.';
+                    secContexto.appendChild(h('p', 'nota', sinDatos));
+                    return;
+                }
+
+                var contexto = zonaDatos.contexto;
+                var tarjetas = h('div', 'info-cards');
+                function mostrarNumero(valor, formato, unidad) {
+                    return valor == null || !Number.isFinite(Number(valor))
+                        ? 'Sin dato'
+                        : formato.format(Number(valor)) + (unidad ? ' ' + unidad : '');
+                }
+                tarjetas.appendChild(infoCard(
+                    'info-card--territorio',
+                    'Población registrada',
+                    mostrarNumero(contexto.poblacion, formatoEntero, 'personas')));
+                tarjetas.appendChild(infoCard(
+                    'info-card--territorio',
+                    'Área reportada',
+                    mostrarNumero(contexto.areaHectareas, formatoDecimal, 'ha')));
+                tarjetas.appendChild(infoCard(
+                    'info-card--territorio',
+                    'Densidad derivada',
+                    mostrarNumero(contexto.densidadHabitantesHa, formatoDecimal, 'hab./ha')));
+                tarjetas.appendChild(infoCard(
+                    'info-card--territorio',
+                    'Hogares / viviendas',
+                    mostrarNumero(contexto.hogares, formatoEntero, '') + ' / ' +
+                        mostrarNumero(contexto.viviendas, formatoEntero, ''),
+                    'Hogares y viviendas registradas'));
+                secContexto.appendChild(tarjetas);
+                if (contexto.localidadOficial) {
+                    secContexto.appendChild(h('p', 'info-card__sub', 'Localidad: ' + contexto.localidadOficial));
+                }
+            });
+
+            var notaContexto = h(
+                'p',
+                'nota',
+                'Cifras territoriales del archivo oficial aportado. El archivo no identifica el año de medición; ' +
+                    'estos datos no son conteos en tiempo real ni se utilizan para calcular llegadas o retrasos.');
+            secContexto.appendChild(notaContexto);
+            var fuenteContexto = h('a', 'enlace', 'Consultar fuente de datos abiertos (ID 7ukm-gc2c)');
+            fuenteContexto.href = 'https://www.datos.gov.co/d/7ukm-gc2c';
+            fuenteContexto.target = '_blank';
+            fuenteContexto.rel = 'noopener noreferrer';
+            secContexto.appendChild(fuenteContexto);
+            panel.appendChild(secContexto);
 
             // ── Pasos del itinerario ──────────────────────────
             var secPasos = h('div', 'info-seccion');

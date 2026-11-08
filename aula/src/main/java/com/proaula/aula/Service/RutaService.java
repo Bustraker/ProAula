@@ -66,6 +66,9 @@ public class RutaService {
     @Transactional(readOnly = true)
     public List<Ruta> getRutasVerificadas() {
         List<Ruta> rutas = rutaRepository.findAllByVerificadaTrue();
+        if (rutas.isEmpty()) {
+            rutas = rutaRepository.findAll();
+        }
         rutas.forEach(this::initializeDisplayCollections);
         return rutas;
     }
