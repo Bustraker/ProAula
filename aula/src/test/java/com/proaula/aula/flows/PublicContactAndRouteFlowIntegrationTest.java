@@ -24,6 +24,7 @@ import com.proaula.aula.Entity.RutaParada;
 import com.proaula.aula.Entity.Parada;
 import com.proaula.aula.Entity.Agencia;
 import com.proaula.aula.Entity.Bus;
+import com.proaula.aula.Entity.ContactoMensaje;
 import com.proaula.aula.Repository.AgenciaRepository;
 import com.proaula.aula.Repository.BusRepository;
 import com.proaula.aula.Repository.ContactoMensajeRepository;
@@ -78,6 +79,36 @@ class PublicContactAndRouteFlowIntegrationTest {
         assertThat(contactoMensajeRepository.count()).isEqualTo(mensajesAntes + 1);
         assertThat(contactoMensajeRepository.findAll())
                 .anySatisfy(mensaje -> assertThat(mensaje.getEmail()).isEqualTo("ana@example.test"));
+    }
+
+    @Test
+    @org.springframework.transaction.annotation.Transactional
+    void publicContactEndpointCannotOverwriteAnExistingMessageById() throws Exception {
+        ContactoMensaje existing = new ContactoMensaje();
+        existing.setNombre("Nombre original");
+        existing.setApellido("Apellido original");
+        existing.setTelefono("3005550101");
+        existing.setEmail("original@example.test");
+        existing.setMensaje("Contenido original");
+        existing = contactoMensajeRepository.saveAndFlush(existing);
+        Long existingId = existing.getId();
+        long messageCount = contactoMensajeRepository.count();
+
+        mockMvc.perform(post("/contacto")
+                        .with(csrf())
+                        .param("id", existingId.toString())
+                        .param("nombre", "Nombre atacante")
+                        .param("apellido", "Apellido atacante")
+                        .param("telefono", "3005550199")
+                        .param("email", "attacker@example.test")
+                        .param("mensaje", "Contenido modificado"))
+                .andExpect(status().is3xxRedirection());
+
+        ContactoMensaje unchanged = contactoMensajeRepository.findById(existingId).orElseThrow();
+        assertThat(unchanged.getNombre()).isEqualTo("Nombre original");
+        assertThat(unchanged.getEmail()).isEqualTo("original@example.test");
+        assertThat(unchanged.getMensaje()).isEqualTo("Contenido original");
+        assertThat(contactoMensajeRepository.count()).isEqualTo(messageCount + 1);
     }
 
     @Test
@@ -200,7 +231,8 @@ class PublicContactAndRouteFlowIntegrationTest {
         assertThat(routeJson).doesNotContain("Ruta provisional " + suffix);
 
         String editorHtml = mockMvc.perform(get("/editar-ruta/{id}", rutaGuardada.getId())
-                        .with(user("admin").roles("ADMIN")))
+                        .with(user("admin").roles("ADMIN"))
+                        .sessionAttr("rolUsuario", "ADMIN"))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         assertThat(editorHtml).contains("Orden pendiente de confirmar", "Zona provisional A " + suffix);

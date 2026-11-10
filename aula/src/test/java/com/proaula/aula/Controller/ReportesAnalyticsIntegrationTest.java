@@ -14,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -26,9 +27,10 @@ class ReportesAnalyticsIntegrationTest {
     private MockMvc mockMvc;
 
     @Test
-    @WithMockUser(roles = "ADMIN")
     void indicatorsEndpointReturnsCurrentAggregatesWithoutCaching() throws Exception {
-        mockMvc.perform(get("/api/admin/reportes/indicadores"))
+        mockMvc.perform(get("/api/admin/reportes/indicadores")
+                        .with(SecurityMockMvcRequestPostProcessors.user("admin").roles("ADMIN"))
+                        .sessionAttr("rolUsuario", "ADMIN"))
                 .andExpect(status().isOk())
                 .andExpect(header().string(HttpHeaders.CACHE_CONTROL,
                         containsString("no-store")))
@@ -46,9 +48,10 @@ class ReportesAnalyticsIntegrationTest {
     }
 
     @Test
-    @WithMockUser(roles = "ADMIN")
     void reportsPageIncludesAnalyticsDashboard() throws Exception {
-        mockMvc.perform(get("/reportes"))
+        mockMvc.perform(get("/reportes")
+                        .with(SecurityMockMvcRequestPostProcessors.user("admin").roles("ADMIN"))
+                        .sessionAttr("rolUsuario", "ADMIN"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("id=\"chartActivity\"")))
                 .andExpect(content().string(containsString("id=\"coveragePriorityChart\"")))

@@ -13,6 +13,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.proaula.aula.Entity.ContactoMensaje;
 import com.proaula.aula.Service.ContactoMensajeService;
+import com.proaula.aula.dto.ContactoMensajeDto;
 
 @Controller
 @RequestMapping("/contacto")
@@ -30,9 +31,15 @@ public class ContactoController {
     }
 
     @PostMapping
-    public String guardarMensaje(@ModelAttribute ContactoMensaje contactoMensaje,
+    public String guardarMensaje(@ModelAttribute ContactoMensajeDto contactoMensajeDto,
                                  RedirectAttributes redirectAttrs,
                                  Authentication authentication) {
+        ContactoMensaje contactoMensaje = new ContactoMensaje();
+        contactoMensaje.setNombre(contactoMensajeDto.getNombre());
+        contactoMensaje.setApellido(contactoMensajeDto.getApellido());
+        contactoMensaje.setTelefono(contactoMensajeDto.getTelefono());
+        contactoMensaje.setEmail(contactoMensajeDto.getEmail());
+        contactoMensaje.setMensaje(contactoMensajeDto.getMensaje());
         contactoMensajeService.guardarMensaje(contactoMensaje);
         redirectAttrs.addFlashAttribute("mensaje", "Gracias por tu mensaje. Nos pondremos en contacto contigo pronto.");
 

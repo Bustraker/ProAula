@@ -39,12 +39,15 @@ class AdminRouteFlowIntegrationTest {
         mockMvc.perform(get("/rutas/admin").with(user("ordinary-user").roles("USER")))
                 .andExpect(status().isForbidden());
 
-        mockMvc.perform(get("/rutas/admin").with(user("route-admin").roles("ADMIN")))
+        mockMvc.perform(get("/rutas/admin")
+                        .with(user("route-admin").roles("ADMIN"))
+                        .sessionAttr("rolUsuario", "ADMIN"))
                 .andExpect(status().isOk());
 
         long rutasAntes = rutaRepository.count();
         mockMvc.perform(post("/rutas")
                         .with(user("route-admin").roles("ADMIN"))
+                        .sessionAttr("rolUsuario", "ADMIN")
                         .with(csrf())
                         .param("nombre", "Ruta Creada por Admin")
                         .param("origen", "Centro")

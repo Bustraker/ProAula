@@ -113,6 +113,32 @@ class CustomOAuth2UserServiceTest {
     }
 
     @Test
+    void doesNotLinkAnExistingLocalAccountToGoogleByEmailAlone() {
+        Usuario existingLocalAccount = new Usuario();
+        existingLocalAccount.setUsername("existing-user");
+        existingLocalAccount.setEmail("person@example.test");
+        existingLocalAccount.setProvider("LOCAL");
+        existingLocalAccount.setPassword("encoded-password");
+        when(usuarioRepository.findByEmail("person@example.test")).thenReturn(existingLocalAccount);
+        OAuth2User user = oauth2User(Map.of(
+            "id", "google-user-id",
+            "sub", "google-user-id",
+            "email", "person@example.test",
+            "email_verified", true,
+            "given_name", "Person"
+        ));
+
+        assertThatThrownBy(() -> customOAuth2UserService.processOAuth2User(
+            userRequest("google"), user))
+            .isInstanceOf(OAuth2AuthenticationException.class);
+
+        assertThat(existingLocalAccount.getProvider()).isEqualTo("LOCAL");
+        assertThat(existingLocalAccount.getProviderId()).isNull();
+        verify(usuarioRepository, never()).save(any(Usuario.class));
+        verify(usuarioService, never()).register(any(Usuario.class));
+    }
+
+    @Test
     void createsGoogleAccountWithFallbackWhenProfileOmitsFamilyName() {
         OAuth2User user = oauth2User(Map.of(
             "id", "google-user-id",

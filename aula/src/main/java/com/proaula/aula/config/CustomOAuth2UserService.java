@@ -86,13 +86,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         }
         Usuario usuario = usuarioRepository.findByProviderAndProviderId(
             registrationId.toUpperCase(Locale.ROOT), providerId);
-        if (usuario == null && !"facebook".equals(registrationId)) {
+        if (usuario == null) {
             usuario = usuarioRepository.findByEmail(email);
-        }
-        if (usuario == null && "facebook".equals(registrationId)
-                && usuarioRepository.existsByEmail(email)) {
-            throw new OAuth2AuthenticationException(
-                "El correo de Facebook ya pertenece a otra cuenta; inicia sesión con esa cuenta para evitar vincularla sin verificación");
+            if (usuario != null || ("facebook".equals(registrationId)
+                    && usuarioRepository.existsByEmail(email))) {
+                throw new OAuth2AuthenticationException(
+                    "El correo ya pertenece a otra cuenta; inicia sesión con esa cuenta antes de vincular un proveedor externo");
+            }
         }
         if (usuario == null) {
             usuario = createUsuarioFromOAuth2User(oauth2User, registrationId, email);

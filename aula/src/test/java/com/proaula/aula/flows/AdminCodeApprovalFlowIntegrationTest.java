@@ -63,6 +63,35 @@ class AdminCodeApprovalFlowIntegrationTest {
     private org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder passwordEncoder;
 
     @Test
+    void regularAdminRoleDoesNotBypassTheAdminCodeGate() throws Exception {
+        Usuario administrator = new Usuario();
+        administrator.setUsername("admin-bypass");
+        administrator.setEmail("admin-bypass@example.test");
+        administrator.setPassword(passwordEncoder.encode("admin-password-26"));
+        administrator.setNombres("Admin");
+        administrator.setApellidos("Prueba");
+        administrator.setRole("ROLE_ADMIN");
+        usuarioRepository.saveAndFlush(administrator);
+
+        MvcResult login = mockMvc.perform(post("/login")
+                .with(csrf())
+                .param("username", "admin-bypass")
+                .param("password", "admin-password-26"))
+            .andExpect(status().is3xxRedirection())
+            .andReturn();
+
+        mockMvc.perform(get("/api/admin/reportes/indicadores")
+                .session((org.springframework.mock.web.MockHttpSession) login.getRequest().getSession(false)))
+            .andExpect(status().isForbidden());
+
+        mockMvc.perform(get("/api/admin/reportes/indicadores")
+                .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user(
+                    "elevated-admin").roles("ADMIN"))
+                .sessionAttr("rolUsuario", "ADMIN"))
+            .andExpect(status().isOk());
+    }
+
+    @Test
     void adminLoginRecognizesOnlyCodesPersistedInTheDatabase() throws Exception {
         String savedCode = "db-admin-code";
         adminCodeService.ensureDefaultAdminCodes(java.util.List.of(savedCode));
@@ -270,7 +299,8 @@ class AdminCodeApprovalFlowIntegrationTest {
     void adminDecisionPostWithoutCsrfTokenIsRejected() throws Exception {
         mockMvc.perform(post("/admin/solicitudes-codigo/1/aprobar")
                 .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user(
-                    "not-the-approver").roles("ADMIN")))
+                    "not-the-approver").roles("ADMIN"))
+                .sessionAttr("rolUsuario", "ADMIN"))
             .andExpect(status().isForbidden());
     }
 }

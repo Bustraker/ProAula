@@ -127,13 +127,15 @@ class LlegadaBusApiIntegrationTest {
     @Test
     void administradorPuedeRegistrarCoordenadasDeUnaParadaSinModificarOtrosDatos() throws Exception {
         mockMvc.perform(get("/admin/coordenadas-paradas")
-                .with(user("admin-prueba").roles("ADMIN")))
+                .with(user("admin-prueba").roles("ADMIN"))
+                .sessionAttr("rolUsuario", "ADMIN"))
             .andExpect(status().isOk())
             .andExpect(content().string(containsString("Coordenadas registradas")))
             .andExpect(content().string(containsString("Capturar GPS aquí")));
 
         mockMvc.perform(post("/admin/paradas/{id}/coordenadas", paradaCentro.getId())
                 .with(user("admin-prueba").roles("ADMIN"))
+                .sessionAttr("rolUsuario", "ADMIN")
                 .with(csrf())
                 .param("latitud", "10.401234")
                 .param("longitud", "-75.501234"))
