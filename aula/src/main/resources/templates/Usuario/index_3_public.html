@@ -13,9 +13,9 @@
     <title>Bustraker | Rutas y movilidad en Cartagena</title>
     <link rel="stylesheet" th:href="@{/css/style_3.css}">
     <link rel="stylesheet" th:href="@{/css/style_contacto_public.css}">
-    <link rel="stylesheet" th:href="@{/css/public-home.css(v='green-13')}">
+    <link rel="stylesheet" th:href="@{/css/public-home.css(v='cartagena-contacto-15')}">
     <link rel="icon" th:href="@{/images/logo.png}" type="image/png">
-    <script th:src="@{/js/index_3_public.js(v='route-map-2')}" defer></script>
+    <script th:src="@{/js/index_3_public.js(v='route-map-3')}" defer></script>
 </head>
 <body class="public-home">
     <div class="site-grid public-page">
@@ -41,24 +41,106 @@
                     </div>
                     <p class="hero-caption"><span aria-hidden="true">✳</span> Planifica tu recorrido sin iniciar sesión. La consulta básica es gratuita y está pensada para Cartagena.</p>
                 </div>
-                <div class="hero-visual" aria-label="Ilustración de una buseta y un mapa de rutas de Cartagena">
+                <div class="hero-visual" aria-label="Visualización animada de rutas, barrios y paradas de Cartagena">
                     <div class="route-scene">
                         <div class="scene-heading">
                             <span class="scene-kicker"><span aria-hidden="true"></span> MOVILIDAD LOCAL</span>
                             <span class="scene-city">CARTAGENA <b>·</b> BOLÍVAR</span>
                         </div>
+                        <div class="scene-route-key" aria-hidden="true">
+                            <span class="scene-route-key-dot"></span>
+                            <span>ATLAS VIVO · CARTAGENA</span>
+                            <span class="scene-route-key-divider"></span>
+                            <span class="scene-route-key-origin">A</span>
+                            <span>ORIGEN</span>
+                            <span class="scene-route-key-destination">B</span>
+                            <span>DESTINO</span>
+                        </div>
+                        <div class="scene-route-readout" aria-hidden="true">
+                            <span class="scene-readout-wave"><i></i><i></i><i></i><i></i></span>
+                            <span class="scene-readout-copy"><b>RED URBANA</b><small>Explora tus conexiones</small></span>
+                            <span class="scene-readout-count"><b>03</b><small>RUTAS</small></span>
+                        </div>
                         <svg class="scene-map" viewBox="0 0 620 470" aria-hidden="true">
+                            <path class="map-bay" d="M25 92 C83 70 127 80 165 103 C207 129 222 167 274 171 C325 176 359 149 401 165 C444 182 475 223 531 216 C562 212 586 195 608 181 L608 255 C556 272 519 277 471 262 C417 245 385 216 337 221 C291 226 254 259 205 244 C154 228 130 187 86 178 C59 173 40 180 20 192 Z"></path>
+                            <path class="map-shoreline" d="M28 91 C87 68 128 81 167 104 C209 129 223 168 274 172 C324 176 358 149 401 165 C446 182 475 223 531 216 C562 212 585 196 608 181"></path>
+                            <path class="map-water-current map-water-current--one" d="M30 119 C90 97 131 111 169 135 C211 161 228 195 278 198 C327 202 363 175 404 191 C451 209 480 247 535 242 C563 239 584 226 605 213"></path>
+                            <path class="map-water-current map-water-current--two" d="M35 145 C91 126 130 140 166 162 C205 186 225 220 272 225 C319 231 356 201 398 218 C443 237 474 272 526 270"></path>
                             <path class="map-coastline" d="M40 95 C135 34 196 80 255 46 S390 44 435 88 S532 123 586 76 M19 360 C112 313 171 376 244 337 S354 305 421 347 S527 389 605 337"></path>
                             <path class="map-street" d="M22 170 C102 132 155 193 225 157 S350 120 404 169 S506 220 602 178 M32 258 C119 214 169 270 245 236 S368 207 431 248 S530 286 596 254 M112 25 C92 104 154 144 123 220 S91 347 154 438 M310 22 C272 108 340 162 300 225 S264 352 319 445 M490 30 C443 106 506 160 473 229 S451 354 512 433"></path>
+                            <g class="map-district map-district--one" aria-hidden="true">
+                                <path d="M220 107h24v13h-24zM249 101h19v19h-19zM274 108h16v12h-16zM231 126h19v14h-19zM255 126h28v12h-28z"></path>
+                                <text x="220" y="96">CENTRO</text>
+                            </g>
+                            <g class="map-district map-district--two" aria-hidden="true">
+                                <path d="M382 310h18v14h-18zM405 304h24v20h-24zM434 311h17v13h-17zM391 329h25v14h-25zM421 330h22v15h-22z"></path>
+                                <text x="383" y="296">GETSEMANÍ</text>
+                            </g>
+                            <g class="map-island" aria-hidden="true">
+                                <path d="M474 88c12-12 30-13 42-4 9 7 11 18 2 24-11 7-35 3-44-5-5-4-5-10 0-15Z"></path>
+                                <circle cx="488" cy="93" r="2"></circle>
+                                <circle cx="502" cy="100" r="2.4"></circle>
+                                <circle cx="511" cy="91" r="1.7"></circle>
+                            </g>
                             <path class="map-route-shadow" d="M76 325 C129 285 157 291 207 254 S286 213 333 236 S413 287 464 227 S517 161 548 130"></path>
-                            <path class="map-route" d="M76 325 C129 285 157 291 207 254 S286 213 333 236 S413 287 464 227 S517 161 548 130"></path>
+                            <path class="map-route-branch map-route-branch--north" pathLength="1" d="M76 325 C118 240 175 220 234 230 S334 188 384 195 S490 179 548 130"></path>
+                            <path class="map-route-branch map-route-branch--south" pathLength="1" d="M76 325 C140 355 194 345 239 310 S321 286 365 265 S448 232 548 130"></path>
+                            <path class="map-route" pathLength="1" d="M76 325 C129 285 157 291 207 254 S286 213 333 236 S413 287 464 227 S517 161 548 130"></path>
+                            <path class="map-route-glow" d="M76 325 C129 285 157 291 207 254 S286 213 333 236 S413 287 464 227 S517 161 548 130"></path>
+                            <circle class="map-stop-ring map-stop-ring--start" cx="76" cy="325" r="13"></circle>
+                            <circle class="map-stop-ring map-stop-ring--mid" cx="333" cy="236" r="10"></circle>
+                            <circle class="map-stop-ring map-stop-ring--end" cx="548" cy="130" r="13"></circle>
                             <circle class="map-stop map-stop--start" cx="76" cy="325" r="9"></circle>
                             <circle class="map-stop map-stop--mid" cx="333" cy="236" r="6"></circle>
                             <circle class="map-stop map-stop--end" cx="548" cy="130" r="9"></circle>
                         </svg>
+                        <svg class="scene-map scene-map--activity" viewBox="0 0 620 470" aria-hidden="true" focusable="false">
+                            <g class="route-runner route-runner--main" aria-hidden="true">
+                                <circle class="route-runner-halo" r="13"></circle>
+                                <circle class="route-runner-core" r="4.5"></circle>
+                                <animateMotion dur="6.8s" repeatCount="indefinite" rotate="auto"
+                                               path="M76 325 C129 285 157 291 207 254 S286 213 333 236 S413 287 464 227 S517 161 548 130"></animateMotion>
+                            </g>
+                            <g class="route-runner route-runner--north" aria-hidden="true">
+                                <circle class="route-runner-halo" r="9"></circle>
+                                <circle class="route-runner-core" r="3.5"></circle>
+                                <animateMotion dur="9s" begin="1.2s" repeatCount="indefinite" rotate="auto"
+                                               path="M76 325 C118 240 175 220 234 230 S334 188 384 195 S490 179 548 130"></animateMotion>
+                            </g>
+                            <g class="route-runner route-runner--south" aria-hidden="true">
+                                <circle class="route-runner-halo" r="8"></circle>
+                                <circle class="route-runner-core" r="3"></circle>
+                                <animateMotion dur="10s" begin="2.8s" repeatCount="indefinite" rotate="auto"
+                                               path="M76 325 C140 355 194 345 239 310 S321 286 365 265 S448 232 548 130"></animateMotion>
+                            </g>
+                            <g class="route-minibus" aria-hidden="true">
+                                <g transform="translate(-17 -10)">
+                                    <path class="route-minibus-body" d="M2 5Q2 2 6 2h20q4 0 5 4l3 11H2Z"></path>
+                                    <path class="route-minibus-window" d="M7 5h7v7H5zM17 5h8q2 0 3 3l1 4H17z"></path>
+                                    <path class="route-minibus-door" d="M17 14h7v3h-7z"></path>
+                                    <circle class="route-minibus-wheel" cx="9" cy="19" r="3"></circle>
+                                    <circle class="route-minibus-wheel" cx="27" cy="19" r="3"></circle>
+                                    <circle class="route-minibus-hub" cx="9" cy="19" r="1"></circle>
+                                    <circle class="route-minibus-hub" cx="27" cy="19" r="1"></circle>
+                                    <path class="route-minibus-light" d="M2 13h3M32 13h2"></path>
+                                </g>
+                                <animateMotion dur="15s" begin="1.5s" repeatCount="indefinite" rotate="auto"
+                                               path="M76 325 C129 285 157 291 207 254 S286 213 333 236 S413 287 464 227 S517 161 548 130"></animateMotion>
+                            </g>
+                        </svg>
+                        <span class="scene-radar" aria-hidden="true"></span>
+                        <span class="scene-scan" aria-hidden="true"></span>
+                        <div class="scene-compass" aria-hidden="true">
+                            <span>N</span>
+                            <svg viewBox="0 0 40 48" focusable="false">
+                                <path class="compass-needle compass-needle--north" d="M20 3 26 23 20 19 14 23Z"></path>
+                                <path class="compass-needle compass-needle--south" d="m20 45-6-21 6 4 6-4Z"></path>
+                                <circle cx="20" cy="24" r="3"></circle>
+                            </svg>
+                        </div>
                         <div class="scene-origin"><span>INICIO</span><strong>Tu barrio</strong></div>
                         <div class="scene-destination"><span>DESTINO</span><strong>Tu próximo lugar</strong></div>
-                        <div class="scene-bus">
+                        <div class="scene-bus" aria-hidden="true">
                             <span class="scene-bus-glow"></span>
                             <img th:src="@{/images/Bus_palmera.png}" alt="Buseta ilustrada entre palmeras">
                         </div>
@@ -140,7 +222,51 @@
                 <div class="city-story-art" aria-hidden="true">
                     <span class="city-story-orbit city-story-orbit--one"></span>
                     <span class="city-story-orbit city-story-orbit--two"></span>
-                    <span class="city-story-route"></span>
+                    <svg class="city-story-landmark" viewBox="0 0 450 450" focusable="false">
+                        <defs>
+                            <linearGradient id="story-house-fill" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0" stop-color="#b9ef9c" stop-opacity=".24"></stop>
+                                <stop offset="1" stop-color="#4dcc9a" stop-opacity=".08"></stop>
+                            </linearGradient>
+                            <linearGradient id="story-sea-fill" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0" stop-color="#43d8b5" stop-opacity=".12"></stop>
+                                <stop offset="1" stop-color="#0e8b78" stop-opacity=".02"></stop>
+                            </linearGradient>
+                        </defs>
+                        <circle class="story-sun" cx="335" cy="275" r="43"></circle>
+                        <path class="story-sea" d="M0 326q56-14 112 0t112 0 112 0 114 0v124H0Z"></path>
+                        <path class="story-sea-line story-sea-line--one" d="M16 341q31-9 62 0t62 0 62 0 62 0"></path>
+                        <path class="story-sea-line story-sea-line--two" d="M245 358q30-8 60 0t60 0 62 0"></path>
+                        <g class="story-walled-city">
+                            <path class="story-wall" d="M34 363v-19h23v-9h19v10h21v-13h22v12h17v-8h23v10h20v-13h19v12h20v-9h22v10h19v-14h22v12h20v-9h18v12h21v-11h18v20Z"></path>
+                            <path class="story-house" d="M43 343v-42l27-19 27 19v42Z"></path>
+                            <path class="story-house-detail" d="M39 301h62l-31-23Zm16 42v-19h10v19m16 0v-19h10v19"></path>
+                            <path class="story-house" d="M291 342v-49l25-18 25 18v49Z"></path>
+                            <path class="story-house-detail" d="M287 294h58l-29-22Zm13 48v-20h10v20m15 0v-20h10v20"></path>
+                            <path class="story-tower" d="M171 351v-66h13v-17l19-17 19 17v17h13v66Z"></path>
+                            <path class="story-tower-detail" d="M166 286h74M177 277h48m-36-9 14-13 14 13"></path>
+                            <circle class="story-clock" cx="203" cy="303" r="10"></circle>
+                            <path class="story-clock-hands" d="M203 297v7l5 3"></path>
+                            <path class="story-tower-arch" d="M194 351v-22a9 9 0 0 1 18 0v22"></path>
+                            <path class="story-building-detail" d="M50 313h7m19 0h7m219 0h7m18 0h7"></path>
+                        </g>
+                        <g class="story-palm">
+                            <path class="story-palm-trunk" d="M378 366q-5-33 10-66"></path>
+                            <path class="story-palm-leaves" d="M388 300q-1-24-20-35 22 3 26 29 5-28 27-35-16 13-21 38 17-22 39-17-24 5-42 25 22-9 37 2-23-4-43 5"></path>
+                        </g>
+                        <path class="story-route-track" d="M90 122C136 45 252 34 319 75s55 112 48 223"></path>
+                        <path class="story-route-light" pathLength="1" d="M90 122C136 45 252 34 319 75s55 112 48 223"></path>
+                        <g class="story-route-bus">
+                            <g transform="translate(-13 -7)">
+                                <path class="story-bus-body" d="M2 4q0-2 3-2h15q3 0 4 3l2 9H2Z"></path>
+                                <path class="story-bus-window" d="M6 4h5v5H5Zm8 0h5q2 0 3 3v2h-8Z"></path>
+                                <circle class="story-bus-wheel" cx="7" cy="15" r="2"></circle>
+                                <circle class="story-bus-wheel" cx="21" cy="15" r="2"></circle>
+                            </g>
+                            <animateMotion dur="12s" begin="0.5s" repeatCount="indefinite" rotate="auto"
+                                           path="M90 122C136 45 252 34 319 75s55 112 48 223"></animateMotion>
+                        </g>
+                    </svg>
                     <span class="city-story-pin city-story-pin--one"></span>
                     <span class="city-story-pin city-story-pin--two"></span>
                     <span class="city-story-city">CTG</span>
@@ -273,14 +399,57 @@
                     <p>¿Encontraste un dato que debemos revisar o tienes una pregunta? Cuéntanos y deja una forma de contactarte.</p>
 
                     <div class="contact-signal" aria-hidden="true">
-                        <span class="contact-signal-orbit contact-signal-orbit--outer"></span>
-                        <span class="contact-signal-orbit contact-signal-orbit--inner"></span>
-                        <span class="contact-signal-core">✳</span>
-                        <span class="contact-signal-line contact-signal-line--one"></span>
-                        <span class="contact-signal-line contact-signal-line--two"></span>
-                        <span class="contact-signal-node contact-signal-node--one"></span>
-                        <span class="contact-signal-node contact-signal-node--two"></span>
-                        <span class="contact-signal-stamp">MENSAJE<br>EN CAMINO</span>
+                        <svg class="contact-signal-map" viewBox="0 0 340 126" focusable="false">
+                            <defs>
+                                <linearGradient id="contact-water-gradient" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0" stop-color="#35cda1" stop-opacity=".2"></stop>
+                                    <stop offset="1" stop-color="#087b68" stop-opacity=".03"></stop>
+                                </linearGradient>
+                                <radialGradient id="contact-beacon-gradient">
+                                    <stop offset="0" stop-color="#d7f36a" stop-opacity=".28"></stop>
+                                    <stop offset="1" stop-color="#d7f36a" stop-opacity="0"></stop>
+                                </radialGradient>
+                            </defs>
+                            <path class="contact-map-water" d="M0 85q42-13 84 0t84 0 84 0 88 0v41H0Z"></path>
+                            <path class="contact-map-wave contact-map-wave--one" d="M5 94q20-6 40 0t40 0 40 0"></path>
+                            <path class="contact-map-wave contact-map-wave--two" d="M205 105q19-6 38 0t38 0 38 0"></path>
+                            <g class="contact-map-city">
+                                <path class="contact-map-wall" d="M8 87v-8h24v-7h20v9h21v-11h22v12h17v-8h22v14Z"></path>
+                                <path class="contact-map-house" d="M18 77V53l16-12 16 12v24Z"></path>
+                                <path class="contact-map-house-detail" d="M15 54h38L34 40Zm10 23V65h7v12m8 0V65h7v12"></path>
+                                <path class="contact-map-tower" d="M145 85V54h8V42l11-10 11 10v12h8v31Z"></path>
+                                <path class="contact-map-tower-detail" d="M142 55h44m-35-5h26m-19-9 6-6 6 6"></path>
+                                <circle class="contact-map-clock" cx="164" cy="64" r="5"></circle>
+                                <path class="contact-map-clock-hand" d="M164 61v3l2 1"></path>
+                                <path class="contact-map-arch" d="M159 85V75a5 5 0 0 1 10 0v10"></path>
+                                <path class="contact-map-house" d="M268 84V60l15-11 15 11v24Z"></path>
+                                <path class="contact-map-house-detail" d="M265 60h36l-18-14Zm10 24V69h7v15m7 0V69h7v15"></path>
+                            </g>
+                            <path class="contact-route-track" d="M26 96C75 96 87 57 128 63s51 31 76 12 53-18 110-18"></path>
+                            <path class="contact-route-flow" pathLength="1" d="M26 96C75 96 87 57 128 63s51 31 76 12 53-18 110-18"></path>
+                            <circle class="contact-route-origin" cx="26" cy="96" r="4"></circle>
+                            <circle class="contact-beacon-halo" cx="164" cy="63" r="31"></circle>
+                            <circle class="contact-beacon-ring contact-beacon-ring--one" cx="164" cy="63" r="17"></circle>
+                            <circle class="contact-beacon-ring contact-beacon-ring--two" cx="164" cy="63" r="17"></circle>
+                            <circle class="contact-beacon" cx="164" cy="63" r="14"></circle>
+                            <path class="contact-beacon-icon" d="M158 60h12v8h-7l-4 3v-3h-1Z"></path>
+                            <circle class="contact-beacon-dot" cx="161" cy="64" r="0.8"></circle>
+                            <circle class="contact-beacon-dot" cx="164" cy="64" r="0.8"></circle>
+                            <circle class="contact-beacon-dot" cx="167" cy="64" r="0.8"></circle>
+                            <g class="contact-route-bus">
+                                <g transform="translate(-10 -6)">
+                                    <path class="contact-bus-body" d="M1 3q0-2 2-2h12q2 0 3 3l2 7H1Z"></path>
+                                    <path class="contact-bus-window" d="M4 3h4v4H3Zm6 0h4q2 0 2 3v1h-6Z"></path>
+                                    <circle class="contact-bus-wheel" cx="5" cy="12" r="1.7"></circle>
+                                    <circle class="contact-bus-wheel" cx="16" cy="12" r="1.7"></circle>
+                                </g>
+                                <animateMotion dur="9s" begin="0.3s" repeatCount="indefinite" rotate="auto"
+                                               path="M26 96C75 96 87 57 128 63s51 31 76 12 53-18 110-18"></animateMotion>
+                            </g>
+                            <text class="contact-map-label contact-map-label--origin" x="11" y="107">TU BARRIO</text>
+                            <text class="contact-map-label contact-map-label--destination" x="274" y="42">BUSTRACKER</text>
+                            <text class="contact-map-stamp" x="327" y="112" text-anchor="end">MENSAJE · CARTAGENA</text>
+                        </svg>
                     </div>
 
                     <div class="contact-guidance">
