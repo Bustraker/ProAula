@@ -4,15 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <meta name="description" content="Pagina principal del usuario">
-    <meta name="theme-color" content="#101715">
+    <meta name="description" content="Explora Bustraker: planea tu recorrido y muévete por Cartagena con más claridad.">
+    <meta name="theme-color" content="#0b3028">
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Bustraker Público</title>
+    <title>Bustraker | Rutas y movilidad en Cartagena</title>
     <link rel="stylesheet" th:href="@{/css/style_3.css}">
     <link rel="stylesheet" th:href="@{/css/style_contacto_public.css}">
+    <link rel="stylesheet" th:href="@{/css/public-home.css(v='green-13')}">
     <link rel="icon" th:href="@{/images/logo.png}" type="image/png">
-    <script th:src="@{/js/index_3_public.js}" defer></script>
+    <script th:src="@{/js/index_3_public.js(v='route-map-2')}" defer></script>
 </head>
 <body class="public-home">
     <div class="site-grid public-page">
@@ -29,24 +32,42 @@
 
             <section class="public-hero" aria-labelledby="hero-title">
                 <div class="hero-copy">
-                    <p class="eyebrow"><span class="status-mark" aria-hidden="true"></span> Movilidad pública · Cartagena de Indias</p>
-                    <h1 id="hero-title">Tu ciudad,<br><span>en movimiento.</span></h1>
-                    <p class="hero-description">Encuentra información de buses y organiza tu próximo recorrido por Cartagena desde un solo lugar.</p>
+                    <p class="eyebrow"><span class="status-mark" aria-hidden="true"></span> Una nueva forma de recorrer Cartagena</p>
+                    <h1 id="hero-title">Cartagena,<br><span>más cerca.</span></h1>
+                    <p class="hero-description">Moverse por Cartagena debería sentirse más claro. Explora opciones entre barrios, consulta paradas registradas y prepara tu recorrido en buseta con más contexto.</p>
                     <div class="hero-actions">
                         <a class="action-link action-primary" th:href="@{/viajar_public}">Planear mi viaje <span aria-hidden="true">→</span></a>
-                        <a class="action-link action-secondary" th:href="@{/consultas}">Consultar buses</a>
+                        <a class="action-link action-secondary" href="#como-funciona">Conoce cómo funciona</a>
                     </div>
-                    <p class="hero-caption">Consulta rutas públicas sin iniciar sesión.</p>
+                    <p class="hero-caption"><span aria-hidden="true">✳</span> Planifica tu recorrido sin iniciar sesión. La consulta básica es gratuita y está pensada para Cartagena.</p>
                 </div>
-                <div class="hero-visual" aria-label="Bustraker, transporte para Cartagena">
-                    <div class="route-label route-label-top"><span></span> Tu próximo recorrido</div>
-                    <div class="route-art">
-                        <span class="route-line" aria-hidden="true"></span>
-                        <span class="route-stop stop-one" aria-hidden="true"></span>
-                        <span class="route-stop stop-two" aria-hidden="true"></span>
-                        <img th:src="@{/images/Bus_palmera.png}" alt="Bus de Bustraker junto a una palmera">
+                <div class="hero-visual" aria-label="Ilustración de una buseta y un mapa de rutas de Cartagena">
+                    <div class="route-scene">
+                        <div class="scene-heading">
+                            <span class="scene-kicker"><span aria-hidden="true"></span> MOVILIDAD LOCAL</span>
+                            <span class="scene-city">CARTAGENA <b>·</b> BOLÍVAR</span>
+                        </div>
+                        <svg class="scene-map" viewBox="0 0 620 470" aria-hidden="true">
+                            <path class="map-coastline" d="M40 95 C135 34 196 80 255 46 S390 44 435 88 S532 123 586 76 M19 360 C112 313 171 376 244 337 S354 305 421 347 S527 389 605 337"></path>
+                            <path class="map-street" d="M22 170 C102 132 155 193 225 157 S350 120 404 169 S506 220 602 178 M32 258 C119 214 169 270 245 236 S368 207 431 248 S530 286 596 254 M112 25 C92 104 154 144 123 220 S91 347 154 438 M310 22 C272 108 340 162 300 225 S264 352 319 445 M490 30 C443 106 506 160 473 229 S451 354 512 433"></path>
+                            <path class="map-route-shadow" d="M76 325 C129 285 157 291 207 254 S286 213 333 236 S413 287 464 227 S517 161 548 130"></path>
+                            <path class="map-route" d="M76 325 C129 285 157 291 207 254 S286 213 333 236 S413 287 464 227 S517 161 548 130"></path>
+                            <circle class="map-stop map-stop--start" cx="76" cy="325" r="9"></circle>
+                            <circle class="map-stop map-stop--mid" cx="333" cy="236" r="6"></circle>
+                            <circle class="map-stop map-stop--end" cx="548" cy="130" r="9"></circle>
+                        </svg>
+                        <div class="scene-origin"><span>INICIO</span><strong>Tu barrio</strong></div>
+                        <div class="scene-destination"><span>DESTINO</span><strong>Tu próximo lugar</strong></div>
+                        <div class="scene-bus">
+                            <span class="scene-bus-glow"></span>
+                            <img th:src="@{/images/Bus_palmera.png}" alt="Buseta ilustrada entre palmeras">
+                        </div>
+                        <div class="scene-route-note">
+                            <span class="scene-note-icon" aria-hidden="true">↗</span>
+                            <span><strong>Conecta con tu ciudad</strong><small>Explora rutas y paradas disponibles</small></span>
+                        </div>
+                        <a class="scene-plan-link" th:href="@{/viajar_public}">VER EL PLANIFICADOR <span aria-hidden="true">↗</span></a>
                     </div>
-                    <div class="route-label route-label-bottom"><span class="route-dot" aria-hidden="true"></span> Cartagena, Bolívar</div>
                 </div>
             </section>
 
@@ -57,42 +78,192 @@
             <ul>
                 <li><a class="is-current" th:href="@{/index_3_public}" aria-current="page">Inicio</a></li>
                 <li><a th:href="@{/viajar_public}">Planear viaje</a></li>
-                <li><a th:href="@{/consultas}">Consulta de buses</a></li>
+                <li><a href="#como-funciona">Cómo funciona</a></li>
                 <li><a href="#contacto">Contacto</a></li>
             </ul>
-            <span class="nav-note">Información abierta para todos</span>
+            <span class="nav-note">Planificador disponible sin iniciar sesión</span>
         </nav>
 
         <main class="public-main">
+            <div class="city-route-rail" aria-hidden="true">
+                <span class="city-route-marker">
+                    <svg viewBox="0 0 40 40" focusable="false">
+                        <path d="M11 8h18a4 4 0 0 1 4 4v15a3 3 0 0 1-3 3H11a3 3 0 0 1-3-3V12a4 4 0 0 1 3-4Z"></path>
+                        <path d="M12 12h16v8H12zM12 23h3m10 0h3"></path>
+                        <circle cx="14" cy="29" r="2.4"></circle>
+                        <circle cx="26" cy="29" r="2.4"></circle>
+                    </svg>
+                </span>
+            </div>
             <section class="explore-section" aria-labelledby="explore-title">
                 <div class="section-heading" data-reveal>
                     <div>
-                        <p class="section-kicker">Explora Bustraker</p>
-                        <h2 id="explore-title">Tu recorrido empieza aquí</h2>
+                        <p class="section-kicker">Una herramienta local, con propósito</p>
+                        <h2 id="explore-title">Menos búsquedas. Más claridad para moverte.</h2>
                     </div>
-                    <p>Herramientas sencillas para moverte con más claridad por la ciudad.</p>
+                    <p>Bustraker reúne en un solo lugar información de rutas, barrios y paradas para ayudarte a organizar tu viaje en bus por Cartagena.</p>
                 </div>
 
                 <div class="feature-grid">
                     <a class="feature-item" data-reveal th:href="@{/viajar_public}">
                         <span class="feature-index">01 <span aria-hidden="true">↗</span></span>
-                        <h3>Planea tu viaje</h3>
-                        <p>Prepara tu recorrido y consulta la información disponible para tu trayecto.</p>
-                        <span class="feature-link">Abrir herramienta <span aria-hidden="true">→</span></span>
+                        <span class="feature-icon feature-icon--map" aria-hidden="true"></span>
+                        <h3>Busca por barrios</h3>
+                        <p>Indica desde dónde sales y a dónde quieres llegar. Explora hasta tres alternativas cuando los datos de ruta lo permiten.</p>
+                        <span class="feature-link">Planear un recorrido <span aria-hidden="true">→</span></span>
                     </a>
-                    <a class="feature-item" data-reveal th:href="@{/consultas}">
+                    <a class="feature-item" data-reveal th:href="@{/viajar_public}">
                         <span class="feature-index">02 <span aria-hidden="true">↗</span></span>
-                        <h3>Consulta de buses</h3>
-                        <p>Explora los datos públicos de buses desde una vista clara y directa.</p>
-                        <span class="feature-link">Ver consulta <span aria-hidden="true">→</span></span>
+                        <span class="feature-icon feature-icon--stops" aria-hidden="true"></span>
+                        <h3>Entiende cada tramo</h3>
+                        <p>Consulta los barrios del recorrido y, cuando estén registrados, sus paradas y buses asociados en el mapa.</p>
+                        <span class="feature-link">Explorar el mapa <span aria-hidden="true">→</span></span>
+                    </a>
+                    <a class="feature-item" data-reveal th:href="@{/viajar_public}">
+                        <span class="feature-index">03 <span aria-hidden="true">↗</span></span>
+                        <span class="feature-icon feature-icon--location" aria-hidden="true"></span>
+                        <h3>Ubicación opcional</h3>
+                        <p>Si das permiso, úsala para orientarte y ver referencias cercanas. También puedes planear sin compartirla.</p>
+                        <span class="feature-link">Tú decides <span aria-hidden="true">→</span></span>
                     </a>
                     <a class="feature-item feature-item-accent" data-reveal th:href="@{/registro-mejorado}">
-                        <span class="feature-index">03 <span aria-hidden="true">↗</span></span>
-                        <h3>Únete a Bustraker</h3>
-                        <p>Crea una cuenta para acceder a las opciones disponibles para usuarios.</p>
-                        <span class="feature-link">Crear cuenta <span aria-hidden="true">→</span></span>
+                        <span class="feature-index">04 <span aria-hidden="true">↗</span></span>
+                        <span class="feature-icon feature-icon--community" aria-hidden="true"></span>
+                        <h3>Una experiencia que continúa</h3>
+                        <p>Con una cuenta puedes guardar rutas favoritas, recibir avisos relacionados y aportar reportes sobre recorridos.</p>
+                        <span class="feature-link">Conocer mi cuenta <span aria-hidden="true">→</span></span>
                     </a>
                 </div>
+            </section>
+
+            <section class="city-story" aria-labelledby="city-story-title">
+                <div class="city-story-art" aria-hidden="true">
+                    <span class="city-story-orbit city-story-orbit--one"></span>
+                    <span class="city-story-orbit city-story-orbit--two"></span>
+                    <span class="city-story-route"></span>
+                    <span class="city-story-pin city-story-pin--one"></span>
+                    <span class="city-story-pin city-story-pin--two"></span>
+                    <span class="city-story-city">CTG</span>
+                    <span class="city-story-caption">UNA CIUDAD · MUCHOS CAMINOS</span>
+                </div>
+                <div class="city-story-copy" data-reveal>
+                    <p class="section-kicker">El reto que nos mueve</p>
+                    <h2 id="city-story-title">La información de tu viaje no debería estar dispersa.</h2>
+                    <p>En Cartagena, encontrar rutas y horarios claros puede ser difícil cuando la información está repartida entre distintas fuentes. Bustraker nace para acercar esos datos locales a las personas que necesitan planear su recorrido.</p>
+                    <p>Es una plataforma web desarrollada con Java y Spring Boot como proyecto de aula: una base para consultar rutas y seguir construyendo, con cuidado, alrededor de las necesidades reales de la ciudad.</p>
+                    <a class="story-link" th:href="@{/viajar_public}">Prueba el planificador <span aria-hidden="true">↗</span></a>
+                </div>
+            </section>
+
+            <section class="journey-section" id="como-funciona" aria-labelledby="journey-title">
+                <div class="journey-heading" data-reveal>
+                    <p class="section-kicker">Del origen al destino</p>
+                    <h2 id="journey-title">Tu camino, en tres momentos.</h2>
+                    <p>Una guía sencilla para explorar las opciones disponibles y entender qué encontrarás antes de salir.</p>
+                </div>
+                <ol class="journey-steps">
+                    <li class="journey-step" data-reveal>
+                        <span class="journey-step-number">01</span>
+                        <span class="journey-step-icon journey-step-icon--pin" aria-hidden="true"></span>
+                        <h3>Cuéntale al mapa adónde vas</h3>
+                        <p>Selecciona los barrios de origen y destino. La ubicación de tu dispositivo es opcional.</p>
+                    </li>
+                    <li class="journey-step" data-reveal>
+                        <span class="journey-step-number">02</span>
+                        <span class="journey-step-icon journey-step-icon--route" aria-hidden="true"></span>
+                        <h3>Compara las rutas disponibles</h3>
+                        <p>Revisa las alternativas sugeridas, los barrios conectados y los tramos que componen cada opción.</p>
+                    </li>
+                    <li class="journey-step" data-reveal>
+                        <span class="journey-step-number">03</span>
+                        <span class="journey-step-icon journey-step-icon--sun" aria-hidden="true"></span>
+                        <h3>Revisa los detalles antes de salir</h3>
+                        <p>Explora paradas y buses registrados, abre el mapa y comparte el enlace de tu consulta.</p>
+                    </li>
+                </ol>
+                <p class="journey-disclaimer"><span aria-hidden="true">i</span> Los trazados y tiempos son estimaciones en auto; pueden diferir del recorrido real y no confirman horarios, tráfico ni llegadas en tiempo real.</p>
+                <a class="journey-cta" th:href="@{/viajar_public}">Vamos a planear <span aria-hidden="true">↗</span></a>
+            </section>
+
+            <section class="member-section" aria-labelledby="member-title">
+                <div class="member-copy" data-reveal>
+                    <p class="section-kicker">Cuando haces parte de la comunidad</p>
+                    <h2 id="member-title">Tu movilidad, con herramientas a tu medida.</h2>
+                    <p>La consulta básica es abierta. Si creas una cuenta, Bustraker suma herramientas para acompañar tus recorridos habituales.</p>
+                    <a class="member-cta" th:href="@{/registro-mejorado}">Crear mi cuenta <span aria-hidden="true">→</span></a>
+                </div>
+                <div class="member-list">
+                    <article class="member-item" data-reveal>
+                        <span class="member-item-number">01</span>
+                        <div><h3>Guarda lo que usas</h3><p>Conserva rutas y trayectos favoritos para tenerlos a mano.</p></div>
+                        <span class="member-item-mark" aria-hidden="true">↗</span>
+                    </article>
+                    <article class="member-item" data-reveal>
+                        <span class="member-item-number">02</span>
+                        <div><h3>Entérate de novedades</h3><p>Recibe avisos relacionados con tus rutas favoritas.</p></div>
+                        <span class="member-item-mark" aria-hidden="true">↗</span>
+                    </article>
+                    <article class="member-item" data-reveal>
+                        <span class="member-item-number">03</span>
+                        <div><h3>Ayuda a informar</h3><p>Reporta incidentes para que puedan revisarse y aportar contexto a la comunidad.</p></div>
+                        <span class="member-item-mark" aria-hidden="true">↗</span>
+                    </article>
+                </div>
+            </section>
+
+            <section class="trust-section" aria-labelledby="trust-title">
+                <div class="trust-heading" data-reveal>
+                    <p class="section-kicker">Información clara. Decisiones tuyas.</p>
+                    <h2 id="trust-title">La confianza también hace parte del recorrido.</h2>
+                </div>
+                <div class="trust-grid">
+                    <article class="trust-card" data-reveal>
+                        <span class="trust-card-label">01 / SIN BARRERAS</span>
+                        <h3>Empieza sin registrarte</h3>
+                        <p>Puedes consultar el planificador público sin crear una cuenta. Las funciones personales requieren iniciar sesión.</p>
+                    </article>
+                    <article class="trust-card" data-reveal>
+                        <span class="trust-card-label">02 / CON TU PERMISO</span>
+                        <h3>Tu ubicación es opcional</h3>
+                        <p>El navegador solo la comparte con la página si aceptas. No se envía al servicio de llegadas de buses.</p>
+                    </article>
+                    <article class="trust-card" data-reveal>
+                        <span class="trust-card-label">03 / SIN PROMESAS FALSAS</span>
+                        <h3>Distinguimos datos y estimaciones</h3>
+                        <p>El mapa puede ayudar a orientarte, pero sus trazados y tiempos no sustituyen los horarios oficiales ni garantizan el estado del servicio.</p>
+                    </article>
+                </div>
+                <a class="trust-privacy-link" th:href="@{/privacidad}">Lee nuestra información de privacidad <span aria-hidden="true">↗</span></a>
+            </section>
+
+            <section class="future-section" aria-labelledby="future-title">
+                <div class="future-heading" data-reveal>
+                    <span class="future-stamp">VISIÓN EN CONSTRUCCIÓN</span>
+                    <p class="section-kicker">Una ciudad que también puede construir el mapa</p>
+                    <h2 id="future-title">Lo que imaginamos para el siguiente tramo.</h2>
+                    <p>Estas ideas vienen de la propuesta de innovación del proyecto. Son posibilidades por evaluar, no funciones disponibles hoy.</p>
+                </div>
+                <div class="future-grid">
+                    <article class="future-card" data-reveal>
+                        <span class="future-number">A</span>
+                        <h3>Acceso desde el territorio</h3>
+                        <p>Códigos QR en universidades y puntos de parada para abrir información de viaje desde el lugar donde empieza tu recorrido.</p>
+                        <span class="future-status">Idea por evaluar</span>
+                    </article>
+                    <article class="future-card" data-reveal>
+                        <span class="future-number">B</span>
+                        <h3>Rutas que escuchan a su comunidad</h3>
+                        <p>Canales para compartir cambios y sugerencias, con revisión antes de convertir un reporte en información para otras personas.</p>
+                        <span class="future-status">Evolución propuesta</span>
+                    </article>
+                    <article class="future-card" data-reveal>
+                        <span class="future-number">C</span>
+                        <h3>Herramientas para instituciones</h3>
+                        <p>Explorar servicios de gestión para universidades y empresas de transporte, junto con análisis agrupados que respeten la privacidad.</p>
+                        <span class="future-status">Modelo por estudiar</span>
+                    </article>
+                </div>
+                <p class="future-note">La consulta básica se plantea gratuita; cualquier evolución debe seguir cuidando los datos personales y la utilidad pública.</p>
             </section>
 
             <section class="contact-section" id="contacto" aria-labelledby="contacto-titulo">
@@ -137,7 +308,6 @@
                         </div>
                         <span class="contact-progress-status" aria-live="polite">Completa tus datos para continuar</span>
                     </div>
-                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                     <div th:if="${mensaje}" class="contact-feedback" role="status" aria-live="polite">
                         <span class="contact-feedback-mark" aria-hidden="true">✓</span>
                         <span th:text="${mensaje}">Tu mensaje fue recibido.</span>
@@ -170,7 +340,11 @@
         <footer class="public-footer" id="pie">
             <a class="footer-brand" th:href="@{/index_3_public}">Bustraker<span>.</span></a>
             <p>Movilidad pública para Cartagena de Indias</p>
-            <p class="copyright">&copy; <span th:text="${#dates.year(#dates.createNow())}">2026</span> Bustraker</p>
+            <div class="footer-meta">
+                <a th:href="@{/privacidad}">Privacidad</a>
+                <a th:href="@{/terminos}">Términos</a>
+                <p class="copyright">&copy; <span th:text="${#dates.year(#dates.createNow())}">2026</span> Bustraker</p>
+            </div>
         </footer>
     </div>
 </body>

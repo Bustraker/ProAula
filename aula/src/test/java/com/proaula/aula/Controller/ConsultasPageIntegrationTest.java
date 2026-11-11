@@ -17,6 +17,7 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.ActiveProfiles;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.proaula.aula.dto.BusConsultaDto;
 import com.proaula.aula.Service.BusService;
@@ -33,26 +34,49 @@ class ConsultasPageIntegrationTest {
     private BusService busService;
 
     @Test
-    void publicPageRendersOnlyRoutesAndNeighborhoods() throws Exception {
-        when(busService.getBusConsultations(false)).thenReturn(List.of(
-                new BusConsultaDto(null, null, null, null, null, "Ruta Centro",
-                        List.of("Centro", "Getsemaní"), null, null)));
+    void busConsultationPageRequiresAuthentication() throws Exception {
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/consultas"))
+                .andExpect(status().is3xxRedirection());
 
-        String page = mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/consultas"))
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/api/buses/todos"))
+                .andExpect(status().is3xxRedirection());
+    }
+
+    @Test
+    void publicLandingDoesNotLinkToBusConsultation() throws Exception {
+        String page = mockMvc.perform(
+                        org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/index_3_public"))
+                .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
 
         assertThat(page)
-                .contains("Ruta Centro", "Centro", "inicio-de-sesion-mejorado",
-                        "bus-directory-page--public", "content=\"#f5f9fd\"")
-                .doesNotContain("bus-directory-page--authenticated",
-                        "ABC123", "Conductora Confidencial", "07:30", "Verificada");
+                .contains("Planifica tu recorrido sin iniciar sesión.",
+                        "Cartagena,",
+                        "MOVILIDAD LOCAL",
+                        "scene-map",
+                        "scene-bus",
+                        "map-route",
+                        "Moverse por Cartagena debería sentirse más claro.",
+                        "Menos búsquedas. Más claridad para moverte.",
+                        "Busca por barrios",
+                        "id=\"como-funciona\"",
+                        "Tu camino, en tres momentos.",
+                        "La información de tu viaje no debería estar dispersa.",
+                        "Lo que imaginamos para el siguiente tramo.",
+                        "Idea por evaluar",
+                        "/css/public-home.css?v=green-13",
+                        "/js/index_3_public.js?v=route-map-2",
+                        "name=\"_csrf\"",
+                        "name=\"_csrf_header\"")
+                .doesNotContain("/consultas", "Consulta de buses", "Consultar buses",
+                        "puzzle-piece--origin", "puzzle-shuttle");
     }
 
     @Test
     void authenticatedPageShowsPrivateBusInformationWithoutLoginLink() throws Exception {
-        when(busService.getBusConsultations(true)).thenReturn(List.of(
+        when(busService.getBusConsultations()).thenReturn(List.of(
                 new BusConsultaDto(44L, "ABC123", "Bus Urbano Test", "Azul",
                         "Conductora Confidencial", "Ruta Centro",
                         List.of("Centro", "Getsemaní"), "07:30", true)));
@@ -66,16 +90,26 @@ class ConsultasPageIntegrationTest {
         String page = mockMvc.perform(
                         org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/consultas")
                                 .session(session))
+                .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
 
         assertThat(page)
                 .contains("bus-directory-page--authenticated", "content=\"#101715\"",
-                        "ABC123", "Conductora Confidencial", "Mi cuenta", "07:30", "Verificada")
+                        "ABC123", "Anónimo", "Mi cuenta", "07:30", "Verificada")
                 .doesNotContain("bus-directory-page--public")
                 .contains("href=\"/dashboard\"")
                 .doesNotContain("href=\"/inicio-de-sesion-mejorado\"");
+
+        String busApi = mockMvc.perform(
+                        org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/api/buses/todos")
+                                .session(session))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        assertThat(busApi).contains("ABC123", "Anónimo").doesNotContain("Conductora Confidencial");
     }
 
     @Test
@@ -87,11 +121,11 @@ class ConsultasPageIntegrationTest {
                 .getContentAsString();
 
         assertThat(publicPage)
-                .contains("id=\"btnPlanificar\"", "id=\"plannerStatus\"", "Opciones de ruta para llegar",
-                        "/css/travel.css?v=map-polish-9",
-                        "/css/map-ui.css?v=trips-2",
-                        "/js/map-base.js?v=map-polish-6",
-                        "/js/map-travel.js?v=trips-6");
+                .contains("id=\"btnPlanificar\"", "id=\"plannerStatus\"", "Rutas disponibles",
+                        "/css/travel.css?v=route-polish-12",
+                        "/css/map-ui.css?v=trips-4",
+                        "/js/map-base.js?v=map-polish-8",
+                        "/js/map-travel.js?v=trips-9");
 
         MockHttpSession session = new MockHttpSession();
         SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
@@ -108,10 +142,10 @@ class ConsultasPageIntegrationTest {
                 .getContentAsString();
 
         assertThat(authenticatedPage)
-                .contains("id=\"btnPlanificar\"", "id=\"plannerStatus\"", "Opciones de ruta para llegar",
-                        "/css/travel.css?v=map-polish-9",
-                        "/css/map-ui.css?v=trips-2",
-                        "/js/map-base.js?v=map-polish-6",
-                        "/js/map-travel.js?v=trips-6");
+                .contains("id=\"btnPlanificar\"", "id=\"plannerStatus\"", "Rutas disponibles",
+                        "/css/travel.css?v=route-polish-12",
+                        "/css/map-ui.css?v=trips-5",
+                        "/js/map-base.js?v=map-polish-8",
+                        "/js/map-travel.js?v=trips-9");
     }
 }

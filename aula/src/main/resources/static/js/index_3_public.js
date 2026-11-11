@@ -68,6 +68,40 @@
         updateContactProgress();
     }
 
+    const publicNav = document.querySelector(".public-nav");
+    const homeNavLink = publicNav?.querySelector('a[aria-current="page"]');
+    const navigationStops = [
+        {
+            section: document.getElementById("como-funciona"),
+            link: publicNav?.querySelector('a[href="#como-funciona"]')
+        },
+        {
+            section: document.getElementById("contacto"),
+            link: publicNav?.querySelector('a[href="#contacto"]')
+        }
+    ].filter((stop) => stop.section && stop.link);
+
+    if (publicNav && homeNavLink && navigationStops.length > 0) {
+        const updateActiveNavigation = () => {
+            const readingLine = window.scrollY + publicNav.offsetHeight + 48;
+            let activeLink = homeNavLink;
+
+            navigationStops.forEach(({ section, link }) => {
+                if (section.getBoundingClientRect().top + window.scrollY <= readingLine) {
+                    activeLink = link;
+                }
+            });
+
+            publicNav.querySelectorAll("a").forEach((link) => {
+                link.classList.toggle("is-current", link === activeLink);
+            });
+        };
+
+        window.addEventListener("scroll", updateActiveNavigation, { passive: true });
+        window.addEventListener("resize", updateActiveNavigation, { passive: true });
+        updateActiveNavigation();
+    }
+
     if (motionPreference.matches) return;
 
     const revealTargets = document.querySelectorAll("[data-reveal]");
@@ -108,7 +142,8 @@
                 ? Math.min(1, documentRoot.scrollTop / scrollableDistance)
                 : 0;
 
-            progressIndicator.style.setProperty("--scroll-progress", progress.toFixed(4));
+            progressIndicator?.style.setProperty("--scroll-progress", progress.toFixed(4));
+
         });
     };
 
