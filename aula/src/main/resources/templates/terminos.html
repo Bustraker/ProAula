@@ -3,73 +3,196 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Términos y Condiciones - Bustraker</title>
+    <meta name="description" content="Términos y condiciones de uso de Bustraker.">
+    <meta name="theme-color" content="#f3f0e8">
+    <title>Términos y condiciones | Bustraker</title>
     <link rel="icon" th:href="@{/images/logo.png}" type="image/png">
-    <link rel="stylesheet" th:href="@{/css/style_responsive.css}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/style-legal.css(v='20261111-1')}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
-    <main class="hero-section">
-        <div class="main-header">
-            <div class="header-inner">
-                <div class="logo">
-                    <img th:src="@{/images/logo.png}" alt="Logo Bustraker">
-                    <span class="brand">Bustraker</span>
-                </div>
-                <nav class="main-nav">
-                    <a th:href="@{/inicio-de-sesion-mejorado}" class="nav-link">Iniciar sesión</a>
-                    <a th:href="@{/registro-mejorado}" class="nav-link nav-link--outline">Registrarse</a>
-                </nav>
-            </div>
+<body class="legal-page">
+    <header class="legal-header">
+        <a class="legal-brand" th:href="@{/}" aria-label="Bustraker, volver al inicio">
+            <img th:src="@{/images/logo.png}" alt="">
+            <span>Bustraker<small>Movilidad en Cartagena</small></span>
+        </a>
+        <nav class="legal-header__actions" aria-label="Navegación">
+            <a class="legal-switch" th:href="@{/privacidad}" aria-label="Leer la política de privacidad">
+                <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+                <span>También disponible <strong>Política de privacidad</strong></span>
+                <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+            </a>
+            <a th:href="@{/contacto}"><i class="fa-regular fa-envelope" aria-hidden="true"></i> Contacto</a>
+            <a class="legal-home-link" th:href="@{/}"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Inicio</a>
+        </nav>
+    </header>
 
-            <div class="auth-section">
-                <div class="auth-item">
-                    <div style="width: 100%;">
-                        <h2><i class="fas fa-file-contract"></i> Términos y Condiciones</h2>
-                        
-                        <div class="card">
-                            <div class="card-body">
-                                <h3>1. Aceptación de Términos</h3>
-                                <p>Al utilizar Bustraker, usted acepta cumplir con estos términos y condiciones en su totalidad. 
-                                   Si no está de acuerdo con alguno de estos términos, no utilice este servicio.</p>
-                                
-                                <h3>2. Descripción del Servicio</h3>
-                                <p>Bustraker es una plataforma que permite la gestión y rastreo de rutas de autobuses universitarios 
-                                   en Cartagena. Ofrecemos herramientas para que los usuarios puedan consultar rutas 
-                                   y recibir información actualizada sobre los servicios de transporte.</p>
-                                
-                                <h3>3. Uso Responsable</h3>
-                                <p>Los usuarios se comprometen a utilizar la plataforma de manera responsable y ética. 
-                                   Queda prohibido cualquier uso que pueda dañar, sobrecargar o deteriorar el servicio.</p>
-                                
-                                <h3>4. Privacidad de Datos</h3>
-                                <p>Respetamos su privacidad. Todos los datos personales son tratados conforme a nuestra 
-                                   Política de Privacidad. Al registrarse, usted acepta el tratamiento de sus datos 
-                                   personales para las finalidades establecidas en dicha política.</p>
-                                
-                                <h3>5. Modificaciones del Servicio</h3>
-                                <p>Podemos actualizar o modificar el servicio en cualquier momento. En caso de modificaciones 
-                                   sustanciales, se notificará a los usuarios registrados.</p>
-                                
-                                <h3>6. Limitación de Responsabilidad</h3>
-                                <p>La plataforma se proporciona "tal cual" sin garantía de funcionamiento continuo o 
-                                   ininterrumpido. No somos responsables de retrasos o problemas causados por factores 
-                                   ajenos a nuestro control.</p>
-                                
-                                <h3>7. Contacto</h3>
-                                <p>Si tiene preguntas sobre estos términos y condiciones, contáctenos a través de 
-                                   nuestro formulario de contacto o al correo electrónico: soporte@bustraker.edu.co</p>
-                                
-                                <div class="text-center" style="margin-top: 2rem;">
-                                    <a th:href="@{/inicio-de-sesion-mejorado}" class="btn btn-primary">
-                                        <i class="fas fa-arrow-left"></i> Volver al Inicio
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
+    <main class="legal-shell">
+        <section class="legal-hero" aria-labelledby="legalTitle">
+            <div class="legal-hero__copy">
+                <p class="legal-eyebrow"><span></span> DOCUMENTO LEGAL · 01</p>
+                <h1 id="legalTitle">Términos <em>y condiciones</em></h1>
+                <p>Reglas claras para acceder y utilizar las herramientas de movilidad de Bustraker.</p>
+            </div>
+            <div class="legal-hero__meta">
+                <span class="legal-meta-icon"><i class="fa-regular fa-calendar" aria-hidden="true"></i></span>
+                <span><small>Última actualización</small><strong>11 de noviembre de 2026</strong></span>
+            </div>
+        </section>
+
+        <div class="legal-layout">
+            <aside class="legal-sidebar" aria-label="Contenido del documento">
+                <p class="legal-sidebar__title">EN ESTA PÁGINA</p>
+                <nav>
+                    <a href="#responsable"><span>01</span> Responsable y aceptación</a>
+                    <a href="#servicio"><span>02</span> Alcance del servicio</a>
+                    <a href="#cuenta"><span>03</span> Cuenta y seguridad</a>
+                    <a href="#uso"><span>04</span> Uso permitido</a>
+                    <a href="#informacion"><span>05</span> Información de movilidad</a>
+                    <a href="#aportes"><span>06</span> Aportes y propiedad</a>
+                    <a href="#disponibilidad"><span>07</span> Disponibilidad</a>
+                    <a href="#medidas"><span>08</span> Medidas y restricciones</a>
+                    <a href="#cambios"><span>09</span> Cambios y ley aplicable</a>
+                    <a href="#contacto"><span>10</span> Contacto</a>
+                </nav>
+                <a class="legal-sidebar__note legal-sidebar__note--link" th:href="@{/privacidad}">
+                    <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+                    <span><strong>¿Buscas información sobre tus datos?</strong><small>Consulta la Política de privacidad</small></span>
+                    <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                </a>
+            </aside>
+
+            <article class="legal-document">
+                <div class="legal-summary">
+                    <span class="legal-summary__icon"><i class="fa-solid fa-file-signature" aria-hidden="true"></i></span>
+                    <div>
+                        <strong>Una guía de uso, no una promesa de transporte</strong>
+                        <p>Bustraker facilita consultas de movilidad. No reemplaza al operador del bus ni garantiza que una ruta, horario o estimación se mantenga sin cambios.</p>
                     </div>
                 </div>
-            </div>
+
+                <section class="legal-section legal-section--notice" id="responsable">
+                    <div class="legal-section__heading">
+                        <span class="legal-section__number">01</span>
+                        <div><p>IDENTIFICACIÓN Y ACEPTACIÓN</p><h2>Responsable y alcance</h2></div>
+                    </div>
+                    <p>Estos términos regulan el acceso y uso de la plataforma Bustraker, orientada a consultar información de rutas, paradas, buses y trayectos en Cartagena, así como las funciones asociadas disponibles en cada momento.</p>
+                    <p>El servicio se ofrece bajo la marca Bustraker. La marca no reemplaza la identificación legal de quien opera la plataforma. Para consultas y solicitudes puedes utilizar el <a th:href="@{/contacto}">formulario de contacto</a>; el tratamiento de datos se explica en la <a th:href="@{/privacidad}">Política de privacidad</a>.</p>
+                    <p>Al crear una cuenta debes aceptar expresamente estos términos y la Política de privacidad mediante las casillas de registro. La aplicación guarda la cuenta, fecha, versiones de ambos documentos y confirmación de mayoría de edad. Si no aceptas, no crees la cuenta ni uses funciones que requieran autorización.</p>
+                    <p>Puedes retirar la autorización de tratamiento desde tu perfil, en «Retirar autorización». La aplicación cerrará tu sesión y bloqueará las funciones protegidas hasta que otorgues una nueva autorización vigente. La revocación no elimina automáticamente la información que deba conservarse por una obligación legal o para atender reclamaciones; consulta los plazos y el procedimiento en la Política de privacidad.</p>
+                </section>
+
+                <section class="legal-section" id="servicio">
+                    <div class="legal-section__heading">
+                        <span class="legal-section__number">02</span>
+                        <div><p>QUÉ OFRECEMOS</p><h2>Alcance del servicio</h2></div>
+                    </div>
+                    <p>Bustraker ofrece herramientas digitales que pueden incluir consulta y visualización de rutas y paradas, planificación de trayectos, guardado de favoritos, reportes de incidentes y estimaciones de llegada basadas en reportes GPS recientes. Algunas funciones dependen de la disponibilidad de datos, conectividad, permisos del dispositivo o una cuenta activa.</p>
+                    <p>Bustraker es una plataforma informativa; no es una empresa transportadora, no opera buses, no vende pasajes y no presta servicios de emergencia. La información de la aplicación no constituye una reserva, contrato de transporte, garantía de recogida ni confirmación oficial del servicio.</p>
+                    <p>El acceso a las funciones disponibles actualmente es gratuito y no genera una tarifa de transporte ni una compra dentro de la plataforma. Si en el futuro se ofrecen servicios pagos, se informarán sus condiciones y precio antes de cualquier contratación.</p>
+                </section>
+
+                <section class="legal-section" id="cuenta">
+                    <div class="legal-section__heading">
+                        <span class="legal-section__number">03</span>
+                        <div><p>ACCESO Y CREDENCIALES</p><h2>Cuenta y seguridad</h2></div>
+                    </div>
+                    <ul class="legal-list">
+                        <li>Solo puedes crear una cuenta si tienes 18 años o más. La declaración de mayoría de edad se solicita en el registro; no está permitido que un adulto cree o use una cuenta en nombre de un menor para habilitar funciones GPS.</li>
+                        <li>Proporciona información propia, exacta y actualizada durante el registro y al modificar tu perfil.</li>
+                        <li>Mantén privadas tus credenciales, usa una contraseña segura y cierra la sesión al terminar en un dispositivo compartido.</li>
+                        <li>Eres responsable de la actividad realizada desde tu cuenta, salvo que informes oportunamente de una pérdida o acceso no autorizado.</li>
+                        <li>No compartas tu cuenta ni uses credenciales de otra persona sin autorización. Bustraker puede solicitar verificaciones razonables para proteger el acceso.</li>
+                    </ul>
+                    <p>Si sospechas que tu cuenta fue comprometida, avisa al operador mediante el <a th:href="@{/contacto}">formulario de contacto</a>. La plataforma puede tener funciones diferentes para cuentas de usuario y de administración; no solicites ni intentes eludir permisos que no te hayan sido concedidos.</p>
+                </section>
+
+                <section class="legal-section" id="uso">
+                    <div class="legal-section__heading">
+                        <span class="legal-section__number">04</span>
+                        <div><p>RESPETO Y SEGURIDAD</p><h2>Uso permitido</h2></div>
+                    </div>
+                    <p>Te comprometes a utilizar Bustraker de forma lícita, responsable y respetuosa. No está permitido:</p>
+                    <ul class="legal-list">
+                        <li>Suplantar identidades, crear cuentas para engañar o presentar deliberadamente reportes falsos.</li>
+                        <li>Publicar amenazas, acoso, discriminación, contenido ilícito o información personal de terceros sin autorización.</li>
+                        <li>Intentar obtener acceso no autorizado a cuentas, datos, sistemas, credenciales o funciones administrativas.</li>
+                        <li>Introducir código malicioso, interferir con el funcionamiento del sitio, eludir límites de uso o realizar extracción automatizada abusiva.</li>
+                        <li>Usar ubicaciones o información de rutas para vigilar, acosar o poner en riesgo a pasajeros, conductores u otras personas.</li>
+                        <li>Reproducir, vender o explotar comercialmente contenidos de Bustraker o de terceros sin los permisos correspondientes.</li>
+                    </ul>
+                </section>
+
+                <section class="legal-section" id="informacion">
+                    <div class="legal-section__heading">
+                        <span class="legal-section__number">05</span>
+                        <div><p>RUTAS, HORARIOS Y ESTIMACIONES</p><h2>Información de movilidad</h2></div>
+                    </div>
+                    <p>Los datos de rutas, horarios, paradas, buses, incidentes y condiciones de operación pueden estar incompletos, desactualizados o cambiar sin aviso. Las estimaciones GPS son orientativas: dependen de reportes recientes, señal, tráfico, desvíos y datos disponibles. La ausencia de una estimación no confirma que un bus no esté en servicio.</p>
+                    <p>La información procede de registros de rutas y paradas publicados por la plataforma, fuentes cartográficas de terceros y reportes voluntarios de usuarios. Bustraker no certifica que las fuentes de movilidad sean oficiales ni garantiza que cada operador haya autorizado su reproducción; los datos de terceros se presentan sujetos a los permisos y licencias aplicables.</p>
+                    <p>Las recomendaciones y predicciones automatizadas pueden ser inexactas, incompletas o desactualizadas; son orientativas, no sustituyen la verificación con el operador y no toman decisiones que produzcan efectos jurídicos sobre ti. Verifica los datos antes de desplazarte.</p>
+                    <p>Antes de viajar, verifica directamente con el operador o autoridad de transporte la ruta, tarifa, horario, accesibilidad, parada y condiciones del servicio. No bases decisiones urgentes, de emergencia o de seguridad únicamente en Bustraker. La aplicación no representa ni certifica a los operadores que puedan aparecer en sus mapas.</p>
+                </section>
+
+                <section class="legal-section" id="aportes">
+                    <div class="legal-section__heading">
+                        <span class="legal-section__number">06</span>
+                        <div><p>REPORTES Y CONTENIDO</p><h2>Aportes y propiedad</h2></div>
+                    </div>
+                    <p>Conservas los derechos que tengas sobre los mensajes, comentarios y reportes que envíes. Al enviarlos, autorizas su uso limitado y no exclusivo para recibirlos, almacenarlos, revisarlos, atenderlos y operar las funciones relacionadas de Bustraker. No incluyas información confidencial o datos de terceros que no estés autorizado a compartir.</p>
+                    <p>La marca Bustraker, el software, diseño y contenidos propios de la plataforma pertenecen a sus titulares o se utilizan con autorización. Estos términos no transfieren derechos de propiedad intelectual. Los mapas, datos y servicios de terceros se rigen además por sus respectivas licencias, atribuciones y condiciones.</p>
+                    <p>El desarrollo, diseño y algunos textos de Bustraker recibieron apoyo de herramientas de inteligencia artificial. El equipo responsable revisa los resultados, pero estos pueden contener errores. La titularidad de los aportes de cada integrante y del proyecto académico, si aplica, se determina conforme a los acuerdos del equipo y las reglas de la institución educativa; estos términos no atribuyen derechos a una persona que no se haya identificado.</p>
+                    <p>La cartografía puede combinar <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>, <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a> y <a href="https://www.esri.com/en-us/legal/terms/full-master-agreement" target="_blank" rel="noopener">Esri</a>; las rutas por calles pueden solicitarse a los servicios públicos <a href="https://github.com/Project-OSRM/osrm-backend/wiki/Api-usage-policy" target="_blank" rel="noopener">OSRM demo</a> y <a href="https://routing.openstreetmap.de/" target="_blank" rel="noopener">openstreetmap.de</a>. Se muestran las atribuciones disponibles en el mapa y deben respetarse las licencias y condiciones de cada proveedor. Los servidores demo no ofrecen garantías y están sujetos a límites y restricciones de uso; no deben considerarse un servicio de producción ni utilizarse comercialmente si sus condiciones no lo permiten.</p>
+                </section>
+
+                <section class="legal-section" id="disponibilidad">
+                    <div class="legal-section__heading">
+                        <span class="legal-section__number">07</span>
+                        <div><p>CONTINUIDAD DEL SERVICIO</p><h2>Disponibilidad</h2></div>
+                    </div>
+                    <p>Procuramos mantener Bustraker disponible, pero no garantizamos un funcionamiento ininterrumpido ni libre de errores. Puede haber interrupciones por mantenimiento, fallas de conectividad, fuerza mayor, proveedores externos o circunstancias fuera del control razonable del operador.</p>
+                    <p>Podemos corregir, actualizar, limitar o retirar funciones para mantener el servicio, proteger a sus usuarios o cumplir obligaciones legales. Cuando sea razonable y posible, informaremos de cambios que afecten de manera sustancial el uso de la plataforma.</p>
+                </section>
+
+                <section class="legal-section" id="medidas">
+                    <div class="legal-section__heading">
+                        <span class="legal-section__number">08</span>
+                        <div><p>PROTECCIÓN DE LA COMUNIDAD</p><h2>Medidas y restricciones</h2></div>
+                    </div>
+                    <p>Ante un incumplimiento, riesgo para la seguridad o uso abusivo, podemos advertir, limitar o suspender temporalmente el acceso y, cuando corresponda, remitir información a las autoridades competentes. La medida será razonable respecto del caso y no limitará los derechos de defensa o reclamación que reconoce la ley.</p>
+                    <p>El operador puede terminar o retirar el servicio por razones técnicas, legales u operativas y podrá cerrar cuentas ante incumplimientos graves, con comunicación cuando resulte razonable y legalmente posible. El cierre no elimina automáticamente datos que deban conservarse por obligaciones legales o reclamaciones; los demás datos se tratarán según la Política de privacidad.</p>
+                    <p>Si consideras que una medida fue un error, puedes solicitar una revisión por el <a th:href="@{/contacto}">canal de contacto</a>. Nada de lo previsto aquí excluye derechos irrenunciables de consumidores ni responsabilidades que la legislación colombiana no permita limitar.</p>
+                    <p>En la máxima medida permitida por la ley, Bustraker no responde por decisiones tomadas exclusivamente con base en estimaciones, interrupciones de servicios de terceros ni condiciones operativas ajenas a la plataforma. Esta limitación no excluye derechos irrenunciables del consumidor, dolo, culpa grave ni responsabilidades que no puedan limitarse legalmente.</p>
+                </section>
+
+                <section class="legal-section" id="cambios">
+                    <div class="legal-section__heading">
+                        <span class="legal-section__number">09</span>
+                        <div><p>ACTUALIZACIONES Y NORMATIVA</p><h2>Cambios y ley aplicable</h2></div>
+                    </div>
+                    <p>Podemos actualizar estos términos para reflejar cambios del servicio o requisitos legales. Publicaremos aquí la versión vigente y la fecha de actualización. Si un cambio requiere una nueva aceptación por ley, la solicitaremos antes de aplicar la función afectada. El uso futuro se regirá por la versión publicada, sin afectar derechos adquiridos ni normas imperativas.</p>
+                    <p>Estos términos se interpretan conforme a las leyes de Colombia. Cuando las reglas de competencia lo permitan, las controversias podrán presentarse ante las autoridades competentes de Cartagena de Indias, sin impedir el uso de mecanismos de protección al consumidor, conciliación o reclamación previstos por la ley. Si una disposición resulta inválida, las demás conservarán su efecto en lo permitido por la ley.</p>
+                </section>
+
+                <section class="legal-section" id="contacto">
+                    <div class="legal-section__heading">
+                        <span class="legal-section__number">10</span>
+                        <div><p>¿NECESITAS AYUDA?</p><h2>Contacto</h2></div>
+                    </div>
+                    <p>Para preguntas sobre estos términos, el funcionamiento de una cuenta o un posible incumplimiento, utiliza el <a th:href="@{/contacto}">formulario de contacto</a>. Para solicitudes relacionadas con datos personales, consulta también la <a th:href="@{/privacidad}">Política de privacidad</a> y describe tu solicitud en el formulario.</p>
+                    <p>Puedes solicitar el cierre de tu cuenta desde el formulario de contacto, identificando el usuario y el correo asociado. La solicitud se verificará y tramitará conforme a la Política de privacidad; cierta información puede conservarse cuando exista una obligación legal, una reclamación pendiente o una necesidad legítima de seguridad. No envíes contraseñas en la solicitud.</p>
+                    <div class="legal-contact-card">
+                        <span><i class="fa-regular fa-paper-plane" aria-hidden="true"></i></span>
+                        <div><strong>La política de privacidad está en una página independiente</strong><p>Allí encontrarás los datos que tratamos, el uso del GPS, los proveedores y tus derechos.</p></div>
+                        <a th:href="@{/privacidad}" aria-label="Ir a la política de privacidad"><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+                    </div>
+                </section>
+
+                <footer class="legal-document__footer">
+                    <span><i class="fa-solid fa-file-contract" aria-hidden="true"></i> Términos y condiciones de Bustraker</span>
+                    <a th:href="@{/}">Bustraker · Cartagena</a>
+                </footer>
+            </article>
         </div>
     </main>
 </body>

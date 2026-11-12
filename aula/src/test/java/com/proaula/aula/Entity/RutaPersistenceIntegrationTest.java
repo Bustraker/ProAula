@@ -10,6 +10,7 @@ import com.proaula.aula.Service.BusService;
 import com.proaula.aula.Service.DataSeederService;
 import com.proaula.aula.Service.LocalDatabaseBootstrapService;
 import com.proaula.aula.Service.RutaService;
+import com.proaula.aula.Service.TpcRouteReferenceSeederService;
 import com.proaula.aula.Service.UsuarioService;
 import com.proaula.aula.exception.AulaException;
 import jakarta.persistence.EntityManager;
@@ -60,6 +61,9 @@ class RutaPersistenceIntegrationTest {
     private LocalDatabaseBootstrapService localDatabaseBootstrapService;
 
     @Autowired
+    private TpcRouteReferenceSeederService tpcRouteReferenceSeederService;
+
+    @Autowired
     private RutaController rutaController;
 
     @Autowired
@@ -97,10 +101,14 @@ class RutaPersistenceIntegrationTest {
         assertThat(rutaGuardada.getCodigo()).startsWith("RUT-").hasSize(20);
         assertThat(busGuardado.getNumeroInterno()).startsWith("BUS-").hasSize(20);
         assertThat(paradaGuardada.getCodigo()).startsWith("PAR-").hasSize(20);
+        assertThat(busGuardado.getConductor()).isEqualTo("Anónimo");
+        assertThat(jdbcTemplate.queryForObject(
+            "SELECT conductor FROM bus WHERE id = ?", String.class, busGuardado.getId()))
+            .isEqualTo("Anónimo");
     }
 
     @Test
-    void initialCartagenaRoutesAndStopsArePersistedWithoutDuplicates() {
+    void currentTpcRoutesAndLegacyReferenceDataArePersistedWithoutDuplicates() {
         Ruta ruta = rutaRepository.findByCodigo("RUT-CAMP-SOC-BCG-CG").orElseThrow();
         List<Parada> paradas = paradaRepository.findByRuta_IdOrderByOrdenAsc(ruta.getId());
         long totalRutas = rutaRepository.count();
@@ -108,6 +116,7 @@ class RutaPersistenceIntegrationTest {
         long totalRelaciones = rutaParadaRepository.count();
 
         assertThat(ruta.getNombre()).contains("El Socorro", "Castillogrande");
+        assertThat(ruta.getEstado()).isEqualTo(Ruta.Estado.INACTIVA);
         assertThat(ruta.getVerificada()).isFalse();
         assertThat(ruta.getDescripcion()).contains("DATOS PROVISIONALES", "Coointracar Ltda.");
         assertThat(paradas).hasSize(10);
@@ -122,9 +131,29 @@ class RutaPersistenceIntegrationTest {
             .extracting(relacion -> relacion.getParada().getNombre())
             .first().isEqualTo("Castillogrande");
         assertThat(jdbcTemplate.queryForObject("SELECT COUNT(*) FROM ruta_barrios", Integer.class))
-            .isEqualTo(26);
+            .isEqualTo(102);
         assertThat(jdbcTemplate.queryForObject("SELECT COUNT(*) FROM ruta_barrios_ordenados", Integer.class))
-            .isEqualTo(26);
+            .isEqualTo(102);
+
+        List<Ruta> rutasTpc = rutaRepository.findAll().stream()
+            .filter(rutaTpc -> rutaTpc.getCodigo().startsWith("TPC-"))
+            .toList();
+        assertThat(rutasTpc).hasSize(20)
+            .allSatisfy(rutaTpc -> {
+                assertThat(rutaTpc.getEstado()).isEqualTo(Ruta.Estado.ACTIVA);
+                assertThat(rutaTpc.getVerificada()).isTrue();
+                assertThat(rutaTpc.getDescripcion())
+                    .contains("Cooperativa:", "Ida:", "Vuelta:", "Fuente: listado compartido por el usuario");
+                assertThat(rutaTpc.isOrdenBarriosConfirmado()).isTrue();
+            });
+        Ruta campestreIda = rutaRepository.findByCodigo("TPC-CAM-CEN-IDA").orElseThrow();
+        Ruta campestreVuelta = rutaRepository.findByCodigo("TPC-CAM-CEN-VUELTA").orElseThrow();
+        assertThat(campestreIda.getBarriosOrdenados())
+            .containsExactly("El Campestre", "El Socorro", "Bazurto", "Centro Histórico");
+        assertThat(campestreVuelta.getBarriosOrdenados())
+            .containsExactly("Centro Histórico", "Bazurto", "El Socorro", "El Campestre");
+        assertThat(campestreIda.getDescripcion())
+            .contains("El Campestre (cerca de cancha principal del barrio)");
 
         for (String codigo : List.of("RUT-POZ-TORICES", "RUT-37-SIM-CENTRO", "RUT-30A-NB-CENTRO")) {
             Ruta otraRuta = rutaRepository.findByCodigo(codigo).orElseThrow();
@@ -139,6 +168,7 @@ class RutaPersistenceIntegrationTest {
 
         assertThatCode(() -> localDatabaseBootstrapService.run(
             new DefaultApplicationArguments(new String[0]))).doesNotThrowAnyException();
+        tpcRouteReferenceSeederService.run(new DefaultApplicationArguments(new String[0]));
         dataSeederService.run();
 
         assertThat(rutaRepository.count()).isEqualTo(totalRutas);
@@ -146,9 +176,49 @@ class RutaPersistenceIntegrationTest {
         assertThat(rutaParadaRepository.count()).isEqualTo(totalRelaciones).isEqualTo(84);
         assertThat(paradaRepository.findByRuta_IdOrderByOrdenAsc(ruta.getId())).hasSize(10);
         assertThat(jdbcTemplate.queryForObject("SELECT COUNT(*) FROM ruta_barrios", Integer.class))
-            .isEqualTo(26);
+            .isEqualTo(102);
         assertThat(jdbcTemplate.queryForObject("SELECT COUNT(*) FROM ruta_barrios_ordenados", Integer.class))
-            .isEqualTo(26);
+            .isEqualTo(102);
+    }
+
+    @Test
+    void existingBusDriverNamesAreAnonymizedInStorage() {
+        Bus bus = new Bus();
+        bus.setPlaca("T" + java.util.UUID.randomUUID().toString().replace("-", "").substring(0, 8));
+        bus.setModelo("Bus de prueba");
+        Bus savedBus = busRepository.saveAndFlush(bus);
+        jdbcTemplate.update("UPDATE bus SET conductor = ? WHERE id = ?", "Nombre generado", savedBus.getId());
+
+        dataSeederService.run();
+
+        assertThat(jdbcTemplate.queryForObject(
+            "SELECT conductor FROM bus WHERE id = ?", String.class, savedBus.getId()))
+            .isEqualTo("Anónimo");
+    }
+
+    @Test
+    void linkedDriverAccountNamesAreAnonymizedInStorage() {
+        String suffix = java.util.UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+        Usuario usuario = new Usuario();
+        usuario.setUsername("driver" + suffix);
+        usuario.setPassword("PasswordTest1!");
+        usuario.setNombres("Nombre generado");
+        usuario.setApellidos("Apellido generado");
+        usuario.setEmail("driver" + suffix + "@example.com");
+        usuario.setRole("ROLE_CONDUCTOR");
+        entityManager.persist(usuario);
+
+        com.proaula.aula.Entity.Conductor conductor = new com.proaula.aula.Entity.Conductor();
+        conductor.setUsuario(usuario);
+        conductor.setNumeroIdentificacion("ID-" + suffix);
+        entityManager.persist(conductor);
+        entityManager.flush();
+
+        dataSeederService.run();
+        entityManager.refresh(usuario);
+
+        assertThat(usuario.getNombres()).isEqualTo("Conductor");
+        assertThat(usuario.getApellidos()).isEqualTo("Anónimo");
     }
 
     @Test

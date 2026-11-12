@@ -17,6 +17,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.proaula.aula.Repository.RutaRepository;
+import com.proaula.aula.Repository.UsuarioRepository;
+import com.proaula.aula.Service.LegalConsentService;
+import com.proaula.aula.LegalConsentTestSupport;
+import org.junit.jupiter.api.BeforeEach;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -29,6 +33,20 @@ class AdminRouteFlowIntegrationTest {
 
     @Autowired
     private RutaRepository rutaRepository;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private LegalConsentService legalConsentService;
+
+    @BeforeEach
+    void consentedMockUsersExist() {
+        LegalConsentTestSupport.ensureConsentedUser(
+                usuarioRepository, legalConsentService, "ordinary-user", "ROLE_USER");
+        LegalConsentTestSupport.ensureConsentedUser(
+                usuarioRepository, legalConsentService, "route-admin", "ROLE_ADMIN");
+    }
 
     @Test
     void routeAdministrationRequiresAdminAndCreatesAConfirmedPublicRoute() throws Exception {

@@ -1703,7 +1703,8 @@ h6 { font-size: 1rem; }
     flex-wrap: nowrap;
     gap: 0.25rem;
     min-width: 0;
-    overflow-x: auto;
+    overflow: visible;
+    flex-wrap: wrap;
     scrollbar-width: none;
 }
 
@@ -1728,6 +1729,41 @@ h6 { font-size: 1rem; }
 
 .dashboard-page .nav-link:hover {
     transform: translateY(-1px);
+}
+
+.dashboard-page .nav-menu {
+    position: relative;
+    flex: 0 0 auto;
+}
+
+.dashboard-page .nav-menu summary {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    cursor: pointer;
+    list-style: none;
+}
+
+.dashboard-page .nav-menu summary::-webkit-details-marker {
+    display: none;
+}
+
+.dashboard-page .nav-menu__panel {
+    position: absolute;
+    top: calc(100% + 0.45rem);
+    right: 0;
+    z-index: 20;
+    display: grid;
+    min-width: 205px;
+    padding: 0.4rem;
+    border: 1px solid rgba(112, 173, 222, 0.22);
+    border-radius: 0.85rem;
+    background: #0b1c2f;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.38);
+}
+
+.dashboard-page .nav-menu__panel .nav-link {
+    white-space: nowrap;
 }
 
 .dashboard-page .nav-link--outline {
@@ -2060,6 +2096,10 @@ h6 { font-size: 1rem; }
     .dashboard-page .nav-link {
         padding: 0.5rem 0.65rem;
         font-size: 0.82rem;
+    }
+
+    .dashboard-page .nav-menu__panel {
+        right: 0;
     }
 
     .dashboard-page .logout-link {

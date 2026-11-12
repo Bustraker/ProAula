@@ -211,7 +211,7 @@
                                     </div>
                                     <div class="fleet-detail">
                                         <span class="fleet-detail__icon"><i class="fas fa-id-badge" aria-hidden="true"></i></span>
-                                        <span><small>CONDUCTOR</small><strong th:text="${bus.conductor != null and !#strings.isEmpty(bus.conductor) ? bus.conductor : 'No asignado'}">No asignado</strong></span>
+                                        <span><small>CONDUCTOR</small><strong th:text="${bus.conductor}">Anónimo</strong></span>
                                     </div>
                                     <div class="fleet-detail fleet-detail--route">
                                         <span class="fleet-detail__icon"><i class="fas fa-route" aria-hidden="true"></i></span>

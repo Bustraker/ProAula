@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,6 +18,9 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import com.proaula.aula.LegalConsentTestSupport;
+import com.proaula.aula.Repository.UsuarioRepository;
+import com.proaula.aula.Service.LegalConsentService;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -25,6 +29,20 @@ class ReportesAnalyticsIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private LegalConsentService legalConsentService;
+
+    @BeforeEach
+    void consentedTestUsersExist() {
+        LegalConsentTestSupport.ensureConsentedUser(
+                usuarioRepository, legalConsentService, "admin", "ROLE_ADMIN");
+        LegalConsentTestSupport.ensureConsentedUser(
+                usuarioRepository, legalConsentService, "user", "ROLE_USER");
+    }
 
     @Test
     void indicatorsEndpointReturnsCurrentAggregatesWithoutCaching() throws Exception {

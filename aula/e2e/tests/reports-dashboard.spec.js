@@ -27,7 +27,19 @@ test("analytics dashboard renders live indicators and filters monthly activity",
     incidentesPorEstado: { PENDIENTE: 2 },
     incidentesPorTipo: [{ nombre: "RETRASO", cantidad: 2 }],
     rutasMasConsultadas: [{ nombre: "Ruta Centro", cantidad: 7 }],
-    actividadMensual: months
+    actividadMensual: months,
+    prioridadCoberturaBarrios: {
+      nombreModelo: "Prioridad potencial de revisión de cobertura",
+      versionModelo: "1.0",
+      metodo: "Índice explicable de cobertura.",
+      advertencia: "La cartografía no incluye datos de población.",
+      totalBarriosAnalizados: 0,
+      barriosPrioridadAlta: 0,
+      barriosPrioridadMedia: 0,
+      barriosPrioridadBaja: 0,
+      poblacionEnBarriosSinRutaVerificada: 0,
+      barriosPrioritarios: []
+    }
   };
   let requestCount = 0;
   const containers = [
@@ -42,6 +54,10 @@ test("analytics dashboard renders live indicators and filters monthly activity",
     <span id="reportsDataState"></span><p id="reportsSyntheticNotice" hidden></p>
     <p id="reportsError" role="alert" hidden></p><p id="reportsUpdatedAt"></p>
     <select id="activityPeriod"><option value="12">12 meses</option><option value="6">6 meses</option><option value="3">3 meses</option></select>
+    <span id="coverageHighCount"></span><span id="coverageMediumCount"></span>
+    <span id="coverageLowCount"></span><span id="coverageUnservedPopulation"></span>
+    <p id="coverageModelNotice"></p><div id="coveragePriorityChart"></div>
+    <div id="coveragePriorityTable"></div>
     ${containers.map(id => `<div id="${id}"></div>`).join("")}
   `;
 

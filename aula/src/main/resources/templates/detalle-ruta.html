@@ -64,7 +64,6 @@
             <i class="fas fa-triangle-exclamation" aria-hidden="true"></i>
             <strong>Información provisional, pendiente de verificación.</strong>
             <span>Este recorrido se muestra como referencia y no está habilitado para planear viajes.</span>
-            <p th:if="${not #strings.isEmpty(ruta.descripcion)}" th:text="${ruta.descripcion}"></p>
         </div>
 
         <!-- Detalle de la Ruta -->
@@ -77,7 +76,8 @@
                     <div class="d-flex flex-wrap flex-between mb-3">
                         <div>
                             <span th:if="${not ruta.verificada}" class="badge badge-warning">Pendiente de verificación</span>
-                            <span th:if="${ruta.verificada and ruta.estado == T(com.proaula.aula.Entity.Ruta.Estado).ACTIVA}" class="badge badge-success">Activa · verificada</span>
+                            <span th:if="${ruta.verificada and ruta.estado == T(com.proaula.aula.Entity.Ruta.Estado).ACTIVA and ruta.codigo != null and ruta.codigo.startsWith('TPC-')}" class="badge badge-success">Activa · referencia aportada</span>
+                            <span th:if="${ruta.verificada and ruta.estado == T(com.proaula.aula.Entity.Ruta.Estado).ACTIVA and (ruta.codigo == null or !ruta.codigo.startsWith('TPC-'))}" class="badge badge-success">Activa · verificada</span>
                             <span th:if="${ruta.verificada and ruta.estado == T(com.proaula.aula.Entity.Ruta.Estado).INACTIVA}" class="badge badge-danger">Inactiva · verificada</span>
                             <span th:if="${ruta.verificada and ruta.estado == T(com.proaula.aula.Entity.Ruta.Estado).SUSPENDIDA}" class="badge badge-warning">Suspendida · verificada</span>
                         </div>
@@ -129,6 +129,10 @@
                                 <div class="stat-value" th:text="${#lists.size(ruta.barrios)}">0</div>
                             </div>
                         </div>
+                        <div th:if="${not #strings.isEmpty(ruta.descripcion)}" class="alert alert-info" role="note">
+                            <i class="fas fa-circle-info" aria-hidden="true"></i>
+                            <p th:text="${ruta.descripcion}">Información del recorrido</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -177,7 +181,7 @@
                                     </td>
                                     <td th:text="${bus.modelo}">2020</td>
                                     <td th:text="${bus.color}">Azul</td>
-                                    <td th:text="${bus.conductor}">Juan Pérez</td>
+                                    <td th:text="${bus.conductor}">Anónimo</td>
                                     <td>
                                         <span th:if="${bus.estado == T(com.proaula.aula.Entity.Bus.Estado).ACTIVO}" class="badge badge-success">Activo</span>
                                         <span th:if="${bus.estado == T(com.proaula.aula.Entity.Bus.Estado).MANTENIMIENTO}" class="badge badge-warning">En mantenimiento</span>

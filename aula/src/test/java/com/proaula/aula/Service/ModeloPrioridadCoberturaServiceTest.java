@@ -17,7 +17,7 @@ import org.springframework.core.io.Resource;
 class ModeloPrioridadCoberturaServiceTest {
     private final BarrioContextoService barrioContextoService = new BarrioContextoService(
         new DefaultResourceLoader().getResource(
-            "classpath:data/Barrios_Oficiales_Distrito_de_Cartagena_de_Indias_20261107.xml"));
+            "classpath:static/data/cartografia/barrios-cartografia.geojson"));
     private final RutaRepository rutaRepository = mock(RutaRepository.class);
     private final ModeloPrioridadCoberturaService service =
         new ModeloPrioridadCoberturaService(barrioContextoService, rutaRepository);
@@ -30,14 +30,14 @@ class ModeloPrioridadCoberturaServiceTest {
         var alcibia = barrio(resultado.barriosPrioritarios(), "ALCIBIA");
 
         assertThat(resultado.nombreModelo()).containsIgnoringCase("prioridad potencial");
-        assertThat(resultado.totalBarriosAnalizados()).isEqualTo(187);
-        assertThat(resultado.barriosPrioridadAlta()).isEqualTo(187);
-        assertThat(resultado.poblacionEnBarriosSinRutaVerificada()).isPositive();
+        assertThat(resultado.totalBarriosAnalizados()).isEqualTo(208);
+        assertThat(resultado.barriosPrioridadAlta()).isEqualTo(208);
+        assertThat(resultado.poblacionEnBarriosSinRutaVerificada()).isZero();
         assertThat(alcibia.rutasActivasVerificadas()).isZero();
-        assertThat(alcibia.indicePrioridad()).isEqualTo(63.9);
+        assertThat(alcibia.indicePrioridad()).isEqualTo(60.0);
         assertThat(alcibia.nivelPrioridad()).isEqualTo("ALTA");
         assertThat(alcibia.factores()).anyMatch(factor -> factor.contains("Sin ruta activa"));
-        assertThat(resultado.advertencia()).contains("no tiene año de medición identificado");
+        assertThat(resultado.advertencia()).contains("no incluye datos de población");
     }
 
     @Test
@@ -89,7 +89,7 @@ class ModeloPrioridadCoberturaServiceTest {
         assertThat(alcibia.rutasActivasVerificadas()).isEqualTo(2);
         assertThat(alcibia.paradasActivasRegistradas()).isEqualTo(2);
         assertThat(alcibia.paradasActivasGeorreferenciadas()).isEqualTo(2);
-        assertThat(alcibia.indicePrioridad()).isEqualTo(3.9);
+        assertThat(alcibia.indicePrioridad()).isZero();
         assertThat(alcibia.nivelPrioridad()).isEqualTo("BAJA");
     }
 

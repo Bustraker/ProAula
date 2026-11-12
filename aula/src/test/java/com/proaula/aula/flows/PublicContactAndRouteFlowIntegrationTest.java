@@ -13,6 +13,7 @@ import java.util.List;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -31,6 +32,9 @@ import com.proaula.aula.Repository.ContactoMensajeRepository;
 import com.proaula.aula.Repository.ParadaRepository;
 import com.proaula.aula.Repository.RutaParadaRepository;
 import com.proaula.aula.Repository.RutaRepository;
+import com.proaula.aula.Repository.UsuarioRepository;
+import com.proaula.aula.Service.LegalConsentService;
+import com.proaula.aula.LegalConsentTestSupport;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -60,6 +64,20 @@ class PublicContactAndRouteFlowIntegrationTest {
 
     @Autowired
     private AgenciaRepository agenciaRepository;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private LegalConsentService legalConsentService;
+
+    @BeforeEach
+    void consentedMockUsersExist() {
+        LegalConsentTestSupport.ensureConsentedUser(
+                usuarioRepository, legalConsentService, "admin", "ROLE_ADMIN");
+        LegalConsentTestSupport.ensureConsentedUser(
+                usuarioRepository, legalConsentService, "viewer", "ROLE_USER");
+    }
 
     @Test
     void publicContactSubmissionPersistsAndShowsAcknowledgement() throws Exception {
@@ -152,9 +170,11 @@ class PublicContactAndRouteFlowIntegrationTest {
         inactiva.setBarriosOrdenados(inactiva.getBarrios());
         rutaRepository.saveAndFlush(inactiva);
 
-        mockMvc.perform(get("/rutas"))
+        String rutasHtml = mockMvc.perform(get("/rutas"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("Ruta Integracion Publica")));
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Ruta Integracion Publica")))
+                .andReturn().getResponse().getContentAsString();
+        assertThat(rutasHtml).contains("CAMPETRE-CENTRO · IDA").doesNotContain("Ruta inactiva");
 
         mockMvc.perform(get("/ruta/{id}", guardada.getId()))
                 .andExpect(status().isOk())
@@ -179,10 +199,18 @@ class PublicContactAndRouteFlowIntegrationTest {
         assertThat(rutaLegacyEnMapa.path("paradasPorSentido").path("IDA").findValuesAsText("nombre"))
                 .containsExactly("Parada legacy " + suffix);
         assertThat(mapaJson).doesNotContain("Parada inactiva", "Ruta inactiva");
+        assertThat(mapaJson).contains("Cooperativa: COOINTRACAR", "Punto de despacho:");
 
         mockMvc.perform(get("/api/rutas"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("Ruta Integracion Publica")));
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("CAMPETRE-CENTRO · IDA")));
+
+        Ruta tpcIda = rutaRepository.findByCodigo("TPC-CAM-CEN-IDA").orElseThrow();
+        String tpcDetail = mockMvc.perform(get("/ruta/{id}", tpcIda.getId()))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        assertThat(tpcDetail).contains("Activa · referencia aportada", "Cooperativa: COOINTRACAR",
+                "Punto de despacho: El Campestre", "Ida:", "Vuelta:");
 
         mockMvc.perform(get("/viajar_public"))
                 .andExpect(status().isOk())

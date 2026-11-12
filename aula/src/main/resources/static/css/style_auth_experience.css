@@ -712,6 +712,23 @@ body.auth-body {
     gap: 0.65rem;
 }
 
+.oauth-legal-check {
+    display: grid;
+    grid-template-columns: 17px 1fr;
+    gap: 10px;
+    margin: 0 0 12px;
+    color: #526679;
+    font-size: 0.78rem;
+    line-height: 1.5;
+}
+
+.oauth-legal-check input {
+    width: 16px;
+    height: 16px;
+    margin: 2px 0 0;
+    accent-color: #1c5d86;
+}
+
 .auth-page .btn-outline {
     min-height: 43px;
     color: #31485c;

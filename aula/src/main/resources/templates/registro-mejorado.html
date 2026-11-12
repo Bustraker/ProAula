@@ -229,22 +229,35 @@
                         </div>
                         </div>
 
-                        <!-- Términos y Condiciones -->
+                        <!-- Consentimiento legal y confirmación de mayoría de edad -->
                         <div class="form-group">
                             <div class="form-check">
-                                <input type="checkbox" 
-                                        id="terminos" 
+                                <input type="checkbox"
+                                        id="terminos"
                                         name="terminos"
                                         class="form-check-input"
                                         required>
                                 <label class="form-check-label" for="terminos">
-                                    Acepto los 
+                                    He leído y acepto los
                                     <a th:href="@{/terminos}" target="_blank" class="btn-link-clear">Términos y Condiciones</a>
-                                    y la 
+                                    y la
                                     <a th:href="@{/privacidad}" target="_blank" class="btn-link-clear">Política de Privacidad</a>
-                                    *
+                                    y autorizo el tratamiento de mis datos personales descrito en ella. *
                                 </label>
                             </div>
+                            <input type="hidden" name="legalVersion" th:value="${legalVersion}">
+                            <div class="form-check">
+                                <input type="checkbox"
+                                        id="mayorEdad"
+                                        name="mayorEdad"
+                                        value="true"
+                                        class="form-check-input"
+                                        required>
+                                <label class="form-check-label" for="mayorEdad">
+                                    Confirmo que tengo 18 años o más y que puedo aceptar estas condiciones por mí mismo. *
+                                </label>
+                            </div>
+                            <small class="form-text">Bustraker no permite crear cuentas ni activar reportes GPS a personas menores de 18 años.</small>
                         </div>
 
                         <!-- Botón de Registro -->

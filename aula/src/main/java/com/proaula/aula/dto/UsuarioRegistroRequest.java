@@ -2,6 +2,7 @@ package com.proaula.aula.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
@@ -13,6 +14,12 @@ public record UsuarioRegistroRequest(
     @Pattern(regexp = "^[\\p{L}\\p{M}][\\p{L}\\p{M} .'-]*$") String nombres,
     @NotBlank @Size(max = 80)
     @Pattern(regexp = "^[\\p{L}\\p{M}][\\p{L}\\p{M} .'-]*$") String apellidos,
-    @NotBlank @Email @Size(max = 254) String email
+    @NotBlank @Email @Size(max = 254) String email,
+    @NotNull Boolean legalConsent,
+    @NotNull Boolean adultConfirmed,
+    @NotBlank @Size(max = 40) String legalVersion
 ) {
+    public UsuarioRegistroRequest(String username, String password, String nombres, String apellidos, String email) {
+        this(username, password, nombres, apellidos, email, false, false, "");
+    }
 }

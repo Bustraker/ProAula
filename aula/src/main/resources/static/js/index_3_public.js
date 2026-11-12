@@ -121,7 +121,7 @@
         });
 
         revealTargets.forEach((target, index) => {
-            const delay = Math.min((index % 3) * 90, 180);
+            const delay = Math.min((index % 3) * 55, 110);
             target.style.setProperty("--reveal-delay", `${delay}ms`);
             revealObserver.observe(target);
         });

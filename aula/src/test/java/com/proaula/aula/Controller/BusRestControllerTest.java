@@ -10,11 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.proaula.aula.Entity.Bus;
 import com.proaula.aula.Entity.Ruta;
 import com.proaula.aula.Service.BusService;
@@ -30,46 +26,18 @@ class BusRestControllerTest {
     private BusRestController controller;
 
     @Test
-    void getAllBusesWithRutaExposesOnlyUniqueRoutesToAnonymousUsers() throws Exception {
+    void getAllBusesWithRutaIncludesBusAndRouteDetails() {
         Bus bus = crearBus();
-        Bus secondBus = crearBus();
-        secondBus.setId(4L);
-        secondBus.setPlaca("XYZ789");
-        when(busService.getBusConsultations(false)).thenReturn(
-                com.proaula.aula.dto.BusConsultaMapper.publicRoutes(List.of(bus, secondBus)));
+        when(busService.getBusConsultations()).thenReturn(
+                com.proaula.aula.dto.BusConsultaMapper.authenticatedBuses(List.of(bus)));
 
-        List<BusConsultaDto> result = controller.getAllBusesWithRuta(null);
+        List<BusConsultaDto> result = controller.getAllBusesWithRuta();
 
         assertThat(result).hasSize(1);
-        assertThat(result.get(0).getRutaNombre()).isEqualTo("Centro");
-        assertThat(result.get(0).getBarrios()).containsExactly("Centro");
-        assertThat(result.get(0).getId()).isNull();
-        assertThat(result.get(0).getPlaca()).isNull();
-        assertThat(result.get(0).getModelo()).isNull();
-        assertThat(result.get(0).getColor()).isNull();
-        assertThat(result.get(0).getConductor()).isNull();
-        assertThat(result.get(0).getHoraAproximada()).isNull();
-        assertThat(result.get(0).getRutaVerificada()).isNull();
-        String json = new ObjectMapper().writeValueAsString(result);
-        assertThat(json)
-                .contains("rutaNombre", "barrios")
-                .doesNotContain("placa", "modelo", "color", "conductor", "horaAproximada");
-    }
-
-    @Test
-    void getAllBusesWithRutaIncludesFullBusAndRouteDetailsForAuthenticatedUsers() {
-        Bus bus = crearBus();
-        when(busService.getBusConsultations(true)).thenReturn(
-                com.proaula.aula.dto.BusConsultaMapper.authenticatedBuses(List.of(bus)));
-        Authentication authentication = new UsernamePasswordAuthenticationToken(
-                "usuario", "credenciales", List.of(new SimpleGrantedAuthority("ROLE_USER")));
-
-        List<BusConsultaDto> result = controller.getAllBusesWithRuta(authentication);
-
         assertThat(result.get(0).getId()).isEqualTo(3L);
         assertThat(result.get(0).getPlaca()).isEqualTo("ABC123");
         assertThat(result.get(0).getModelo()).isEqualTo("Bus de prueba");
-        assertThat(result.get(0).getConductor()).isEqualTo("Conductor de prueba");
+        assertThat(result.get(0).getConductor()).isEqualTo("Anónimo");
         assertThat(result.get(0).getBarrios()).containsExactly("Centro");
         assertThat(result.get(0).getHoraAproximada()).isEqualTo("07:30");
         assertThat(result.get(0).getRutaVerificada()).isTrue();

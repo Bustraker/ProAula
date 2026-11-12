@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -31,6 +32,8 @@ import com.proaula.aula.Repository.AdminInviteCodeRepository;
 import com.proaula.aula.Repository.UsuarioRepository;
 import com.proaula.aula.Service.AdminCodeService;
 import com.proaula.aula.Service.UsuarioService;
+import com.proaula.aula.LegalConsentTestSupport;
+import com.proaula.aula.Service.LegalConsentService;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -48,6 +51,9 @@ class AdminCodeApprovalFlowIntegrationTest {
     private UsuarioService usuarioService;
 
     @Autowired
+    private LegalConsentService legalConsentService;
+
+    @Autowired
     private AdminInviteCodeRepository inviteCodeRepository;
 
     @Autowired
@@ -62,6 +68,16 @@ class AdminCodeApprovalFlowIntegrationTest {
     @Autowired
     private org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder passwordEncoder;
 
+    @BeforeEach
+    void consentedMockUsersExist() {
+        LegalConsentTestSupport.ensureConsentedUser(
+            usuarioRepository, legalConsentService, "elevated-admin", "ROLE_ADMIN");
+        LegalConsentTestSupport.ensureConsentedUser(
+            usuarioRepository, legalConsentService, "ordinary-user", "ROLE_USER");
+        LegalConsentTestSupport.ensureConsentedUser(
+            usuarioRepository, legalConsentService, "not-the-approver", "ROLE_ADMIN");
+    }
+
     @Test
     void regularAdminRoleDoesNotBypassTheAdminCodeGate() throws Exception {
         Usuario administrator = new Usuario();
@@ -72,6 +88,7 @@ class AdminCodeApprovalFlowIntegrationTest {
         administrator.setApellidos("Prueba");
         administrator.setRole("ROLE_ADMIN");
         usuarioRepository.saveAndFlush(administrator);
+        LegalConsentTestSupport.recordConsent(administrator, legalConsentService);
 
         MvcResult login = mockMvc.perform(post("/login")
                 .with(csrf())
@@ -179,7 +196,10 @@ class AdminCodeApprovalFlowIntegrationTest {
                 .session((org.springframework.mock.web.MockHttpSession) session)
                 .param("username", "approvedadmin")
                 .param("password", "candidate-password-26")
-                .param("passwordConfirm", "candidate-password-26"))
+                .param("passwordConfirm", "candidate-password-26")
+                .param("legalConsent", "true")
+                .param("adultConfirmed", "true")
+                .param("legalVersion", "2026-11-11-v1"))
             .andExpect(status().is3xxRedirection())
             .andExpect(header().string("Location", "/admin-login?verified=true"));
 

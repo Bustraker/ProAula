@@ -12,6 +12,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -86,10 +87,24 @@ public class Bus {
     @EqualsAndHashCode.Exclude
     private Agencia agencia;
 
+    public String getConductor() {
+        return "Anónimo";
+    }
+
+    public void setConductor(String conductor) {
+        this.conductor = "Anónimo";
+    }
+
     @PrePersist
     void generarNumeroInternoSiHaceFalta() {
         if (numeroInterno == null || numeroInterno.isBlank()) {
             numeroInterno = CodigoInterno.generar("BUS-");
         }
+        anonimizarConductor();
+    }
+
+    @PreUpdate
+    void anonimizarConductor() {
+        conductor = "Anónimo";
     }
 }

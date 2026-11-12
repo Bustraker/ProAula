@@ -204,7 +204,7 @@ public class ModeloPrioridadCoberturaService {
     }
 
     private static String advertencia(boolean datosSinteticosConfigurados) {
-        String advertencia = "La población de la fuente no tiene año de medición identificado. "
+        String advertencia = "La fuente cartográfica no incluye datos de población. "
             + "La cobertura se calcula con rutas y paradas registradas, no mide frecuencia, "
             + "demanda real ni calidad del servicio. Úselo para priorizar revisiones, no como "
             + "decisión automática de inversión.";

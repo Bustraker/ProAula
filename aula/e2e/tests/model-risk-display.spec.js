@@ -69,9 +69,12 @@ test("public route options show the model delay probability before route selecti
   await page.locator("#btnPlanificar").click();
 
   const risk = page.locator(".tramo__riesgo");
+  await expect(risk).toContainText("Alto");
   await expect(risk).toContainText("42%");
+  await expect(risk).toHaveClass(/tramo__riesgo--alto/);
+  await expect(risk.getByRole("meter")).toHaveAttribute("aria-valuenow", "42");
   await expect(page.locator(".resultados__riesgo-nota"))
-    .toContainText("No incluye semáforos, tráfico ni retrasos reales");
+    .toContainText("No incluye espera ni tráfico.");
   expect(predictionRequest.method).toBe("POST");
   expect(predictionRequest.headers["content-type"]).toContain("application/json");
   expect(predictionRequest.body.ruta).toBe("101");

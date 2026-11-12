@@ -20,6 +20,8 @@ test("administrative access appears centered only after selecting the Bustraker 
   await expect(page.locator(".admin-access-stage__status")).toContainText("SISTEMA PROTEGIDO");
   await expect(accessButton).toContainText("Acceso administrativo");
   await expect(accessButton).toContainText("CENTRO DE OPERACIONES");
+  await page.locator(".admin-access-stage")
+    .evaluate(element => Promise.all(element.getAnimations().map(animation => animation.finished)));
 
   const buttonBox = await accessButton.boundingBox();
   const viewport = page.viewportSize();

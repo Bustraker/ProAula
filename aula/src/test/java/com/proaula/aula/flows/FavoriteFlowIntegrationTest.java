@@ -10,6 +10,8 @@ import com.proaula.aula.Repository.NotificacionRepository;
 import com.proaula.aula.Repository.ParadaRepository;
 import com.proaula.aula.Repository.RutaRepository;
 import com.proaula.aula.Repository.UsuarioRepository;
+import com.proaula.aula.Service.LegalConsentService;
+import com.proaula.aula.LegalConsentTestSupport;
 import com.proaula.aula.Service.AvisoFavoritoService;
 import com.proaula.aula.Service.FavoritoService;
 import com.proaula.aula.dto.FavoritoRequest;
@@ -66,6 +68,9 @@ class FavoriteFlowIntegrationTest {
     private UsuarioRepository usuarioRepository;
 
     @Autowired
+    private LegalConsentService legalConsentService;
+
+    @Autowired
     private RutaRepository rutaRepository;
 
     @Autowired
@@ -73,8 +78,8 @@ class FavoriteFlowIntegrationTest {
 
     @Test
     void usersCanSaveRoutesAndStopsPrivatelyAndReceiveRouteAlerts() throws Exception {
-        Usuario ana = usuarioRepository.saveAndFlush(usuario("ana"));
-        Usuario otraPersona = usuarioRepository.saveAndFlush(usuario("otra"));
+        Usuario ana = saveConsentedUser("ana");
+        Usuario otraPersona = saveConsentedUser("otra");
         Ruta ruta = rutaRepository.saveAndFlush(ruta());
         Parada parada = new Parada();
         parada.setNombre("Parada Centro");
@@ -202,6 +207,12 @@ class FavoriteFlowIntegrationTest {
         usuario.setNombres("Usuario");
         usuario.setApellidos("Prueba");
         usuario.setEmail(prefijo + sufijo + "@example.test");
+        return usuario;
+    }
+
+    private Usuario saveConsentedUser(String prefijo) {
+        Usuario usuario = usuarioRepository.saveAndFlush(usuario(prefijo));
+        LegalConsentTestSupport.recordConsent(usuario, legalConsentService);
         return usuario;
     }
 

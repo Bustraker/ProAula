@@ -88,8 +88,19 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             registrationId.toUpperCase(Locale.ROOT), providerId);
         if (usuario == null) {
             usuario = usuarioRepository.findByEmail(email);
-            if (usuario != null || ("facebook".equals(registrationId)
-                    && usuarioRepository.existsByEmail(email))) {
+            if (usuario != null) {
+                if (!usuario.isEmailVerified()) {
+                    throw new OAuth2AuthenticationException(
+                        "El correo ya está registrado pero aún no ha sido verificado. Revisa tu correo o inicia sesión con la cuenta local.");
+                }
+                throw new OAuth2AuthenticationException(
+                    "El correo ya pertenece a otra cuenta; inicia sesión con esa cuenta antes de vincular un proveedor externo");
+            }
+            if (usuarioRepository.existsByEmail(email)) {
+                if (!isProviderEmailVerified(oauth2User, registrationId)) {
+                    throw new OAuth2AuthenticationException(
+                        "El correo ya está registrado pero aún no ha sido verificado. Revisa tu correo o inicia sesión con la cuenta local.");
+                }
                 throw new OAuth2AuthenticationException(
                     "El correo ya pertenece a otra cuenta; inicia sesión con esa cuenta antes de vincular un proveedor externo");
             }
@@ -136,6 +147,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         usuario.setUsername(generateUsername(email));
         usuario.setPassword(UUID.randomUUID().toString());
         usuario.setRole("ROLE_USER");
+        usuario.setEmailVerified(isProviderEmailVerified(oauth2User, registrationId));
         usuario.setPasswordSetupRequired(true);
         usuario.setNombres(getFirstName(oauth2User, registrationId));
         usuario.setApellidos(getLastName(oauth2User, registrationId));
@@ -216,6 +228,16 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             return name.substring(name.lastIndexOf(' ') + 1);
         }
         return "No especificado";
+    }
+
+    private boolean isProviderEmailVerified(OAuth2User oauth2User, String registrationId) {
+        if (PROVIDER_GOOGLE.equals(registrationId)) {
+            return Boolean.TRUE.equals(oauth2User.getAttribute("email_verified"));
+        }
+        if (PROVIDER_GITHUB.equals(registrationId)) {
+            return true;
+        }
+        return Boolean.TRUE.equals(oauth2User.getAttribute("verified"));
     }
 
     private String nonBlankOrDefault(String value, String defaultValue) {

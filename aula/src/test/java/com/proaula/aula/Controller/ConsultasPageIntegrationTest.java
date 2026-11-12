@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,6 +22,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.proaula.aula.dto.BusConsultaDto;
 import com.proaula.aula.Service.BusService;
+import com.proaula.aula.Repository.UsuarioRepository;
+import com.proaula.aula.Service.LegalConsentService;
+import com.proaula.aula.LegalConsentTestSupport;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -32,6 +36,18 @@ class ConsultasPageIntegrationTest {
 
     @MockitoBean
     private BusService busService;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private LegalConsentService legalConsentService;
+
+    @BeforeEach
+    void consentedSessionUserExists() {
+        LegalConsentTestSupport.ensureConsentedUser(
+                usuarioRepository, legalConsentService, "usuario", "ROLE_USER");
+    }
 
     @Test
     void busConsultationPageRequiresAuthentication() throws Exception {
@@ -66,8 +82,8 @@ class ConsultasPageIntegrationTest {
                         "La información de tu viaje no debería estar dispersa.",
                         "Lo que imaginamos para el siguiente tramo.",
                         "Idea por evaluar",
-                        "/css/public-home.css?v=green-13",
-                        "/js/index_3_public.js?v=route-map-2",
+                        "/css/public-home.css?v=cartagena-contacto-15",
+                        "/js/index_3_public.js?v=route-map-3",
                         "name=\"_csrf\"",
                         "name=\"_csrf_header\"")
                 .doesNotContain("/consultas", "Consulta de buses", "Consultar buses",

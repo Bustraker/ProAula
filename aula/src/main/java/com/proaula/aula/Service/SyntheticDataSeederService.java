@@ -191,7 +191,10 @@ public class SyntheticDataSeederService implements ApplicationRunner {
         Random random = new Random(seed);
         Faker faker = new Faker(Locale.forLanguageTag("es"), random);
 
-        List<Ruta> routes = rutaRepository.findAll();
+        List<Ruta> routes = rutaRepository.findAll().stream()
+            .filter(route -> route.getEstado() == Ruta.Estado.ACTIVA
+                && Boolean.TRUE.equals(route.getVerificada()))
+            .collect(Collectors.toList());
         List<Parada> stops = paradaRepository.findAll();
         List<Usuario> demoUsers = seedUsers(faker);
         List<Usuario> customers = demoUsers.stream()
@@ -239,6 +242,18 @@ public class SyntheticDataSeederService implements ApplicationRunner {
             .filter(user -> user.getUsername() != null && user.getUsername().startsWith(SYNTHETIC_USER_PREFIX)
                 && "SYNTHETIC".equalsIgnoreCase(user.getProvider()))
             .collect(Collectors.toCollection(ArrayList::new));
+        boolean anonymizedDrivers = false;
+        for (Usuario user : existingDemoUsers) {
+            if ("ROLE_CONDUCTOR".equalsIgnoreCase(user.getRole())
+                    && (!"Conductor".equals(user.getNombres()) || !"Anónimo".equals(user.getApellidos()))) {
+                user.setNombres("Conductor");
+                user.setApellidos("Anónimo");
+                anonymizedDrivers = true;
+            }
+        }
+        if (anonymizedDrivers) {
+            usuarioRepository.saveAll(existingDemoUsers);
+        }
         if (existingDemoUsers.size() >= userCount) {
             return existingDemoUsers;
         }
@@ -276,8 +291,8 @@ public class SyntheticDataSeederService implements ApplicationRunner {
             user.setUsername(username);
             user.setEmail(username + "@example.com");
             user.setPassword(passwordEncoder.encode(faker.internet().password(12, 16, true, true)));
-            user.setNombres(limit(faker.name().firstName(), 100));
-            user.setApellidos(limit(faker.name().lastName(), 100));
+            user.setNombres(isDriver ? "Conductor" : limit(faker.name().firstName(), 100));
+            user.setApellidos(isDriver ? "Anónimo" : limit(faker.name().lastName(), 100));
             user.setProvider("SYNTHETIC");
             user.setRole(role.getNombre());
             user.setRoles(new HashSet<>(Set.of(role)));
@@ -339,7 +354,7 @@ public class SyntheticDataSeederService implements ApplicationRunner {
             bus.setMarca(BUS_MAKES.get(random.nextInt(BUS_MAKES.size())));
             bus.setModelo(BUS_MODELS.get(random.nextInt(BUS_MODELS.size())));
             bus.setColor(BUS_COLORS.get(random.nextInt(BUS_COLORS.size())));
-            bus.setConductor(faker.name().fullName());
+            bus.setConductor("Anónimo");
             bus.setCapacidadPasajeros(List.of(30, 35, 40, 45).get(random.nextInt(4)));
             bus.setAnio(2012 + random.nextInt(13));
             bus.setEstado(random.nextInt(100) < 92 ? Bus.Estado.ACTIVO : Bus.Estado.MANTENIMIENTO);
@@ -563,6 +578,8 @@ public class SyntheticDataSeederService implements ApplicationRunner {
         }
         if (!tickets.isEmpty()) {
             pasajeRepository.saveAll(tickets);
+        } else if (ticketCount > 0) {
+            log.warn("No se generaron pasajes: las rutas elegidas no tienen al menos dos paradas registradas.");
         }
     }
 

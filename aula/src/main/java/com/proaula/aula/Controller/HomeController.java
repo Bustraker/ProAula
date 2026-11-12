@@ -1,7 +1,6 @@
 package com.proaula.aula.Controller;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,6 +28,7 @@ import com.proaula.aula.Service.AvisoFavoritoService;
 import com.proaula.aula.Service.BusService;
 import com.proaula.aula.Service.ContactoMensajeService;
 import com.proaula.aula.Service.FavoritoService;
+import com.proaula.aula.Service.LegalConsentService;
 import com.proaula.aula.Service.RutaService;
 import com.proaula.aula.Service.TrayectoFavoritoService;
 import com.proaula.aula.Service.UsuarioService;
@@ -61,6 +61,7 @@ public class HomeController {
     private final FavoritoService favoritoService;
     private final AvisoFavoritoService avisoFavoritoService;
     private final TrayectoFavoritoService trayectoFavoritoService;
+    private final LegalConsentService legalConsentService;
 
     public HomeController(BusService busService,
                           RutaService rutaService,
@@ -70,7 +71,8 @@ public class HomeController {
                           ContactoMensajeService contactoMensajeService,
                           FavoritoService favoritoService,
                           AvisoFavoritoService avisoFavoritoService,
-                          TrayectoFavoritoService trayectoFavoritoService) {
+                          TrayectoFavoritoService trayectoFavoritoService,
+                          LegalConsentService legalConsentService) {
         this.busService = busService;
         this.rutaService = rutaService;
         this.usuarioService = usuarioService;
@@ -80,6 +82,7 @@ public class HomeController {
         this.favoritoService = favoritoService;
         this.avisoFavoritoService = avisoFavoritoService;
         this.trayectoFavoritoService = trayectoFavoritoService;
+        this.legalConsentService = legalConsentService;
     }
 
     @GetMapping("/")
@@ -90,12 +93,14 @@ public class HomeController {
     @GetMapping({"/inicio-de-sesion-mejorado.html", "/inicio-de-sesion-mejorado", "/inicio_de_sesion"})
     public String login(Model model) {
         model.addAttribute(MODEL_ATTR_USUARIO, new UsuarioFormDto());
+        model.addAttribute("legalVersion", LegalConsentService.CURRENT_VERSION);
         return "inicio-de-sesion-mejorado";
     }
 
     @GetMapping({"/registro-mejorado.html", "/registro-mejorado", "/registro"})
     public String registro(Model model) {
         model.addAttribute(MODEL_ATTR_USUARIO, new UsuarioFormDto());
+        model.addAttribute("legalVersion", LegalConsentService.CURRENT_VERSION);
         return VIEW_REGISTRO_MEJORADO;
     }
 
@@ -105,7 +110,10 @@ public class HomeController {
                            BindingResult bindingResult,
                            @RequestParam(required = false) String passwordConfirm,
                            @RequestParam(required = false) Boolean terminos,
+                           @RequestParam(required = false) Boolean mayorEdad,
+                           @RequestParam(required = false) String legalVersion,
                            Model model) {
+        model.addAttribute("legalVersion", LegalConsentService.CURRENT_VERSION);
         if (bindingResult.hasErrors()) {
             model.addAttribute(MODEL_ATTR_ERROR, "Revisa los datos ingresados y corrige los campos marcados.");
             model.addAttribute(MODEL_ATTR_USUARIO, usuarioForm);
@@ -125,7 +133,21 @@ public class HomeController {
         }
 
         if (!Boolean.TRUE.equals(terminos)) {
-            model.addAttribute(MODEL_ATTR_ERROR, "Debes aceptar los términos y condiciones para registrarte");
+            model.addAttribute(MODEL_ATTR_ERROR,
+                "Debes aceptar los Términos, la Política de privacidad y el tratamiento descrito para registrarte.");
+            model.addAttribute(MODEL_ATTR_USUARIO, usuarioForm);
+            return VIEW_REGISTRO_MEJORADO;
+        }
+
+        if (!Boolean.TRUE.equals(mayorEdad)) {
+            model.addAttribute(MODEL_ATTR_ERROR, "Debes confirmar que tienes al menos 18 años para crear una cuenta.");
+            model.addAttribute(MODEL_ATTR_USUARIO, usuarioForm);
+            return VIEW_REGISTRO_MEJORADO;
+        }
+
+        if (!LegalConsentService.CURRENT_VERSION.equals(legalVersion)) {
+            model.addAttribute(MODEL_ATTR_ERROR,
+                "La información legal cambió. Recarga la página y vuelve a aceptar antes de registrarte.");
             model.addAttribute(MODEL_ATTR_USUARIO, usuarioForm);
             return VIEW_REGISTRO_MEJORADO;
         }
@@ -153,7 +175,8 @@ public class HomeController {
 
         usuario.setRole(ROLE_USER);
 
-        usuarioService.register(usuario);
+        Usuario creado = usuarioService.register(usuario);
+        legalConsentService.recordAcceptance(creado, legalVersion, true, "REGISTRATION");
 
         return "redirect:/inicio-de-sesion-mejorado?registrado=true";
     }
@@ -173,7 +196,6 @@ public class HomeController {
         model.addAttribute("viajesRealizados", 0);
         model.addAttribute("proximoViaje", "--");
         model.addAttribute("busesActivos", rutaService.countActiveBuses());
-        model.addAttribute(MODEL_ATTR_BUSES, busService.getAllBuses());
         model.addAttribute(MODEL_ATTR_CONTACTO_MENSAJE, new ContactoMensaje());
         model.addAttribute("favoritos", favoritoService.listar(username));
         model.addAttribute("avisosFavoritos", avisoFavoritoService.listar(usuario.getId()));
@@ -378,11 +400,8 @@ public class HomeController {
     }
 
     @GetMapping("/consultas")
-    public String consultas(Model model, Authentication authentication) {
-        boolean autenticado = authentication != null
-                && authentication.isAuthenticated()
-                && !(authentication instanceof AnonymousAuthenticationToken);
-        List<BusConsultaDto> buses = busService.getBusConsultations(autenticado);
+    public String consultas(Model model) {
+        List<BusConsultaDto> buses = busService.getBusConsultations();
         long rutasConBuses = buses.stream()
                 .map(bus -> bus.getRutaNombre())
                 .filter(nombre -> nombre != null && !nombre.isBlank())
@@ -392,7 +411,7 @@ public class HomeController {
                 .flatMap(bus -> bus.getBarrios().stream())
                 .distinct()
                 .count();
-        model.addAttribute("autenticado", autenticado);
+        model.addAttribute("autenticado", true);
         model.addAttribute(MODEL_ATTR_BUSES, buses);
         model.addAttribute("totalBuses", buses.size());
         model.addAttribute("rutasConBuses", rutasConBuses);

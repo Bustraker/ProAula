@@ -147,6 +147,21 @@
                             <input type="password" id="passwordConfirm" name="passwordConfirm" placeholder="Repite la contraseña" autocomplete="new-password" minlength="12" maxlength="72" required>
                         </div>
                     </div>
+                    <input type="hidden" name="legalVersion" th:value="${legalVersion}">
+                    <div class="form-group">
+                        <div class="form-check">
+                            <input type="checkbox" id="adminLegalConsent" name="legalConsent" value="true" required>
+                            <label for="adminLegalConsent">
+                                Acepto los <a th:href="@{/terminos}" target="_blank" rel="noopener">Términos y condiciones</a>,
+                                la <a th:href="@{/privacidad}" target="_blank" rel="noopener">Política de privacidad</a>
+                                y autorizo el tratamiento de mis datos.
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" id="adminAdultConfirmed" name="adultConfirmed" value="true" required>
+                            <label for="adminAdultConfirmed">Confirmo que tengo 18 años o más.</label>
+                        </div>
+                    </div>
                     <button type="submit" class="btn-login"><span>Crear cuenta ADMIN</span><i class="fas fa-arrow-right" aria-hidden="true"></i></button>
                 </form>
 

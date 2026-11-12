@@ -13,6 +13,9 @@ import org.springframework.data.repository.query.Param;
 public interface IncidenteRepository extends JpaRepository<Incidente, Long> {
     boolean existsByRuta_Id(Long rutaId);
 
+    List<Incidente> findByRuta_IdAndEstadoInOrderByFechaReporteDescIdDesc(
+            Long rutaId, List<String> estados);
+
     long countByEstadoIgnoreCase(String estado);
 
     @Query("""

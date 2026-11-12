@@ -52,7 +52,7 @@ class BusControllerTest {
         assertThat(existente.getPlaca()).isEqualTo("XYZ-987");
         assertThat(existente.getModelo()).isEqualTo("Modelo actualizado");
         assertThat(existente.getColor()).isEqualTo("Azul");
-        assertThat(existente.getConductor()).isEqualTo("Ana Pérez");
+        assertThat(existente.getConductor()).isEqualTo("Anónimo");
         assertThat(existente.getRuta()).isSameAs(ruta);
         verify(busService).saveBus(existente);
     }

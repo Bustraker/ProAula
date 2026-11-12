@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.proaula.aula.Entity.Usuario;
 import com.proaula.aula.Service.UsuarioService;
+import com.proaula.aula.Service.LegalConsentService;
 import com.proaula.aula.config.JwtTokenProvider;
 import com.proaula.aula.dto.UsuarioRegistroRequest;
 import com.proaula.aula.dto.UsuarioRegistroResponse;
@@ -31,14 +33,30 @@ public class UsuarioController {
 
     private final UsuarioService usuarioService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final LegalConsentService legalConsentService;
 
-    public UsuarioController(UsuarioService usuarioService, JwtTokenProvider jwtTokenProvider) {
+    public UsuarioController(UsuarioService usuarioService, JwtTokenProvider jwtTokenProvider,
+                             LegalConsentService legalConsentService) {
         this.usuarioService = usuarioService;
         this.jwtTokenProvider = jwtTokenProvider;
+        this.legalConsentService = legalConsentService;
     }
 
     @PostMapping("/register")
+    @Transactional
     public ResponseEntity<?> register(@Valid @RequestBody UsuarioRegistroRequest request) {
+        if (!Boolean.TRUE.equals(request.legalConsent())) {
+            return ResponseEntity.badRequest()
+                .body(Map.of("error", "Debes aceptar los términos y autorizar el tratamiento de datos."));
+        }
+        if (!Boolean.TRUE.equals(request.adultConfirmed())) {
+            return ResponseEntity.badRequest()
+                .body(Map.of("error", "Debes confirmar que tienes al menos 18 años."));
+        }
+        if (!LegalConsentService.CURRENT_VERSION.equals(request.legalVersion())) {
+            return ResponseEntity.badRequest()
+                .body(Map.of("error", "La versión legal cambió. Actualiza la página e inténtalo de nuevo."));
+        }
         if (request.password() == null
                 || request.password().getBytes(StandardCharsets.UTF_8).length > 72) {
             return ResponseEntity.badRequest()
@@ -60,9 +78,11 @@ public class UsuarioController {
         nuevoUsuario.setApellidos(request.apellidos().trim());
         nuevoUsuario.setEmail(request.email().trim());
         nuevoUsuario.setProvider("LOCAL");
+        nuevoUsuario.setEmailVerified(true);
         nuevoUsuario.setRole("ROLE_USER");
 
         Usuario creado = usuarioService.register(nuevoUsuario);
+        legalConsentService.recordAcceptance(creado, request.legalVersion(), true, "REGISTRATION");
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(UsuarioRegistroResponse.from(creado));
     }

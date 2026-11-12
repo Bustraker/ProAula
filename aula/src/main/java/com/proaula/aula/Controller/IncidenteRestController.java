@@ -7,6 +7,7 @@ import com.proaula.aula.dto.IncidentePageResponse;
 import com.proaula.aula.dto.IncidentePanelResponse;
 import com.proaula.aula.dto.IncidenteReportRequest;
 import com.proaula.aula.dto.IncidenteReportResponse;
+import com.proaula.aula.dto.IncidenteRutaResponse;
 import com.proaula.aula.exception.AulaException;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -23,6 +24,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/incidentes")
 public class IncidenteRestController {
@@ -33,6 +36,11 @@ public class IncidenteRestController {
 
     public IncidenteRestController(IncidenteService incidenteService) {
         this.incidenteService = incidenteService;
+    }
+
+    @GetMapping("/ruta/{rutaId}")
+    public List<IncidenteRutaResponse> listarActivosDeRuta(@PathVariable Long rutaId) {
+        return incidenteService.listarActivosDeRuta(rutaId);
     }
 
     @GetMapping

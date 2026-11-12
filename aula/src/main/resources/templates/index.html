@@ -13,7 +13,7 @@
     <link rel="icon" th:href="@{/images/logo.png}" type="image/png">
     <link rel="stylesheet" th:href="@{/css/index.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" th:href="@{/css/style-index-landing.css(v='admin-access-gate-2')}">
+    <link rel="stylesheet" th:href="@{/css/style-index-landing.css(v='puerta-reloj-sunset-1')}">
 </head>
 <body class="landing-page">
     <main class="landing-main">
@@ -40,60 +40,320 @@
                         <a th:href="@{/index_3_public}" class="landing-primary-action">Entrar al menú público <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
                     </div>
                 </div>
-                <div class="landing-route-art" role="img" aria-label="Animación de un bus recorriendo una ruta entre paradas de la ciudad">
-                    <span class="route-art-coordinate route-art-coordinate--top">CTG <i>·</i> 10.39° N</span>
-                    <span class="route-art-scan" aria-hidden="true"></span>
-                    <span class="route-art-beacon route-art-beacon--one" aria-hidden="true"></span>
-                    <span class="route-art-beacon route-art-beacon--two" aria-hidden="true"></span>
-                    <span class="route-art-ring route-art-ring--outer" aria-hidden="true"></span>
-                    <span class="route-art-ring route-art-ring--inner" aria-hidden="true"></span>
-                    <svg viewBox="0 0 360 240" aria-hidden="true" focusable="false">
+                <div class="landing-cartagena-art" role="img" aria-label="Buseta en una calle de Cartagena frente a la Puerta del Reloj, con sus ruedas y el pavimento en movimiento">
+                    <span class="route-art-coordinate route-art-coordinate--top">CENTRO <i>·</i> CARTAGENA</span>
+                    <svg class="ctg-v2-scene" viewBox="0 0 360 240" aria-hidden="true" focusable="false">
                         <defs>
-                            <linearGradient id="route-art-gradient" x1="0" y1="1" x2="1" y2="0">
-                                <stop offset="0" stop-color="#f2a183"></stop>
-                                <stop offset="0.46" stop-color="#83dfd3"></stop>
-                                <stop offset="1" stop-color="#ffc375"></stop>
+                            <linearGradient id="ctg-v2-sky" x1="0" y1="0" x2="0" y2="1">
+                                <stop stop-color="#183448"></stop>
+                                <stop offset=".48" stop-color="#55727a"></stop>
+                                <stop offset=".72" stop-color="#cb9272"></stop>
+                                <stop offset=".88" stop-color="#f0c77f"></stop>
+                                <stop offset="1" stop-color="#d98969"></stop>
                             </linearGradient>
+                            <linearGradient id="ctg-v2-stone" x1="0" y1="0" x2=".8" y2="1">
+                                <stop stop-color="#e5c396"></stop>
+                                <stop offset=".58" stop-color="#bd9370"></stop>
+                                <stop offset="1" stop-color="#866957"></stop>
+                            </linearGradient>
+                            <linearGradient id="ctg-v2-tower" x1="0" y1="0" x2="1" y2="1">
+                                <stop stop-color="#f0d1a2"></stop>
+                                <stop offset=".52" stop-color="#d3a779"></stop>
+                                <stop offset="1" stop-color="#a77c63"></stop>
+                            </linearGradient>
+                            <linearGradient id="ctg-v2-road" x1="0" y1="0" x2="0" y2="1">
+                                <stop stop-color="#485e62"></stop>
+                                <stop offset="1" stop-color="#263b45"></stop>
+                            </linearGradient>
+                            <linearGradient id="ctg-v2-bus" x1="0" y1="0" x2="0" y2="1">
+                                <stop stop-color="#f58b78"></stop>
+                                <stop offset=".58" stop-color="#d95461"></stop>
+                                <stop offset="1" stop-color="#96394e"></stop>
+                            </linearGradient>
+                            <linearGradient id="ctg-v2-glass" x1="0" y1="0" x2="1" y2="1">
+                                <stop stop-color="#d8eee0"></stop>
+                                <stop offset="1" stop-color="#71aab2"></stop>
+                            </linearGradient>
+                            <radialGradient id="ctg-v2-sunset">
+                                <stop stop-color="#ffd994" stop-opacity=".62"></stop>
+                                <stop offset=".36" stop-color="#f1b779" stop-opacity=".38"></stop>
+                                <stop offset="1" stop-color="#e9a47c" stop-opacity="0"></stop>
+                            </radialGradient>
+                            <radialGradient id="ctg-v2-sun">
+                                <stop stop-color="#fff0b0"></stop>
+                                <stop offset=".72" stop-color="#ffd585"></stop>
+                                <stop offset="1" stop-color="#f4a36f"></stop>
+                            </radialGradient>
                         </defs>
-                        <path class="route-art-street route-art-street--one" d="M-15 64H78l38 35h72l41-42h146"></path>
-                        <path class="route-art-street route-art-street--two" d="M-10 190h97l42-39h77l52-49h115"></path>
-                        <path class="route-art-street route-art-street--three" d="M88 -12v74l47 47v143"></path>
-                        <path class="route-art-street route-art-street--four" d="M283 -10v64l-55 54v145"></path>
-                        <path class="route-art-path route-art-path--halo" d="M35 177c44 0 35-102 91-102 45 0 35 65 83 65s38-82 111-82"></path>
-                        <path class="route-art-path route-art-path--line" pathLength="1" d="M35 177c44 0 35-102 91-102 45 0 35 65 83 65s38-82 111-82"></path>
-                        <path class="route-art-path route-art-path--current" pathLength="1" d="M35 177c44 0 35-102 91-102 45 0 35 65 83 65s38-82 111-82"></path>
-                        <path class="route-art-secondary" pathLength="1" d="M21 205h66l42-39h77l52-49h82"></path>
-                        <circle class="route-art-stop" cx="35" cy="177" r="6"></circle>
-                        <circle class="route-art-stop route-art-stop--middle" cx="126" cy="75" r="5"></circle>
-                        <circle class="route-art-stop route-art-stop--middle" cx="209" cy="140" r="5"></circle>
-                        <circle class="route-art-stop-wave" cx="126" cy="75" r="11"></circle>
-                        <circle class="route-art-stop-wave route-art-stop-wave--second" cx="209" cy="140" r="11"></circle>
-                        <circle class="route-art-destination-pulse" cx="320" cy="58" r="13"></circle>
-                        <circle class="route-art-destination-pulse route-art-destination-pulse--second" cx="320" cy="58" r="13"></circle>
-                        <circle class="route-art-stop route-art-stop--destination" cx="320" cy="58" r="7"></circle>
-                        <circle class="route-art-runner route-art-runner--one" r="3.1">
-                            <animateMotion dur="5.8s" repeatCount="indefinite" path="M35 177c44 0 35-102 91-102 45 0 35 65 83 65s38-82 111-82"></animateMotion>
-                        </circle>
-                        <circle class="route-art-runner route-art-runner--two" r="2">
-                            <animateMotion dur="5.8s" begin="-2.9s" repeatCount="indefinite" path="M35 177c44 0 35-102 91-102 45 0 35 65 83 65s38-82 111-82"></animateMotion>
-                        </circle>
-                        <circle class="route-art-runner route-art-runner--three" r="1.6">
-                            <animateMotion dur="7.4s" begin="-4.2s" repeatCount="indefinite" path="M35 177c44 0 35-102 91-102 45 0 35 65 83 65s38-82 111-82"></animateMotion>
-                        </circle>
-                        <g class="route-art-bus">
-                            <path class="route-art-headlight" d="M11-3l9-4v8l-9-1z"></path>
-                            <rect x="-13" y="-8" width="26" height="16" rx="4"></rect>
-                            <path class="route-art-windows" d="M-9-5h18v5H-9z"></path>
-                            <path class="route-art-bus-stripe" d="M-9 3h18"></path>
-                            <circle class="route-art-wheel" cx="-7" cy="8" r="2"></circle>
-                            <circle class="route-art-wheel" cx="7" cy="8" r="2"></circle>
-                            <animateMotion dur="9s" repeatCount="indefinite" rotate="auto" path="M35 177c44 0 35-102 91-102 45 0 35 65 83 65s38-82 111-82"></animateMotion>
+                        <path class="ctg-v2-sky" d="M0 0h360v240H0z"></path>
+                        <ellipse class="ctg-v2-sunset" cx="270" cy="85" rx="112" ry="64"></ellipse>
+                        <circle class="ctg-v2-sun-halo" cx="270" cy="85" r="31"></circle>
+                        <circle class="ctg-v2-sun" cx="270" cy="85" r="22"></circle>
+                        <path class="ctg-v2-horizon" d="M0 116q45-13 87 0t89 0 91 0 93-2v24H0z"></path>
+                        <g class="ctg-v2-gateway">
+                            <path class="ctg-v2-gate-shadow" d="M0 148V111h17v-9h18v9h18V99h32V85h28V99h21V83h11V52h9V38h8V29q17-17 34 0v9h8v14h9v31h11v16h21V85h28v14h32v12h17v-9h18v9h16v37z"></path>
+                            <path class="ctg-v2-gate" d="M0 147V111h17v-9h18v9h18V99h32V85h28V99h21V82h11V51h10V38h9V29q17-15 34 0v9h9v13h10v31h11v17h21V85h28v14h32v12h17v-9h18v9h16v36z"></path>
+                            <path class="ctg-v2-gate-battlement" d="M0 111h17v-9h18v9h18V99h32V85h28V99h21V82h11V51h10V38h9V29q17-15 34 0v9h9v13h10v31h11v17h21V85h28v14h32v12h17v-9h18v9h16"></path>
+                            <path class="ctg-v2-tower-face" d="M145 101V52h9V39h9V29q17-15 34 0v10h9v13h9v49z"></path>
+                            <path class="ctg-v2-tower-cornice" d="M140 53h81M147 39h15m36 0h15M164 27q16-10 32 0"></path>
+                            <path class="ctg-v2-clock-arch" d="M163 54q17-19 34 0"></path>
+                            <circle class="ctg-v2-clock-rim" cx="180" cy="55" r="12.2"></circle>
+                            <circle class="ctg-v2-clock-face" cx="180" cy="55" r="10"></circle>
+                            <path class="ctg-v2-clock-ticks" d="M180 47v2m0 12v2m-8-8h2m12 0h2m-12-5 1.5 1.5m7 7 1.5 1.5m0-10-1.5 1.5m-7 7-1.5 1.5"></path>
+                            <path class="ctg-v2-clock-hands" d="M180 49v6l4 2"></path>
+                            <path class="ctg-v2-tower-window" d="M168 82v-7a5 5 0 0 1 10 0v7m5 0v-7a5 5 0 0 1 10 0v7"></path>
+                            <path class="ctg-v2-tower-fluting" d="M151 61v36m5-36v36m48-36v36m5-36v36"></path>
+                            <path class="ctg-v2-tower-base" d="M141 101h78m-81 4h84"></path>
+                            <path class="ctg-v2-gate-arch" d="M157 147v-20a23 23 0 0 1 46 0v20z"></path>
+                            <path class="ctg-v2-gate-arch-line" d="M153 147v-20a27 27 0 0 1 54 0v20"></path>
+                            <path class="ctg-v2-gate-depth" d="M164 147v-19a16 16 0 0 1 32 0v19z"></path>
+                            <path class="ctg-v2-gate-light" d="M167 144q13-19 26 0"></path>
+                            <path class="ctg-v2-side-arch" d="M91 147v-15a10 10 0 0 1 20 0v15m138 0v-15a10 10 0 0 1 20 0v15"></path>
+                            <path class="ctg-v2-stone-joints" d="M7 123h78m35 0h27m66 0h42m30 0h68M8 135h43m63 0h36m69 0h45m30 0h58"></path>
+                            <path class="ctg-v2-gate-highlight" d="M7 115h17m21-13h15m45-12h14m27-38h11m38 0h10m28 48h14m58 12h22m20 0h18m8 12h19"></path>
                         </g>
+                        <path class="ctg-v2-sidewalk" d="M0 147h360v11q-180-4-360 0z"></path>
+                        <path class="ctg-v2-road" d="M0 158q180-4 360 0v82H0z"></path>
+                        <path class="ctg-v2-road-edge" d="M0 158q180-4 360 0"></path>
+                        <path class="ctg-v2-road-flow ctg-v2-road-flow--center" d="M-360 194h1080"></path>
+                        <path class="ctg-v2-road-flow ctg-v2-road-flow--left" d="M-360 171h1080m-1080 46h1080"></path>
+                        <path class="ctg-v2-road-grain" d="M0 165h360m-360 16h360m-360 27h360m-360 16h360"></path>
+                        <path class="ctg-v2-road-glow" d="M0 160h360"></path>
+                        <g class="ctg-v2-bus" aria-hidden="true">
+                            <ellipse class="ctg-v2-bus-shadow" cx="180" cy="211" rx="49" ry="6"></ellipse>
+                            <g class="ctg-v2-bus-body">
+                                <path class="ctg-v2-bus-shell" d="M134 192v-17q0-9 10-11h43q8 0 13 6l12 13 2 8v13q0 4-5 4h-5a8 8 0 0 0-16 0h-24a8 8 0 0 0-16 0h-9q-5 0-5-5z"></path>
+                                <path class="ctg-v2-bus-roof" d="M143 165h44q7 0 11 6l4 5h-62v-5q0-4 3-6z"></path>
+                                <path class="ctg-v2-bus-window" d="M142 169h15v14h-17v-10q0-3 2-4zm19 0h17v14h-17zm21 0h4q5 0 8 5l4 9h-16z"></path>
+                                <path class="ctg-v2-bus-window-frame" d="M159 168v16m21-16v16"></path>
+                                <path class="ctg-v2-bus-glint" d="m144 171 8-2m10 1h10m15 0 4 2"></path>
+                                <path class="ctg-v2-bus-door" d="M184 184v19m6-19v14"></path>
+                                <path class="ctg-v2-bus-band" d="M136 187q25 3 48 1l27-1v9l-28 2q-24 2-47-1z"></path>
+                                <path class="ctg-v2-bus-pinstripe" d="M138 187q23 3 46 1l27-1"></path>
+                                <path class="ctg-v2-bus-front" d="M205 176l7 8v15h-7z"></path>
+                                <path class="ctg-v2-bus-grille" d="M210 189h6m-6 3h6m-6 3h5"></path>
+                                <path class="ctg-v2-bus-lamp" d="M211 182h4l2 4h-6z"></path>
+                                <path class="ctg-v2-bus-mirror" d="m207 176 7-3 2 3-5 3"></path>
+                                <path class="ctg-v2-bus-bumper" d="M207 200h13v3h-12z"></path>
+                            </g>
+                            <g class="ctg-v2-wheel" transform="translate(154 202)">
+                                <circle class="ctg-v2-tire" r="8"></circle>
+                                <circle class="ctg-v2-rim" r="5.1"></circle>
+                                <g class="ctg-v2-wheel-spokes"><path d="M0-4v8m-4-4h8m-2.8-2.8 5.6 5.6m0-5.6-5.6 5.6"></path></g>
+                                <circle class="ctg-v2-hub" r="1.7"></circle>
+                            </g>
+                            <g class="ctg-v2-wheel" transform="translate(198 202)">
+                                <circle class="ctg-v2-tire" r="8"></circle>
+                                <circle class="ctg-v2-rim" r="5.1"></circle>
+                                <g class="ctg-v2-wheel-spokes"><path d="M0-4v8m-4-4h8m-2.8-2.8 5.6 5.6m0-5.6-5.6 5.6"></path></g>
+                                <circle class="ctg-v2-hub" r="1.7"></circle>
+                            </g>
+                        </g>
+                        <path class="ctg-v2-road-sheen" d="M18 224h36m258 0h30"></path>
                     </svg>
-                    <span class="route-art-label route-art-label--start"><i aria-hidden="true"></i> CENTRO</span>
-                    <span class="route-art-label route-art-label--end"><i aria-hidden="true"></i> TU DESTINO</span>
-                    <span class="route-art-status"><i aria-hidden="true"></i> RUTA EN MOVIMIENTO</span>
-                    <span class="route-art-coordinate route-art-coordinate--bottom">75°30′ O <i>·</i> CARTAGENA</span>
+                    <svg class="ctg-legacy-scene" viewBox="0 0 360 240" aria-hidden="true" focusable="false">
+                        <defs>
+                            <linearGradient id="route-ctg-sky" x1="0" y1="0" x2="0" y2="1">
+                                <stop stop-color="#102c47"></stop>
+                                <stop offset=".38" stop-color="#31566d"></stop>
+                                <stop offset=".76" stop-color="#78908e"></stop>
+                                <stop offset="1" stop-color="#d8a47f"></stop>
+                            </linearGradient>
+                            <linearGradient id="route-ctg-water" x1="0" y1="0" x2="0" y2="1">
+                                <stop stop-color="#438e91"></stop>
+                                <stop offset=".48" stop-color="#286b7c"></stop>
+                                <stop offset="1" stop-color="#183b55"></stop>
+                            </linearGradient>
+                            <linearGradient id="route-ctg-cloud" x1="0" y1="0" x2="0" y2="1">
+                                <stop stop-color="#d6ddd2" stop-opacity=".36"></stop>
+                                <stop offset="1" stop-color="#bac8c5" stop-opacity=".08"></stop>
+                            </linearGradient>
+                            <linearGradient id="route-ctg-wall" x1="0" y1="0" x2="0" y2="1">
+                                <stop stop-color="#b39a7d"></stop>
+                                <stop offset=".18" stop-color="#927c6a"></stop>
+                                <stop offset="1" stop-color="#6c615b"></stop>
+                            </linearGradient>
+                            <linearGradient id="route-ctg-silhouette" x1="0" y1="0" x2="0" y2="1">
+                                <stop stop-color="#58747a"></stop>
+                                <stop offset="1" stop-color="#38555f"></stop>
+                            </linearGradient>
+                            <radialGradient id="route-ctg-atmosphere">
+                                <stop stop-color="#e4b38a" stop-opacity=".25"></stop>
+                                <stop offset="1" stop-color="#e4b38a" stop-opacity="0"></stop>
+                            </linearGradient>
+                            <linearGradient id="route-ctg-bus" x1="0" y1="0" x2="0" y2="1">
+                                <stop stop-color="#ff8b79"></stop>
+                                <stop offset=".58" stop-color="#e25563"></stop>
+                                <stop offset="1" stop-color="#a93350"></stop>
+                            </linearGradient>
+                            <linearGradient id="route-ctg-glass" x1="0" y1="0" x2="1" y2="1">
+                                <stop stop-color="#c5eee0"></stop>
+                                <stop offset="1" stop-color="#6eacb3"></stop>
+                            </linearGradient>
+                            <linearGradient id="route-ctg-stone" x1="0" y1="0" x2="0" y2="1">
+                                <stop stop-color="#9b745f"></stop>
+                                <stop offset="1" stop-color="#604f4e"></stop>
+                            </linearGradient>
+                            <pattern id="route-ctg-cobble" width="18" height="10" patternUnits="userSpaceOnUse">
+                                <path d="M0 9.5h18M9 0v4.5M3 5v4.5M15 5v4.5" fill="none" stroke="#d7c6a9" stroke-opacity=".14" stroke-width=".7"></path>
+                            </pattern>
+                        </defs>
+                        <g class="ctg-route-scene">
+                            <path class="ctg-route-sky" d="M0 0h360v240H0z"></path>
+                            <ellipse class="ctg-route-atmosphere" cx="276" cy="92" rx="136" ry="64"></ellipse>
+                            <circle class="ctg-route-horizon-glow" cx="271" cy="96" r="52"></circle>
+                            <circle class="ctg-route-sun" cx="273" cy="87" r="13"></circle>
+                            <g class="ctg-route-cloud ctg-route-cloud--far">
+                                <path d="M70 45q0-4 5-4 2-7 9-5 5-6 11 0 7-2 9 4 6 0 6 5zm90-13q0-4 5-4 2-6 8-4 4-5 9 0 6-2 8 4 5 0 5 4z"></path>
+                            </g>
+                            <g class="ctg-route-cloud ctg-route-cloud--near">
+                                <path d="M130 58q0-4 5-4 2-7 9-5 5-6 11 0 6-2 9 4 6 0 6 5zm104-30q0-3 4-3 2-5 7-4 4-5 8 0 6-1 7 4 5 0 5 3z"></path>
+                            </g>
+                            <g class="ctg-route-cloud ctg-route-cloud--horizon">
+                                <path d="M26 82q0-3 4-3 2-5 7-3 4-5 9 0 5-2 7 3 5 0 5 3zM150 76q0-3 4-3 2-5 7-3 4-5 9 0 5-2 7 3 5 0 5 3z"></path>
+                            </g>
+                            <g class="ctg-route-birds">
+                                <path d="m219 62 4-3 4 3m4-8 3-2 3 2m-30 14 3-2 3 2"></path>
+                            </g>
+                            <path class="ctg-route-distant-shore" d="M0 111V106h14v-5h6v5h11l9-8 9 8h12v-5h8v10h14v-8h8v8h8l10-16 10 16h15v-9h8v9h12V97h8v14h13v-7h11v7h17l10-9 11 9h11v-10h8v10h12V98h8v13h15l9-8 9 8h12v-9h9v9h12l9-14 9 14h15v-7h12v7h12v-5h12v5h8v-8h10v8z"></path>
+                            <path class="ctg-route-distant-lights" d="M17 104h1m29-1h1m39 5h1m34-5h1m33 5h1m26-8h1m32 5h1m36 1h1m32-7h1m30 7h1m35-4h1"></path>
+                            <g class="ctg-route-distant-church">
+                                <path class="ctg-route-distant-church-body" d="M228 111v-9h7V91c0-7 5-12 9-12s9 5 9 12v11h7v9z"></path>
+                                <path class="ctg-route-distant-church-details" d="M235 102V91a9 9 0 0 1 18 0v11m-13 9v-6a4 4 0 0 1 8 0v6m-2-29v-5m-3 2h6"></path>
+                                <circle class="ctg-route-distant-church-window" cx="244" cy="90" r="2.1"></circle>
+                            </g>
+                            <path class="ctg-route-sea" d="M0 111c53-5 94 3 143-1 67-6 133-3 217 3v58H0z"></path>
+                            <path class="ctg-route-sea-line" d="M202 125h28m17 6h19m29-9h35m-254 6h19m68 11h20m101 0h26m-205 5h16"></path>
+                            <path class="ctg-route-sea-glint" d="M230 119h17m31 6h12m-155 6h23m101 8h19m-203-8h15m173 14h27"></path>
+                            <path class="ctg-route-shore" d="M0 123c25-9 42-7 64-2 23-8 43-7 61-2 23-8 40-8 63 0 23-7 45-7 64 1 24-7 47-7 69 0 16-4 26-4 39-2v28H0z"></path>
+                            <g class="ctg-route-clocktower">
+                                <path d="M26 121V78l7-7V52l13-17 14 17v19l7 7v43z"></path>
+                                <path class="ctg-route-tower-trim" d="M32 77h28m-34 40h40M37 53h18"></path>
+                                <path class="ctg-route-tower-arch" d="M38 66v-7a8 8 0 0 1 16 0v7"></path>
+                                <circle class="ctg-route-clock-face" cx="46" cy="58" r="5"></circle>
+                                <path class="ctg-route-clock-hands" d="M46 55v3l3 2"></path>
+                                <path class="ctg-route-tower-window" d="M39 91v-6a7 7 0 0 1 14 0v6m-14 21v-6a7 7 0 0 1 14 0v6"></path>
+                            </g>
+                            <g class="ctg-route-houses">
+                                <path class="ctg-route-house ctg-route-house--ochre" d="M78 115V84l23-14 26 14v31z"></path>
+                                <path class="ctg-route-house-roof" d="m75 85 26-18 29 18-3 3-26-16-23 16z"></path>
+                                <path class="ctg-route-house-window" d="M83 106V95a5.5 5.5 0 0 1 11 0v11zm31 0V95a5.5 5.5 0 0 1 11 0v11z"></path>
+                                <path class="ctg-route-house-shutter" d="M82 89h2v18h-2zm12 0h2v18h-2zm17 0h2v18h-2zm12 0h2v18h-2z"></path>
+                                <path class="ctg-route-house-door" d="M99 97h9v18h-9z"></path>
+                                <path class="ctg-route-house ctg-route-house--coral" d="M127 115V78l25-16 27 16v37z"></path>
+                                <path class="ctg-route-house-roof ctg-route-house-roof--coral" d="m124 79 28-20 30 20-3 4-27-18-25 18z"></path>
+                                <path class="ctg-route-house-window" d="M135 103V91a5.5 5.5 0 0 1 11 0v12zm24 0V91a6 6 0 0 1 12 0v12z"></path>
+                                <path class="ctg-route-house-shutter" d="M133 84h2v20h-2zm13 0h2v20h-2zm10 0h2v20h-2zm14 0h2v20h-2z"></path>
+                                <path class="ctg-route-house-door ctg-route-house-door--blue" d="M148 94h10v21h-10z"></path>
+                                <path class="ctg-route-house ctg-route-house--teal" d="M180 115V88l22-14 24 14v27z"></path>
+                                <path class="ctg-route-house-roof" d="m177 89 25-18 27 18-3 4-24-16-22 16z"></path>
+                                <path class="ctg-route-house-window" d="M185 108V98a5 5 0 0 1 10 0v10zm24 0V98a5.5 5.5 0 0 1 11 0v10z"></path>
+                            </g>
+                            <path class="ctg-route-house-cornice" d="M76 85h57m-5-7h-5m-51 9v22m3-22v22m52-22v22m3-22v22m-47-17h13m2 0h13m2 0h13m5-7h50m-4-7h-5m-47 9v22m3-22v22m46-22v22m3-22v22m-46-17h14m3 0h11m3 0h12m6-4h48m-4-5h-5m-45 8v17m3-17v17m42-17v17m3-17v17m-42-10h12m3 0h11m3 0h10"></path>
+                            <path class="ctg-route-balcony" d="M82 108h17m-16-3h15m-13-3v6m5-6v6m5-6v6m27 0h18m-17-3h16m-14-3v6m5-6v6m5-6v6m37 0h14m-13-3h12m-10-3v6m5-6v6"></path>
+                            <path class="ctg-route-palm-trunk" d="M333 138c-4-20-4-38 0-58"></path>
+                            <path class="ctg-route-palm-fronds" d="M333 82c-13-15-26-20-39-18 15 4 25 12 38 24-17-10-29-10-41-5 15 1 27 7 40 14-14-3-24 0-34 5 15-3 25-2 37 1m0-21c7-18 19-28 33-31-13 8-21 17-31 34 14-15 26-20 39-18-14 7-25 16-37 28 14-8 25-9 37-6-15 4-27 11-40 20"></path>
+                            <g class="ctg-route-skiff" transform="translate(270 129)">
+                                <path class="ctg-route-skiff-hull" d="M-10 2h20l-3 4h-13z"></path>
+                                <path class="ctg-route-skiff-sail" d="M-1-12v13h9z"></path>
+                                <path class="ctg-route-skiff-mast" d="M-1-13V2"></path>
+                                <path class="ctg-route-skiff-wake" d="M-14 8h12m7 0h11"></path>
+                            </g>
+                            <path class="ctg-route-wall" d="M0 158v-36h12v-8h14v8h13v-5h13v5h15v-9h15v9h14v-5h13v5h14v-9h16v9h15v-5h13v5h14v-8h15v8h15v-5h14v5h14v-9h16v9h14v-5h13v5h14v-9h15v9h18v42H0z"></path>
+                            <path class="ctg-route-wall-top" d="M0 122h360v3H0z"></path>
+                            <path class="ctg-route-wall-joints" d="M0 132h360M0 140h360M17 125v7m22 0v8m27-8v8m24-8v8m28-8v8m26-8v8m28-8v8m25-8v8m28-8v8m28-8v8m26-8v8m27-8v8m22-8v8m-326-15v7m39-7v7m42-7v7m47-7v7m41-7v7m43-7v7m40-7v7m39-7v7"></path>
+                            <path class="ctg-route-wall-light" d="M0 127h18m8 0h26m15 0h27m15 0h25m13 0h27m18 0h28m18 0h25m15 0h25m14 0h25m14 0h18"></path>
+                            <g class="ctg-route-lantern">
+                                <circle class="ctg-route-lantern-glow" cx="20" cy="139" r="10"></circle>
+                                <path class="ctg-route-lantern-post" d="M20 158v-19m-4 19h8m-7-21v-3q0-3 3-3h4v4h-3v2"></path>
+                                <circle class="ctg-route-lantern-light" cx="21" cy="135" r="1.5"></circle>
+                            </g>
+                            <path class="ctg-route-cobblestone-road" d="M0 158c64-7 121-4 177-2 62 2 116-5 183 3v81H0z"></path>
+                            <path class="ctg-route-cobble-overlay" d="M0 158c64-7 121-4 177-2 62 2 116-5 183 3v81H0z"></path>
+                            <path class="ctg-route-curb" d="M0 158c64-7 121-4 177-2 62 2 116-5 183 3"></path>
+                            <path class="ctg-route-reflection" d="M20 216h33m36-8h21m152 17h36m-118-6h20"></path>
+                            <path class="ctg-route-guide" d="M59 192c25 0 27-39 52-39 39 0 41 25 79 25s48-54 106-54"></path>
+                            <path class="ctg-route-halo" d="M64 190c22 0 25-40 47-40 41 0 43 26 81 26s47-53 107-53"></path>
+                            <path class="ctg-route-line" pathLength="1" d="M64 190c22 0 25-40 47-40 41 0 43 26 81 26s47-53 107-53"></path>
+                            <path class="ctg-route-progress" pathLength="1" d="M64 190c22 0 25-40 47-40 41 0 43 26 81 26s47-53 107-53"></path>
+                            <circle class="ctg-route-stop-wave" cx="64" cy="190" r="10"></circle>
+                            <circle class="ctg-route-stop ctg-route-stop--origin" cx="64" cy="190" r="5"></circle>
+                            <circle class="ctg-route-stop-wave ctg-route-stop-wave--one" cx="111" cy="150" r="9"></circle>
+                            <circle class="ctg-route-stop ctg-route-stop--middle" cx="111" cy="150" r="4.5"></circle>
+                            <circle class="ctg-route-stop-wave ctg-route-stop-wave--two" cx="192" cy="176" r="9"></circle>
+                            <circle class="ctg-route-stop ctg-route-stop--middle" cx="192" cy="176" r="4.5"></circle>
+                            <circle class="ctg-route-destination-pulse" cx="299" cy="123" r="13"></circle>
+                            <path class="ctg-route-stop ctg-route-stop--destination" d="M299 116.5 305.5 123l-6.5 6.5-6.5-6.5z"></path>
+                            <circle class="ctg-route-runner" r="2.2">
+                                <animateMotion dur="12s" repeatCount="indefinite" calcMode="spline"
+                                               keyTimes="0;0.06;0.25;0.31;0.5;0.56;0.75;0.81;0.95;1"
+                                               keyPoints="0;0;0.25;0.25;0.52;0.52;0.79;0.79;1;1"
+                                               keySplines="0.4 0 0.2 1;0.4 0 0.2 1;0.4 0 0.2 1;0.4 0 0.2 1;0.4 0 0.2 1;0.4 0 0.2 1;0.4 0 0.2 1;0.4 0 0.2 1;0.4 0 0.2 1"
+                                               path="M64 190c22 0 25-40 47-40 41 0 43 26 81 26s47-53 107-53"></animateMotion>
+                            </circle>
+                            <g class="ctg-route-bus">
+                                <g transform="scale(1.4)">
+                                    <ellipse class="ctg-route-bus-shadow" cx="0" cy="20" rx="29" ry="4"></ellipse>
+                                    <path class="ctg-route-bus-body" d="M-25 11v-18q0-5 5-6 13-4 28-2l9 2q4 1 6 4l5 8v10q0 3-4 3h-3a5 5 0 0 0-10 0h-11a5 5 0 0 0-10 0h-11q-4 0-4-3z"></path>
+                                    <path class="ctg-route-bus-tail-light" d="M-25-4h2v4h-2z"></path>
+                                    <path class="ctg-route-bus-roof" d="M-19-13q12-3 26-1l9 2q3 1 4 4l1 2h-40z"></path>
+                                    <path class="ctg-route-bus-roof-light" d="M-12-15h4v1.5h-4zm16 0h4v1.5H4z"></path>
+                                    <path class="ctg-route-bus-sign" d="M12-16h6v2h-6z"></path>
+                                    <path class="ctg-route-bus-window" d="M-17-12q5-2 10-2v7h-10zm13-2q7-1 13 0v7h-13zm16 1 4 1q2 1 3 3l1 2h-8z"></path>
+                                    <path class="ctg-route-bus-window-frame" d="M-5-14v7M9-13v7"></path>
+                                    <path class="ctg-route-bus-window-glint" d="m-15-12 5-1m6-1 5-.5m13 2 3 1"></path>
+                                    <path class="ctg-route-bus-door" d="M-8-7v15m7-16v10"></path>
+                                    <path class="ctg-route-bus-mirror" d="m19-7 5-2 2 3-5 2"></path>
+                                    <path class="ctg-route-bus-band" d="M-24 0q13 2 25 1 12-1 24 0v5q-12-1-24 0-13 1-25-1z"></path>
+                                    <path class="ctg-route-bus-pinstripe" d="M-23-2q13 2 24 1 12-1 23 0"></path>
+                                    <path class="ctg-route-bus-grille" d="m18-1 5 1m-5 2h5"></path>
+                                    <path class="ctg-route-bus-lamp" d="m22-5 3 1 1 3h-4z"></path>
+                                    <path class="ctg-route-bus-indicator" d="m23 4 3 1v2h-3z"></path>
+                                    <circle class="ctg-route-wheel" cx="-15" cy="10" r="3.3"></circle>
+                                    <circle class="ctg-route-wheel-inner" cx="-15" cy="10" r="1.5"></circle>
+                                    <path class="ctg-route-wheel-spoke" d="M-15 8.5v3m-1.5-1.5h3"></path>
+                                    <circle class="ctg-route-wheel" cx="14" cy="10" r="3.3"></circle>
+                                    <circle class="ctg-route-wheel-inner" cx="14" cy="10" r="1.5"></circle>
+                                    <path class="ctg-route-wheel-spoke" d="M14 8.5v3m-1.5-1.5h3"></path>
+                                </g>
+                                <animateMotion dur="12s" repeatCount="indefinite" rotate="auto" calcMode="spline"
+                                               keyTimes="0;0.06;0.25;0.31;0.5;0.56;0.75;0.81;0.95;1"
+                                               keyPoints="0;0;0.25;0.25;0.52;0.52;0.79;0.79;1;1"
+                                               keySplines="0.4 0 0.2 1;0.4 0 0.2 1;0.4 0 0.2 1;0.4 0 0.2 1;0.4 0 0.2 1;0.4 0 0.2 1;0.4 0 0.2 1;0.4 0 0.2 1;0.4 0 0.2 1"
+                                               path="M64 190c22 0 25-40 47-40 41 0 43 26 81 26s47-53 107-53"></animateMotion>
+                            </g>
+                            <g class="ctg-route-bus-static" transform="translate(180 166)">
+                                <g transform="scale(1.4)">
+                                    <ellipse class="ctg-route-bus-shadow" cx="0" cy="20" rx="29" ry="4"></ellipse>
+                                    <path class="ctg-route-bus-body" d="M-25 11v-18q0-5 5-6 13-4 28-2l9 2q4 1 6 4l5 8v10q0 3-4 3h-3a5 5 0 0 0-10 0h-11a5 5 0 0 0-10 0h-11q-4 0-4-3z"></path>
+                                    <path class="ctg-route-bus-tail-light" d="M-25-4h2v4h-2z"></path>
+                                    <path class="ctg-route-bus-roof" d="M-19-13q12-3 26-1l9 2q3 1 4 4l1 2h-40z"></path>
+                                    <path class="ctg-route-bus-roof-light" d="M-12-15h4v1.5h-4zm16 0h4v1.5H4z"></path>
+                                    <path class="ctg-route-bus-sign" d="M12-16h6v2h-6z"></path>
+                                    <path class="ctg-route-bus-window" d="M-17-12q5-2 10-2v7h-10zm13-2q7-1 13 0v7h-13zm16 1 4 1q2 1 3 3l1 2h-8z"></path>
+                                    <path class="ctg-route-bus-window-frame" d="M-5-14v7M9-13v7"></path>
+                                    <path class="ctg-route-bus-window-glint" d="m-15-12 5-1m6-1 5-.5m13 2 3 1"></path>
+                                    <path class="ctg-route-bus-door" d="M-8-7v15m7-16v10"></path>
+                                    <path class="ctg-route-bus-mirror" d="m19-7 5-2 2 3-5 2"></path>
+                                    <path class="ctg-route-bus-band" d="M-24 0q13 2 25 1 12-1 24 0v5q-12-1-24 0-13 1-25-1z"></path>
+                                    <path class="ctg-route-bus-pinstripe" d="M-23-2q13 2 24 1 12-1 23 0"></path>
+                                    <path class="ctg-route-bus-grille" d="m18-1 5 1m-5 2h5"></path>
+                                    <path class="ctg-route-bus-lamp" d="m22-5 3 1 1 3h-4z"></path>
+                                    <path class="ctg-route-bus-indicator" d="m23 4 3 1v2h-3z"></path>
+                                    <circle class="ctg-route-wheel" cx="-15" cy="10" r="3.3"></circle>
+                                    <circle class="ctg-route-wheel-inner" cx="-15" cy="10" r="1.5"></circle>
+                                    <path class="ctg-route-wheel-spoke" d="M-15 8.5v3m-1.5-1.5h3"></path>
+                                    <circle class="ctg-route-wheel" cx="14" cy="10" r="3.3"></circle>
+                                    <circle class="ctg-route-wheel-inner" cx="14" cy="10" r="1.5"></circle>
+                                    <path class="ctg-route-wheel-spoke" d="M14 8.5v3m-1.5-1.5h3"></path>
+                                </g>
+                            </g>
+                            <path class="ctg-route-frame-line" d="M8 16h27M8 16v22m344-22h-27m27 0v22M8 224v-20m0 20h27m317-20v20h-27"></path>
+                            <circle class="ctg-route-edge-dot" cx="14" cy="48" r="1.3"></circle>
+                            <circle class="ctg-route-edge-dot" cx="346" cy="48" r="1.3"></circle>
+                        </g>
+                        </svg>
+                    <span class="route-art-coordinate route-art-coordinate--bottom">PUERTA DEL RELOJ <i>·</i> CARTAGENA</span>
                 </div>
             </section>
 
@@ -191,6 +451,6 @@
         </div>
     </dialog>
 
-    <script th:src="@{/js/index.js(v='admin-access-gate-1')}"></script>
+    <script th:src="@{/js/index.js(v='route-cartagena-13')}"></script>
 </body>
 </html>

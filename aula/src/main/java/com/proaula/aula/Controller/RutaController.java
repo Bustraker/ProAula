@@ -81,7 +81,9 @@ public class RutaController {
     public String listarRutas(Model model,
                              @RequestParam(required = false) String buscar,
                              @RequestParam(required = false) String barrio) {
-        List<Ruta> todasLasRutas = rutaService.getAllRutas();
+        List<Ruta> todasLasRutas = rutaService.getAllRutas().stream()
+            .filter(ruta -> ruta.getEstado() == Ruta.Estado.ACTIVA)
+            .collect(Collectors.toCollection(ArrayList::new));
         List<Ruta> rutas = new ArrayList<>(todasLasRutas);
         
         // Filtros

@@ -3,88 +3,255 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Política de Privacidad - Bustraker</title>
+    <meta name="description" content="Política de privacidad y tratamiento de datos personales de Bustraker.">
+    <meta name="theme-color" content="#f3f0e8">
+    <title>Política de privacidad | Bustraker</title>
     <link rel="icon" th:href="@{/images/logo.png}" type="image/png">
-    <link rel="stylesheet" th:href="@{/css/style_responsive.css}">
-    <link rel="stylesheet" th:href="@{/css/style_common.css}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/style-legal.css(v='20261111-1')}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
-    <main class="hero-section">
-        <div class="main-header">
-            <div class="header-inner">
-                <div class="logo">
-                    <img th:src="@{/images/logo.png}" alt="Logo Bustraker">
-                    <span class="brand">Bustraker</span>
-                </div>
-                <nav class="main-nav">
-                    <a th:href="@{/inicio-de-sesion-mejorado}" class="nav-link">Iniciar sesión</a>
-                    <a th:href="@{/registro-mejorado}" class="nav-link nav-link--outline">Registrarse</a>
-                </nav>
-            </div>
+<body class="legal-page">
+    <header class="legal-header">
+        <a class="legal-brand" th:href="@{/}" aria-label="Bustraker, volver al inicio">
+            <img th:src="@{/images/logo.png}" alt="">
+            <span>Bustraker<small>Movilidad en Cartagena</small></span>
+        </a>
+        <nav class="legal-header__actions" aria-label="Navegación">
+            <a class="legal-switch" th:href="@{/terminos}" aria-label="Leer los términos y condiciones">
+                <i class="fa-solid fa-file-contract" aria-hidden="true"></i>
+                <span>También disponible <strong>Términos y condiciones</strong></span>
+                <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+            </a>
+            <a th:href="@{/contacto}"><i class="fa-regular fa-envelope" aria-hidden="true"></i> Contacto</a>
+            <a class="legal-home-link" th:href="@{/}"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Inicio</a>
+        </nav>
+    </header>
 
-            <div class="auth-section">
-                <div class="auth-item">
-                    <div class="full-width">
-                        <h2><i class="fas fa-shield-alt"></i> Política de Privacidad</h2>
-                        
-                        <div class="card">
-                            <div class="card-body">
-                                <h3>1. Información que Recopilamos</h3>
-                                <p>Recopilamos información personal que usted nos proporciona directamente al registrarse 
-                                    en nuestra plataforma, como nombre, apellido, dirección de correo electrónico y 
-                                    nombre de usuario. También recopilamos información sobre su uso del servicio.</p>
-                                
-                                <h3>2. Cómo Usamos Su Información</h3>
-                                <p>Utilizamos la información recopilada para:</p>
-                                <ul>
-                                    <li>Proporcionar y mejorar nuestros servicios</li>
-                                    <li>Personalizar su experiencia de usuario</li>
-                                    <li>Comunicarnos con usted sobre actualizaciones y servicios</li>
-                                    <li>Gestionar su experiencia de consulta de rutas y uso de la plataforma</li>
-                                    <li>Mantener la seguridad de nuestros servicios</li>
-                                </ul>
-                                
-                                <h3>3. Cómo Compartimos Su Información</h3>
-                                <p>No vendemos, comercializamos ni alquilamos su información personal a terceros. 
-                                   Podemos compartir su información con proveedores de servicios que nos ayudan 
-                                   a operar nuestra plataforma, siempre bajo acuerdos de confidencialidad.</p>
-                                
-                                <h3>4. Seguridad de la Información</h3>
-                                <p>Implementamos medidas de seguridad adecuadas para proteger su información 
-                                   personal contra accesos no autorizados, alteración, divulgación o destrucción.</p>
-                                
-                                <h3>5. Derechos del Usuario</h3>
-                                <p>Usted tiene derecho a:</p>
-                                <ul>
-                                    <li>Acceder a sus datos personales</li>
-                                    <li>Solicitar la corrección de datos inexactos</li>
-                                    <li>Solicitar la eliminación de sus datos personales</li>
-                                    <li>Revocar su consentimiento para el tratamiento de datos</li>
-                                </ul>
-                                
-                                <h3>6. Conservación de Datos</h3>
-                                <p>Mantenemos su información personal durante el tiempo necesario para 
-                                   proporcionar nuestros servicios y cumplir con nuestras obligaciones legales.</p>
-                                
-                                <h3>7. Cambios a Esta Política</h3>
-                                <p>Podemos actualizar esta política de privacidad periódicamente. 
-                                   Los cambios entrarán en vigencia cuando se publique la nueva versión.</p>
-                                
-                                <h3>8. Contacto</h3>
-                                <p>Si tiene preguntas sobre esta política de privacidad, contáctenos a través de 
-                                   nuestro formulario de contacto o al correo electrónico: privacidad@bustraker.edu.co</p>
-                                
-                                <div class="text-center mt-3">
-                                    <a th:href="@{/inicio-de-sesion-mejorado}" class="btn btn-primary">
-                                        <i class="fas fa-arrow-left"></i> Volver al Inicio
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
+    <main class="legal-shell">
+        <section class="legal-hero" aria-labelledby="legalTitle">
+            <div class="legal-hero__copy">
+                <p class="legal-eyebrow"><span></span> DOCUMENTO LEGAL · 02</p>
+                <h1 id="legalTitle">Política <em>de privacidad</em></h1>
+                <p>Te explicamos qué información puede tratar Bustraker, para qué se utiliza, cuándo se comparte y cómo ejercer tus derechos.</p>
+            </div>
+            <div class="legal-hero__meta">
+                <span class="legal-meta-icon"><i class="fa-regular fa-calendar" aria-hidden="true"></i></span>
+                <span><small>Última actualización</small><strong>11 de noviembre de 2026</strong></span>
+            </div>
+        </section>
+
+        <div class="legal-layout">
+            <aside class="legal-sidebar" aria-label="Contenido del documento">
+                <p class="legal-sidebar__title">EN ESTA PÁGINA</p>
+                <nav>
+                    <a href="#responsable"><span>01</span> Responsable y alcance</a>
+                    <a href="#datos"><span>02</span> Datos que tratamos</a>
+                    <a href="#ubicacion"><span>03</span> Ubicación y GPS</a>
+                    <a href="#finalidades"><span>04</span> Usos y bases</a>
+                    <a href="#compartir"><span>05</span> Destinatarios</a>
+                    <a href="#cookies"><span>06</span> Sesión y preferencias</a>
+                    <a href="#conservacion"><span>07</span> Conservación y seguridad</a>
+                    <a href="#derechos"><span>08</span> Tus derechos</a>
+                    <a href="#menores"><span>09</span> Niños, niñas y adolescentes</a>
+                    <a href="#cambios"><span>10</span> Cambios y contacto</a>
+                </nav>
+                <a class="legal-sidebar__note legal-sidebar__note--link" th:href="@{/terminos}">
+                    <i class="fa-solid fa-file-contract" aria-hidden="true"></i>
+                    <span><strong>¿Buscas las reglas de uso?</strong><small>Consulta Términos y condiciones</small></span>
+                    <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                </a>
+            </aside>
+
+            <article class="legal-document">
+                <div class="legal-summary">
+                    <span class="legal-summary__icon"><i class="fa-solid fa-user-shield" aria-hidden="true"></i></span>
+                    <div>
+                        <strong>Tu ubicación no se comparte automáticamente con Bustraker</strong>
+                        <p>El navegador puede usarla en tu dispositivo para mostrarte en el mapa. El envío al servidor solo ocurre si activas expresamente el reporte GPS de llegadas.</p>
                     </div>
                 </div>
-            </div>
+
+                <section class="legal-section legal-section--notice" id="responsable">
+                    <div class="legal-section__heading">
+                        <span class="legal-section__number">01</span>
+                        <div><p>AVISO DE TRATAMIENTO</p><h2>Responsable y alcance</h2></div>
+                    </div>
+                    <p>Esta política describe el tratamiento de datos personales en Bustraker, una plataforma de información y consulta de movilidad en Cartagena. El tratamiento se rige por la Ley 1581 de 2012, el Decreto 1074 de 2015 y las demás normas colombianas aplicables. Rige desde el 11 de noviembre de 2026 y permanecerá vigente mientras se preste el servicio o hasta que sea sustituida por una versión posterior.</p>
+                    <p>La base de datos se mantendrá activa durante la prestación de Bustraker y mientras existan finalidades legítimas u obligaciones de conservación aplicables. Su cierre no elimina los deberes legales de conservar o bloquear información que deban mantenerse conforme a la ley.</p>
+                    <p>La marca Bustraker no es por sí sola la identificación del responsable. Para consultas y solicitudes relacionadas con tus datos puedes utilizar el <a th:href="@{/contacto}">formulario de contacto</a> e indicar «Protección de datos».</p>
+                    <p>Esta política es independiente de los <a th:href="@{/terminos}">Términos y condiciones</a>. Cuando una función requiera una autorización específica —por ejemplo, GPS o notificaciones— se solicitará además el permiso correspondiente desde la aplicación, el navegador o el dispositivo.</p>
+                </section>
+
+                <section class="legal-section" id="datos">
+                    <div class="legal-section__heading">
+                        <span class="legal-section__number">02</span>
+                        <div><p>INFORMACIÓN QUE PUEDE GENERARSE</p><h2>Datos que tratamos</h2></div>
+                    </div>
+                    <p>Los datos dependen de las funciones que utilices y de la información que decidas proporcionar:</p>
+                    <div class="legal-data-grid">
+                        <div class="legal-data-card">
+                            <span><i class="fa-solid fa-user" aria-hidden="true"></i></span>
+                            <h3>Cuenta y acceso</h3>
+                            <p>Nombres, apellidos, nombre de usuario, correo electrónico, rol y datos necesarios para autenticarte. En cuentas locales, la contraseña se almacena como hash BCrypt y no como contraseña legible. Si eliges un proveedor externo de inicio de sesión, este puede comunicar los datos de perfil que autorices en ese flujo.</p>
+                        </div>
+                        <div class="legal-data-card">
+                            <span><i class="fa-solid fa-map-location-dot" aria-hidden="true"></i></span>
+                            <h3>Consultas y trayectos</h3>
+                            <p>Origen, destino, rutas y barrios que introduces o solicitas al planear trayectos; y, si usas la opción de guardar, las rutas, paradas o trayectos favoritos y sus datos asociados. La ubicación GPS del dispositivo es una categoría distinta y se trata como se indica en la sección 03.</p>
+                        </div>
+                        <div class="legal-data-card">
+                            <span><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i></span>
+                            <h3>Incidentes y reportes</h3>
+                            <p>Tipo, título y descripción del incidente, ruta o bus relacionado, estado y fechas; además de comentarios de gestión. El personal administrador autorizado los consulta para atender el reporte.</p>
+                        </div>
+                        <div class="legal-data-card">
+                            <span><i class="fa-solid fa-envelope" aria-hidden="true"></i></span>
+                            <h3>Contacto y solicitudes</h3>
+                            <p>Nombre, apellido, teléfono, correo y contenido del mensaje de contacto. En solicitudes de acceso administrativo pueden incluirse nombre, correo, motivo, estado, fechas y datos de gestión o aprobación.</p>
+                        </div>
+                        <div class="legal-data-card">
+                            <span><i class="fa-solid fa-location-dot" aria-hidden="true"></i></span>
+                            <h3>Ubicación precisa</h3>
+                            <p>Coordenadas y precisión estimada que entrega el dispositivo cuando autorizas y usas una función GPS. La aplicación no solicita estos datos al crear una cuenta.</p>
+                        </div>
+                        <div class="legal-data-card">
+                            <span><i class="fa-solid fa-laptop" aria-hidden="true"></i></span>
+                            <h3>Datos técnicos y preferencias</h3>
+                            <p>La infraestructura puede procesar dirección IP, fecha y hora de solicitudes u otros metadatos técnicos para entregar y proteger el servicio. Preferencias de mapa y voz pueden guardarse en el almacenamiento local de tu navegador. Los administradores pueden registrar una suscripción técnica para notificaciones push.</p>
+                        </div>
+                    </div>
+                    <p>No pedimos datos financieros, médicos ni contraseñas de otros servicios. No incluyas datos sensibles o de terceros en tus mensajes; si lo haces, solicita orientación al responsable mediante el canal de contacto.</p>
+                </section>
+
+                <section class="legal-section" id="ubicacion">
+                    <div class="legal-section__heading">
+                        <span class="legal-section__number">03</span>
+                        <div><p>PERMISO Y ELECCIÓN</p><h2>Ubicación y GPS</h2></div>
+                    </div>
+                    <div class="legal-location-panel">
+                        <div class="legal-location-panel__icon"><i class="fa-solid fa-location-crosshairs" aria-hidden="true"></i></div>
+                        <div>
+                            <strong>El permiso lo controlas desde tu dispositivo</strong>
+                            <p>Puedes rechazarlo o revocarlo. Sin GPS, las funciones que dependen de la ubicación actual no estarán disponibles; las demás consultas pueden seguir funcionando.</p>
+                        </div>
+                    </div>
+                    <ul class="legal-list">
+                        <li><strong>Ubicación para orientarte:</strong> cuando eliges «mi ubicación», el navegador entrega coordenadas a la página para mostrar tu posición y ayudar a planear consultas. La aplicación las usa en el dispositivo para esta función; una búsqueda o solicitud de ruta puede transmitir los puntos de origen y destino al proveedor de enrutamiento.</li>
+                        <li><strong>Reporte de llegadas:</strong> si inicias sesión y activas «compartir llegadas», la aplicación envía coordenadas, precisión, ruta y sentido al servidor de Bustraker para calcular estimaciones. El reporte se actualiza mientras mantengas esa opción activa y haya señal GPS reciente y precisa.</li>
+                        <li><strong>Duración del reporte:</strong> el servicio de llegadas mantiene los reportes GPS temporalmente en memoria; vencen 90 segundos después de la última actualización o se eliminan al detener el reporte. Si se reinicia la aplicación, también pueden desaparecer antes. La API publica estimaciones y el número de reportes activos, no el nombre del reportante ni sus coordenadas exactas. Los registros de infraestructura, proxies o monitoreo dependen de la instalación y deben configurarse para no conservar coordenadas más tiempo del necesario.</li>
+                        <li><strong>Enrutamiento externo:</strong> si solicitas una ruta entre un origen y un destino, el proveedor externo de enrutamiento puede recibir las coordenadas o referencias de esos puntos, aunque no actives el GPS.</li>
+                    </ul>
+                    <p>La precisión depende del dispositivo, la señal y el entorno. Puedes detener el seguimiento desde los controles de la aplicación y retirar el permiso en la configuración del navegador o del dispositivo.</p>
+                    <p>Los reportes GPS están disponibles únicamente para cuentas que hayan aceptado la versión vigente de los documentos y confirmado tener 18 años o más. No utilices esta función si eres menor de edad.</p>
+                </section>
+
+                <section class="legal-section" id="finalidades">
+                    <div class="legal-section__heading">
+                        <span class="legal-section__number">04</span>
+                        <div><p>FINALIDADES Y FUNDAMENTOS</p><h2>Para qué usamos los datos</h2></div>
+                    </div>
+                    <ul class="legal-list">
+                        <li>Crear, mantener y proteger tu cuenta; autenticar sesiones y aplicar permisos.</li>
+                        <li>Buscar y presentar rutas, paradas, trayectos y datos de movilidad que solicites; guardar favoritos cuando uses esa función.</li>
+                        <li>Procesar reportes GPS que actives y calcular estimaciones de llegada.</li>
+                        <li>Recibir, gestionar y responder incidentes, solicitudes administrativas y mensajes de contacto.</li>
+                        <li>Diagnosticar errores, prevenir usos abusivos, mantener la seguridad y cumplir obligaciones legales.</li>
+                        <li>Calcular riesgos de retraso usando ruta, día de la semana, hora de salida, duración planificada e índice de demanda; recomendar trayectos comparando una opción habitual con alternativas; y sugerir destinos usando el texto consultado, un catálogo de destinos y un historial de visitas proporcionado a esa función.</li>
+                    </ul>
+                    <p>La aplicación utiliza modelos predictivos y de recomendación (no una función de decisión legal automatizada). Los datos indicados se envían al servicio de modelos configurado por la instalación; por defecto, la configuración apunta a un servicio local. Si se configura un proveedor externo, el responsable debe informarlo antes de habilitarlo y verificar el país de tratamiento, retención y uso para entrenamiento. No se afirma que un proveedor externo esté impedido de entrenar con esos datos mientras sus condiciones no se hayan confirmado. Las respuestas son orientativas, no producen efectos jurídicos y puedes solicitar revisión humana mediante el formulario de contacto.</p>
+                    <p>La regla general del tratamiento es tu autorización previa, expresa e informada, salvo las excepciones previstas por la ley. El registro y el inicio de sesión social solicitan aceptación afirmativa y confirmación de mayoría de edad; la aplicación guarda la versión y fecha de aceptación. Bustraker no activa GPS al iniciar sesión: el envío al servidor requiere que actives expresamente el reporte de llegadas.</p>
+                </section>
+
+                <section class="legal-section" id="compartir">
+                    <div class="legal-section__heading">
+                        <span class="legal-section__number">05</span>
+                        <div><p>DESTINATARIOS</p><h2>Cuándo y con quién se comparten</h2></div>
+                    </div>
+                    <p>No vendemos tus datos personales. El acceso o comunicación puede ocurrir únicamente según la función y finalidad descritas:</p>
+                    <ul class="legal-list">
+                        <li>Personal administrador autorizado de Bustraker para gestionar cuentas, incidentes, solicitudes y seguridad.</li>
+                        <li>Proveedores de alojamiento, base de datos, correo electrónico, autenticación externa o notificaciones push, en la medida necesaria para prestar esas funciones.</li>
+                        <li>Proveedores de mapas y enrutamiento que se encuentren habilitados, incluidos OpenStreetMap/CARTO, Esri y servicios OSRM. Al solicitar mapas, se puede revelar la IP y el área de los mosaicos consultados; al calcular un trayecto, el proveedor puede recibir los orígenes y destinos necesarios. Cada proveedor aplica sus propios términos y políticas.</li>
+                        <li>Cloudflare cdnjs, desde donde las páginas cargan Font Awesome; al abrir una página que use esos iconos, la CDN puede recibir la dirección IP, datos técnicos de la solicitud y encabezados del navegador.</li>
+                        <li>El servicio de modelos predictivos configurado por la instalación. Recibe exclusivamente los campos de la consulta descritos en la sección 04; el proveedor y el país dependen del despliegue.</li>
+                        <li>Autoridades competentes, cuando exista una obligación legal o requerimiento válido conforme a la ley.</li>
+                    </ul>
+                    <p>Los proveedores externos pueden procesar solicitudes desde países distintos de Colombia, incluidos servicios de autenticación social, mapas/enrutamiento y cdnjs. El país concreto depende del proveedor y su infraestructura global; no se garantiza una ubicación única. Sus propias políticas y condiciones regulan ese tratamiento, y la autorización otorgada al crear la cuenta incluye la transmisión internacional estrictamente necesaria para las funciones que solicites.</p>
+                </section>
+
+                <section class="legal-section" id="cookies">
+                    <div class="legal-section__heading">
+                        <span class="legal-section__number">06</span>
+                        <div><p>ALMACENAMIENTO EN EL NAVEGADOR</p><h2>Sesión y preferencias</h2></div>
+                    </div>
+                    <p>La aplicación utiliza mecanismos técnicos de sesión y protección de solicitudes para mantener el acceso y la seguridad mientras navegas. También puede guardar localmente preferencias funcionales, como la capa de mapa elegida o preferencias de voz para notificaciones. Estas preferencias permanecen en el navegador hasta que las borres o cambies; no son necesarias para crear un perfil de publicidad.</p>
+                    <p>El navegador y los proveedores de servicios externos pueden usar sus propios mecanismos técnicos. Puedes revisar o borrar cookies y almacenamiento desde la configuración del navegador; al bloquear mecanismos esenciales, algunas funciones podrían dejar de operar correctamente.</p>
+                </section>
+
+                <section class="legal-section" id="conservacion">
+                    <div class="legal-section__heading">
+                        <span class="legal-section__number">07</span>
+                        <div><p>PLAZOS Y SALVAGUARDAS</p><h2>Conservación y seguridad</h2></div>
+                    </div>
+                    <p>Los tiempos de la tabla describen el ciclo de vida aplicado por las funciones actuales. Cuando no existe una eliminación automática implementada, la información puede permanecer hasta atender una solicitud válida de supresión o hasta que exista una obligación legal de conservación; por ello no se debe interpretar como un plazo automático de borrado.</p>
+                    <div class="legal-table-wrap">
+                        <table class="legal-table">
+                            <thead><tr><th>Categoría</th><th>Conservación conocida</th><th>Eliminación</th></tr></thead>
+                            <tbody>
+                                <tr><td>Reportes GPS en vivo</td><td>Hasta 90 segundos desde la última actualización</td><td>Caducidad en memoria o detención del reporte</td></tr>
+                                <tr><td>Cuenta y datos de perfil</td><td>Mientras la cuenta esté activa; no hay vencimiento automático configurado</td><td>Solicitud de supresión, sujeta a conservación legal o registros asociados</td></tr>
+                                <tr><td>Mensajes de contacto e incidentes</td><td>Sin plazo automático configurado; se conservan para atender y gestionar la solicitud</td><td>Solicitud de supresión, sujeta a obligaciones y reclamaciones pendientes</td></tr>
+                                <tr><td>Sesiones y tokens</td><td>Sesión hasta 30 minutos; JWT según la configuración (por defecto, 24 horas)</td><td>Expiración o cierre de sesión</td></tr>
+                                <tr><td>Preferencias locales</td><td>Hasta que se borre el almacenamiento del navegador</td><td>Eliminación por el usuario desde el navegador</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p>La plataforma implementa medidas disponibles como permisos por roles, control de sesión y almacenamiento de contraseñas con hash BCrypt. Si ocurre un incidente que afecte datos personales, el responsable lo investigará, adoptará medidas de contención y notificará a la SIC y a las personas afectadas cuando así lo exija la normativa aplicable. Ningún sistema conectado a Internet garantiza seguridad absoluta.</p>
+                </section>
+
+                <section class="legal-section" id="derechos">
+                    <div class="legal-section__heading">
+                        <span class="legal-section__number">08</span>
+                        <div><p>LEY 1581 DE 2012</p><h2>Tus derechos y cómo ejercerlos</h2></div>
+                    </div>
+                    <p>Como titular de datos personales puedes solicitar conocer, actualizar y rectificar tus datos; pedir prueba de la autorización cuando aplique; conocer el uso que se les ha dado; presentar consultas y reclamos; solicitar la supresión o revocar la autorización cuando proceda; y presentar quejas ante la Superintendencia de Industria y Comercio (SIC) después de agotar el trámite ante el responsable, en los casos previstos por la ley.</p>
+                    <p>El acceso y las consultas sobre tus datos personales son gratuitos. Las consultas se responderán, como regla general, en un máximo de diez (10) días hábiles; si no es posible, se informará el motivo y la nueva fecha, que no podrá exceder cinco (5) días hábiles adicionales. Los reclamos se atenderán en un máximo de quince (15) días hábiles; si no es posible, se informará el motivo y la nueva fecha, que no podrá exceder ocho (8) días hábiles adicionales, conforme a la normativa aplicable.</p>
+                    <p>Si tienes una cuenta, puedes retirar tu autorización desde <strong>Perfil → Retirar autorización</strong>. La aplicación registra la fecha de revocación, cierra la sesión y bloquea las funciones protegidas hasta que otorgues una nueva autorización vigente. La revocación no borra automáticamente los datos anteriores ni los que deban conservarse por una obligación legal o para atender reclamaciones; puedes solicitar su supresión por este mismo canal cuando proceda.</p>
+                    <ol class="legal-steps">
+                        <li><span>1</span><p>Envía tu solicitud desde el <a th:href="@{/contacto}">formulario de contacto</a> e indica «Protección de datos».</p></li>
+                        <li><span>2</span><p>Explica qué derecho deseas ejercer y proporciona datos suficientes para identificar la cuenta. Nunca envíes tu contraseña.</p></li>
+                        <li><span>3</span><p>El responsable verificará la identidad y responderá dentro de los plazos legales. Si una norma exige conservar parte de la información, deberá explicarte el motivo.</p></li>
+                    </ol>
+                    <p>La solicitud de supresión o revocatoria puede no proceder cuando exista un deber legal o contractual de conservar la información. También puedes presentar una queja ante la SIC una vez agotado el trámite de consulta o reclamo ante el responsable, según corresponda.</p>
+                </section>
+
+                <section class="legal-section" id="menores">
+                    <div class="legal-section__heading">
+                        <span class="legal-section__number">09</span>
+                        <div><p>PROTECCIÓN REFORZADA</p><h2>Niños, niñas y adolescentes</h2></div>
+                    </div>
+                    <p>La creación de cuentas y el reporte GPS están limitados a personas de 18 años o más. El formulario solicita una confirmación expresa, pero no verifica documentalmente la edad. No se autoriza a menores a crear una cuenta ni a activar el reporte de ubicación. Si se detectan datos de una persona menor, se limitará su tratamiento y se solicitará al representante legal que contacte al responsable para su revisión y eventual supresión, conforme a la ley.</p>
+                </section>
+
+                <section class="legal-section" id="cambios">
+                    <div class="legal-section__heading">
+                        <span class="legal-section__number">10</span>
+                        <div><p>TRANSPARENCIA Y CONSULTAS</p><h2>Cambios y contacto</h2></div>
+                    </div>
+                    <p>Esta política puede actualizarse cuando cambien las funciones, proveedores o normas aplicables. Publicaremos aquí la versión vigente y la fecha. Si un cambio requiere una nueva autorización, se solicitará por un medio válido antes de tratar los datos para la nueva finalidad.</p>
+                    <p>Para preguntas, consultas o reclamos sobre privacidad, utiliza el <a th:href="@{/contacto}">formulario de contacto</a> e indica «Protección de datos». La política se complementa con los <a th:href="@{/terminos}">Términos y condiciones</a>, que regulan el uso general de la plataforma.</p>
+                    <div class="legal-contact-card">
+                        <span><i class="fa-solid fa-file-contract" aria-hidden="true"></i></span>
+                        <div><strong>Los términos están en una página independiente</strong><p>Consulta las reglas de acceso, uso aceptable, contenido y disponibilidad del servicio.</p></div>
+                        <a th:href="@{/terminos}" aria-label="Ir a términos y condiciones"><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+                    </div>
+                </section>
+
+                <footer class="legal-document__footer">
+                    <span><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> Política de privacidad de Bustraker</span>
+                    <a th:href="@{/}">Bustraker · Cartagena</a>
+                </footer>
+            </article>
         </div>
     </main>
 </body>

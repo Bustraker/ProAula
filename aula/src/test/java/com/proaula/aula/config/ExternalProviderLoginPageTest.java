@@ -3,6 +3,7 @@ package com.proaula.aula.config;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -17,6 +18,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.mock.web.MockHttpSession;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @SpringBootTest(properties = {
@@ -42,13 +45,13 @@ class ExternalProviderLoginPageTest {
         mockMvc.perform(get("/inicio-de-sesion-mejorado"))
             .andExpect(status().isOk())
             .andExpect(content().string(org.hamcrest.Matchers.containsString(
-                "href=\"/oauth2/authorization/github\"")))
+                "name=\"provider\" value=\"github\"")))
             .andExpect(content().string(org.hamcrest.Matchers.containsString(
-                "href=\"/oauth2/authorization/discord\"")))
+                "name=\"provider\" value=\"discord\"")))
             .andExpect(content().string(org.hamcrest.Matchers.containsString(
-                "href=\"/oauth2/authorization/facebook\"")))
+                "name=\"provider\" value=\"facebook\"")))
             .andExpect(content().string(org.hamcrest.Matchers.not(
-                org.hamcrest.Matchers.containsString("/oauth2/authorization/google"))));
+                org.hamcrest.Matchers.containsString("name=\"provider\" value=\"google\""))));
     }
 
     @Test
@@ -59,6 +62,14 @@ class ExternalProviderLoginPageTest {
                 "No se pudo completar el inicio con el proveedor externo.")))
             .andExpect(content().string(org.hamcrest.Matchers.not(
                 org.hamcrest.Matchers.containsString("Usuario o contraseña incorrectos."))));
+    }
+
+    @Test
+    void socialLoginCannotStartWithoutRecordedPreauthorization() throws Exception {
+        mockMvc.perform(get("/oauth2/authorization/github"))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(header().string("Location",
+                org.hamcrest.Matchers.containsString("/inicio-de-sesion-mejorado?consentRequired=true")));
     }
 
     @Test
@@ -141,7 +152,18 @@ class ExternalProviderLoginPageTest {
 
     private void assertAuthorizationRedirect(String path, String expectedHost, String expectedCallback,
                                              String expectedScope, boolean secure) throws Exception {
-        MvcResult result = mockMvc.perform(get(path).with(request -> {
+        String provider = path.substring(path.lastIndexOf('/') + 1);
+        MvcResult consentResult = mockMvc.perform(post("/oauth2/preauthorize")
+                .with(csrf())
+                .param("provider", provider)
+                .param("legalConsent", "true")
+                .param("adultConfirmed", "true")
+                .param("legalVersion", "2026-11-11-v1"))
+            .andExpect(status().is3xxRedirection())
+            .andReturn();
+        MockHttpSession session = (MockHttpSession) consentResult.getRequest().getSession(false);
+
+        MvcResult result = mockMvc.perform(get(path).session(session).with(request -> {
                 request.setSecure(secure);
                 request.setScheme(secure ? "https" : "http");
                 request.setServerPort(secure ? 5679 : 80);

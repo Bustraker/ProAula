@@ -2,6 +2,7 @@ package com.proaula.aula.Controller;
 
 import com.proaula.aula.Entity.Usuario;
 import com.proaula.aula.Service.UsuarioService;
+import com.proaula.aula.Service.LegalConsentService;
 import com.proaula.aula.config.JwtTokenProvider;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,6 +33,9 @@ class UsuarioControllerTest {
 
     @Mock
     private JwtTokenProvider jwtTokenProvider;
+
+    @Mock
+    private LegalConsentService legalConsentService;
 
     @InjectMocks
     private UsuarioController usuarioController;
@@ -75,7 +79,8 @@ class UsuarioControllerTest {
         when(usuarioService.register(any(Usuario.class))).thenReturn(savedUser);
 
         ResponseEntity<?> response = usuarioController.register(new UsuarioRegistroRequest(
-            "new-user", "long-password", "New", "User", "new-user@test.com"));
+            "new-user", "long-password", "New", "User", "new-user@test.com",
+            true, true, LegalConsentService.CURRENT_VERSION));
 
         ArgumentCaptor<Usuario> userCaptor = ArgumentCaptor.forClass(Usuario.class);
         verify(usuarioService).register(userCaptor.capture());

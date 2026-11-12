@@ -47,6 +47,7 @@ public class GlobalExceptionHandler {
         boolean conflict = "RESOURCE_IN_USE".equals(ex.getErrorCode())
                 || "EMAIL_ALREADY_EXISTS".equals(ex.getErrorCode());
         HttpStatus status = "INCIDENT_NOT_FOUND".equals(ex.getErrorCode())
+                || "ROUTE_NOT_FOUND".equals(ex.getErrorCode())
                 || "FAVORITE_NOT_FOUND".equals(ex.getErrorCode())
                 || "NOTIFICATION_NOT_FOUND".equals(ex.getErrorCode())
                 || "STOP_NOT_FOUND".equals(ex.getErrorCode())

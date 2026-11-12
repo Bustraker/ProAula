@@ -106,6 +106,108 @@
         return bases;
     }
 
+    function crearCapasCartografia(mapa) {
+        var capas = [
+            {
+                etiqueta: 'Barrios · límites catastrales',
+                ruta: '/data/cartografia/barrios-cartografia.geojson',
+                color: '#14b8a6',
+                tipo: 'Barrio',
+                capa: L.layerGroup(),
+                cargada: false,
+                cargando: null
+            },
+            {
+                etiqueta: 'Localidades · límites catastrales',
+                ruta: '/data/cartografia/localidades-cartografia.geojson',
+                color: '#f59e0b',
+                tipo: 'Localidad',
+                capa: L.layerGroup(),
+                cargada: false,
+                cargando: null
+            }
+        ];
+        var atribucionAgregada = false;
+        var superposiciones = {};
+
+        capas.forEach(function (config) {
+            superposiciones[config.etiqueta] = config.capa;
+        });
+
+        L.control.layers(null, superposiciones, {
+            collapsed: true,
+            position: 'topleft'
+        }).addTo(mapa);
+
+        mapa.on('overlayadd', function (evento) {
+            var config = capas.find(function (item) { return item.capa === evento.layer; });
+            if (!config || config.cargada || config.cargando) return;
+
+            config.cargando = fetchJSON(urlAplicacion(config.ruta), 30000)
+                .then(function (datos) {
+                    if (!datos || datos.type !== 'FeatureCollection' || !Array.isArray(datos.features)) {
+                        throw new Error('El archivo cartográfico no contiene una colección GeoJSON válida.');
+                    }
+
+                    L.geoJSON(datos, {
+                        style: {
+                            color: config.color,
+                            weight: 1.5,
+                            opacity: 0.9,
+                            fillColor: config.color,
+                            fillOpacity: 0.035
+                        },
+                        onEachFeature: function (feature, elemento) {
+                            var propiedades = feature.properties || {};
+                            var nombre = String(propiedades.nombre || '').trim();
+                            if (!nombre) return;
+
+                            elemento.bindTooltip(escapeHtml(nombre), {
+                                sticky: true,
+                                direction: 'auto',
+                                className: 'mu-tooltip'
+                            });
+
+                            var texto = config.tipo === 'Barrio'
+                                ? 'Barrio según cartografía catastral.'
+                                : 'Localidad según cartografía catastral.';
+                            var html = '<div class="mu-popup mu-popup--pro">' +
+                                '<div class="mu-popup__banner mu-popup__banner--barrio">' +
+                                '<i class="fas fa-map-location-dot" aria-hidden="true"></i>' +
+                                '<span>' + escapeHtml(config.tipo) + '</span></div>' +
+                                '<div class="mu-popup__body"><strong class="mu-popup__title">' +
+                                escapeHtml(nombre) + '</strong><div class="mu-popup__meta">' +
+                                '<span>' + texto + '</span></div></div>';
+
+                            if (config.tipo === 'Barrio') {
+                                html += '<div class="mu-popup__actions">' +
+                                    '<button type="button" class="mu-popup__btn-action mu-popup__btn--orig" data-set-origin="' +
+                                    escapeHtml(nombre) + '"><i class="fas fa-play" aria-hidden="true"></i> Origen (A)</button>' +
+                                    '<button type="button" class="mu-popup__btn-action mu-popup__btn--dest" data-set-dest="' +
+                                    escapeHtml(nombre) + '"><i class="fas fa-flag" aria-hidden="true"></i> Destino (B)</button>' +
+                                    '</div>';
+                            }
+                            elemento.bindPopup(html + '</div>');
+                        }
+                    }).addTo(config.capa);
+
+                    config.cargada = true;
+                    if (!atribucionAgregada && mapa.attributionControl) {
+                        mapa.attributionControl.addAttribution('Cartografía catastral de Cartagena · barrios y localidades');
+                        atribucionAgregada = true;
+                    }
+                })
+                .catch(function (error) {
+                    mapa.removeLayer(config.capa);
+                    mostrarAviso('No se pudo cargar la capa de ' + config.tipo.toLowerCase() +
+                        ': ' + (error && error.message ? error.message : 'error desconocido'), 'warn', 7000);
+                })
+                .finally(function () {
+                    config.cargando = null;
+                });
+        });
+    }
+
     function capaPrincipal(capa) {
         return capa.getLayers ? capa.getLayers()[0] : capa;
     }
@@ -363,6 +465,7 @@
 
         L.control.zoom({ position: 'topleft', zoomInTitle: 'Acercar', zoomOutTitle: 'Alejar' }).addTo(mapa);
         new ControlVista({ obtenerLimites: opciones.obtenerLimites }).addTo(mapa);
+        crearCapasCartografia(mapa);
 
         var bases = crearMapasBase();
         var nombre = leerPreferencia();

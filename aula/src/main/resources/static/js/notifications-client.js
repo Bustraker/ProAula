@@ -7,7 +7,7 @@
  * 2. Entrega In-App: Muestra avisos emergentes inmediatos cuando el usuario está logueado y dentro.
  * 3. Audio & Voz Accesible:
  *    - Campanilla sonora sintetizada (Web Audio API) que no requiere archivos externos.
- *    - Síntesis de voz (Web Speech API) en español para personas ciegas o con discapacidad visual.
+ *    - Voz Web Speech para anuncios accesibles.
  *    - Región aria-live para compatibilidad absoluta con lectores de pantalla (JAWS, NVDA, TalkBack).
  * 4. Desconexión Limpia: Notifica al backend al cerrar o salir de la app (sendBeacon)
  *    para que las siguientes alertas se envíen directamente por correo.
@@ -15,7 +15,6 @@
 (function (global) {
     'use strict';
 
-    var PREF_AUDIO = 'bustraker.audioNotificaciones';
     var PREF_VOICE = 'bustraker.preferenciasVoz';
     var HEARTBEAT_MS = 25000;
     var notificacionesVistas = new Set();
@@ -25,15 +24,11 @@
     // Valores predeterminados: voz masculina (pitch bajo), velocidad normal, volumen pleno
     var preferenciasVoz = { voiceURI: '', rate: 1.0, pitch: 0.85, volume: 1 };
 
-    // Inicializar preferencia de audio (solo se activa si el usuario lo encendió antes explícitamente)
+    // Audio queda siempre desactivado al cargar; elimina la preferencia persistida anteriormente.
     try {
-        var guardado = global.localStorage.getItem(PREF_AUDIO);
-        // Si nunca guardó preferencia (null) → queda desactivado por defecto
-        if (guardado !== null) {
-            audioHabilitado = guardado === 'true';
-        }
+        global.localStorage.removeItem('bustraker.audioNotificaciones');
     } catch (e) {
-        audioHabilitado = false;
+        console.warn('No se pudo limpiar la preferencia de audio anterior:', e);
     }
 
     try {
@@ -44,6 +39,7 @@
             preferenciasVoz.rate = limitarNumero(opcionesVoz.rate, 0.5, 2, 1.0);
             preferenciasVoz.pitch = limitarNumero(opcionesVoz.pitch, 0, 2, 0.85);
             preferenciasVoz.volume = limitarNumero(opcionesVoz.volume, 0, 1, 1);
+            guardarPreferenciasVoz();
         }
     } catch (e) {
         console.warn('No se pudieron cargar las preferencias de voz:', e);
@@ -104,14 +100,9 @@
         /* ── Constantes ── */
         var MAX_SEGMENTO_CHARS = 160;   // Chrome trunka utterances > ~200 chars
         var KEEP_ALIVE_MS      = 10000; // Intervalo anti-pausa de Chrome
-        var WAIT_VOICES_MS     = 100;   // Polling de voces aún no cargadas
-        var MAX_WAIT_VOICES    = 25;    // Máximo 2.5 s esperando voces
-
         /* ── Estado interno ── */
         var _vozCacheada      = null;   // Voz seleccionada (se recalcula si cambian las voces)
         var _keepAliveTimer   = null;
-        var _vocesListas      = false;
-        var _colaEspera       = [];     // Mensajes encolados antes de que las voces carguen
 
         /* ════════════════════════════════════════════════
          * 1. PREPROCESADOR DE TEXTO
@@ -346,15 +337,6 @@
          * ════════════════════════════════════════════════ */
         function _onVoicesChanged() {
             _vozCacheada = null;  // Forzar re-selección
-            _vocesListas = true;
-            // Despachar mensajes que esperaban voces
-            if (_colaEspera.length > 0) {
-                var pendientes = _colaEspera.slice();
-                _colaEspera = [];
-                pendientes.forEach(function (item) {
-                    _despachar(item.texto, item.voz);
-                });
-            }
         }
 
         /* ════════════════════════════════════════════════
@@ -413,23 +395,9 @@
                 _stopKeepAlive();
             }
 
-            var voces = synth.getVoices();
-            if (voces && voces.length > 0) {
-                _vocesListas = true;
-                _despachar(texto, prefs);
-            } else {
-                // Chrome: voces aún no cargadas → encolar y esperar
-                _colaEspera.push({ texto: texto, voz: prefs });
-                var intentos = 0;
-                var poll = setInterval(function () {
-                    intentos++;
-                    var v = global.speechSynthesis.getVoices();
-                    if ((v && v.length > 0) || intentos >= MAX_WAIT_VOICES) {
-                        clearInterval(poll);
-                        _onVoicesChanged();
-                    }
-                }, WAIT_VOICES_MS);
-            }
+            // No esperar a que el navegador complete getVoices(): usa su voz por
+            // defecto (lang es-CO) ahora y vuelve a elegir si luego llegan voces.
+            _despachar(texto, prefs);
         }
 
         function cancelar() {
@@ -651,28 +619,26 @@
         if (botonPrueba) {
             botonPrueba.addEventListener('click', function () {
                 var estado = document.getElementById('voiceStatus');
+                var textoPrueba = 'Buenas, aquí Bustraker. Listo para ayudarte con tu viaje por Cartagena. Te indico las rutas, las paradas y los transbordos que necesitas, sin complicaciones.';
                 if (!global.speechSynthesis || !global.SpeechSynthesisUtterance) {
                     if (estado) estado.textContent = 'La síntesis de voz no está disponible en este navegador.';
                     return;
                 }
-                hablarMensaje('Buenas, aquí Bustraker. Listo para ayudarte con tu viaje por Cartagena. Te indico las rutas, las paradas y los transbordos que necesitas, sin complicaciones.', true);
+                SpeechEngine.hablar(textoPrueba, true, preferenciasVoz);
                 if (estado) estado.textContent = 'Reproduciendo la prueba con las preferencias actuales.';
             });
         }
 
         actualizarControlesVoz();
         if (!global.speechSynthesis || !global.SpeechSynthesisUtterance) {
-            var estado = document.getElementById('voiceStatus');
-            var boton = document.getElementById('btnProbarVoz');
-            if (estado) estado.textContent = 'La síntesis de voz no está disponible en este navegador.';
-            if (boton) boton.disabled = true;
             if (selector) selector.disabled = true;
-            return;
+            var estadoSinVoz = document.getElementById('voiceStatus');
+            if (estadoSinVoz) estadoSinVoz.textContent = 'Este navegador no dispone de síntesis de voz.';
+        } else {
+            actualizarVoces();
+            global.speechSynthesis.onvoiceschanged = actualizarVoces;
+            setTimeout(actualizarVoces, 250);
         }
-
-        actualizarVoces();
-        global.speechSynthesis.onvoiceschanged = actualizarVoces;
-        setTimeout(actualizarVoces, 250);
     }
 
     /**
@@ -922,18 +888,12 @@
 
     function toggleAudio() {
         audioHabilitado = !audioHabilitado;
-        try {
-            global.localStorage.setItem(PREF_AUDIO, String(audioHabilitado));
-        } catch (e) {
-            console.warn('No se pudo guardar la preferencia de audio:', e);
-        }
-
         actualizarBotonAudio();
         if (audioHabilitado) {
             emitirCampanilla();
             hablarMensaje('Audio y notificaciones por voz activadas.', true);
-        } else if (global.speechSynthesis) {
-            global.speechSynthesis.cancel();
+        } else {
+            if (global.speechSynthesis) global.speechSynthesis.cancel();
         }
     }
 

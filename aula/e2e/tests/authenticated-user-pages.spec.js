@@ -13,6 +13,7 @@ async function registerAndLogin(page) {
   await page.locator("#password").fill(password);
   await page.locator("#passwordConfirm").fill(password);
   await page.locator("#terminos").check();
+  await page.locator("#mayorEdad").check();
   await page.locator("#registroForm button[type=submit]").click();
   await expect(page).toHaveURL(/\/inicio-de-sesion-mejorado\?registrado=true$/);
 
@@ -39,10 +40,10 @@ test("authenticated dashboard shortcuts and support modal work", async ({ page }
   await expect(page.locator("#contactSuccessAlert")).toContainText(/Mensaje enviado con éxito/i);
   await expect(page.getByRole("dialog", { name: /Contacto rápido/i })).toBeHidden({ timeout: 5000 });
 
-  await page.locator('a[data-target="buses-section"]').click();
-  await expect(page).toHaveURL(/#buses-section$/);
-  await expect(page.locator("#buses-section")).toBeInViewport();
-  await page.getByRole("link", { name: /Mi Perfil/i }).click();
+  await page.getByRole("link", { name: /Consultar buses/i }).click();
+  await expect(page).toHaveURL(/\/consultas$/);
+  await expect(page.getByRole("heading", { name: /La movilidad, con más contexto/i })).toBeVisible();
+  await page.getByRole("link", { name: /^Perfil$/i }).click();
   await expect(page).toHaveURL(/\/perfil$/);
 });
 
@@ -91,8 +92,10 @@ test("authenticated history, route directory, trip planner and contact page are 
   await expect(page.getByRole("status")).toContainText(/Tu primera historia empieza aquí/i);
   await page.getByRole("link", { name: /Explorar opciones para viajar/i }).click();
   await expect(page).toHaveURL(/\/viajar$/);
-  await expect(page.getByRole("heading", { name: /Consulta de rutas/i })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Planear viaje/i })).toBeVisible();
   await expect(page.locator("#btnSeguirUbicacion")).toBeEnabled({ timeout: 15000 });
+  await expect(page.locator("#btnSeguirUbicacion")).toHaveAttribute("aria-pressed", "false");
+  await expect(page.locator("#locationStatus")).toContainText("Ubicación opcional");
 
   await page.goto("/historial/999999");
   await expect(page.locator(".history-detail--warning")).toContainText(/no tienes permiso para verlo/i);
@@ -150,4 +153,19 @@ test("authenticated incident report guides entry and handles route availability"
   await page.getByRole("button", { name: "Enviar reporte" }).click();
   await expect(page).toHaveURL(/\/incidentes\/nuevo$/);
   await expect(page.getByRole("status")).toContainText(/Incidente #\d+ registrado correctamente/i);
+});
+
+test("More menu exposes incident and accident reports on mobile", async ({ page }) => {
+  await registerAndLogin(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.locator(".nav-menu summary").click();
+
+  const menu = page.locator(".nav-menu__panel");
+  await expect(menu).toBeVisible();
+  await expect(menu.getByRole("link", { name: /Reportar incidente/i })).toBeVisible();
+  await menu.getByRole("link", { name: /Reportar accidente/i }).click();
+
+  await expect(page).toHaveURL(/\/incidentes\/nuevo\?tipo=ACCIDENTE$/);
+  await expect(page.getByRole("heading", { name: "Reportar un accidente" })).toBeVisible();
+  await expect(page.locator("#tipo")).toHaveValue("ACCIDENTE");
 });

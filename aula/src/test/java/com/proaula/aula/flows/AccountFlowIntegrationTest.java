@@ -21,7 +21,9 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import com.proaula.aula.Entity.Usuario;
 import com.proaula.aula.Repository.UsuarioRepository;
+import com.proaula.aula.Repository.LegalConsentRepository;
 import com.proaula.aula.Service.UsuarioService;
+import com.proaula.aula.Service.LegalConsentService;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -33,6 +35,12 @@ class AccountFlowIntegrationTest {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private LegalConsentRepository legalConsentRepository;
+
+    @Autowired
+    private LegalConsentService legalConsentService;
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
@@ -55,7 +63,9 @@ class AccountFlowIntegrationTest {
                         .param("password", "safe-password-26")
                         .param("passwordConfirm", "safe-password-26")
                         .param("role", "USER")
-                        .param("terminos", "true"))
+                        .param("terminos", "true")
+                        .param("mayorEdad", "true")
+                        .param("legalVersion", "2026-11-11-v1"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(header().string("Location", "/inicio-de-sesion-mejorado?registrado=true"));
 
@@ -65,6 +75,10 @@ class AccountFlowIntegrationTest {
         assertThat(usuario.getEmail()).isEqualTo("flowuser@example.test");
         assertThat(usuario.getRole()).isEqualTo("ROLE_USER");
         assertThat(passwordEncoder.matches("safe-password-26", usuario.getPassword())).isTrue();
+        assertThat(legalConsentRepository
+                .existsByUsuario_UsernameAndTermsVersionAndPrivacyVersionAndAdultConfirmedTrue(
+                        "flowuser", "2026-11-11-v1", "2026-11-11-v1"))
+                .isTrue();
 
         MvcResult loginResult = mockMvc.perform(post("/login")
                         .with(csrf())
@@ -94,6 +108,95 @@ class AccountFlowIntegrationTest {
     }
 
     @Test
+    void revokingConsentPreservesEvidenceAndEndsTheAuthenticatedSession() throws Exception {
+        mockMvc.perform(post("/registro")
+                        .with(csrf())
+                        .param("nombres", "Usuario")
+                        .param("apellidos", "Revocacion")
+                        .param("username", "consentrevoke")
+                        .param("email", "consentrevoke@example.test")
+                        .param("password", "safe-password-26")
+                        .param("passwordConfirm", "safe-password-26")
+                        .param("role", "USER")
+                        .param("terminos", "true")
+                        .param("mayorEdad", "true")
+                        .param("legalVersion", "2026-11-11-v1"))
+                .andExpect(status().is3xxRedirection());
+
+        MvcResult loginResult = mockMvc.perform(post("/login")
+                        .with(csrf())
+                        .param("username", "consentrevoke")
+                        .param("password", "safe-password-26"))
+                .andExpect(status().is3xxRedirection())
+                .andReturn();
+        MockHttpSession session = (MockHttpSession) loginResult.getRequest().getSession(false);
+        assertThat(session).isNotNull();
+        assertThat(legalConsentService.hasCurrentConsent("consentrevoke")).isTrue();
+        mockMvc.perform(get("/perfil").session(session))
+                .andExpect(status().isOk())
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content()
+                        .string(org.hamcrest.Matchers.containsString("Retirar autorización")));
+
+        MvcResult revocationResult = mockMvc.perform(post("/legal/revocar").session(session).with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(header().string("Location",
+                    "/inicio-de-sesion-mejorado?consentRevoked=true"))
+                .andReturn();
+
+        assertThat(revocationResult.getResponse().getHeaders("Set-Cookie").toString())
+                .contains("JWT_TOKEN=;");
+        assertThat(legalConsentService.hasCurrentConsent("consentrevoke")).isFalse();
+        assertThat(legalConsentRepository.existsByUsuario_UsernameAndRevokedAtIsNotNull("consentrevoke"))
+                .isTrue();
+    }
+
+    @Test
+    void authenticatedAccountWithoutConsentIsGatedForPagesAndApiWrites() throws Exception {
+        Usuario legacyUser = new Usuario();
+        legacyUser.setUsername("legacyconsent");
+        legacyUser.setEmail("legacyconsent@example.test");
+        legacyUser.setPassword("existing-password-26");
+        legacyUser.setNombres("Cuenta");
+        legacyUser.setApellidos("Antigua");
+        legacyUser.setRole("ROLE_USER");
+        legacyUser.setProvider("LOCAL");
+        usuarioService.register(legacyUser);
+
+        mockMvc.perform(get("/dashboard").with(user("legacyconsent")))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(header().string("Location", "/legal/consentir"));
+
+        mockMvc.perform(post("/api/llegadas/1/reportes")
+                        .with(user("legacyconsent"))
+                        .with(csrf())
+                        .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                        .content("{\"latitude\":10.4,\"longitude\":-75.5}"))
+                .andExpect(status().isForbidden())
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content()
+                        .string(org.hamcrest.Matchers.containsString("LEGAL_CONSENT_REQUIRED")));
+
+        mockMvc.perform(get("/legal/consentir").with(user("legacyconsent")))
+                .andExpect(status().isOk())
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content()
+                        .string(org.hamcrest.Matchers.containsString("Guardar mi aceptación")));
+
+        mockMvc.perform(post("/legal/consentir")
+                        .with(user("legacyconsent"))
+                        .with(csrf())
+                        .param("legalConsent", "true")
+                        .param("adultConfirmed", "true")
+                        .param("legalVersion", "2026-11-11-v1"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(header().string("Location", "/perfil"));
+
+        assertThat(legalConsentService.hasCurrentConsent("legacyconsent")).isTrue();
+        mockMvc.perform(get("/perfil").with(user("legacyconsent")))
+                .andExpect(status().isOk())
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content()
+                        .string(org.hamcrest.Matchers.containsString("Retirar autorización")));
+    }
+
+    @Test
     void secureRequestsIncludeSpringSecurityBrowserProtectionHeaders() throws Exception {
         mockMvc.perform(get("/").secure(true))
                 .andExpect(status().isOk())
@@ -114,7 +217,9 @@ class AccountFlowIntegrationTest {
                         .param("passwordConfirm", "safe-password-26")
                         .param("role", "ADMIN")
                         .param("adminCode", "forged-admin-code")
-                        .param("terminos", "true"))
+                        .param("terminos", "true")
+                        .param("mayorEdad", "true")
+                        .param("legalVersion", "2026-11-11-v1"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(header().string("Location", "/inicio-de-sesion-mejorado?registrado=true"));
 
@@ -197,7 +302,10 @@ class AccountFlowIntegrationTest {
                                   "password": "short",
                                   "nombres": "Nuevo",
                                   "apellidos": "Viajero",
-                                  "email": "newtraveler@example.test"
+                                  "email": "newtraveler@example.test",
+                                  "legalConsent": true,
+                                  "adultConfirmed": true,
+                                  "legalVersion": "2026-11-11-v1"
                                 }
                                 """))
                 .andExpect(status().isBadRequest());
@@ -217,7 +325,9 @@ class AccountFlowIntegrationTest {
                         .param("email", "utf8register@example.test")
                         .param("password", oversizedUtf8Password)
                         .param("passwordConfirm", oversizedUtf8Password)
-                        .param("terminos", "true"))
+                        .param("terminos", "true")
+                        .param("mayorEdad", "true")
+                        .param("legalVersion", "2026-11-11-v1"))
                 .andExpect(status().isOk())
                 .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content()
                         .string(org.hamcrest.Matchers.containsString(
@@ -300,6 +410,8 @@ class AccountFlowIntegrationTest {
         usuario.setRole("ROLE_USER");
         usuario.setProvider("LOCAL");
         usuario.setPasswordSetupRequired(passwordSetupRequired);
-        return usuarioService.register(usuario);
+        Usuario registered = usuarioService.register(usuario);
+        legalConsentService.recordAcceptance(registered, "2026-11-11-v1", true, "REGISTRATION");
+        return registered;
     }
 }

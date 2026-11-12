@@ -48,6 +48,9 @@ public class RutaRestController {
             Map<String, Object> mapa = new HashMap<>();
             mapa.put("id", ruta.getId());
             mapa.put(CAMPO_NOMBRE, ruta.getNombre());
+            mapa.put("origen", ruta.getOrigen());
+            mapa.put("destino", ruta.getDestino());
+            mapa.put("descripcion", ruta.getDescripcion());
             mapa.put(CAMPO_BARRIOS, ruta.getBarrios());
             mapa.put("barriosOrdenados", ruta.getBarriosOrdenados());
             mapa.put("ordenBarriosConfirmado", ruta.isOrdenBarriosConfirmado());
@@ -107,7 +110,7 @@ public class RutaRestController {
                 datosBus.put("modelo", bus.getModelo());
                 datosBus.put("color", bus.getColor());
                 if (autenticado) {
-                    datosBus.put("conductor", bus.getConductor());
+                    datosBus.put("conductor", "Anónimo");
                 }
                 buses.add(datosBus);
             });
@@ -124,10 +127,15 @@ public class RutaRestController {
     public ResponseEntity<List<Map<String, Object>>> getAllRutas() {
         List<Map<String, Object>> rutas = new ArrayList<>();
         
-        rutaService.getRutasVerificadas().forEach(ruta -> {
+        rutaService.getRutasVerificadas().stream()
+            .filter(ruta -> ruta.getEstado() == Ruta.Estado.ACTIVA)
+            .forEach(ruta -> {
             Map<String, Object> mapa = new HashMap<>();
             mapa.put("id", ruta.getId());
             mapa.put(CAMPO_NOMBRE, ruta.getNombre());
+            mapa.put("origen", ruta.getOrigen());
+            mapa.put("destino", ruta.getDestino());
+            mapa.put("descripcion", ruta.getDescripcion());
             mapa.put(CAMPO_BARRIOS, ruta.getBarrios());
             mapa.put("barriosOrdenados", ruta.getBarriosOrdenados());
             mapa.put("ordenBarriosConfirmado", ruta.isOrdenBarriosConfirmado());

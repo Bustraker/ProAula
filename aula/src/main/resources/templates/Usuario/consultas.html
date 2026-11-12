@@ -174,7 +174,7 @@
                 <form id="busFilterForm" class="filter-form" role="search" onsubmit="return false;">
                     <label class="directory-search" for="searchInput">
                         <i class="fas fa-magnifying-glass" aria-hidden="true"></i>
-                        <input type="search" id="searchInput" th:placeholder="${autenticado} ? 'Buscar placa, ruta, conductor, modelo...' : 'Buscar ruta o barrio...'" placeholder="Buscar ruta o barrio..." autocomplete="off">
+                        <input type="search" id="searchInput" th:placeholder="${autenticado} ? 'Buscar placa, ruta o modelo...' : 'Buscar ruta o barrio...'" placeholder="Buscar ruta o barrio..." autocomplete="off">
                         <kbd>/</kbd>
                     </label>
                     <label class="directory-select" for="routeFilter">
@@ -265,7 +265,7 @@
                 <span><i class="fas fa-magnifying-glass" aria-hidden="true"></i></span>
                 <div>
                     <strong th:text="${autenticado} ? 'No encontramos unidades con esos criterios' : 'No encontramos rutas con esos criterios'">No encontramos rutas con esos criterios</strong>
-                    <p th:text="${autenticado} ? 'Prueba otra placa, conductor o selecciona una ruta diferente.' : 'Prueba otro nombre de ruta o barrio.'">Prueba otro nombre de ruta o barrio.</p>
+                    <p th:text="${autenticado} ? 'Prueba otra placa, modelo o selecciona una ruta diferente.' : 'Prueba otro nombre de ruta o barrio.'">Prueba otro nombre de ruta o barrio.</p>
                 </div>
                 <button type="button" class="no-results-reset" id="emptyClearButton">Limpiar filtros</button>
             </div>

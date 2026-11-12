@@ -7,27 +7,27 @@ import org.springframework.core.io.DefaultResourceLoader;
 
 class BarrioContextoServiceTest {
     private static final String ARCHIVO_CONTEXTO =
-        "classpath:data/Barrios_Oficiales_Distrito_de_Cartagena_de_Indias_20261107.xml";
+        "classpath:static/data/cartografia/barrios-cartografia.geojson";
 
     private final BarrioContextoService service = new BarrioContextoService(
         new DefaultResourceLoader().getResource(ARCHIVO_CONTEXTO));
 
     @Test
-    void cargaContextoOficialYCalculaDensidadAproximada() {
+    void cargaBarriosCartograficosSinInventarDatosDemograficos() {
         var contexto = service.obtenerPorNombre("Alcibia").orElseThrow();
 
         assertThat(service.disponible()).isTrue();
-        assertThat(contexto.poblacion()).isEqualTo(4192);
-        assertThat(contexto.areaHectareas()).hasToString("24");
-        assertThat(contexto.hogares()).isEqualTo(878);
-        assertThat(contexto.viviendas()).isEqualTo(869);
-        assertThat(contexto.densidadHabitantesHa()).hasToString("174.7");
+        assertThat(service.obtenerTodos()).hasSize(208);
+        assertThat(contexto.nombreBarrio()).isEqualTo("ALCIBIA");
+        assertThat(contexto.poblacion()).isNull();
+        assertThat(contexto.areaHectareas()).isNull();
+        assertThat(contexto.densidadHabitantesHa()).isNull();
     }
 
     @Test
-    void relacionaNombresConCaracteresCorruptosDelArchivoConLosBarriosDeLaAplicacion() {
+    void normalizaNombresConTildesYDeduplicaPoligonosDeUnMismoBarrio() {
         assertThat(service.obtenerPorNombre("España")).isPresent();
-        assertThat(service.obtenerPorNombre("Olaya St. Rafael Núñez")).isPresent();
+        assertThat(service.obtenerPorNombre("Olaya Herrera (Com 5)")).isPresent();
     }
 
     @Test

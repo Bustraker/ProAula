@@ -75,6 +75,91 @@ function makeProvisionalRouteFixtures() {
   return { routes, neighborhoods };
 }
 
+test("selected routes warn about active incidents in public and private trip planners", async ({ page }) => {
+  const { routes, neighborhoods } = makeProvisionalRouteFixtures();
+  const route = routes.find(item => item.id === "provisional-campestre");
+  const routeNeighborhoods = neighborhoods.filter(item => route.barrios.includes(item.nombre));
+  const activeIncidents = [{
+    tipo: "ACCIDENTE",
+    estado: "EN_ATENCION",
+    fechaReporte: "2026-11-07T08:30:00"
+  }];
+
+  await page.route("**/api/barrios/todos", request => request.fulfill({
+    contentType: "application/json",
+    body: JSON.stringify(routeNeighborhoods)
+  }));
+  await page.route("**/api/rutas-con-coordenadas", request => request.fulfill({
+    contentType: "application/json",
+    body: JSON.stringify([route])
+  }));
+  await page.route("**/api/incidentes/ruta/**", request => request.fulfill({
+    contentType: "application/json",
+    body: JSON.stringify(activeIncidents)
+  }));
+  await page.route("https://router.project-osrm.org/**", request => request.fulfill({
+    contentType: "application/json",
+    body: JSON.stringify({
+      routes: [{
+        geometry: {
+          type: "LineString",
+          coordinates: [[-75.56, 10.39], [-75.55, 10.41], [-75.54, 10.43]]
+        },
+        distance: 5000,
+        duration: 1200
+      }]
+    })
+  }));
+
+  async function verifySelectedRouteWarning(url) {
+    const routeData = page.waitForResponse(
+      response => response.url().includes("/api/rutas-con-coordenadas") && response.status() === 200
+    );
+    await page.goto(url);
+    await routeData;
+    await page.locator("#origen").fill("El Campestre");
+    await expect(page.locator("#destino")).toBeEnabled();
+    await page.locator("#destino").fill("El Socorro");
+    await page.locator("#btnPlanificar").click();
+    await expect(page.locator("#rutaDetalle")).toBeVisible();
+    await expect(page.locator(".incidentes-ruta")).toContainText("Accidente reportado");
+    await expect(page.locator(".incidentes-ruta")).toContainText("podrían ocasionar demoras");
+    await expect(page.locator(".incidentes-ruta")).toContainText("En atención");
+    await expect(page.locator(".incidentes-ruta")).not.toContainText("Consultando reportes");
+
+    await page.locator("#origen").fill("El Socorro");
+    await expect(page.locator("#rutaDetalle")).toBeHidden();
+    await expect(page.locator("#destino")).toBeEnabled();
+    await page.locator("#destino").fill("Blas de Lezo");
+    await page.locator("#btnPlanificar").click();
+    await expect(page.locator("#rutaDetalle")).toBeVisible();
+    await expect(page.locator(".incidentes-ruta")).toContainText("Accidente reportado");
+    await expect(page.locator(".incidentes-ruta")).toHaveCount(1);
+  }
+
+  await verifySelectedRouteWarning("/viajar_public");
+
+  const username = `incidentroutes${Date.now().toString(36)}`;
+  const password = "safe-password-26";
+  await page.goto("/registro-mejorado");
+  await page.locator("#nombres").fill("Usuario");
+  await page.locator("#apellidos").fill("Rutas");
+  await page.locator("#username").fill(username);
+  await page.locator("#email").fill(`${username}@example.test`);
+  await page.locator("#password").fill(password);
+  await page.locator("#passwordConfirm").fill(password);
+  await page.locator("#terminos").check();
+  await page.locator("#mayorEdad").check();
+  await page.locator("#registroForm button[type=submit]").click();
+  await expect(page).toHaveURL(/\/inicio-de-sesion-mejorado\?registrado=true$/);
+  await page.locator("#username").fill(username);
+  await page.locator("#password").fill(password);
+  await page.locator("#loginForm button[type=submit]").click();
+  await expect(page).toHaveURL(/\/dashboard$/);
+
+  await verifySelectedRouteWarning("/viajar");
+});
+
 async function expectMapTiles(page) {
   await expect(page.locator("#map")).toBeVisible();
   await expect.poll(async () => page.locator("#map img.leaflet-tile").evaluateAll(
@@ -83,6 +168,8 @@ async function expectMapTiles(page) {
 }
 
 test("every confirmed route segment can be planned in public and private pages", async ({ page }) => {
+  test.setTimeout(420_000);
+
   await page.route("https://router.project-osrm.org/**", routeRequest => routeRequest.fulfill({
     contentType: "application/json",
     body: JSON.stringify({
@@ -124,6 +211,7 @@ test("every confirmed route segment can be planned in public and private pages",
   await page.locator("#password").fill(password);
   await page.locator("#passwordConfirm").fill(password);
   await page.locator("#terminos").check();
+  await page.locator("#mayorEdad").check();
   await page.locator("#registroForm button[type=submit]").click();
   await expect(page).toHaveURL(/\/inicio-de-sesion-mejorado\?registrado=true$/);
   await page.locator("#username").fill(username);
@@ -186,6 +274,7 @@ test("all provisional seed route segments can be planned in public and private p
   await page.locator("#password").fill(password);
   await page.locator("#passwordConfirm").fill(password);
   await page.locator("#terminos").check();
+  await page.locator("#mayorEdad").check();
   await page.locator("#registroForm button[type=submit]").click();
   await expect(page).toHaveURL(/\/inicio-de-sesion-mejorado\?registrado=true$/);
   await page.locator("#username").fill(username);
@@ -216,9 +305,11 @@ test("public navigation loads route data and supports trip planning inputs", asy
   await page.goto("/index_3_public");
   await page.getByRole("link", { name: /Planear mi viaje/i }).click();
   await expect(page).toHaveURL(/\/viajar_public(?:\?.*)?$/);
-  await expect(page.getByRole("heading", { name: /Consulta de rutas/i })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Planear viaje/i })).toBeVisible();
   await Promise.all([barriosResponse, rutasResponse]);
   await expectMapTiles(page);
+
+  await expect(page.locator("#locationStatus")).toContainText("Ubicación opcional");
 
   await page.locator(".mu-estilos__boton").click();
   await expect(page.locator('[data-estilo="Claro"]')).toBeVisible();
@@ -282,12 +373,13 @@ test("public navigation loads route data and supports trip planning inputs", asy
   await expect(page.locator("#btnPanel")).toHaveAttribute("aria-expanded", "true");
 
   await expect(page.locator("#btnSeguirUbicacion")).toBeEnabled();
-  await expect(page.locator("#btnSeguirUbicacion")).toHaveAttribute("aria-pressed", "true");
-  await page.locator("#btnSeguirUbicacion").click();
   await expect(page.locator("#btnSeguirUbicacion")).toHaveAttribute("aria-pressed", "false");
   await page.locator("#btnSeguirUbicacion").click();
   await expect(page.locator("#btnSeguirUbicacion")).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator("#locationStatus")).toContainText("GPS activo");
   await page.locator("#btnSeguirUbicacion").click();
+  await expect(page.locator("#btnSeguirUbicacion")).toHaveAttribute("aria-pressed", "false");
+  await expect(page.locator("#locationStatus")).toContainText("Última ubicación");
 
   await page.locator("#btnLimpiar").click();
   await expect(page.locator("#origen")).toHaveValue("");
@@ -448,7 +540,109 @@ test("a transfer itinerary lists every registered stop in route order without in
   await expect(routeBStops.nth(2)).toContainText("Bajada: Terminal del Destino");
 });
 
-test("GPS starts automatically, lists only nearby route neighborhoods and detects route-like movement", async ({ page }) => {
+test("shows at most three fastest estimated options, puts direct routes first, and maps transfer walks", async ({ page }) => {
+  const coordinates = {
+    "Barrio Origen": [10.39, -75.56],
+    "Centro": [10.41, -75.55],
+    "Barrio Destino": [10.43, -75.54],
+    "Destino cercano": [10.392, -75.558],
+    "Plaza": [10.415, -75.555]
+  };
+  const neighborhoods = Object.entries(coordinates).map(([nombre, [latitud, longitud]]) => ({
+    nombre,
+    latitud,
+    longitud,
+    coordenadaEstimada: false
+  }));
+  const makeRoute = (id, nombre, barrios, paradas = []) => ({
+    id,
+    nombre,
+    barrios: [...barrios],
+    barriosOrdenados: [...barrios],
+    ordenBarriosConfirmado: true,
+    coordenadasBarrios: Object.fromEntries(barrios.map(barrio => [barrio, coordinates[barrio]])),
+    paradas,
+    buses: []
+  });
+  const directShort = makeRoute("e2e-direct-short", "Ruta directa corta", ["Barrio Origen", "Barrio Destino"]);
+  directShort.coordenadasBarrios["Barrio Destino"] = coordinates["Destino cercano"];
+  const routes = [
+    makeRoute("e2e-direct-long", "Ruta directa larga", ["Barrio Origen", "Barrio Destino"]),
+    directShort,
+    makeRoute("e2e-transfer-a", "Ruta hacia Centro", ["Barrio Origen", "Centro"], [
+      { nombre: "Parada para bajar", barrio: "Centro", orden: 1, latitud: 10.410, longitud: -75.550 }
+    ]),
+    makeRoute("e2e-transfer-b", "Ruta desde Centro", ["Centro", "Barrio Destino"], [
+      { nombre: "Parada para abordar", barrio: "Centro", orden: 1, latitud: 10.411, longitud: -75.549 }
+    ]),
+    makeRoute("e2e-transfer-c", "Ruta hacia Plaza", ["Barrio Origen", "Plaza"], [
+      { nombre: "Parada para bajar en Plaza", barrio: "Plaza", orden: 1, latitud: 10.415, longitud: -75.555 }
+    ]),
+    makeRoute("e2e-transfer-d", "Ruta desde Plaza", ["Plaza", "Barrio Destino"], [
+      { nombre: "Parada para abordar en Plaza", barrio: "Plaza", orden: 1, latitud: 10.416, longitud: -75.554 }
+    ])
+  ];
+
+  await page.route("**/api/barrios/todos", routeRequest => routeRequest.fulfill({
+    contentType: "application/json",
+    body: JSON.stringify(neighborhoods)
+  }));
+  await page.route("**/api/rutas-con-coordenadas", routeRequest => routeRequest.fulfill({
+    contentType: "application/json",
+    body: JSON.stringify(routes)
+  }));
+  await page.route("https://router.project-osrm.org/**", routeRequest => routeRequest.fulfill({
+    contentType: "application/json",
+    body: JSON.stringify({
+      routes: [{
+        geometry: {
+          type: "LineString",
+          coordinates: [[-75.56, 10.39], [-75.55, 10.41], [-75.54, 10.43]]
+        },
+        distance: 5000,
+        duration: 1200
+      }]
+    })
+  }));
+
+  const transcaribeRequests = [];
+  page.on("request", request => {
+    if (/transcaribe/i.test(request.url())) transcaribeRequests.push(request.url());
+  });
+
+  await page.goto("/viajar_public");
+  await expect(page.locator("#origen")).toBeEnabled();
+  await page.locator("#origen").fill("Barrio Origen");
+  await page.locator("#destino").fill("Barrio Destino");
+  await page.locator("#btnPlanificar").click();
+
+  const options = page.locator("button.tramo");
+  await expect(options).toHaveCount(3);
+  await expect(options.nth(0).locator(".tramo__rutas")).toContainText("Ruta directa corta");
+  await expect(options.nth(1).locator(".tramo__rutas")).toContainText("Ruta directa larga");
+  await expect(options.nth(2).locator(".tramo__nombre")).toContainText("transbordo");
+  await expect(options.nth(2).locator(".tramo__conexion"))
+    .toContainText("Bájate en");
+  await expect(options.nth(2).locator(".tramo__conexion"))
+    .toContainText("Camina hasta");
+  await expect(page.locator("body")).not.toContainText(/transcaribe/i);
+  expect(transcaribeRequests).toEqual([]);
+
+  await options.nth(2).click();
+  await expect.poll(() => page.locator("#map .leaflet-overlay-pane path[stroke='#ffd166']").count())
+    .toBeGreaterThan(0);
+  await expect(page.locator("#map .transbordo-mapa-tooltip")).toHaveCount(2);
+
+  await page.setViewportSize({ width: 320, height: 900 });
+  await expect.poll(() => options.nth(2).evaluate(element =>
+    element.scrollWidth <= element.clientWidth
+  )).toBe(true);
+  await expect.poll(() => page.locator("#rutaDetalle").evaluate(element =>
+    element.scrollWidth <= element.clientWidth
+  )).toBe(true);
+});
+
+test("GPS is optional and detects route-like movement after the user enables it", async ({ page }) => {
   await page.addInitScript(() => {
     const listeners = new Map();
     let nextListener = 1;
@@ -519,6 +713,8 @@ test("GPS starts automatically, lists only nearby route neighborhoods and detect
   }));
 
   await page.goto("/viajar_public");
+  await expect(page.locator("#btnSeguirUbicacion")).toHaveAttribute("aria-pressed", "false");
+  await page.locator("#btnSeguirUbicacion").click();
   await expect(page.locator("#btnSeguirUbicacion")).toHaveAttribute("aria-pressed", "true");
   await page.locator("#origen").fill("Barrio Origen");
   await page.locator("#destino").fill("Barrio Destino");
@@ -548,44 +744,12 @@ test("GPS starts automatically, lists only nearby route neighborhoods and detect
   await expect(statusPanel).toContainText("La coincidencia con la ruta es aproximada");
 });
 
-test("public home and bus directory controls work", async ({ page }) => {
+test("public home keeps bus consultation private", async ({ page }) => {
   await page.goto("/index_3_public");
-  await expect(page.getByRole("heading", { name: /Tu ciudad, en movimiento/i })).toBeVisible();
-  await page.getByRole("link", { name: /Consultar buses/i }).first().click();
-  await expect(page).toHaveURL(/\/consultas$/);
-  await expect(page.getByRole("heading", { name: /La ciudad, ruta por ruta/i })).toBeVisible();
-
-  const initialCount = await page.locator("#base > .bus-card").count();
-  const firstCard = page.locator(".bus-card-trigger").first();
-  if (initialCount > 0) {
-    await firstCard.click();
-    await expect(firstCard).toHaveAttribute("aria-expanded", "true");
-    await expect(firstCard.locator("xpath=..").locator(".bus-card-details")).toHaveAttribute("aria-hidden", "false");
-    await firstCard.click();
-    await expect(firstCard).toHaveAttribute("aria-expanded", "false");
-  }
-
-  await page.locator("#toggleTable").click();
-  await expect(page.locator("#toggleTable")).toHaveAttribute("aria-pressed", "true");
-  await expect(page.locator("#busTableContainer")).toBeVisible();
-  await page.locator("#toggleCards").click();
-  await expect(page.locator("#toggleCards")).toHaveAttribute("aria-pressed", "true");
-  await expect(page.locator("#base")).toHaveJSProperty("hidden", false);
-
-  await page.locator("#searchInput").fill("sin-resultados-para-esta-busqueda");
-  await page.locator("#clearButton").click();
-  await expect(page.locator("#searchInput")).toHaveValue("");
-  await expect(page.locator("#visibleCount")).toHaveText(String(initialCount));
-  await page.locator("#searchInput").fill("sin-resultados-para-esta-busqueda");
-  if (initialCount > 0) {
-    await expect(page.locator("#noResults")).toBeVisible();
-    await page.locator("#emptyClearButton").click();
-    await expect(page.locator("#noResults")).toBeHidden();
-  } else {
-    await page.locator("#clearButton").click();
-  }
-  await expect(page.locator("#searchInput")).toHaveValue("");
-  await expect(page.locator("#visibleCount")).toHaveText(String(initialCount));
+  await expect(page.getByRole("heading", { name: /Cartagena, más cerca/i })).toBeVisible();
+  await expect(page.getByRole("link", { name: /Consultar buses/i })).toHaveCount(0);
+  await page.goto("/consultas");
+  await expect(page).toHaveURL(/\/inicio-de-sesion-mejorado(?:\?.*)?$/);
 });
 
 test("public contact form submits and displays its confirmation", async ({ page }) => {
@@ -634,6 +798,7 @@ test("account registration, login, protected page and logout work in the browser
   await page.locator("#password").fill("safe-password-26");
   await page.locator("#passwordConfirm").fill("safe-password-26");
   await page.locator("#terminos").check();
+  await page.locator("#mayorEdad").check();
   await page.locator("#registroForm button[type=submit]").click();
 
   await expect(page).toHaveURL(/\/inicio-de-sesion-mejorado\?registrado=true$/);
@@ -650,7 +815,7 @@ test("account registration, login, protected page and logout work in the browser
     response => response.url().includes("/api/rutas-con-coordenadas") && response.status() === 200
   );
   await page.goto("/viajar");
-  await expect(page.getByRole("heading", { name: /Consulta de rutas/i })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Planear viaje/i })).toBeVisible();
   await Promise.all([privateNeighborhoods, privateRoutes]);
   await expectMapTiles(page);
 

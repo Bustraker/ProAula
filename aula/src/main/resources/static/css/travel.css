@@ -958,3 +958,525 @@ body::before {
     .btn--principal::before { display: none; }
     .icon-btn, .btn, .tramo, .pestana, .parada__boton, .options-panel input[type="search"], .options-panel select, .leaflet-control-zoom a { transition: none !important; }
 }
+
+/* Compact route planning and make the model estimate easy to scan. */
+.options-panel { width: min(390px, calc(100vw - 28px)); }
+.panel-cuerpo { padding-top: 2px; }
+.estado--info { padding: 5px 2px 0; border-color: transparent; background: transparent; }
+.resultados__resumen { font-size: 0.78rem; }
+.resultados__riesgo-nota { margin: -3px 0 0; font-size: 0.68rem; }
+
+.tramo__riesgo {
+    display: grid;
+    gap: 7px;
+    padding-top: 10px;
+    color: #d7e8e4;
+    font-size: 0.72rem;
+}
+
+.tramo__riesgo-resumen { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.tramo__riesgo-titulo { color: #a9c2bd; font-weight: 600; }
+.tramo__riesgo-valor { color: #f1d38b; font-size: 0.75rem; white-space: nowrap; }
+.tramo__riesgo-barra {
+    display: block;
+    height: 5px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(153, 177, 171, 0.16);
+}
+.tramo__riesgo-progreso {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: #eab75d;
+    transition: width 350ms ease;
+}
+.tramo__riesgo--alto .tramo__riesgo-valor { color: #ff9a91; }
+.tramo__riesgo--alto .tramo__riesgo-progreso { background: #ef766f; }
+.tramo__riesgo--medio .tramo__riesgo-valor,
+.tramo__riesgo--moderado .tramo__riesgo-valor { color: #f1d38b; }
+.tramo__riesgo--medio .tramo__riesgo-progreso,
+.tramo__riesgo--moderado .tramo__riesgo-progreso { background: #eab75d; }
+.tramo__riesgo--bajo .tramo__riesgo-valor { color: #7de0b0; }
+.tramo__riesgo--bajo .tramo__riesgo-progreso { background: #55c99a; }
+.tramo__riesgo--error { color: #fca5a5; }
+.tramo__riesgo--cargando { color: #a9c2bd; }
+
+.panel-pie { font-size: 0.68rem; }
+
+@media (max-width: 700px) {
+    .options-panel { width: auto; }
+    .panel-cab__titulo { min-width: 0; }
+    .panel-cab__controles { gap: 4px; }
+    .tramo__riesgo-resumen { align-items: flex-start; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   CENTRO DE OPERACIONES & NAVEGACIÓN PRO (PANEL LOGUEADO)
+   ═══════════════════════════════════════════════════════════════════ */
+.panel-badge-live {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 2px;
+}
+
+.pulse-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    animation: livePulse 2s infinite;
+}
+
+@keyframes livePulse {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+    }
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+    }
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+    }
+}
+
+.panel-cab__controles {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.icon-btn--accent {
+    border-color: rgba(55, 200, 186, 0.35);
+    background: rgba(55, 200, 186, 0.08);
+    color: #6ee7b7;
+}
+
+.icon-btn--accent:hover {
+    background: rgba(55, 200, 186, 0.22);
+    border-color: #34d399;
+    color: #ffffff;
+}
+
+/* HUD OPERATIVO SUPERIOR */
+.operativo-hud {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto 1fr;
+    align-items: center;
+    margin-top: 10px;
+    margin-bottom: 12px;
+    padding: 8px 12px;
+    border-radius: 12px;
+    background: rgba(15, 34, 43, 0.6);
+    border: 1px solid rgba(86, 191, 181, 0.18);
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.hud-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.hud-divider {
+    width: 1px;
+    height: 22px;
+    background: rgba(148, 163, 184, 0.15);
+}
+
+.hud-label {
+    font-size: 0.62rem;
+    font-weight: 700;
+    color: var(--texto-3);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.hud-label i {
+    color: var(--acento);
+    font-size: 0.58rem;
+}
+
+.hud-value {
+    font-size: 0.74rem;
+    font-weight: 800;
+    color: #f0fdf4;
+    letter-spacing: -0.01em;
+}
+
+/* ENCABEZADOS DE SECCIÓN CON TAG */
+.seccion__cab-flex {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.seccion__cab-flex .seccion__titulo {
+    margin-bottom: 0;
+}
+
+.seccion__tag {
+    font-size: 0.62rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 6px;
+    background: rgba(55, 200, 186, 0.12);
+    color: #5eead4;
+    border: 1px solid rgba(94, 234, 212, 0.2);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.seccion__tag--info {
+    background: rgba(59, 130, 246, 0.12);
+    color: #93c5fd;
+    border-color: rgba(147, 197, 253, 0.25);
+}
+
+/* SLIDERS DE VOZ EN REJILLA */
+.voice-grid-sliders {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin-top: 8px;
+    margin-bottom: 4px;
+}
+
+.slider-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.slider-group label {
+    font-size: 0.72rem;
+    margin-bottom: 4px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.voice-settings summary {
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+/* BOTÓN DE PLANIFICACIÓN PRO */
+.btn--principal {
+    position: relative;
+    overflow: hidden;
+    font-size: 0.94rem;
+    letter-spacing: 0.01em;
+    box-shadow: 0 4px 18px rgba(20, 184, 166, 0.35);
+}
+
+.btn--principal:hover {
+    box-shadow: 0 6px 24px rgba(20, 184, 166, 0.5);
+}
+
+/* FILA DE ACCIONES OPERATIVAS */
+.fila--acciones {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.estado--gps {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.estado--gps i {
+    color: var(--acento);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   SISTEMA DE ANIMACIONES AVANZADAS & ESTÉTICA DE ALTA FIDELIDAD
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Efecto Shimmer y resplandor continuo para el botón principal */
+.btn--principal::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -60%;
+    width: 40%;
+    height: 200%;
+    background: linear-gradient(
+        60deg,
+        rgba(255, 255, 255, 0) 10%,
+        rgba(255, 255, 255, 0.28) 50%,
+        rgba(255, 255, 255, 0) 90%
+    );
+    transform: rotate(25deg);
+    animation: btnShimmer 4.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    pointer-events: none;
+}
+
+@keyframes btnShimmer {
+    0%, 40% {
+        left: -80%;
+        opacity: 0;
+    }
+    48% {
+        opacity: 1;
+    }
+    60%, 100% {
+        left: 140%;
+        opacity: 0;
+    }
+}
+
+/* Enfoque ultra profesional de los inputs de búsqueda */
+.options-panel input[type="search"] {
+    transition: all 0.26s cubic-bezier(0.16, 1, 0.3, 1);
+    background: rgba(9, 23, 29, 0.7);
+    border: 1px solid rgba(86, 191, 181, 0.22);
+}
+
+.options-panel input[type="search"]:focus {
+    background: rgba(14, 34, 42, 0.95);
+    border-color: #38cbb5;
+    box-shadow: 0 0 0 3px rgba(56, 203, 181, 0.18), 0 8px 20px rgba(0, 0, 0, 0.35);
+    transform: translateY(-1px);
+}
+
+/* Micro-animación de las marcas A / B en los campos */
+.campo:focus-within .campo__marca--a {
+    box-shadow: 0 0 14px rgba(34, 197, 94, 0.65);
+    transform: translateY(-50%) scale(1.08);
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.campo:focus-within .campo__marca--b {
+    box-shadow: 0 0 14px rgba(239, 68, 68, 0.65);
+    transform: translateY(-50%) scale(1.08);
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+/* Tarjetas de tramos/rutas con efecto de elevación y borde interactivo */
+.tramo {
+    position: relative;
+    border: 1px solid rgba(139, 190, 184, 0.16);
+    border-radius: 14px;
+    background: linear-gradient(145deg, rgba(14, 34, 40, 0.94), rgba(8, 22, 28, 0.92));
+    transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1),
+                border-color 0.24s ease,
+                box-shadow 0.24s ease,
+                background 0.24s ease;
+    overflow: hidden;
+}
+
+.tramo::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: transparent;
+    transition: background 0.24s ease, box-shadow 0.24s ease;
+}
+
+.tramo:hover {
+    transform: translateY(-2px);
+    border-color: rgba(56, 203, 181, 0.45);
+    box-shadow: 0 8px 24px rgba(0, 12, 16, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.tramo:hover::before {
+    background: #38cbb5;
+    box-shadow: 0 0 10px rgba(56, 203, 181, 0.7);
+}
+
+.tramo--activo {
+    border-color: #38cbb5 !important;
+    background: linear-gradient(145deg, rgba(18, 48, 54, 0.98), rgba(9, 28, 33, 0.98)) !important;
+    box-shadow: 0 10px 30px rgba(0, 16, 22, 0.65), 0 0 0 1px rgba(56, 203, 181, 0.35) !important;
+}
+
+.tramo--activo::before {
+    background: #38cbb5 !important;
+    box-shadow: 0 0 12px #38cbb5 !important;
+}
+
+/* Transición suave y organizada del panel de detalles */
+.detalle {
+    animation: detalleElevado 440ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    border-radius: 16px;
+    box-shadow: 0 16px 42px rgba(0, 8, 12, 0.48), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+@keyframes detalleElevado {
+    0% {
+        opacity: 0;
+        transform: translateY(14px) scale(0.98);
+        filter: blur(4px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+    }
+}
+
+/* Pestañas con transición suave y brillo activo */
+.pestana {
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    border-radius: 8px;
+}
+
+.pestana[aria-selected="true"] {
+    background: rgba(56, 203, 181, 0.18) !important;
+    color: #6ee7b7 !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.pestana[aria-selected="true"] .contador {
+    background: #14b8a6;
+    color: #03201d;
+    font-weight: 800;
+}
+
+/* Animación sutil de entrada para los paneles de pestañas */
+.pestana-panel {
+    animation: tabContenidoSuave 320ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes tabContenidoSuave {
+    0% {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Efecto interactivo sobre los items de la lista de paradas */
+.parada__boton {
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    border-radius: 9px;
+}
+
+.parada__boton:hover {
+    background: rgba(56, 203, 181, 0.1);
+    transform: translateX(3px);
+}
+
+/* Botón invertir origen-destino con rotación fluida */
+#btnInvertir {
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.15s, border-color 0.15s;
+}
+
+#btnInvertir:hover {
+    transform: rotate(180deg) scale(1.08);
+    background: rgba(56, 203, 181, 0.2);
+    border-color: rgba(56, 203, 181, 0.4);
+    color: #ffffff;
+}
+
+#btnInvertir:active {
+    transform: rotate(360deg) scale(0.96);
+}
+
+/* Efecto de pulso en radar GPS cuando está activado */
+.btn--secundario[aria-pressed="true"] {
+    position: relative;
+    box-shadow: 0 0 16px rgba(20, 184, 166, 0.4);
+}
+
+.btn--secundario[aria-pressed="true"] i {
+    animation: radarSpin 3.5s linear infinite;
+}
+
+@keyframes radarSpin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Keep route cards and detail panels readable in narrow layouts. */
+.tramo {
+    grid-template-columns: minmax(0, 1fr);
+    min-width: 0;
+}
+.tramo__cabecera,
+.tramo__nombre,
+.tramo__rutas,
+.tramo__cadena,
+.tramo__meta,
+.tramo__riesgo {
+    min-width: 0;
+}
+.tramo__cabecera { flex-wrap: wrap; }
+.tramo__nombre,
+.tramo__rutas,
+.tramo__cadena,
+.tramo__conexion,
+.detalle__cab,
+.detalle__tramo,
+.itinerario-paso,
+.itinerario-paso__detalle,
+.parada__texto,
+.info-card {
+    overflow-wrap: anywhere;
+}
+.tramo__conexion {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    min-width: 0;
+    padding: 9px 10px;
+    border: 1px solid rgba(251, 191, 36, 0.2);
+    border-radius: 10px;
+    color: #fde7a7;
+    background: rgba(217, 119, 6, 0.09);
+    font-size: 0.74rem;
+    line-height: 1.5;
+}
+.tramo__conexion i { flex: none; margin-top: 2px; color: #ffd166; }
+.tramo__conexion span { min-width: 0; }
+.transbordo-mapa-tooltip {
+    max-width: 180px;
+    padding: 4px 7px;
+    border: 1px solid rgba(255, 209, 102, 0.6);
+    border-radius: 7px;
+    color: #fff3cc;
+    background: rgba(17, 35, 38, 0.96);
+    font-size: 0.68rem;
+    line-height: 1.35;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    box-shadow: 0 2px 9px rgba(0, 0, 0, 0.36);
+}
+.transbordo-mapa-tooltip::before { border-top-color: rgba(255, 209, 102, 0.6); }
+.detalle,
+.pestana-panel,
+.pestanas,
+.itinerario-paso {
+    min-width: 0;
+}
+.detalle__cab > div { min-width: 0; }
+.pestana { min-width: 0; overflow-wrap: anywhere; }
+.itinerario-paso { overflow-wrap: anywhere; }
+
+@media (max-width: 380px) {
+    .tramo { padding: 12px; }
+    .detalle { padding: 11px; }
+    .pestanas { flex-wrap: wrap; }
+    .pestana { flex: 1 1 30%; }
+}

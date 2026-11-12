@@ -4,6 +4,7 @@ import com.proaula.aula.Barrios.Localidades;
 import com.proaula.aula.Entity.Barrio;
 import com.proaula.aula.Entity.Usuario;
 import com.proaula.aula.Repository.BarrioRepository;
+import com.proaula.aula.Repository.BusRepository;
 import com.proaula.aula.Repository.UsuarioRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,7 @@ public class DataSeederService implements CommandLineRunner {
     private static final Logger log = LoggerFactory.getLogger(DataSeederService.class);
 
     private final BarrioRepository barrioRepository;
+    private final BusRepository busRepository;
     private final BarrioService barrioService;
     private final AdminCodeService adminCodeService;
     private final UsuarioRepository usuarioRepository;
@@ -45,11 +47,13 @@ public class DataSeederService implements CommandLineRunner {
     private String adminApproverEmail;
 
     public DataSeederService(BarrioRepository barrioRepository,
+                             BusRepository busRepository,
                              BarrioService barrioService,
                              AdminCodeService adminCodeService,
                              UsuarioRepository usuarioRepository,
                              UsuarioService usuarioService) {
         this.barrioRepository = barrioRepository;
+        this.busRepository = busRepository;
         this.barrioService = barrioService;
         this.adminCodeService = adminCodeService;
         this.usuarioRepository = usuarioRepository;
@@ -61,6 +65,14 @@ public class DataSeederService implements CommandLineRunner {
     public void run(String... args) {
         adminCodeService.migrateLegacyAdminCodes();
         seedBarrios();
+        int conductoresAnonimizados = busRepository.anonimizarConductores();
+        if (conductoresAnonimizados > 0) {
+            log.info("Se anonimizaron los datos de conductor de {} buses.", conductoresAnonimizados);
+        }
+        int usuariosConductoresAnonimizados = usuarioRepository.anonimizarUsuariosConductores();
+        if (usuariosConductoresAnonimizados > 0) {
+            log.info("Se anonimizaron los nombres de {} cuentas de conductor.", usuariosConductoresAnonimizados);
+        }
         bootstrapAdminIfConfigured();
     }
 

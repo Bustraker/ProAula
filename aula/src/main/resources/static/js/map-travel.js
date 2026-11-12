@@ -7,9 +7,9 @@
  *
  * Qué resuelve:
  *   - Origen / destino por barrio y búsqueda explícita con validación.
- *   - Itinerarios con transbordos, ordenados primero por cantidad de transbordos.
+ *   - Hasta tres itinerarios, priorizados por rapidez estimada y rutas directas.
  *   - Detalle del tramo: paradas en orden (línea de tiempo), buses asignados e información.
- *   - Mapa: pines A/B, paradas numeradas, trazado por calles (OSRM) y recorridos TransCaribe.
+ *   - Mapa: pines A/B, paradas numeradas, trazado por calles (OSRM) y conexiones a pie.
  *   - Ubicación en vivo: barrio, parada más cercana a pie y siguiente barrio del trazado.
  *   - Estado en la URL (?o=…&d=…&r=…) para compartir una consulta.
  *
@@ -20,7 +20,6 @@
     'use strict';
 
     var M = global.BustrakerMap;
-    var URL_TRANSCARIBE = 'https://services7.arcgis.com/t784NacZjQPpWVsA/arcgis/rest/services/Cobertura_Transcaribe_2024_WFL1/FeatureServer/1/query';
     var METROS_POR_MINUTO_A_PIE = 80;
     var MAX_PUNTOS_OSRM = 40;
     var COLORES_BUS = {
@@ -127,11 +126,11 @@
             solicitud: 0,
             colaRiesgo: [],
             solicitudesRiesgoActivas: 0,
+            solicitudIncidentesRuta: 0,
             controlador: null,
             trayecto: null, barriosTrayecto: [],
             ubicacion: null, seguimiento: null,
             gpsError: '',
-            intentadoSeguimientoAutomatico: false,
             reportandoLlegadas: null,
             tarjetasLlegadas: [],
             temporizadorLlegadas: null,
@@ -142,7 +141,6 @@
             resumenEstimado: null,
             resumenConfirmado: false,
             dialogoTrayecto: null,
-            transcaribe: [],
             favoritosHabilitados: privado,
             favoritos: [],
             trayectosFavoritos: [],
@@ -151,7 +149,7 @@
         var capas = {
             paradas: L.layerGroup(), pinOrigen: null, pinDestino: null,
             base: null, linea: null, flujo: null, caminatas: null,
-            transcaribe: null, usuario: null, precision: null,
+            usuario: null, precision: null,
             marcadorClick: null
         };
         var el = {};
@@ -161,10 +159,12 @@
             obtenerLimites: function () {
                 if (capas.linea) return capas.linea.getBounds();
                 if (estado.items.length) return L.latLngBounds(estado.items.map(function (p) { return [p.lat, p.lng]; }));
-                if (capas.transcaribe) return capas.transcaribe.getBounds();
                 return null;
             }
         });
+        var seleccionMapaPendiente = null;
+        var temporizadorConfirmacionMapa = null;
+        var dobleClickZoomDesactivado = false;
         capas.paradas.addTo(mapa);
         agregarLeyenda();
         agregarPanelSeguimiento();
@@ -181,7 +181,7 @@
                 'btnSeguirUbicacion', 'btnFinalizarTrayecto', 'locationStatus',
                 'resultados', 'resumenBusqueda', 'rutaDetalle', 'detalleTitulo', 'detalleTramo', 'rutaStats', 'detalleHora',
                 'panelParadas', 'panelBuses', 'panelInfo', 'favoriteActions', 'llegadasRutaPanel',
-                'mostrarParadas', 'trazadoTranscaribe', 'barriosTrayecto',
+                'mostrarParadas', 'barriosTrayecto',
                 'btnPanel', 'btnCompartir', 'btnLimpiar', 'contadorParadas', 'contadorBuses'
             ].forEach(function (id) { el[id] = $(id); });
 
@@ -205,7 +205,6 @@
             el.mostrarParadas.addEventListener('change', function () {
                 if (el.mostrarParadas.checked) capas.paradas.addTo(mapa); else mapa.removeLayer(capas.paradas);
             });
-            el.trazadoTranscaribe.addEventListener('change', mostrarTranscaribe);
             document.querySelectorAll('[role="tab"][data-pestana]').forEach(function (boton) {
                 boton.addEventListener('click', function () { cambiarPestana(boton.getAttribute('data-pestana')); });
                 boton.addEventListener('keydown', navegarPestanas);
@@ -253,7 +252,6 @@
 
             pintarResultados();
             cargarDatos();
-            cargarTranscaribe();
         }
 
         function alHacerClicEnMapa(e) {
@@ -263,6 +261,32 @@
 
             var lat = e.latlng.lat;
             var lng = e.latlng.lng;
+            var ahora = Date.now();
+            if (!seleccionMapaPendiente || ahora - seleccionMapaPendiente.ultimoClic > 5000 ||
+                haversineKm(lat, lng, seleccionMapaPendiente.lat, seleccionMapaPendiente.lng) > 0.03) {
+                reiniciarConfirmacionMapa();
+                seleccionMapaPendiente = { lat: lat, lng: lng, cantidad: 0, ultimoClic: ahora };
+                mapa.doubleClickZoom.disable();
+                dobleClickZoomDesactivado = true;
+            }
+            seleccionMapaPendiente.cantidad++;
+            seleccionMapaPendiente.ultimoClic = ahora;
+
+            if (seleccionMapaPendiente.cantidad < 3) {
+                var restantes = 3 - seleccionMapaPendiente.cantidad;
+                M.mostrarAviso(
+                    'Sitio seleccionado. Haz clic o toca el mismo lugar ' + restantes +
+                    (restantes === 1 ? ' vez más' : ' veces más') +
+                    ' para mostrar la ayuda y escuchar la ubicación.',
+                    'info',
+                    3000
+                );
+                clearTimeout(temporizadorConfirmacionMapa);
+                temporizadorConfirmacionMapa = setTimeout(reiniciarConfirmacionMapa, 5000);
+                return;
+            }
+
+            reiniciarConfirmacionMapa();
             var mejor = null;
             var menorDist = Infinity;
 
@@ -318,6 +342,18 @@
 
             if (global.BustrakerNotificaciones && global.BustrakerNotificaciones.hablar) {
                 global.BustrakerNotificaciones.hablar(textoVoz, false);
+            }
+        }
+
+        function reiniciarConfirmacionMapa() {
+            if (temporizadorConfirmacionMapa) {
+                clearTimeout(temporizadorConfirmacionMapa);
+                temporizadorConfirmacionMapa = null;
+            }
+            seleccionMapaPendiente = null;
+            if (dobleClickZoomDesactivado) {
+                mapa.doubleClickZoom.enable();
+                dobleClickZoomDesactivado = false;
             }
         }
 
@@ -379,10 +415,6 @@
                 restaurarDesdeURL();
                 pintarResultados();
                 el.btnSeguirUbicacion.disabled = false;
-                if (!estado.intentadoSeguimientoAutomatico) {
-                    estado.intentadoSeguimientoAutomatico = true;
-                    iniciarSeguimiento();
-                }
             } catch (error) {
                 console.error('Error cargando datos de viaje:', error);
                 M.mostrarAviso('No se pudieron cargar las rutas. Revisa tu conexión e intenta de nuevo.', 'error', 8000);
@@ -732,6 +764,11 @@
                     disponibles.set(barrio.nombreN, barrio.nombre);
                 }
             });
+            estado.servidos.forEach(function (nombre, nombreN) {
+                if (nombreN && !disponibles.has(nombreN)) {
+                    disponibles.set(nombreN, nombre);
+                }
+            });
             return disponibles;
         }
 
@@ -811,7 +848,7 @@
         }
 
         function limpiarMensajePlanificador() {
-            el.plannerStatus.textContent = 'Selecciona el origen y el destino para comparar rutas, transbordos y tiempos estimados.';
+            el.plannerStatus.textContent = 'Elige origen y destino.';
             el.plannerStatus.classList.remove('estado--error', 'estado--warning', 'estado--ok');
             el.plannerStatus.classList.add('estado--info');
             el.origen.removeAttribute('aria-invalid');
@@ -882,7 +919,6 @@
             el.origen.value = '';
             alCambiarOrigen();
             limpiarRuta();
-            limpiarTranscaribe();
             mapa.flyTo(M.CENTRO, 13, { duration: 0.8 });
         }
 
@@ -986,6 +1022,19 @@
             var distanciaTransbordosKm = puntosTransbordo.reduce(function (total, punto) {
                 return total + (punto.ubicacionesConocidas ? punto.distanciaKm : 0);
             }, 0);
+            var distanciaRecorridoKm = 0;
+            var distanciaDisponible = true;
+            tramos.forEach(function (tramo) {
+                for (var indice = 1; indice < tramo.barrios.length; indice++) {
+                    var anterior = coordenadasBarrioRuta(tramo.ruta, tramo.barrios[indice - 1], tramo.barriosN[indice - 1]);
+                    var actual = coordenadasBarrioRuta(tramo.ruta, tramo.barrios[indice], tramo.barriosN[indice]);
+                    if (!anterior || !actual) {
+                        distanciaDisponible = false;
+                        continue;
+                    }
+                    distanciaRecorridoKm += haversineKm(anterior.lat, anterior.lng, actual.lat, actual.lng);
+                }
+            });
             return {
                 ruta: tramos[0].ruta,
                 tramos: tramos,
@@ -995,8 +1044,27 @@
                 puntosTransbordo: puntosTransbordo,
                 transbordosSinCoordenadas: transbordosSinCoordenadas,
                 distanciaTransbordosKm: distanciaTransbordosKm,
+                distanciaRecorridoKm: distanciaDisponible ? distanciaRecorridoKm : null,
+                puntajeRapidez: distanciaDisponible
+                    ? distanciaRecorridoKm + distanciaTransbordosKm * 1.25
+                        + puntosTransbordo.length * 0.8
+                        + tramos.reduce(function (total, tramo) { return total + tramo.paradas.length; }, 0) * 0.04
+                    : Infinity,
                 paradas: tramos.reduce(function (total, tramo) { return total + tramo.paradas.length; }, 0)
             };
+        }
+
+        function coordenadasBarrioRuta(ruta, barrio, barrioN) {
+            var coordenadas = ruta.coordenadas[barrio];
+            if (Array.isArray(coordenadas) && coordenadas.length === 2) {
+                var lat = Number(coordenadas[0]), lng = Number(coordenadas[1]);
+                if (!ruta.coordenadasEstimadas.has(barrioN)
+                    && Number.isFinite(lat) && Number.isFinite(lng)) return { lat: lat, lng: lng };
+            }
+            var respaldo = estado.barrios.find(function (item) { return item.nombreN === barrioN; });
+            if (!respaldo || respaldo.coordenadaEstimada
+                || !Number.isFinite(respaldo.lat) || !Number.isFinite(respaldo.lng)) return null;
+            return { lat: respaldo.lat, lng: respaldo.lng };
         }
 
         function buscarTramos(origenN, destinoN) {
@@ -1065,12 +1133,13 @@
                 var rutasA = a.tramos.map(function (tramo) { return nombreRutaEnSentido(tramo.ruta); }).join(' → ');
                 var rutasB = b.tramos.map(function (tramo) { return nombreRutaEnSentido(tramo.ruta); }).join(' → ');
                 return a.transbordos - b.transbordos
+                    || a.puntajeRapidez - b.puntajeRapidez
                     || a.transbordosSinCoordenadas - b.transbordosSinCoordenadas
-                    || a.distanciaTransbordosKm - b.distanciaTransbordosKm
+                    || a.paradas - b.paradas
                     || a.barrios.length - b.barrios.length
                     || rutasA.localeCompare(rutasB, 'es');
             });
-            return resultados;
+            return resultados.slice(0, 3);
         }
 
         function buscar() {
@@ -1119,26 +1188,25 @@
             el.resumenBusqueda.textContent = '';
 
             if (!estado.origen) {
-                mostrarEstadoPlanificador('Selecciona el origen y el destino para comparar rutas, transbordos y tiempos estimados.', 'info');
+                mostrarEstadoPlanificador('Elige origen y destino.', 'info');
                 el.resultados.appendChild(estado.rutas.length
                     ? estadoVacio('fas fa-map-location-dot', 'Planifica tu viaje',
-                        'Elige tu barrio de origen y destino para ver las rutas verificadas, sus paradas y los buses asignados.')
-                    : estadoVacio('fas fa-route', 'No hay recorridos con sentido confirmado',
-                        'Un administrador debe revisar y guardar el orden real de los barrios antes de que la ruta aparezca en esta consulta.'));
+                        'Indica dos barrios para comparar rutas.')
+                    : estadoVacio('fas fa-route', 'Aún no hay rutas disponibles',
+                        'Vuelve a intentarlo más tarde.'));
                 return;
             }
             if (!estado.destino) {
-                mostrarEstadoPlanificador('Listo: ya tienes el origen. Elige el destino para ver las opciones recomendadas.', 'info');
+                mostrarEstadoPlanificador('Ahora elige destino.', 'info');
                 el.resultados.appendChild(estadoVacio('fas fa-location-dot', 'Ahora elige el destino',
-                    'Te mostraremos las rutas disponibles ordenadas por transbordos y caminatas de conexión. La primera opción será la recomendada; selecciona otra para ver su recorrido en el mapa.'));
+                    'Verás las rutas disponibles y su recorrido en el mapa.'));
                 return;
             }
             if (!estado.tramos.length) {
-                var mensaje = 'No existe una combinación de rutas verificadas desde ' + mayuscula(nombreVisible(estado.origen)) +
-                    ' hasta ' + mayuscula(nombreVisible(estado.destino)) + '. Revisa el sentido del recorrido o prueba otra combinación.';
+                var mensaje = 'No hay una ruta verificada entre estos barrios.';
                 mostrarEstadoPlanificador(mensaje, 'warning');
                 var vacio = estadoVacio('fas fa-circle-xmark', 'No hay combinación de rutas',
-                    'No existe una combinación disponible con la información verificada del sistema para ese recorrido. Esto puede significar que la ruta no está confirmada, que el sentido no coincide o que el destino no se puede conectar con el origen.');
+                    'Prueba otros barrios o revisa el sentido del recorrido.');
                 if (buscarTramos(estado.destino, estado.origen).length) {
                     var inverso = h('button', 'btn btn--secundario', 'Ver el sentido contrario');
                     inverso.type = 'button';
@@ -1150,26 +1218,19 @@
             }
 
             var recomendada = estado.tramos[0];
-            var barriosIntermedios = Math.max(0, recomendada.barrios.length - 2);
             var nombreRutas = recomendada.tramos.map(function (parte) {
                 return nombreRutaEnSentido(parte.ruta);
             }).join(' → ');
             var resumen = estado.tramos.length + (estado.tramos.length === 1
-                ? ' opción disponible. ' : ' opciones disponibles. ') +
-                'Recomendada: ' + nombreRutas + ' · ' +
-                barriosIntermedios + (barriosIntermedios === 1 ? ' barrio intermedio' : ' barrios intermedios') +
-                (recomendada.transbordos
-                    ? ' · ' + recomendada.transbordos +
-                        (recomendada.transbordos === 1 ? ' transbordo' : ' transbordos')
-                    : ' · directa') +
-                '. Se priorizan menos transbordos, conexiones con paradas ubicables y menor distancia en línea recta entre paradas; luego, menos barrios intermedios. Esa distancia no representa una ruta peatonal. El mapa muestra la opción seleccionada; su tiempo es una estimación en auto, no el tiempo real del bus.';
+                ? ' opción mostrada' : ' opciones mostradas') + ' · Recomendada: ' + nombreRutas;
             el.resumenBusqueda.textContent = resumen;
-            mostrarEstadoPlanificador('Se muestran ' + estado.tramos.length + ' opciones para este recorrido. La recomendación seleccionada es ' + nombreRutas + '.', 'ok');
+            mostrarEstadoPlanificador(estado.tramos.length + (estado.tramos.length === 1
+                ? ' opción de viaje.' : ' opciones de viaje.'), 'ok');
             el.resultados.appendChild(h('p', 'resultados__resumen', resumen));
             el.resultados.appendChild(h(
                 'p',
                 'resultados__riesgo-nota',
-                'Riesgo demostrativo con datos sintéticos: usa la hora actual, demanda simulada y una duración de referencia (5 min por barrio recorrido + 0,5 min por parada). No incluye semáforos, tráfico ni retrasos reales; no es una predicción operativa.'
+                'Hasta 3 opciones: primero las directas; se ordenan con la distancia disponible y las paradas. No incluye espera ni tráfico.'
             ));
             estado.tramos.forEach(function (tramo, indice) {
                 el.resultados.appendChild(crearTarjetaTramo(tramo, indice));
@@ -1185,58 +1246,93 @@
             var cabecera = h('div', 'tramo__cabecera');
             cabecera.appendChild(h('span', 'tramo__nombre',
                 tramo.transbordos ? tramo.transbordos + (tramo.transbordos === 1 ? ' transbordo' : ' transbordos') : 'Directa'));
-            if (indice === 0) cabecera.appendChild(h('span', 'chip chip--ok', 'Recomendada'));
+            cabecera.appendChild(h('span', 'chip chip--ok',
+                indice === 0 ? 'Más rápida estimada' : 'Opción ' + (indice + 1)));
             tarjeta.appendChild(cabecera);
 
             tarjeta.appendChild(h('span', 'tramo__rutas', tramo.tramos.map(function (parte) {
                 return nombreRutaEnSentido(parte.ruta);
             }).join(' → ')));
             var cadena = h('div', 'tramo__cadena');
+            var conexiones = [];
             cadena.appendChild(h('span', null, mayuscula(tramo.barrios[0])));
             tramo.tramos.forEach(function (parte, indiceParte) {
                 cadena.appendChild(icono('fas fa-arrow-right'));
                 cadena.appendChild(h('span', null, mayuscula(parte.barrios[parte.barrios.length - 1])));
                 if (indiceParte < tramo.tramos.length - 1) {
-                    cadena.appendChild(h('span', 'chip chip--transbordo', tramo.puntosTransbordo[indiceParte].detalle));
+                    var punto = tramo.puntosTransbordo[indiceParte];
+                    var conexion = h('div', 'tramo__conexion');
+                    conexion.appendChild(icono('fas fa-person-walking'));
+                    conexion.appendChild(h('span', null, textoConexionTransbordo(punto, tramo.tramos[indiceParte + 1])));
+                    conexiones.push(conexion);
                 }
             });
             tarjeta.appendChild(cadena);
+            conexiones.forEach(function (conexion) { tarjeta.appendChild(conexion); });
 
-            var meta = h('div', 'tramo__meta');
-            var buses = tramo.tramos.reduce(function (totalBuses, parte) { return totalBuses + parte.ruta.buses.length; }, 0);
-            var datos = [
-                ['fas fa-right-left', tramo.transbordos ? tramo.transbordos + (tramo.transbordos === 1 ? ' transbordo' : ' transbordos') : 'Sin transbordos'],
-                ['fas fa-location-dot', tramo.paradas ? tramo.paradas + ' paradas' : 'Sin paradas registradas'],
-                ['fas fa-bus', buses ? buses + (buses === 1 ? ' bus asignado' : ' buses asignados') : 'Sin buses asignados']
-            ];
-            datos.forEach(function (d) {
+            if (tramo.paradas) {
+                var meta = h('div', 'tramo__meta');
                 var item = h('span', 'tramo__dato');
-                item.appendChild(icono(d[0]));
-                item.appendChild(document.createTextNode(' ' + d[1]));
+                item.appendChild(icono('fas fa-location-dot'));
+                item.appendChild(document.createTextNode(' ' + tramo.paradas + ' paradas'));
                 meta.appendChild(item);
-            });
-            tarjeta.appendChild(meta);
+                tarjeta.appendChild(meta);
+            }
 
             var indicadorRiesgo = h('output', 'tramo__riesgo');
             indicadorRiesgo.setAttribute('aria-live', 'polite');
-            indicadorRiesgo.setAttribute('aria-label', 'Probabilidad demostrativa de retraso mayor a diez minutos');
+            indicadorRiesgo.setAttribute('aria-label', 'Estimación generada por un modelo predictivo del riesgo de retraso mayor a diez minutos');
             tarjeta.appendChild(indicadorRiesgo);
             mostrarRiesgoRetraso(tramo, indicadorRiesgo);
             solicitarRiesgoRetraso(tramo);
             return tarjeta;
         }
 
+        function textoConexionTransbordo(punto, siguienteTramo) {
+            var rutaSiguiente = nombreRutaEnSentido(siguienteTramo.ruta);
+            if (punto.ubicacionesConocidas && punto.mismoPunto) {
+                return 'Bájate en ' + punto.bajar.nombre + ' y aborda ' + rutaSiguiente + ' en el mismo punto.';
+            }
+            if (punto.ubicacionesConocidas) {
+                return 'Bájate en ' + punto.bajar.nombre + '. Camina hasta ' + punto.subir.nombre +
+                    ' (' + formatearDistancia(punto.distanciaKm * 1000) +
+                    ' en línea recta; no es una ruta peatonal) y aborda ' + rutaSiguiente + '.';
+            }
+            return 'Bájate en ' + mayuscula(punto.barrio) + '. La parada para abordar ' + rutaSiguiente +
+                ' no tiene ubicación confirmada; consulta las paradas antes de caminar.';
+        }
+
         function mostrarRiesgoRetraso(tramo, indicador) {
             if (tramo.riesgoRetraso) {
-                indicador.textContent = 'Demo · probabilidad de retraso >10 min: ' +
-                    Math.round(tramo.riesgoRetraso.probabilidadRetraso * 100) + '%';
-                indicador.classList.remove('tramo__riesgo--error');
+                var porcentaje = Math.round(tramo.riesgoRetraso.probabilidadRetraso * 100);
+                var niveles = { ALTO: 'Alto', MEDIO: 'Medio', MODERADO: 'Moderado', BAJO: 'Bajo' };
+                var nivel = String(tramo.riesgoRetraso.riesgo || '').toLocaleUpperCase();
+                var nivelValido = Object.prototype.hasOwnProperty.call(niveles, nivel);
+                var etiqueta = nivelValido ? niveles[nivel] : 'Estimado';
+                var claseNivel = nivelValido ? nivel.toLowerCase() : 'desconocido';
+                indicador.className = 'tramo__riesgo tramo__riesgo--' + claseNivel;
+                indicador.setAttribute('aria-label',
+                    'Riesgo ' + etiqueta.toLowerCase() + ' de retraso mayor a diez minutos: ' + porcentaje + '%');
+                var fila = h('span', 'tramo__riesgo-resumen');
+                fila.appendChild(h('span', 'tramo__riesgo-titulo', 'Modelo predictivo · riesgo de retraso >10 min'));
+                fila.appendChild(h('strong', 'tramo__riesgo-valor', etiqueta + ' · ' + porcentaje + '%'));
+                var barra = h('span', 'tramo__riesgo-barra');
+                barra.setAttribute('role', 'meter');
+                barra.setAttribute('aria-label', 'Probabilidad estimada');
+                barra.setAttribute('aria-valuemin', '0');
+                barra.setAttribute('aria-valuemax', '100');
+                barra.setAttribute('aria-valuenow', String(porcentaje));
+                var progreso = h('span', 'tramo__riesgo-progreso');
+                progreso.style.width = porcentaje + '%';
+                barra.appendChild(progreso);
+                indicador.replaceChildren(fila, barra);
             } else if (tramo.errorRiesgoRetraso) {
-                indicador.textContent = 'Probabilidad no disponible';
+                indicador.className = 'tramo__riesgo tramo__riesgo--error';
+                indicador.textContent = 'Predicción no disponible';
                 indicador.title = 'El servicio de predicciones no respondió. No se muestra un valor de reemplazo.';
-                indicador.classList.add('tramo__riesgo--error');
             } else {
-                indicador.textContent = 'Calculando riesgo demostrativo…';
+                indicador.className = 'tramo__riesgo tramo__riesgo--cargando';
+                indicador.textContent = 'Calculando predicción…';
             }
             tramo.indicadorRiesgo = indicador;
         }
@@ -1389,7 +1485,6 @@
         function seleccionarTramo(tramo) {
             detenerCompartirLlegadas();
             limpiarTemporizadorLlegadas();
-            limpiarTranscaribe();
             limpiarRuta();
             estado.activo = tramo;
             estado.movimientoRuta = { ultimaMuestra: null, avances: 0, detectado: false };
@@ -1440,6 +1535,7 @@
             if (!el.mostrarParadas.checked) mapa.removeLayer(capas.paradas);
 
             var limites = L.latLngBounds(items.map(function (p) { return [p.lat, p.lng]; }));
+            incluirCaminatasEnLimites(limites, tramo);
             if (capas.usuario) limites.extend(capas.usuario.getLatLng());
             M.ajustarVista(mapa, limites);
             pintarStats({ cargando: true, paradas: items.length });
@@ -1456,8 +1552,10 @@
                 capas.base = c.base.addTo(mapa);
                 capas.linea = c.linea.addTo(mapa);
                 dibujarFlujo(resultado.geometry);
+                dibujarCaminatasTransbordo(tramo);
                 establecerTrayecto(resultado.geometry);
                 var b = capas.linea.getBounds();
+                incluirCaminatasEnLimites(b, tramo);
                 if (capas.usuario) b.extend(capas.usuario.getLatLng());
                 M.ajustarVista(mapa, b);
                 estado.resumenEstimado = {
@@ -1492,16 +1590,44 @@
             capas.caminatas = L.layerGroup();
             itinerario.puntosTransbordo.forEach(function (punto) {
                 if (!punto.ubicacionesConocidas || punto.mismoPunto) return;
+                var puntos = [
+                    [punto.bajar.lat, punto.bajar.lng],
+                    [punto.subir.lat, punto.subir.lng]
+                ];
+                var halo = L.polyline(puntos, {
+                    color: '#061014', weight: 9, opacity: 0.9, lineCap: 'round', interactive: false
+                });
                 var linea = L.polyline(
-                    [[punto.bajar.lat, punto.bajar.lng], [punto.subir.lat, punto.subir.lng]],
-                    { color: '#f59e0b', weight: 4, opacity: 0.95, dashArray: '6 8', lineCap: 'round' }
+                    puntos,
+                    { color: '#ffd166', weight: 6, opacity: 1, dashArray: '8 7', lineCap: 'round', interactive: false }
                 );
                 linea.bindTooltip('Conexión a pie: ' + formatearDistancia(punto.distanciaKm * 1000) +
                     ' en línea recta (estimación, no es una ruta peatonal).');
+                var marcadorBajada = L.circleMarker(puntos[0], {
+                    radius: 7, color: '#061014', weight: 3, fillColor: '#ff8b6a', fillOpacity: 1
+                }).bindTooltip('Bájate · ' + punto.bajar.nombre, {
+                    permanent: true, direction: 'top', offset: [0, -8], className: 'transbordo-mapa-tooltip'
+                });
+                var marcadorAbordaje = L.circleMarker(puntos[1], {
+                    radius: 7, color: '#061014', weight: 3, fillColor: '#ffd166', fillOpacity: 1
+                }).bindTooltip('Aborda · ' + punto.subir.nombre, {
+                    permanent: true, direction: 'bottom', offset: [0, 8], className: 'transbordo-mapa-tooltip'
+                });
+                capas.caminatas.addLayer(halo);
                 capas.caminatas.addLayer(linea);
+                capas.caminatas.addLayer(marcadorBajada);
+                capas.caminatas.addLayer(marcadorAbordaje);
             });
             if (capas.caminatas.getLayers().length) capas.caminatas.addTo(mapa);
             else capas.caminatas = null;
+        }
+
+        function incluirCaminatasEnLimites(limites, itinerario) {
+            itinerario.puntosTransbordo.forEach(function (punto) {
+                if (!punto.ubicacionesConocidas) return;
+                limites.extend([punto.bajar.lat, punto.bajar.lng]);
+                limites.extend([punto.subir.lat, punto.subir.lng]);
+            });
         }
 
         function limpiarRuta() {
@@ -1525,6 +1651,7 @@
         };
 
         function ocultarDetalle() {
+            estado.solicitudIncidentesRuta++;
             detenerCompartirLlegadas();
             limpiarTemporizadorLlegadas();
             estado.tarjetasLlegadas = [];
@@ -1620,6 +1747,7 @@
 
             // Insertar Hero antes del rutaStats
             el.rutaStats.parentNode.insertBefore(hero, el.rutaStats);
+            pintarIncidentesRuta(tramo, hero);
 
             /* ── Ocultar los campos viejos del header ──── */
             if (el.detalleTitulo) el.detalleTitulo.textContent = '';
@@ -1958,8 +2086,9 @@
             }).catch(function (error) {
                 console.error('Error compartiendo ubicación de pasajero:', error);
                 if (estado.reportandoLlegadas !== actual) return;
-                actual.tarjeta.estadoCompartir.textContent = error.message ||
-                    'No se pudo compartir la ubicación. Inténtalo de nuevo.';
+                actual.tarjeta.estadoCompartir.textContent = error.status === 403
+                    ? 'Para compartir GPS, confirma primero que tienes 18 años y acepta los documentos legales desde /legal/consentir.'
+                    : error.message || 'No se pudo compartir la ubicación. Inténtalo de nuevo.';
                 if (error.status !== 429) {
                     estado.reportandoLlegadas = null;
                     actualizarBotonesCompartir();
@@ -2017,6 +2146,111 @@
                 }
                 return false;
             }
+        }
+
+        function pintarIncidentesRuta(tramo, hero) {
+            var rutas = tramo.tramos.map(function (parte) { return parte.ruta; });
+            var panelAnterior = el.rutaDetalle.querySelector('.incidentes-ruta');
+            if (panelAnterior) panelAnterior.remove();
+            var panel = h('section', 'incidentes-ruta');
+            panel.setAttribute('aria-labelledby', 'incidentesRutaTitulo');
+            panel.setAttribute('aria-busy', 'true');
+
+            var encabezado = h('div', 'incidentes-ruta__encabezado');
+            encabezado.appendChild(icono('fas fa-triangle-exclamation'));
+            encabezado.appendChild(h('h3', null, 'Incidentes en esta ruta'));
+            panel.appendChild(encabezado);
+            panel.appendChild(h('p', 'incidentes-ruta__nota',
+                'Reportes ciudadanos no verificados; podrían ocasionar demoras.'));
+
+            var contenido = h('div', 'incidentes-ruta__contenido');
+            contenido.setAttribute('aria-live', 'polite');
+            panel.appendChild(contenido);
+            hero.parentNode.insertBefore(panel, hero.nextSibling);
+
+            var titulo = panel.querySelector('h3');
+            titulo.id = 'incidentesRutaTitulo';
+
+            function cargarReportes() {
+                var solicitud = ++estado.solicitudIncidentesRuta;
+                panel.setAttribute('aria-busy', 'true');
+                vaciar(contenido);
+                contenido.appendChild(h('p', null, 'Consultando reportes activos…'));
+
+                Promise.all(rutas.map(function (ruta) {
+                    if (ruta.id == null || String(ruta.id).trim() === '') {
+                        return Promise.reject(new Error('La ruta seleccionada no tiene identificador.'));
+                    }
+                    var url = M.url('/api/incidentes/ruta/' + encodeURIComponent(String(ruta.id)));
+                    return M.fetchJSON(url, 15000).then(function (incidentes) {
+                        if (!Array.isArray(incidentes)) {
+                            throw new Error('La respuesta de reportes de ruta no es válida.');
+                        }
+                        return incidentes.map(function (incidente) {
+                            return { incidente: incidente, ruta: ruta.nombre };
+                        });
+                    });
+                })).then(function (resultados) {
+                    if (solicitud !== estado.solicitudIncidentesRuta || !panel.isConnected) return;
+                    panel.setAttribute('aria-busy', 'false');
+                    vaciar(contenido);
+                    var incidentes = resultados.reduce(function (todos, grupo) {
+                        return todos.concat(grupo);
+                    }, []);
+
+                    if (!incidentes.length) {
+                        contenido.appendChild(h('p', null,
+                            'No hay reportes ciudadanos activos asociados a esta ruta.'));
+                        return;
+                    }
+
+                    var lista = h('ul', 'incidentes-ruta__lista');
+                    incidentes.forEach(function (reporte) {
+                        var item = h('li', 'incidentes-ruta__item');
+                        var detalle = h('div', 'incidentes-ruta__detalle');
+                        var tipo = reporte.incidente.tipo;
+                        var etiquetaTipo = {
+                            ACCIDENTE: 'Accidente reportado',
+                            RETRASO: 'Retraso reportado',
+                            FALLA_SERVICIO: 'Falla del bus o del servicio',
+                            RUTA_DESVIADA: 'Desvío de ruta reportado',
+                            OTRO: 'Incidente reportado'
+                        }[tipo] || 'Incidente reportado';
+                        detalle.appendChild(h('strong', null, etiquetaTipo));
+                        detalle.appendChild(h('span', null, reporte.ruta));
+                        item.appendChild(detalle);
+
+                        var estadoReporte = reporte.incidente.estado === 'EN_ATENCION'
+                            ? 'En atención'
+                            : 'En revisión';
+                        var fecha = reporte.incidente.fechaReporte
+                            ? new Date(reporte.incidente.fechaReporte)
+                            : null;
+                        var etiquetaFecha = fecha && Number.isFinite(fecha.getTime())
+                            ? new Intl.DateTimeFormat('es-CO', {
+                                day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
+                            }).format(fecha)
+                            : null;
+                        var meta = h('span', 'incidentes-ruta__meta',
+                            estadoReporte + (etiquetaFecha ? ' · ' + etiquetaFecha : ''));
+                        item.appendChild(meta);
+                        lista.appendChild(item);
+                    });
+                    contenido.appendChild(lista);
+                }).catch(function () {
+                    if (solicitud !== estado.solicitudIncidentesRuta || !panel.isConnected) return;
+                    panel.setAttribute('aria-busy', 'false');
+                    vaciar(contenido);
+                    contenido.appendChild(h('p', null,
+                        'No pudimos consultar los reportes de esta ruta.'));
+                    var reintentar = h('button', 'incidentes-ruta__reintentar', 'Reintentar');
+                    reintentar.type = 'button';
+                    reintentar.addEventListener('click', cargarReportes);
+                    contenido.appendChild(reintentar);
+                });
+            }
+
+            cargarReportes();
         }
 
         function cambiarPestana(nombre) {
@@ -2288,7 +2522,7 @@
             var cta = h('div', 'bus-login-cta');
             cta.appendChild(icono('fas fa-lock'));
             cta.appendChild(h('strong', null, 'Funciones exclusivas para usuarios'));
-            cta.appendChild(h('p', null, 'Inicia sesión para ver el conductor asignado, amenidades del bus y simular el recorrido en vivo.'));
+            cta.appendChild(h('p', null, 'Inicia sesión para consultar más detalles de las unidades y simular el recorrido en vivo.'));
             var link = h('a', null, null);
             link.href = '/login';
             link.innerHTML = '<i class="fas fa-right-to-bracket" aria-hidden="true"></i> Iniciar sesión';
@@ -2474,12 +2708,6 @@
                 'Las distancias peatonales son en línea recta. Verifica el trayecto antes de iniciar.';
             panel.appendChild(notaLegal);
 
-            var enlace = h('a', 'enlace', null);
-            enlace.href = 'https://transcaribe.gov.co/index.php/rutas-sitm/';
-            enlace.target = '_blank';
-            enlace.rel = 'noopener noreferrer';
-            enlace.innerHTML = '<i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i> Mapas oficiales de TransCaribe';
-            panel.appendChild(enlace);
         }
 
         /* ===================== SIMULADOR DE RECORRIDO (privado) ===================== */
@@ -2857,72 +3085,6 @@
             actualizarPanelSeguimiento();
         }
 
-        /* ===================== TRANSCARIBE ===================== */
-        async function cargarTranscaribe() {
-            var select = el.trazadoTranscaribe;
-            var params = new URLSearchParams({
-                where: '1=1', outFields: 'name,cod_ruta,ruta,tipo,h_lu_vi,h_sa,h_do_fe,f_act',
-                returnGeometry: 'true', outSR: '4326', f: 'geojson'
-            });
-            try {
-                var datos = await M.fetchJSON(URL_TRANSCARIBE + '?' + params, 25000);
-                estado.transcaribe = datos.features || [];
-                select.replaceChildren(new Option('Selecciona un recorrido', ''));
-                estado.transcaribe.forEach(function (f, i) {
-                    var p = f.properties || {};
-                    select.add(new Option((p.cod_ruta || '') + ' · ' + (p.name || p.ruta || 'Ruta'), i));
-                });
-                select.disabled = estado.transcaribe.length === 0;
-            } catch (error) {
-                console.error('No se pudieron cargar los trazados de TransCaribe:', error);
-                select.replaceChildren(new Option('Trazados no disponibles', ''));
-                select.disabled = true;
-            }
-        }
-
-        function popupTranscaribe(p) {
-            var popup = h('div', 'mu-popup');
-            popup.appendChild(h('span', 'mu-popup__titulo', 'TransCaribe'));
-            popup.appendChild(h('strong', null, (p.cod_ruta || '') + ' · ' + (p.ruta || p.name || 'TransCaribe')));
-            if (p.tipo) popup.appendChild(h('span', null, p.tipo));
-            [['Lun-Vie', p.h_lu_vi], ['Sábado', p.h_sa], ['Domingos y festivos', p.h_do_fe]].forEach(function (par) {
-                if (par[1]) popup.appendChild(h('span', null, par[0] + ': ' + par[1]));
-            });
-            popup.appendChild(h('span', 'mu-popup__nota', 'Trazado de referencia ' + (p.f_act ? String(p.f_act).slice(0, 4) : '2024')));
-            return popup;
-        }
-
-        function mostrarTranscaribe() {
-            if (capas.transcaribe) { mapa.removeLayer(capas.transcaribe); capas.transcaribe = null; }
-            var valor = el.trazadoTranscaribe.value;
-            var feature = valor === '' ? null : estado.transcaribe[Number(valor)];
-            if (!feature) {
-                if (!capas.linea) {
-                    if (capas.flujo) { mapa.removeLayer(capas.flujo); capas.flujo = null; }
-                    establecerTrayecto(null);
-                }
-                return;
-            }
-            estado.activo = null;
-            ocultarDetalle();
-            limpiarRuta();
-            pintarResultados();
-            capas.transcaribe = L.geoJSON(feature, {
-                style: { color: '#1cb9bf', weight: 6, opacity: 0.95, lineCap: 'round', lineJoin: 'round' },
-                onEachFeature: function (f, capa) { capa.bindPopup(popupTranscaribe(f.properties || {})); }
-            }).addTo(mapa);
-            dibujarFlujo(feature.geometry, '#d6ffff');
-            var b = capas.transcaribe.getBounds();
-            if (capas.usuario) b.extend(capas.usuario.getLatLng());
-            if (b.isValid()) M.ajustarVista(mapa, b);
-            establecerTrayecto(feature.geometry);
-        }
-
-        function limpiarTranscaribe() {
-            if (capas.transcaribe) { mapa.removeLayer(capas.transcaribe); capas.transcaribe = null; }
-            if (el.trazadoTranscaribe) el.trazadoTranscaribe.value = '';
-        }
-
         /* ===================== UBICACIÓN EN VIVO ===================== */
         function barrioMasCercano(lat, lng, soloServidos) {
             var mejor = null, minimo = Infinity;
@@ -2938,31 +3100,20 @@
         function actualizarEstadoUbicacion() {
             var u = estado.ubicacion;
             if (!el.locationStatus || !u) return;
-            var partes = ['Ubicación en vivo' + (Number.isFinite(u.precision) ? ' ±' + Math.round(u.precision) + ' m' : '') + '.'];
             var cerca = barrioMasCercano(u.lat, u.lng, false);
-            if (cerca) partes.push('Barrio de referencia: ' + cerca.barrio.nombre + '.');
-
             var paradas = estado.items.filter(function (p) { return p.tipo === 'parada'; });
+            var partes = [estado.gpsError ? 'GPS sin señal' :
+                (estado.seguimiento !== null ? 'GPS activo' : 'Última ubicación')];
+            if (cerca) partes.push(cerca.barrio.nombre);
             if (paradas.length) {
                 var mejor = null;
                 paradas.forEach(function (p) {
                     var m = haversineKm(u.lat, u.lng, p.lat, p.lng) * 1000;
                     if (!mejor || m < mejor.m) mejor = { p: p, m: m };
                 });
-                partes.push('Parada más cercana: ' + mejor.p.nombre + ', a ' + formatearDistancia(mejor.m) +
-                    ' (~' + Math.max(1, Math.round(mejor.m / METROS_POR_MINUTO_A_PIE)) + ' min a pie).');
+                partes.push('Parada cercana: ' + mejor.p.nombre + ' · ' + formatearDistancia(mejor.m));
             }
-            var proy = proyectarEnTrayecto(u.lat, u.lng, estado.trayecto);
-            if (proy && estado.barriosTrayecto.length && proy.distanciaAlTrayectoKm <= 1.2) {
-                var siguiente = estado.barriosTrayecto.find(function (b) { return b.desde >= proy.distanciaDesdeInicioKm - 0.15; });
-                if (siguiente) partes.push('Siguiente barrio aproximado: ' + siguiente.nombre + '.');
-            } else if (estado.trayecto && proy) {
-                partes.push('Estás a ' + proy.distanciaAlTrayectoKm.toFixed(1) + ' km del trazado seleccionado.');
-            }
-            partes.push(estado.reportandoLlegadas
-                ? 'El envío temporal de GPS está activado para estimar llegadas en la ruta elegida.'
-                : 'Tu GPS no se comparte con el servicio de llegadas; solo se envía si activas “Estoy a bordo · compartir GPS”.');
-            el.locationStatus.textContent = partes.join(' ');
+            el.locationStatus.textContent = partes.join(' · ');
         }
 
         function alRecibirUbicacion(posicion) {
@@ -3020,7 +3171,7 @@
         function fijarBotonSeguimiento(activo) {
             el.btnSeguirUbicacion.replaceChildren(
                 icono(activo ? 'fas fa-location-crosshairs' : 'fas fa-location-arrow'),
-                document.createTextNode(activo ? ' Pausar GPS' : ' Activar GPS'));
+                document.createTextNode(activo ? ' Pausar ubicación' : ' Usar mi ubicación'));
             el.btnSeguirUbicacion.setAttribute('aria-pressed', String(activo));
         }
 
@@ -3029,8 +3180,11 @@
                 navigator.geolocation.clearWatch(estado.seguimiento);
                 estado.seguimiento = null;
                 fijarBotonSeguimiento(false);
-                el.locationStatus.textContent = 'Seguimiento pausado. Se conserva la última posición en el mapa.';
-                estado.gpsError = 'GPS pausado. Activa el seguimiento para continuar.';
+                estado.gpsError = '';
+                el.locationStatus.textContent = estado.ubicacion
+                    ? 'Última ubicación disponible.'
+                    : 'Ubicación pausada.';
+                if (estado.ubicacion) actualizarEstadoUbicacion();
                 actualizarPanelSeguimiento();
                 return;
             }

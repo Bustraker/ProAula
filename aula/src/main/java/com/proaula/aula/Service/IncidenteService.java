@@ -8,6 +8,7 @@ import com.proaula.aula.Repository.RutaRepository;
 import com.proaula.aula.Repository.UsuarioRepository;
 import com.proaula.aula.dto.IncidentePanelResponse;
 import com.proaula.aula.dto.IncidenteReportRequest;
+import com.proaula.aula.dto.IncidenteRutaResponse;
 import com.proaula.aula.exception.AulaException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +24,7 @@ public class IncidenteService {
 
     private static final Set<String> ESTADOS_PERMITIDOS =
             Set.of("PENDIENTE", "EN_ATENCION", "RESUELTO", "DESCARTADO");
+    private static final List<String> ESTADOS_ACTIVOS = List.of("PENDIENTE", "EN_ATENCION");
 
     private final IncidenteRepository incidenteRepository;
     private final RutaRepository rutaRepository;
@@ -57,6 +59,25 @@ public class IncidenteService {
                         incidente.getDescripcion(),
                         incidente.getFechaReporte(),
                         incidente.getEstado()));
+    }
+
+    @Transactional(readOnly = true)
+    public List<IncidenteRutaResponse> listarActivosDeRuta(Long rutaId) {
+        if (rutaId == null || rutaId <= 0) {
+            throw new AulaException("El identificador de la ruta no es válido.", "VALIDATION_ERROR");
+        }
+        if (!rutaRepository.existsById(rutaId)) {
+            throw new AulaException("La ruta seleccionada no existe.", "ROUTE_NOT_FOUND");
+        }
+
+        return incidenteRepository
+                .findByRuta_IdAndEstadoInOrderByFechaReporteDescIdDesc(rutaId, ESTADOS_ACTIVOS)
+                .stream()
+                .map(incidente -> new IncidenteRutaResponse(
+                        incidente.getTipo(),
+                        incidente.getEstado(),
+                        incidente.getFechaReporte()))
+                .toList();
     }
 
     @Transactional

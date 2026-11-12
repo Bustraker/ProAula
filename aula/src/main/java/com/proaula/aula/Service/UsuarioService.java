@@ -50,6 +50,12 @@ public class UsuarioService {
     public Usuario register(Usuario usuario) {
         usuario.setUsername(normalizarIdentificador(usuario.getUsername()));
         usuario.setEmail(normalizarIdentificador(usuario.getEmail()));
+        if (usuario.getProvider() == null || usuario.getProvider().isBlank()) {
+            usuario.setProvider("LOCAL");
+        }
+        if ("LOCAL".equalsIgnoreCase(usuario.getProvider()) && !usuario.isEmailVerified()) {
+            usuario.setEmailVerified(true);
+        }
 
         String role = usuario.getRole();
         if (role == null || role.trim().isEmpty()) {

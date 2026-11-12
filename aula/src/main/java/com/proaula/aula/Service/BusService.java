@@ -62,11 +62,9 @@ public class BusService {
     }
 
     @Transactional(readOnly = true)
-    public List<BusConsultaDto> getBusConsultations(boolean authenticated) {
+    public List<BusConsultaDto> getBusConsultations() {
         List<Bus> buses = busRepository.findAllWithDetails();
-        return authenticated
-                ? BusConsultaMapper.authenticatedBuses(buses)
-                : BusConsultaMapper.publicRoutes(buses);
+        return BusConsultaMapper.authenticatedBuses(buses);
     }
 
     @Transactional

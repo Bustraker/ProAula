@@ -30,6 +30,10 @@ import com.proaula.aula.Repository.ParadaRepository;
 import com.proaula.aula.Repository.RutaParadaRepository;
 import com.proaula.aula.Repository.RutaRepository;
 import com.proaula.aula.Service.LlegadaBusService;
+import com.proaula.aula.Entity.Usuario;
+import com.proaula.aula.Repository.UsuarioRepository;
+import com.proaula.aula.Service.LegalConsentService;
+import com.proaula.aula.LegalConsentTestSupport;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -46,6 +50,10 @@ class LlegadaBusApiIntegrationTest {
     private RutaParadaRepository rutaParadaRepository;
     @Autowired
     private LlegadaBusService llegadaBusService;
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+    @Autowired
+    private LegalConsentService legalConsentService;
 
     private Ruta ruta;
     private String usuario;
@@ -53,7 +61,20 @@ class LlegadaBusApiIntegrationTest {
 
     @BeforeEach
     void crearRutaDePrueba() {
-        usuario = "llegadas-" + UUID.randomUUID();
+        usuario = "llegadas-" + UUID.randomUUID().toString().replace("-", "").substring(0, 8);
+        Usuario cuenta = new Usuario();
+        cuenta.setUsername(usuario);
+        cuenta.setEmail(usuario + "@example.test");
+        cuenta.setPassword("test-password-26");
+        cuenta.setNombres("Usuario");
+        cuenta.setApellidos("GPS");
+        cuenta.setRole("ROLE_USER");
+        cuenta.setProvider("LOCAL");
+        cuenta = usuarioRepository.saveAndFlush(cuenta);
+        LegalConsentTestSupport.recordConsent(cuenta, legalConsentService);
+        LegalConsentTestSupport.ensureConsentedUser(
+            usuarioRepository, legalConsentService, "admin-prueba", "ROLE_ADMIN");
+
         ruta = new Ruta();
         ruta.setNombre("Ruta temporal de pruebas");
         ruta.setBarrios(List.of("Centro", "Manga", "Crespo"));

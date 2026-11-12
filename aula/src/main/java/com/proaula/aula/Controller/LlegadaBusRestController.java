@@ -15,8 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.proaula.aula.Entity.RutaParada;
 import com.proaula.aula.Service.LlegadaBusService;
+import com.proaula.aula.Service.LegalConsentService;
 import com.proaula.aula.dto.LlegadasRutaResponse;
 import com.proaula.aula.dto.UbicacionBusReporteRequest;
+import org.springframework.web.server.ResponseStatusException;
 
 import jakarta.validation.Valid;
 
@@ -24,9 +26,11 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/llegadas")
 public class LlegadaBusRestController {
     private final LlegadaBusService llegadaBusService;
+    private final LegalConsentService legalConsentService;
 
-    public LlegadaBusRestController(LlegadaBusService llegadaBusService) {
+    public LlegadaBusRestController(LlegadaBusService llegadaBusService, LegalConsentService legalConsentService) {
         this.llegadaBusService = llegadaBusService;
+        this.legalConsentService = legalConsentService;
     }
 
     @GetMapping("/{rutaId}")
@@ -44,6 +48,10 @@ public class LlegadaBusRestController {
             @RequestParam(defaultValue = "IDA") RutaParada.Sentido sentido,
             @Valid @RequestBody UbicacionBusReporteRequest ubicacion,
             Authentication authentication) {
+        if (authentication == null || !legalConsentService.hasCurrentConsent(authentication.getName())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                "Debes aceptar los Términos y la Política de privacidad, y confirmar que tienes al menos 18 años.");
+        }
         llegadaBusService.reportarUbicacion(rutaId, sentido,
             authentication == null ? null : authentication.getName(), ubicacion);
         return ResponseEntity.status(HttpStatus.ACCEPTED).build();

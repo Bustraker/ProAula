@@ -1,6 +1,7 @@
 package com.proaula.aula.Controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -17,6 +18,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 
 import com.proaula.aula.Entity.RutaParada;
 import com.proaula.aula.Service.LlegadaBusService;
+import com.proaula.aula.Service.LegalConsentService;
 import com.proaula.aula.dto.LlegadasRutaResponse;
 import com.proaula.aula.dto.UbicacionBusReporteRequest;
 
@@ -24,12 +26,14 @@ import com.proaula.aula.dto.UbicacionBusReporteRequest;
 class LlegadaBusRestControllerTest {
     @Mock
     private LlegadaBusService llegadaBusService;
+    @Mock
+    private LegalConsentService legalConsentService;
 
     private LlegadaBusRestController controller;
 
     @BeforeEach
     void setUp() {
-        controller = new LlegadaBusRestController(llegadaBusService);
+        controller = new LlegadaBusRestController(llegadaBusService, legalConsentService);
     }
 
     @Test
@@ -51,14 +55,28 @@ class LlegadaBusRestControllerTest {
         var authentication = UsernamePasswordAuthenticationToken.authenticated(
             "pasajero", "n/a", List.of());
         UbicacionBusReporteRequest ubicacion = new UbicacionBusReporteRequest(10.4, -75.5, 12.0);
+        when(legalConsentService.hasCurrentConsent("pasajero")).thenReturn(true);
 
         var respuesta = controller.reportarUbicacion(
             12L, RutaParada.Sentido.IDA, ubicacion, authentication);
 
         assertThat(respuesta.getStatusCode()).isEqualTo(HttpStatus.ACCEPTED);
         assertThat(respuesta.getBody()).isNull();
+        verify(legalConsentService).hasCurrentConsent("pasajero");
         verify(llegadaBusService).reportarUbicacion(
             12L, RutaParada.Sentido.IDA, "pasajero", ubicacion);
+    }
+
+    @Test
+    void rechazaElReporteGpsSiNoHayConsentimientoVigente() {
+        var authentication = UsernamePasswordAuthenticationToken.authenticated(
+            "pasajero", "n/a", List.of());
+        when(legalConsentService.hasCurrentConsent("pasajero")).thenReturn(false);
+
+        assertThatThrownBy(() -> controller.reportarUbicacion(
+            12L, RutaParada.Sentido.IDA, new UbicacionBusReporteRequest(10.4, -75.5, 12.0), authentication))
+            .isInstanceOf(org.springframework.web.server.ResponseStatusException.class)
+            .hasMessageContaining("18 años");
     }
 
     @Test

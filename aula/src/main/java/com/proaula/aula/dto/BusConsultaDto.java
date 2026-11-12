@@ -23,7 +23,7 @@ public class BusConsultaDto {
         this.placa = placa;
         this.modelo = modelo;
         this.color = color;
-        this.conductor = conductor;
+        this.conductor = "Anónimo";
         this.rutaNombre = rutaNombre;
         this.barrios = barrios;
         this.horaAproximada = horaAproximada;

@@ -1,5 +1,48 @@
 # Informe de verificación de runtime
 
+# Verificación rigurosa — consentimiento legal — 2026-11-11
+
+## Veredicto de la ejecución actual
+
+```yaml
+environment:
+  docker: UNAVAILABLE — Get-Command docker no encontró el ejecutable
+  node: AVAILABLE — v26.7.0
+  playwright: AVAILABLE — 1.65.0; instalación/verificación de Chromium completada
+  infra-tier: FALLBACK(embedded/in-memory) — pruebas con perfil validation y H2; Docker no disponible
+  browser-tier: PRIMARY(Playwright) — chromium headless
+startup: PASS — el webServer de Playwright arrancó Spring Boot mediante ./mvnw.cmd y alcanzó /solicitar-codigo-admin
+integration: PASS — exit_code: 0; 178 pruebas, 0 fallas, 0 errores, 0 omitidas
+e2e: PASS — exit_code: 0; 37 pruebas, 0 fallas; Chromium, suite ejecutada con un worker
+overall: PASS — todas las pruebas Java, las de navegador y la comprobación puntual de localidades pasaron
+```
+
+## Alcance y resultados
+
+| Comprobación | Resultado |
+|---|---|
+| `.\mvnw.cmd '-Dstyle.color=never' test` | **PASS**, código 0; 178 pruebas Java, 0 fallas, 0 errores, 0 omitidas. |
+| `npm test -- --workers=1 --timeout=60000` en `e2e` | **PASS**, código 0; 37 pruebas Playwright aprobadas. El servidor de validación y Chromium se iniciaron correctamente. |
+| `npm test -- --grep legal-consent` | **PASS**, código 0; 3 flujos: alta con aceptación expresa, revocación/cierre de sesión/bloqueo y reaceptación/restauración de acceso. |
+| `CheckLocalidades.java` | **PASS**, compilado contra `target/classes` y ejecutado; validó el resultado `[San Diego, Álvaro Gómez, La Candelaria]`. |
+| `git diff --check` | **PASS**; sin errores de whitespace. |
+
+Las pruebas nuevas de navegador cubren alta obligando a marcar autorización y edad; prueban el efecto persistente de la aceptación accediendo a una API protegida, retiran autorización y verifican cierre de sesión y bloqueo, y vuelven a aceptar para comprobar la restauración de permisos. Los flujos Java existentes comprueban además reaceptación, filtro global, escritura API denegada y retención del registro de revocación.
+
+### Ajustes de pruebas encontrados durante la verificación
+
+- Se actualizaron dos aserciones obsoletas de la suite Java/E2E: las versiones de recursos de la página pública y el título actual de la portada (“Cartagena, más cerca”).
+- Una expectativa de perfil se comprobó aislada y pasa con su texto actual.
+- El primer intento de ejecutar todos los E2E con ocho workers produjo timeouts bajo contención de recursos. Se repitió serialmente con un límite más holgado y pasó la suite completa; los flujos legales también pasaron de forma focalizada.
+
+## Límites de esta validación
+
+- Docker no está instalado; el perfil usa H2 en memoria. Esto no sustituye la validación de migraciones ni pruebas de integración contra MySQL de producción.
+- Se verifica el comportamiento del consentimiento, no la identidad del responsable legal, contratos/proveedores reales, plazos autorizados de conservación ni el contenido de logs de la infraestructura productiva.
+- Las migraciones legales aún deben aplicarse y verificarse en producción antes del despliegue.
+
+---
+
 ## Regresión de limpieza — 2026-11-06
 
 **Objetivo:** comprobar que la eliminación del `package-lock.json` vacío y de siete hojas CSS sin referencias no afecta las funciones existentes.

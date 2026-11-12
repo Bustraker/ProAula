@@ -8,15 +8,15 @@
     <meta name="theme-color" content="#01315f">
     <meta name="_csrf" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
-    <title>Viajar - Bustraker</title>
+    <title>Planear viaje - Bustraker</title>
     <link rel="icon" th:href="@{/images/logo.png}" type="image/png">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="anonymous" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous">
     <link rel="preconnect" href="https://server.arcgisonline.com" crossorigin>
     <link rel="preconnect" href="https://tile.openstreetmap.org" crossorigin>
-    <link rel="stylesheet" th:href="@{/css/travel.css(v='map-polish-9')}">
-    <link rel="stylesheet" th:href="@{/css/map-ui.css(v='trips-4')}">
-    <link rel="stylesheet" th:href="@{/css/detail-pro.css(v='det-pro-1')}">
+    <link rel="stylesheet" th:href="@{/css/travel.css(v='route-polish-12')}">
+    <link rel="stylesheet" th:href="@{/css/map-ui.css(v='trips-5')}">
+    <link rel="stylesheet" th:href="@{/css/detail-pro.css(v='det-pro-2')}">
 </head>
 <body>
     <div id="map" role="application" aria-label="Mapa de rutas de Cartagena"></div>
@@ -25,13 +25,24 @@
     <main class="options-panel" aria-label="Consulta de rutas">
         <header class="panel-cab">
             <div class="panel-cab__titulo">
-                <span class="panel-kicker">BUSTRAKER · CARTAGENA · USUARIO</span>
-                <h1><i class="fas fa-route" aria-hidden="true"></i> Consulta de rutas</h1>
+                <span class="panel-kicker">RUTAS · CARTAGENA</span>
+                <h1><i class="fas fa-route" aria-hidden="true"></i> Planear viaje</h1>
             </div>
-            <button id="btnNotificacionesViaje" class="icon-btn icon-btn--notif" type="button" aria-label="Notificaciones del sistema" title="Notificaciones" aria-expanded="false"><i class="fas fa-bell" aria-hidden="true"></i><span id="badgeNotifViaje" class="notif-badge" style="display:none;" hidden>0</span></button>
-            <button id="btnAudioAccesible" class="icon-btn" type="button" aria-label="Asistente de voz accesible para personas con discapacidad visual" title="Voz y sonido: ACTIVADOS"><i class="fas fa-volume-high" aria-hidden="true"></i></button>
-            <a class="icon-btn" th:href="@{/index_3}" title="Volver al inicio" aria-label="Volver al inicio"><i class="fas fa-house" aria-hidden="true"></i></a>
-            <button id="btnPanel" class="icon-btn" type="button" aria-expanded="true" aria-label="Minimizar el panel"><i class="fas fa-chevron-down" aria-hidden="true"></i></button>
+            <div class="panel-cab__controles">
+                <button id="btnNotificacionesViaje" class="icon-btn icon-btn--notif" type="button" aria-label="Notificaciones del sistema" title="Notificaciones" aria-expanded="false">
+                    <i class="fas fa-bell" aria-hidden="true"></i>
+                    <span id="badgeNotifViaje" class="notif-badge" style="display:none;" hidden>0</span>
+                </button>
+                <button id="btnAudioAccesible" class="icon-btn" type="button" aria-label="Asistente de voz accesible para personas con discapacidad visual" title="Voz y sonido: SILENCIADOS">
+                    <i class="fas fa-volume-xmark" aria-hidden="true"></i>
+                </button>
+                <a class="icon-btn icon-btn--accent" th:href="@{/index_3}" title="Volver al panel principal" aria-label="Volver al inicio">
+                    <i class="fas fa-house" aria-hidden="true"></i>
+                </a>
+                <button id="btnPanel" class="icon-btn" type="button" aria-expanded="true" aria-label="Minimizar el panel">
+                    <i class="fas fa-chevron-down" aria-hidden="true"></i>
+                </button>
+            </div>
         </header>
 
         <div class="panel-cuerpo">
@@ -40,54 +51,74 @@
                 <div class="voice-settings__body">
                     <label for="voiceSelect">Voz en español</label>
                     <select id="voiceSelect"></select>
-                    <label for="voiceRate">Velocidad <output id="voiceRateValue">1.0</output></label>
-                    <input id="voiceRate" type="range" min="0.5" max="2" step="0.1" value="1">
-                    <label for="voicePitch">Tono <output id="voicePitchValue">0.85</output></label>
-                    <input id="voicePitch" type="range" min="0" max="2" step="0.1" value="0.85">
-                    <label for="voiceVolume">Volumen de voz <output id="voiceVolumeValue">1</output></label>
-                    <input id="voiceVolume" type="range" min="0" max="1" step="0.1" value="1">
+                    <div class="voice-grid-sliders">
+                        <div class="slider-group">
+                            <label for="voiceRate">Velocidad <output id="voiceRateValue">1.0</output></label>
+                            <input id="voiceRate" type="range" min="0.5" max="2" step="0.1" value="1">
+                        </div>
+                        <div class="slider-group">
+                            <label for="voicePitch">Tono <output id="voicePitchValue">0.85</output></label>
+                            <input id="voicePitch" type="range" min="0" max="2" step="0.1" value="0.85">
+                        </div>
+                    </div>
+                    <div class="slider-group">
+                        <label for="voiceVolume">Volumen de voz <output id="voiceVolumeValue">1</output></label>
+                        <input id="voiceVolume" type="range" min="0" max="1" step="0.1" value="1">
+                    </div>
                     <p id="voiceStatus" class="voice-settings__note" role="status" aria-live="polite"></p>
                     <button id="btnProbarVoz" class="notif-btn-footer" type="button"><i class="fas fa-play" aria-hidden="true"></i> Probar configuración</button>
                 </div>
             </details>
-            <section class="seccion" aria-labelledby="tituloViaje">
-                <h2 id="tituloViaje" class="seccion__titulo">Tu viaje</h2>
+
+            <section class="seccion seccion--itinerario" aria-labelledby="tituloViaje">
+                <div class="seccion__cab-flex">
+                    <h2 id="tituloViaje" class="seccion__titulo">Tu recorrido</h2>
+                </div>
                 <div class="viaje">
                     <div class="viaje__campos">
                         <div class="campo">
                             <span class="campo__marca campo__marca--a" aria-hidden="true">A</span>
                             <label for="origen" class="sr-only">Barrio de origen</label>
-                            <input id="origen" type="search" list="listaOrigen" placeholder="¿En qué barrio estás?" autocomplete="off" spellcheck="false">
+                            <input id="origen" type="search" list="listaOrigen" placeholder="Barrio de origen" autocomplete="off" spellcheck="false">
                         </div>
                         <div class="campo">
                             <span class="campo__marca campo__marca--b" aria-hidden="true">B</span>
                             <label for="destino" class="sr-only">Barrio de destino</label>
-                            <input id="destino" type="search" list="listaDestino" placeholder="Primero elige el origen" autocomplete="off" spellcheck="false" disabled>
+                            <input id="destino" type="search" list="listaDestino" placeholder="Barrio de destino" autocomplete="off" spellcheck="false" disabled>
                         </div>
                     </div>
-                    <button id="btnInvertir" class="icon-btn icon-btn--tenue" type="button" title="Invertir origen y destino" aria-label="Invertir origen y destino"><i class="fas fa-arrow-right-arrow-left fa-rotate-90" aria-hidden="true"></i></button>
+                    <button id="btnInvertir" class="icon-btn icon-btn--tenue" type="button" title="Invertir origen y destino" aria-label="Invertir origen y destino">
+                        <i class="fas fa-arrow-right-arrow-left fa-rotate-90" aria-hidden="true"></i>
+                    </button>
                 </div>
                 <datalist id="listaOrigen"></datalist>
                 <datalist id="listaDestino"></datalist>
 
                 <button id="btnPlanificar" class="btn btn--principal" type="button">
-                    <i class="fas fa-route" aria-hidden="true"></i> Planificar
+                    <i class="fas fa-route" aria-hidden="true"></i> Ver rutas
                 </button>
-                <output id="plannerStatus" class="estado estado--info" role="status" aria-live="polite">Selecciona el origen y el destino para comparar rutas, transbordos y tiempos estimados.</output>
-                <div class="fila">
+                <output id="plannerStatus" class="estado estado--info" role="status" aria-live="polite">Elige origen y destino.</output>
+
+                <div class="fila fila--acciones">
                     <button id="btnSeguirUbicacion" class="btn btn--secundario" type="button" aria-pressed="false" disabled>
-                        <i class="fas fa-location-arrow" aria-hidden="true"></i> Activar GPS
+                        <i class="fas fa-location-arrow" aria-hidden="true"></i> Usar mi ubicación
                     </button>
                     <button id="btnFinalizarTrayecto" class="btn btn--finalizar" type="button" hidden>
-                        <i class="fas fa-flag-checkered" aria-hidden="true"></i> Finalizar trayecto
+                        <i class="fas fa-flag-checkered" aria-hidden="true"></i> Finalizar
                     </button>
-                    <button id="btnLimpiar" class="btn btn--texto" type="button">Limpiar</button>
+                    <button id="btnLimpiar" class="btn btn--texto" type="button" title="Restablecer búsqueda">
+                        <i class="fas fa-rotate-left"></i> Restablecer
+                    </button>
                 </div>
-                <output id="locationStatus" class="estado estado--info" aria-live="polite">Al abrir este mapa se solicitará permiso para seguir tu GPS. Solo se envía al servicio de llegadas si eliges “Estoy a bordo · compartir GPS”; tu ubicación no confirma la posición de un bus.</output>
+                <output id="locationStatus" class="estado estado--info estado--gps" aria-live="polite">
+                    Ubicación opcional; úsala para ver referencias cercanas.
+                </output>
             </section>
 
-            <section class="seccion" aria-labelledby="tituloRutas">
-                <h2 id="tituloRutas" class="seccion__titulo">Opciones de ruta para llegar</h2>
+            <section class="seccion seccion--rutas" aria-labelledby="tituloRutas">
+                <div class="seccion__cab-flex">
+                    <h2 id="tituloRutas" class="seccion__titulo">Rutas disponibles</h2>
+                </div>
                 <p id="resumenBusqueda" class="sr-only" aria-live="polite"></p>
                 <div id="resultados" class="resultados"></div>
             </section>
@@ -117,17 +148,11 @@
             <details class="avanzado">
                 <summary>Opciones del mapa</summary>
                 <label class="interruptor"><input id="mostrarParadas" type="checkbox" checked> Mostrar paradas en el mapa</label>
-                <label for="trazadoTranscaribe" class="avanzado__etiqueta">Recorridos TransCaribe (referencia 2024)</label>
-                <select id="trazadoTranscaribe" disabled>
-                    <option value="">Cargando trazados…</option>
-                </select>
-                <p class="nota">Geometrías 2024 de <a href="https://www.arcgis.com/home/item.html?id=5f15cce4f923477b8c40ccc4dc2b84d1" target="_blank" rel="noopener noreferrer">Cartagena Cómo Vamos</a>. Pueden no reflejar cambios posteriores.</p>
                 <p id="barriosTrayecto" class="estado" hidden></p>
             </details>
 
             <footer class="panel-pie">
-                Se priorizan menos transbordos, conexiones entre paradas ubicables y la menor distancia en línea recta entre ellas; luego, menos barrios intermedios. Esa distancia no representa una ruta peatonal. El trazado y su tiempo son estimaciones en auto, no el recorrido ni el tiempo real del bus.
-                <a href="https://transcaribe.gov.co/index.php/rutas-sitm/" target="_blank" rel="noopener noreferrer">Mapas oficiales de TransCaribe</a>
+                El trazado y el tiempo son estimaciones en auto; pueden diferir del recorrido real de la buseta y no incluyen esperas ni tráfico.
             </footer>
         </div>
     </main>
@@ -149,9 +174,9 @@
     <div id="srAudioAlert" role="alert" aria-live="assertive" class="sr-only"></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
-    <script th:src="@{/js/notifications-client.js(v='voice-engine-pro-4')}"></script>
-    <script th:src="@{/js/map-base.js(v='map-polish-7')}"></script>
-    <script th:src="@{/js/map-travel.js(v='trips-7')}"></script>
+    <script th:src="@{/js/notifications-client.js(v='browser-voice-2')}"></script>
+    <script th:src="@{/js/map-base.js(v='map-polish-8')}"></script>
+    <script th:src="@{/js/map-travel.js(v='trips-9')}"></script>
     <script th:src="@{/js/viajar.js}"></script>
 </body>
 </html>
