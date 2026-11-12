@@ -123,7 +123,12 @@ sin recrear la tabla ni perder datos. También aplica
 crea la tabla si aún no existe y, si ya contiene notificaciones, añade las columnas
 de canal y fecha, completa los valores históricos e incorpora los índices sin
 borrar filas. No habilites Flyway ni cambies `ddl-auto` mientras siga vigente el
-workaround de conexión.
+workaround de conexión. El consentimiento legal requiere aplicar manualmente, en
+este orden, [`V20261111_01__create_legal_consent.sql`](../src/main/resources/db/migration/mysql/V20261111_01__create_legal_consent.sql)
+y [`V20261111_02__add_legal_consent_revocation.sql`](../src/main/resources/db/migration/mysql/V20261111_02__add_legal_consent_revocation.sql).
+Confirma que exista `usuario` antes de crear `legal_consent`; la segunda migración
+añade `revoked_at` y no es idempotente, así que verifica que la columna no exista
+antes de ejecutarla. Estas operaciones conservan las aceptaciones existentes.
 
 La migración preparada
 `src/main/resources/db/migration/mysql/V20261015_02__normalize_horario_days_column.sql`
@@ -194,6 +199,12 @@ Cuando Flyway esté habilitado, los scripts del perfil MySQL se ejecutan en orde
 8. [`V20261101_01__align_favorite_creation_timestamp.sql`](../src/main/resources/db/migration/mysql/V20261101_01__align_favorite_creation_timestamp.sql)
    agrega `favorito.fecha_creacion` en esquemas anteriores, conserva el valor de
    `created_at` si existe y crea el índice requerido por las consultas de favoritos.
+9. [`V20261106_01__enhance_notificacion_table.sql`](../src/main/resources/db/migration/mysql/V20261106_01__enhance_notificacion_table.sql)
+   crea o completa la tabla de notificaciones conservando sus filas.
+10. [`V20261111_01__create_legal_consent.sql`](../src/main/resources/db/migration/mysql/V20261111_01__create_legal_consent.sql)
+    crea la tabla que registra las aceptaciones legales.
+11. [`V20261111_02__add_legal_consent_revocation.sql`](../src/main/resources/db/migration/mysql/V20261111_02__add_legal_consent_revocation.sql)
+    añade la fecha de revocación del consentimiento.
 
 Flyway está configurado con `baseline-on-migrate`; antes del primer despliegue
 respalda la base y confirma que el esquema base de Bustraker y
@@ -210,7 +221,10 @@ adelante después de revisar el esquema.
 
 Actualmente Flyway continúa deshabilitado en el perfil `prod` por el workaround de
 Render descrito arriba; los scripts enumerados indican las migraciones que se
-aplican manualmente o mediante el bootstrap específico de producción.
+aplican manualmente o mediante el bootstrap específico de producción. En particular,
+las migraciones de consentimiento legal no se aplican automáticamente por ese
+bootstrap; aplícalas manualmente según las instrucciones anteriores antes de
+desplegar una versión que dependa de `legal_consent`.
 
 Los perfiles locales y de validación deshabilitan estas migraciones MySQL: el
 entorno local administra su esquema con Hibernate y las pruebas usan su esquema H2

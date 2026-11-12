@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f3f0e8">
+    <title>Permisos para acceso externo | Bustraker</title>
+    <link rel="icon" th:href="@{/images/logo.png}" type="image/png">
+    <link rel="stylesheet" th:href="@{/css/style-legal.css(v='20261112-1')}">
+</head>
+<body class="legal-page oauth-consent-page">
+    <main class="oauth-consent-card">
+        <header class="oauth-consent-topbar">
+            <a class="legal-brand" th:href="@{/inicio-de-sesion-mejorado}" aria-label="Bustraker, volver al inicio de sesión">
+                <img th:src="@{/images/logo.png}" alt="">
+                <span>Bustraker<small>Acceso con proveedor externo</small></span>
+            </a>
+            <span class="oauth-consent-secure">
+                <svg viewBox="0 0 20 20" aria-hidden="true">
+                    <path d="M10 2.2 16 4.5v4.7c0 3.8-2.5 6.7-6 8.6-3.5-1.9-6-4.8-6-8.6V4.5l6-2.3Z"></path>
+                    <path d="m7.2 9.8 1.8 1.8 3.8-4"></path>
+                </svg>
+                Conexión protegida
+            </span>
+        </header>
+
+        <section class="oauth-consent-hero" aria-labelledby="oauthConsentTitle">
+            <div class="oauth-consent-copy">
+                <p class="legal-eyebrow"><span></span> UN ÚLTIMO PASO</p>
+                <h1 id="oauthConsentTitle">Continúa con <em th:text="${providerLabel}">Google</em></h1>
+                <p>Confirma estos permisos para completar tu acceso a Bustraker de forma segura.</p>
+            </div>
+            <div class="oauth-consent-provider" aria-label="Proveedor seleccionado">
+                <span class="oauth-consent-provider__mark" th:text="${#strings.substring(providerLabel, 0, 1)}">G</span>
+                <span class="oauth-consent-provider__details">
+                    <small>INICIO DE SESIÓN CON</small>
+                    <strong th:text="${providerLabel}">Google</strong>
+                </span>
+            </div>
+        </section>
+
+        <div th:if="${error}" class="legal-consent-alert" role="alert" th:text="${error}"></div>
+
+        <form class="oauth-consent-form" th:action="@{/oauth2/preauthorize}" method="post">
+            <input type="hidden" name="provider" th:value="${provider}">
+            <input type="hidden" name="legalVersion" th:value="${legalVersion}">
+
+            <div class="oauth-consent-section-heading">
+                <div>
+                    <p>ANTES DE CONTINUAR</p>
+                    <h2>Revisa y confirma</h2>
+                </div>
+                <span>2 permisos</span>
+            </div>
+
+            <div class="oauth-consent-check">
+                <span class="oauth-consent-check__index" aria-hidden="true">01</span>
+                <input id="oauthLegalConsent" type="checkbox" name="legalConsent" value="true" required>
+                <span class="oauth-consent-check__copy">
+                    <label for="oauthLegalConsent"><strong>Documentos y tratamiento de datos</strong></label>
+                    <span>Acepto los <a th:href="@{/terminos}" target="_blank" rel="noopener">Términos y condiciones</a> y la <a th:href="@{/privacidad}" target="_blank" rel="noopener">Política de privacidad</a>, y autorizo el tratamiento de mis datos personales para las finalidades descritas.</span>
+                </span>
+            </div>
+
+            <div class="oauth-consent-check">
+                <span class="oauth-consent-check__index" aria-hidden="true">02</span>
+                <input id="oauthAdultConfirmed" type="checkbox" name="adultConfirmed" value="true" required>
+                <span class="oauth-consent-check__copy">
+                    <label for="oauthAdultConfirmed"><strong>Confirmación de edad</strong></label>
+                    <span>Confirmo que tengo 18 años o más y puedo aceptar estas condiciones por mí mismo.</span>
+                </span>
+            </div>
+
+            <button type="submit" class="oauth-consent-submit">
+                <span>Aceptar y continuar con <span th:text="${providerLabel}">Google</span></span>
+                <svg viewBox="0 0 20 20" aria-hidden="true">
+                    <path d="M3.5 10h12"></path>
+                    <path d="m10.5 5 5 5-5 5"></path>
+                </svg>
+            </button>
+            <p class="oauth-consent-hint">Debes marcar las dos opciones para continuar.</p>
+        </form>
+
+        <footer class="oauth-consent-footer">
+            <span>Tus datos se tratarán según los documentos legales.</span>
+            <a th:href="@{/inicio-de-sesion-mejorado}">Volver al inicio de sesión</a>
+        </footer>
+    </main>
+</body>
+</html>

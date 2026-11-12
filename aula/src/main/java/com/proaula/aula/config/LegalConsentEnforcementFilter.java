@@ -20,7 +20,7 @@ public class LegalConsentEnforcementFilter extends OncePerRequestFilter {
         "/", "/inicio-de-sesion-mejorado", "/inicio-de-sesion-mejorado.html", "/inicio_de_sesion",
         "/registro", "/registro-mejorado", "/registro-mejorado.html",
         "/admin-login", "/admin/verificar-codigo", "/admin/login", "/admin/registrar",
-        "/oauth2/preauthorize", "/legal/consentir", "/legal/revocar",
+        "/oauth2/preauthorize", "/oauth2/consentir", "/legal/consentir", "/legal/revocar",
         "/terminos", "/terminos.html", "/privacidad", "/privacidad.html",
         "/contacto", "/contacto_public", "/contacto_usuario",
         "/logout", "/error", "/favicon.ico", "/actuator/health"

@@ -203,28 +203,16 @@
 
                 <!-- Login social -->
                 <div class="card-body">
-                    <form th:action="@{/oauth2/preauthorize}" method="post">
-                        <input type="hidden" name="legalVersion" th:value="${legalVersion}">
-                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-                        <label class="oauth-legal-check">
-                            <input type="checkbox" name="legalConsent" value="true" required>
-                            <span>Acepto los <a th:href="@{/terminos}" target="_blank" rel="noopener">Términos</a> y la <a th:href="@{/privacidad}" target="_blank" rel="noopener">Política de privacidad</a> y autorizo el tratamiento de mis datos.</span>
-                        </label>
-                        <label class="oauth-legal-check">
-                            <input type="checkbox" name="adultConfirmed" value="true" required>
-                            <span>Confirmo que tengo al menos 18 años.</span>
-                        </label>
-                        <div class="auth-social-grid">
-                            <button th:if="${!#strings.isEmpty(@environment.getProperty('spring.security.oauth2.client.registration.google.client-id')) and !#strings.startsWith(@environment.getProperty('spring.security.oauth2.client.registration.google.client-id'), 'placeholder-') and !#strings.isEmpty(@environment.getProperty('spring.security.oauth2.client.registration.google.client-secret')) and !#strings.startsWith(@environment.getProperty('spring.security.oauth2.client.registration.google.client-secret'), 'placeholder-')}"
-                                    type="submit" name="provider" value="google" class="btn btn-outline btn-block d-inline-flex align-center justify-center"><i class="fab fa-google text-google auth-social-icon" aria-hidden="true"></i> Google</button>
-                            <button th:if="${!#strings.isEmpty(@environment.getProperty('spring.security.oauth2.client.registration.github.client-id')) and !#strings.startsWith(@environment.getProperty('spring.security.oauth2.client.registration.github.client-id'), 'placeholder-') and !#strings.isEmpty(@environment.getProperty('spring.security.oauth2.client.registration.github.client-secret')) and !#strings.startsWith(@environment.getProperty('spring.security.oauth2.client.registration.github.client-secret'), 'placeholder-')}"
-                                    type="submit" name="provider" value="github" class="btn btn-outline btn-block d-inline-flex align-center justify-center"><i class="fab fa-github auth-social-icon" aria-hidden="true"></i> GitHub</button>
-                            <button th:if="${!#strings.isEmpty(@environment.getProperty('spring.security.oauth2.client.registration.discord.client-id')) and !#strings.startsWith(@environment.getProperty('spring.security.oauth2.client.registration.discord.client-id'), 'placeholder-') and !#strings.isEmpty(@environment.getProperty('spring.security.oauth2.client.registration.discord.client-secret')) and !#strings.startsWith(@environment.getProperty('spring.security.oauth2.client.registration.discord.client-secret'), 'placeholder-')}"
-                                    type="submit" name="provider" value="discord" class="btn btn-outline btn-block d-inline-flex align-center justify-center"><i class="fab fa-discord auth-social-icon auth-social-icon--discord" aria-hidden="true"></i> Discord</button>
-                            <button th:if="${!#strings.isEmpty(@environment.getProperty('spring.security.oauth2.client.registration.facebook.client-id')) and !#strings.startsWith(@environment.getProperty('spring.security.oauth2.client.registration.facebook.client-id'), 'placeholder-') and !#strings.isEmpty(@environment.getProperty('spring.security.oauth2.client.registration.facebook.client-secret')) and !#strings.startsWith(@environment.getProperty('spring.security.oauth2.client.registration.facebook.client-secret'), 'placeholder-')}"
-                                    type="submit" name="provider" value="facebook" class="btn btn-outline btn-block d-inline-flex align-center justify-center"><i class="fab fa-facebook-f auth-social-icon auth-social-icon--facebook" aria-hidden="true"></i> Facebook</button>
-                        </div>
-                    </form>
+                    <div class="auth-social-grid">
+                        <a th:if="${!#strings.isEmpty(@environment.getProperty('spring.security.oauth2.client.registration.google.client-id')) and !#strings.startsWith(@environment.getProperty('spring.security.oauth2.client.registration.google.client-id'), 'placeholder-') and !#strings.isEmpty(@environment.getProperty('spring.security.oauth2.client.registration.google.client-secret')) and !#strings.startsWith(@environment.getProperty('spring.security.oauth2.client.registration.google.client-secret'), 'placeholder-')}"
+                           th:href="@{/oauth2/consentir(provider='google')}" class="btn btn-outline btn-block d-inline-flex align-center justify-center"><i class="fab fa-google text-google auth-social-icon" aria-hidden="true"></i> Google</a>
+                        <a th:if="${!#strings.isEmpty(@environment.getProperty('spring.security.oauth2.client.registration.github.client-id')) and !#strings.startsWith(@environment.getProperty('spring.security.oauth2.client.registration.github.client-id'), 'placeholder-') and !#strings.isEmpty(@environment.getProperty('spring.security.oauth2.client.registration.github.client-secret')) and !#strings.startsWith(@environment.getProperty('spring.security.oauth2.client.registration.github.client-secret'), 'placeholder-')}"
+                           th:href="@{/oauth2/consentir(provider='github')}" class="btn btn-outline btn-block d-inline-flex align-center justify-center"><i class="fab fa-github auth-social-icon" aria-hidden="true"></i> GitHub</a>
+                        <a th:if="${!#strings.isEmpty(@environment.getProperty('spring.security.oauth2.client.registration.discord.client-id')) and !#strings.startsWith(@environment.getProperty('spring.security.oauth2.client.registration.discord.client-id'), 'placeholder-') and !#strings.isEmpty(@environment.getProperty('spring.security.oauth2.client.registration.discord.client-secret')) and !#strings.startsWith(@environment.getProperty('spring.security.oauth2.client.registration.discord.client-secret'), 'placeholder-')}"
+                           th:href="@{/oauth2/consentir(provider='discord')}" class="btn btn-outline btn-block d-inline-flex align-center justify-center"><i class="fab fa-discord auth-social-icon auth-social-icon--discord" aria-hidden="true"></i> Discord</a>
+                        <a th:if="${!#strings.isEmpty(@environment.getProperty('spring.security.oauth2.client.registration.facebook.client-id')) and !#strings.startsWith(@environment.getProperty('spring.security.oauth2.client.registration.facebook.client-id'), 'placeholder-') and !#strings.isEmpty(@environment.getProperty('spring.security.oauth2.client.registration.facebook.client-secret')) and !#strings.startsWith(@environment.getProperty('spring.security.oauth2.client.registration.facebook.client-secret'), 'placeholder-')}"
+                           th:href="@{/oauth2/consentir(provider='facebook')}" class="btn btn-outline btn-block d-inline-flex align-center justify-center"><i class="fab fa-facebook-f auth-social-icon auth-social-icon--facebook" aria-hidden="true"></i> Facebook</a>
+                    </div>
                 </div>
             </div>
 

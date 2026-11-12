@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Component;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -41,20 +42,28 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
                                         HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
         var session = request.getSession(false);
+        String consentProvider = session == null
+            ? null
+            : (String) session.getAttribute("oauthConsentSource");
+        boolean providerMatches = authentication instanceof OAuth2AuthenticationToken oauthAuthentication
+            && oauthAuthentication.getAuthorizedClientRegistrationId().equals(consentProvider);
         boolean accepted = session != null
             && LegalConsentService.CURRENT_VERSION.equals(session.getAttribute("oauthLegalConsentVersion"))
             && Boolean.TRUE.equals(session.getAttribute("oauthAdultConfirmed"))
-            && session.getAttribute("oauthConsentAcceptedAt") instanceof LocalDateTime;
+            && session.getAttribute("oauthConsentAcceptedAt") instanceof LocalDateTime
+            && providerMatches;
         Usuario usuario = usuarioService.findByUsername(authentication.getName());
         if (!accepted || usuario == null) {
             response.sendRedirect("/inicio-de-sesion-mejorado?consentRequired=true");
             return;
         }
-        try {
-            legalConsentService.recordAcceptance(usuario, LegalConsentService.CURRENT_VERSION, true, "OAUTH2",
-                (LocalDateTime) session.getAttribute("oauthConsentAcceptedAt"));
-        } catch (IllegalArgumentException exception) {
-            throw new ServletException("No se pudo registrar la aceptación legal del acceso social.", exception);
+        if (!legalConsentService.hasCurrentConsent(authentication.getName())) {
+            try {
+                legalConsentService.recordAcceptance(usuario, LegalConsentService.CURRENT_VERSION, true, "OAUTH2",
+                    (LocalDateTime) session.getAttribute("oauthConsentAcceptedAt"));
+            } catch (IllegalArgumentException exception) {
+                throw new ServletException("No se pudo registrar la aceptación legal del acceso social.", exception);
+            }
         }
         session.removeAttribute("oauthLegalConsentVersion");
         session.removeAttribute("oauthAdultConfirmed");

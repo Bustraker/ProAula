@@ -100,7 +100,7 @@ public class SecurityConfig {
                     "/css/**", "/js/**", "/images/**", "/data/cartografia/**",
                     "/public_index_3", "/viajar_public", "/index_3_public",
                     "/contacto", "/contacto_public", "/contacto_usuario",
-                    "/oauth2/preauthorize",
+                    "/oauth2/preauthorize", "/oauth2/consentir",
                     "/terminos", "/terminos.html", "/privacidad", "/privacidad.html",
                     "/login/oauth2/**", "/oauth2/authorization/**",
                     "/api/usuarios/login", "/api/usuarios/register",

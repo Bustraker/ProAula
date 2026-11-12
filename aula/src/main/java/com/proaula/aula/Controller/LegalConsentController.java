@@ -18,6 +18,7 @@ import org.springframework.security.web.authentication.logout.SecurityContextLog
 import java.time.LocalDateTime;
 import java.time.Duration;
 import java.util.List;
+import java.util.Set;
 
 @Controller
 public class LegalConsentController {
@@ -30,32 +31,53 @@ public class LegalConsentController {
         this.legalConsentService = legalConsentService;
     }
 
+    @GetMapping("/oauth2/consentir")
+    public String oauthConsentPage(@RequestParam String provider,
+                                   HttpServletRequest request,
+                                   Model model) {
+        if (!Set.of("google", "github", "discord", "facebook").contains(provider)) {
+            return "redirect:/inicio-de-sesion-mejorado";
+        }
+        request.getSession(true).setAttribute("oauthConsentProvider", provider);
+        model.addAttribute("provider", provider);
+        model.addAttribute("providerLabel", provider.substring(0, 1).toUpperCase() + provider.substring(1));
+        model.addAttribute("legalVersion", LegalConsentService.CURRENT_VERSION);
+        return "oauth-consent";
+    }
+
     @PostMapping("/oauth2/preauthorize")
-    public String preauthorizeOAuth(@RequestParam String provider,
+    public String preauthorizeOAuth(@RequestParam(required = false) String provider,
                                     @RequestParam(required = false) Boolean legalConsent,
                                     @RequestParam(required = false) Boolean adultConfirmed,
                                     @RequestParam(required = false) String legalVersion,
                                     HttpServletRequest request,
                                     RedirectAttributes redirectAttributes) {
-        if (!java.util.Set.of("google", "github", "discord", "facebook").contains(provider)
-                || !Boolean.TRUE.equals(legalConsent) || !Boolean.TRUE.equals(adultConfirmed)) {
+        var session = request.getSession(false);
+        String selectedProvider = session == null
+            ? null
+            : (String) session.getAttribute("oauthConsentProvider");
+        if (provider == null || !Set.of("google", "github", "discord", "facebook").contains(provider)
+                || !provider.equals(selectedProvider)) {
+            return "redirect:/inicio-de-sesion-mejorado";
+        }
+        if (!Boolean.TRUE.equals(legalConsent) || !Boolean.TRUE.equals(adultConfirmed)) {
             redirectAttributes.addFlashAttribute("error",
                 "Debes aceptar los documentos legales y confirmar que tienes al menos 18 años.");
-            return "redirect:/inicio-de-sesion-mejorado";
+            return "redirect:/oauth2/consentir?provider=" + provider;
         }
         try {
             if (!LegalConsentService.CURRENT_VERSION.equals(legalVersion)) {
                 throw new IllegalArgumentException("La versión legal cambió. Recarga la página y vuelve a aceptar.");
             }
-            var session = request.getSession(true);
             session.setAttribute("oauthLegalConsentVersion", LegalConsentService.CURRENT_VERSION);
             session.setAttribute("oauthAdultConfirmed", Boolean.TRUE);
             session.setAttribute("oauthConsentSource", provider);
             session.setAttribute("oauthConsentAcceptedAt", LocalDateTime.now());
+            session.removeAttribute("oauthConsentProvider");
             return "redirect:/oauth2/authorization/" + provider;
         } catch (IllegalArgumentException exception) {
             redirectAttributes.addFlashAttribute("error", exception.getMessage());
-            return "redirect:/inicio-de-sesion-mejorado";
+            return "redirect:/oauth2/consentir?provider=" + provider;
         }
     }
 
@@ -64,6 +86,9 @@ public class LegalConsentController {
         Usuario usuario = usuarioService.findByUsername(authentication.getName());
         if (usuario == null) {
             return "redirect:/inicio-de-sesion-mejorado";
+        }
+        if (legalConsentService.hasCurrentConsent(authentication.getName())) {
+            return "redirect:/perfil";
         }
         model.addAttribute("legalVersion", LegalConsentService.CURRENT_VERSION);
         return "legal-consent";
@@ -75,14 +100,17 @@ public class LegalConsentController {
                                 @RequestParam(required = false) Boolean adultConfirmed,
                                 @RequestParam(required = false) String legalVersion,
                                 RedirectAttributes redirectAttributes) {
+        Usuario usuario = usuarioService.findByUsername(authentication.getName());
+        if (usuario == null) {
+            return "redirect:/inicio-de-sesion-mejorado";
+        }
+        if (legalConsentService.hasCurrentConsent(authentication.getName())) {
+            return "redirect:/perfil";
+        }
         if (!Boolean.TRUE.equals(legalConsent) || !Boolean.TRUE.equals(adultConfirmed)) {
             redirectAttributes.addFlashAttribute("error",
                 "Debes aceptar los documentos legales y confirmar que tienes al menos 18 años.");
             return "redirect:/legal/consentir";
-        }
-        Usuario usuario = usuarioService.findByUsername(authentication.getName());
-        if (usuario == null) {
-            return "redirect:/inicio-de-sesion-mejorado";
         }
         try {
             legalConsentService.recordAcceptance(usuario, legalVersion, true, "RECONSENT");
