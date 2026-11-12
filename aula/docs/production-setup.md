@@ -6,6 +6,12 @@ Inicia la aplicación con `SPRING_PROFILES_ACTIVE=prod`. El perfil `prod` usa My
 En el workaround temporal actualmente desplegado, Hibernate no valida ni modifica
 el esquema (`spring.jpa.hibernate.ddl-auto=none`).
 
+Render usa TiDB Cloud como única base de datos de producción. El perfil `local`
+usa XAMPP y las variables `LOCAL_DB_URL`, `LOCAL_DB_USERNAME` y
+`LOCAL_DB_PASSWORD`; no reutilices las variables `SPRING_DATASOURCE_*` de Render
+para una ejecución local. Los datos locales son de desarrollo y no se copian
+automáticamente a producción.
+
 Define estas variables antes de iniciar el proceso:
 
 | Variable | Obligatoria | Uso |
@@ -71,6 +77,16 @@ usuario de la base necesita permisos para crear y modificar esas tablas. La
 tabla base `favorito` y las migraciones de horarios siguen el procedimiento
 manual indicado abajo.
 
+El bootstrap productivo ejecuta, antes de inicializar Hibernate, las migraciones
+idempotentes enumeradas en `ProductionAdminSchemaBootstrapService`. La migración
+`V20261112_01__align_user_and_legal_consent.sql` agrega
+`usuario.email_verified` con valor predeterminado `TRUE` para las cuentas
+existentes y añade `legal_consent.revoked_at` si falta. No elimina tablas ni
+filas. Al introducir una migración nueva para producción, crea un archivo SQL
+versionado, hazlo seguro para reejecutarse y agrégalo en el orden correcto a ese
+bootstrap. Mantén Flyway deshabilitado hasta que se valide su baseline contra una
+copia de TiDB.
+
 En desarrollo y producción, configura `ADMIN_APPROVER_EMAIL` mediante el entorno
 y asegúrate de que pertenezca a la cuenta ADMIN aprobadora. `MAIL_USERNAME` es
 la cuenta SMTP emisora y puede ser diferente del aprobador. Proporciona una
@@ -109,6 +125,10 @@ permite que Hibernate no rechace el tipo existente de `horario.dias_semana`, per
 modifica esa columna y deja de validar todo el esquema. No lo consideres una reparación
 permanente.
 
+El despliegue no copia datos desde XAMPP. Usa la guía de migración de datos solo
+para una carga inicial explícitamente revisada; no la ejecutes como sincronización
+de producción ni para actualizar el esquema.
+
 La tabla base de favoritos requiere aplicar manualmente
 [`V20261021_01__create_user_favorites.sql`](../src/main/resources/db/migration/mysql/V20261021_01__create_user_favorites.sql)
 en la base MySQL/TiDB. Confirma que existan `usuario`, `ruta` y `parada` antes de
@@ -123,12 +143,11 @@ sin recrear la tabla ni perder datos. También aplica
 crea la tabla si aún no existe y, si ya contiene notificaciones, añade las columnas
 de canal y fecha, completa los valores históricos e incorpora los índices sin
 borrar filas. No habilites Flyway ni cambies `ddl-auto` mientras siga vigente el
-workaround de conexión. El consentimiento legal requiere aplicar manualmente, en
-este orden, [`V20261111_01__create_legal_consent.sql`](../src/main/resources/db/migration/mysql/V20261111_01__create_legal_consent.sql)
-y [`V20261111_02__add_legal_consent_revocation.sql`](../src/main/resources/db/migration/mysql/V20261111_02__add_legal_consent_revocation.sql).
-Confirma que exista `usuario` antes de crear `legal_consent`; la segunda migración
-añade `revoked_at` y no es idempotente, así que verifica que la columna no exista
-antes de ejecutarla. Estas operaciones conservan las aceptaciones existentes.
+workaround de conexión. El consentimiento legal se crea al arrancar mediante
+[`V20261111_01__create_legal_consent.sql`](../src/main/resources/db/migration/mysql/V20261111_01__create_legal_consent.sql)
+y se completa con `V20261112_01__align_user_and_legal_consent.sql`, que agrega
+`revoked_at` de forma idempotente. Estas operaciones conservan las aceptaciones
+existentes.
 
 La migración preparada
 `src/main/resources/db/migration/mysql/V20261015_02__normalize_horario_days_column.sql`
@@ -203,8 +222,8 @@ Cuando Flyway esté habilitado, los scripts del perfil MySQL se ejecutan en orde
    crea o completa la tabla de notificaciones conservando sus filas.
 10. [`V20261111_01__create_legal_consent.sql`](../src/main/resources/db/migration/mysql/V20261111_01__create_legal_consent.sql)
     crea la tabla que registra las aceptaciones legales.
-11. [`V20261111_02__add_legal_consent_revocation.sql`](../src/main/resources/db/migration/mysql/V20261111_02__add_legal_consent_revocation.sql)
-    añade la fecha de revocación del consentimiento.
+11. `V20261112_01__align_user_and_legal_consent.sql` agrega la columna de
+    verificación de correo y, si falta, la fecha de revocación del consentimiento.
 
 Flyway está configurado con `baseline-on-migrate`; antes del primer despliegue
 respalda la base y confirma que el esquema base de Bustraker y
@@ -220,11 +239,10 @@ una migración versionada que ya se haya aplicado; crea una migración nueva hac
 adelante después de revisar el esquema.
 
 Actualmente Flyway continúa deshabilitado en el perfil `prod` por el workaround de
-Render descrito arriba; los scripts enumerados indican las migraciones que se
-aplican manualmente o mediante el bootstrap específico de producción. En particular,
-las migraciones de consentimiento legal no se aplican automáticamente por ese
-bootstrap; aplícalas manualmente según las instrucciones anteriores antes de
-desplegar una versión que dependa de `legal_consent`.
+Render descrito arriba. El bootstrap específico de producción ejecuta las
+migraciones incluidas en `ProductionAdminSchemaBootstrapService` en cada inicio;
+por eso esas migraciones deben ser idempotentes. Las migraciones no incluidas en
+ese bootstrap siguen requiriendo el procedimiento manual descrito en esta guía.
 
 Los perfiles locales y de validación deshabilitan estas migraciones MySQL: el
 entorno local administra su esquema con Hibernate y las pruebas usan su esquema H2
