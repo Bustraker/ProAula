@@ -7,10 +7,10 @@ existir, tener columnas compatibles y estar vacías; el script aborta si detecta
 tablas o columnas faltantes, incompatibilidades o filas existentes. Si una tabla
 ya se copió, no vuelvas a ejecutar la migración sobre ella.
 
-La aplicación local sigue usando XAMPP mediante `SPRING_DATASOURCE_URL` en
-`application-local.yml`. La conexión de destino del migrador usa variables
-separadas (`TARGET_DB_*`), para no reemplazar ni confundir la configuración local
-con las variables de despliegue de Render.
+La aplicación local usa XAMPP mediante `LOCAL_DB_URL`, `LOCAL_DB_USERNAME` y
+`LOCAL_DB_PASSWORD` en `application-local.yml`. La conexión de destino del
+migrador usa variables separadas (`TARGET_DB_*`), para no reemplazar ni confundir
+la configuración local con las variables de despliegue de Render.
 
 ## Preparación
 

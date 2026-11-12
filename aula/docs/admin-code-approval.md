@@ -46,8 +46,8 @@ aplicación para que las nuevas sesiones las reciban:
 
 | Variable | Uso |
 | --- | --- |
-| `SPRING_DATASOURCE_URL` | URL JDBC de la base MySQL local o de desarrollo. |
-| `SPRING_DATASOURCE_USERNAME` / `SPRING_DATASOURCE_PASSWORD` | Credenciales de base de datos. |
+| `LOCAL_DB_URL` | URL JDBC de XAMPP; por defecto `jdbc:mysql://localhost:3306/bustraker`. |
+| `LOCAL_DB_USERNAME` / `LOCAL_DB_PASSWORD` | Credenciales locales de XAMPP; por defecto `root` y contraseña vacía. |
 | `JWT_SECRET` | Secreto aleatorio para firmar tokens; obligatorio también en local. |
 | `JWT_EXPIRATION_MS` | Duración del token en milisegundos; por defecto 86400000. |
 | `GITHUB_CLIENT_ID` / `GITHUB_CLIENT_SECRET` | Credenciales OAuth de GitHub, si se habilita ese proveedor. |
