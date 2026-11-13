@@ -1230,7 +1230,7 @@
             el.resultados.appendChild(h(
                 'p',
                 'resultados__riesgo-nota',
-                'Hasta 3 opciones: primero las directas; se ordenan con la distancia disponible y las paradas. No incluye espera ni tráfico.'
+                'Hasta 3 opciones: primero las directas; se ordenan con la distancia disponible y las paradas. El tiempo no incluye espera ni tráfico.'
             ));
             estado.tramos.forEach(function (tramo, indice) {
                 el.resultados.appendChild(crearTarjetaTramo(tramo, indice));
@@ -1310,12 +1310,24 @@
                 var nivelValido = Object.prototype.hasOwnProperty.call(niveles, nivel);
                 var etiqueta = nivelValido ? niveles[nivel] : 'Estimado';
                 var claseNivel = nivelValido ? nivel.toLowerCase() : 'desconocido';
+                var origenDatos = String(tramo.riesgoRetraso.origenDatos || '');
+                var textoOrigen = origenDatos === 'HISTORICO_REAL'
+                    ? 'Entrenado con historial real'
+                    : origenDatos === 'SINTETICOS_DEMOSTRACION'
+                        ? 'Demostración con datos sintéticos'
+                        : 'Origen de datos no informado';
                 indicador.className = 'tramo__riesgo tramo__riesgo--' + claseNivel;
                 indicador.setAttribute('aria-label',
                     'Riesgo ' + etiqueta.toLowerCase() + ' de retraso mayor a diez minutos: ' + porcentaje + '%');
                 var fila = h('span', 'tramo__riesgo-resumen');
                 fila.appendChild(h('span', 'tramo__riesgo-titulo', 'Modelo predictivo · riesgo de retraso >10 min'));
                 fila.appendChild(h('strong', 'tramo__riesgo-valor', etiqueta + ' · ' + porcentaje + '%'));
+                fila.appendChild(h('span', 'tramo__riesgo-origen', textoOrigen));
+                fila.appendChild(h(
+                    'span',
+                    'tramo__riesgo-origen',
+                    'Umbral de alerta: ' + Math.round(tramo.riesgoRetraso.umbral * 100) + '%'
+                ));
                 var barra = h('span', 'tramo__riesgo-barra');
                 barra.setAttribute('role', 'meter');
                 barra.setAttribute('aria-label', 'Probabilidad estimada');
@@ -1406,8 +1418,9 @@
 
                 var datos = await respuesta.json();
                 if (!datos || !Number.isFinite(datos.probabilidadRetraso)
-                    || datos.probabilidadRetraso < 0 || datos.probabilidadRetraso > 1) {
-                    throw new Error('El servicio de modelos devolvió una probabilidad inválida.');
+                    || datos.probabilidadRetraso < 0 || datos.probabilidadRetraso > 1
+                    || !Number.isFinite(datos.umbral) || datos.umbral < 0 || datos.umbral > 1) {
+                    throw new Error('El servicio de modelos devolvió una probabilidad o umbral inválido.');
                 }
                 return datos;
             } finally {
