@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous">
     <link rel="preconnect" href="https://server.arcgisonline.com" crossorigin>
     <link rel="preconnect" href="https://tile.openstreetmap.org" crossorigin>
-    <link rel="stylesheet" th:href="@{/css/travel.css(v='route-polish-12')}">
+    <link rel="stylesheet" th:href="@{/css/travel.css(v='route-polish-13')}">
     <link rel="stylesheet" th:href="@{/css/map-ui.css(v='trips-5')}">
     <link rel="stylesheet" th:href="@{/css/detail-pro.css(v='det-pro-2')}">
 </head>
@@ -115,6 +115,18 @@
                 </output>
             </section>
 
+            <section class="weather-section" aria-labelledby="weatherTitle">
+                <h2 id="weatherTitle" class="seccion__titulo">Clima de Cartagena</h2>
+                <output id="weatherStatus" class="weather-panel" role="status" aria-live="polite">
+                    Consultando condiciones meteorológicas…
+                </output>
+                <p class="weather-note">
+                    Pronóstico de la zona central, no de tu ubicación GPS. Es solo contexto:
+                    no se convierte en minutos de demora ni modifica la predicción de retraso.
+                    Fuente: <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a>.
+                </p>
+            </section>
+
             <section class="seccion seccion--rutas" aria-labelledby="tituloRutas">
                 <div class="seccion__cab-flex">
                     <h2 id="tituloRutas" class="seccion__titulo">Rutas disponibles</h2>
@@ -176,7 +188,8 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
     <script th:src="@{/js/notifications-client.js(v='browser-voice-2')}"></script>
     <script th:src="@{/js/map-base.js(v='map-polish-8')}"></script>
-    <script th:src="@{/js/map-travel.js(v='trips-9')}"></script>
+    <script th:src="@{/js/map-weather.js(v='weather-3')}"></script>
+    <script th:src="@{/js/map-travel.js(v='trips-10')}"></script>
     <script th:src="@{/js/viajar.js}"></script>
 </body>
 </html>
