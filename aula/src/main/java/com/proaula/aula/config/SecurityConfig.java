@@ -77,7 +77,7 @@ public class SecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
             )
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/actuator/health").permitAll()
+                .requestMatchers("/actuator/health", "/actuator/health/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/rutas").access(adminAuthorization())
                 .requestMatchers(HttpMethod.POST, "/api/buses/**").access(adminAuthorization())
                 .requestMatchers(HttpMethod.PUT, "/api/buses/**").access(adminAuthorization())

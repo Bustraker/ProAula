@@ -159,6 +159,14 @@ class AdminCodeApprovalFlowIntegrationTest {
             .andReturn();
         assertThat(health.getResponse().getStatus()).isIn(200, 503);
 
+        for (String probePath : new String[] {
+                "/actuator/health/readiness",
+                "/actuator/health/liveness"
+        }) {
+            MvcResult probe = mockMvc.perform(get(probePath)).andReturn();
+            assertThat(probe.getResponse().getStatus()).isNotEqualTo(302);
+        }
+
         mockMvc.perform(get("/solicitar-codigo-admin"))
             .andExpect(status().is3xxRedirection())
             .andExpect(header().string("Location", "http://localhost/inicio-de-sesion-mejorado"));
