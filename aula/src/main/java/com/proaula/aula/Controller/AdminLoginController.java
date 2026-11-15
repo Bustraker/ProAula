@@ -4,6 +4,7 @@ import com.proaula.aula.Entity.AdminCode;
 import com.proaula.aula.Entity.AdminCodeRequest;
 import com.proaula.aula.Entity.Usuario;
 import com.proaula.aula.Service.AdminCodeRequestService;
+import com.proaula.aula.Service.AdminAccessLogService;
 import com.proaula.aula.Service.AdminCodeService;
 import com.proaula.aula.Service.LegalConsentService;
 import com.proaula.aula.Service.UsuarioService;
@@ -21,6 +22,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -40,6 +42,7 @@ public class AdminLoginController {
 
     private final UsuarioService usuarioService;
     private final AdminCodeService adminCodeService;
+    private final AdminAccessLogService adminAccessLogService;
     private final AdminCodeRequestService requestService;
     private final LegalConsentService legalConsentService;
     private final AuthenticationManager authenticationManager;
@@ -47,12 +50,14 @@ public class AdminLoginController {
 
     public AdminLoginController(UsuarioService usuarioService,
                                 AdminCodeService adminCodeService,
+                                AdminAccessLogService adminAccessLogService,
                                 AdminCodeRequestService requestService,
                                 LegalConsentService legalConsentService,
                                 AuthenticationManager authenticationManager,
                                 SecurityContextRepository securityContextRepository) {
         this.usuarioService = usuarioService;
         this.adminCodeService = adminCodeService;
+        this.adminAccessLogService = adminAccessLogService;
         this.requestService = requestService;
         this.legalConsentService = legalConsentService;
         this.authenticationManager = authenticationManager;
@@ -198,6 +203,7 @@ public class AdminLoginController {
                 return "redirect:/admin-login?verified=true";
             }
 
+            adminAccessLogService.recordSuccessfulLogin(user, code);
             clearCodeVerification(session);
             session.invalidate();
             HttpSession authenticatedSession = request.getSession(true);
@@ -211,6 +217,11 @@ public class AdminLoginController {
         } catch (AuthenticationException exception) {
             log.warn("Login administrativo fallido para el usuario indicado.");
             redirectAttributes.addFlashAttribute("error", "El código o las credenciales no son válidos.");
+            return "redirect:/admin-login?verified=true";
+        } catch (DataAccessException exception) {
+            log.error("Could not record successful ADMIN access for user id {}.", user.getId(), exception);
+            redirectAttributes.addFlashAttribute("error",
+                "No se pudo registrar el acceso administrativo. No se inició sesión; inténtalo de nuevo.");
             return "redirect:/admin-login?verified=true";
         }
     }

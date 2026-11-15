@@ -138,10 +138,10 @@ class ConsultasPageIntegrationTest {
 
         assertThat(publicPage)
                 .contains("id=\"btnPlanificar\"", "id=\"plannerStatus\"", "Rutas disponibles",
-                        "/css/travel.css?v=route-polish-12",
+                        "/css/travel.css?v=route-polish-13",
                         "/css/map-ui.css?v=trips-4",
                         "/js/map-base.js?v=map-polish-8",
-                        "/js/map-travel.js?v=trips-9");
+                        "/js/map-travel.js?v=trips-10");
 
         MockHttpSession session = new MockHttpSession();
         SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
@@ -159,9 +159,9 @@ class ConsultasPageIntegrationTest {
 
         assertThat(authenticatedPage)
                 .contains("id=\"btnPlanificar\"", "id=\"plannerStatus\"", "Rutas disponibles",
-                        "/css/travel.css?v=route-polish-12",
+                        "/css/travel.css?v=route-polish-13",
                         "/css/map-ui.css?v=trips-5",
                         "/js/map-base.js?v=map-polish-8",
-                        "/js/map-travel.js?v=trips-9");
+                        "/js/map-travel.js?v=trips-10");
     }
 }

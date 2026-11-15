@@ -74,7 +74,7 @@ test("public route options show the model delay probability before route selecti
   await expect(risk).toHaveClass(/tramo__riesgo--alto/);
   await expect(risk.getByRole("meter")).toHaveAttribute("aria-valuenow", "42");
   await expect(page.locator(".resultados__riesgo-nota"))
-    .toContainText("No incluye espera ni tráfico.");
+    .toContainText("El tiempo no incluye espera ni tráfico.");
   expect(predictionRequest.method).toBe("POST");
   expect(predictionRequest.headers["content-type"]).toContain("application/json");
   expect(predictionRequest.body.ruta).toBe("101");

@@ -24,6 +24,7 @@
             <nav class="sidebar-nav">
                 <a th:href="@{/index_2}" class="active"><i class="fas fa-home"></i> Inicio</a>
                 <a th:href="@{/gestionar-usuarios}"><i class="fas fa-users"></i> Gestionar Usuarios</a>
+                <a th:if="${isAdminApprover}" th:href="@{/admin/accesos}"><i class="fas fa-user-clock"></i> Registro de accesos</a>
                 <a th:href="@{/reportes}"><i class="fas fa-chart-bar"></i> Reportes</a>
                 <a th:href="@{/mensajes_contacto}"><i class="fas fa-envelope"></i> Mensajes</a>
                 <a th:href="@{/rutas/admin}"><i class="fas fa-route"></i> Rutas</a>
@@ -221,6 +222,11 @@
                             <a th:href="@{/gestionar-usuarios}" class="quick-action">
                                 <i class="fas fa-users"></i>
                                 <span>Gestionar Usuarios</span>
+                            </a>
+
+                            <a th:if="${isAdminApprover}" th:href="@{/admin/accesos}" class="quick-action">
+                                <i class="fas fa-user-clock"></i>
+                                <span>Registro de accesos ADMIN</span>
                             </a>
                             
                             <a th:href="@{/registro-buses}" class="quick-action">

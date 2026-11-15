@@ -45,13 +45,48 @@ class ExternalProviderLoginPageTest {
         mockMvc.perform(get("/inicio-de-sesion-mejorado"))
             .andExpect(status().isOk())
             .andExpect(content().string(org.hamcrest.Matchers.containsString(
-                "name=\"provider\" value=\"github\"")))
+                "/oauth2/consentir?provider=github")))
             .andExpect(content().string(org.hamcrest.Matchers.containsString(
-                "name=\"provider\" value=\"discord\"")))
+                "/oauth2/consentir?provider=discord")))
             .andExpect(content().string(org.hamcrest.Matchers.containsString(
-                "name=\"provider\" value=\"facebook\"")))
+                "/oauth2/consentir?provider=facebook")))
             .andExpect(content().string(org.hamcrest.Matchers.not(
-                org.hamcrest.Matchers.containsString("name=\"provider\" value=\"google\""))));
+                org.hamcrest.Matchers.containsString("/oauth2/consentir?provider=google"))))
+            .andExpect(content().string(org.hamcrest.Matchers.not(
+                org.hamcrest.Matchers.containsString("oauth-legal-check"))));
+    }
+
+    @Test
+    void legalChecksAreShownOnlyAfterChoosingAnExternalProvider() throws Exception {
+        mockMvc.perform(get("/oauth2/consentir").param("provider", "github"))
+            .andExpect(status().isOk())
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("Continúa con")))
+            .andExpect(content().string(org.hamcrest.Matchers.containsString(
+                "name=\"legalConsent\"")))
+            .andExpect(content().string(org.hamcrest.Matchers.containsString(
+                "name=\"adultConfirmed\"")))
+            .andExpect(content().string(org.hamcrest.Matchers.containsString(
+                "name=\"provider\" value=\"github\"")));
+
+        mockMvc.perform(get("/oauth2/consentir").param("provider", "unknown"))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(header().string("Location", "/inicio-de-sesion-mejorado"));
+    }
+
+    @Test
+    void externalProviderCannotContinueUntilBothLegalChecksAreAccepted() throws Exception {
+        MvcResult panelResult = mockMvc.perform(get("/oauth2/consentir").param("provider", "github"))
+            .andExpect(status().isOk())
+            .andReturn();
+        MockHttpSession session = (MockHttpSession) panelResult.getRequest().getSession(false);
+
+        mockMvc.perform(post("/oauth2/preauthorize")
+                .session(session)
+                .with(csrf())
+                .param("provider", "github")
+                .param("legalVersion", "2026-11-11-v1"))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(header().string("Location", "/oauth2/consentir?provider=github"));
     }
 
     @Test
@@ -69,7 +104,20 @@ class ExternalProviderLoginPageTest {
         mockMvc.perform(get("/oauth2/authorization/github"))
             .andExpect(status().is3xxRedirection())
             .andExpect(header().string("Location",
-                org.hamcrest.Matchers.containsString("/inicio-de-sesion-mejorado?consentRequired=true")));
+                org.hamcrest.Matchers.containsString("/oauth2/consentir?provider=github")));
+    }
+
+    @Test
+    void consentForOneProviderCannotAuthorizeAnotherProvider() throws Exception {
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("oauthLegalConsentVersion", "2026-11-11-v1");
+        session.setAttribute("oauthAdultConfirmed", Boolean.TRUE);
+        session.setAttribute("oauthConsentAcceptedAt", java.time.LocalDateTime.now());
+        session.setAttribute("oauthConsentSource", "google");
+
+        mockMvc.perform(get("/oauth2/authorization/github").session(session))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(header().string("Location", "/oauth2/consentir?provider=github"));
     }
 
     @Test
@@ -79,6 +127,10 @@ class ExternalProviderLoginPageTest {
             .andExpect(content().string(org.hamcrest.Matchers.containsString("auth-scene--access")))
             .andExpect(content().string(org.hamcrest.Matchers.containsString("ENTRAR A MI CUENTA")))
             .andExpect(content().string(org.hamcrest.Matchers.containsString("IDENTIDAD VERIFICADA")))
+            .andExpect(content().string(org.hamcrest.Matchers.not(
+                org.hamcrest.Matchers.containsString("name=\"legalConsent\""))))
+            .andExpect(content().string(org.hamcrest.Matchers.not(
+                org.hamcrest.Matchers.containsString("name=\"adultConfirmed\""))))
             .andExpect(content().string(org.hamcrest.Matchers.not(
                 org.hamcrest.Matchers.containsString("route-map__bus"))))
             .andExpect(content().string(org.hamcrest.Matchers.containsString("style_auth_experience.css?v=20261024-3")));
@@ -153,7 +205,12 @@ class ExternalProviderLoginPageTest {
     private void assertAuthorizationRedirect(String path, String expectedHost, String expectedCallback,
                                              String expectedScope, boolean secure) throws Exception {
         String provider = path.substring(path.lastIndexOf('/') + 1);
+        MvcResult panelResult = mockMvc.perform(get("/oauth2/consentir").param("provider", provider))
+            .andExpect(status().isOk())
+            .andReturn();
+        MockHttpSession session = (MockHttpSession) panelResult.getRequest().getSession(false);
         MvcResult consentResult = mockMvc.perform(post("/oauth2/preauthorize")
+                .session(session)
                 .with(csrf())
                 .param("provider", provider)
                 .param("legalConsent", "true")
@@ -161,7 +218,6 @@ class ExternalProviderLoginPageTest {
                 .param("legalVersion", "2026-11-11-v1"))
             .andExpect(status().is3xxRedirection())
             .andReturn();
-        MockHttpSession session = (MockHttpSession) consentResult.getRequest().getSession(false);
 
         MvcResult result = mockMvc.perform(get(path).session(session).with(request -> {
                 request.setSecure(secure);

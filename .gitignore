@@ -1,4 +1,4 @@
 /.env
 /.env.*
+/docs/logs/
 !/.env.example
-/migracion_tidb.log

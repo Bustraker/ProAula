@@ -10,12 +10,16 @@ import com.proaula.aula.Service.RutaService;
 import com.proaula.aula.Service.TrayectoFavoritoService;
 import com.proaula.aula.Service.UsuarioService;
 import org.springframework.security.core.Authentication;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class DashboardController {
+    @Value("${app.admin.approver-email:}")
+    private String approverEmail;
+
     private final UsuarioService usuarioService;
     private final RutaService rutaService;
     private final BusService busService;
@@ -87,6 +91,8 @@ public class DashboardController {
         
         // Añade datos al modelo
         model.addAttribute("usuario", usuario);
+        model.addAttribute("isAdminApprover", usuario.getEmail() != null
+            && !approverEmail.isBlank() && usuario.getEmail().equalsIgnoreCase(approverEmail));
         model.addAttribute("totalUsuarios", totalUsuarios);
         model.addAttribute("totalBuses", totalBuses);
         model.addAttribute("totalRutas", totalRutas);
