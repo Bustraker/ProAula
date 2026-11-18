@@ -45,6 +45,10 @@ class ExternalProviderLoginPageTest {
         mockMvc.perform(get("/inicio-de-sesion-mejorado"))
             .andExpect(status().isOk())
             .andExpect(content().string(org.hamcrest.Matchers.containsString(
+                "/css/accessibility.css")))
+            .andExpect(content().string(org.hamcrest.Matchers.containsString(
+                "/js/accessibility.js")))
+            .andExpect(content().string(org.hamcrest.Matchers.containsString(
                 "/oauth2/consentir?provider=github")))
             .andExpect(content().string(org.hamcrest.Matchers.containsString(
                 "/oauth2/consentir?provider=discord")))
