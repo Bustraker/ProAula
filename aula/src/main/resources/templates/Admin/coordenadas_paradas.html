@@ -63,6 +63,7 @@
                 </header>
 
                 <div th:if="${coordenadasGuardadas}" class="coordinates-alert coordinates-alert--ok" role="status" th:text="${coordenadasGuardadas}"></div>
+                <div th:if="${accesibilidadGuardada}" class="coordinates-alert coordinates-alert--ok" role="status" th:text="${accesibilidadGuardada}"></div>
                 <div th:if="${errorCoordenadas == 'datos'}" class="coordinates-alert coordinates-alert--error" role="alert">
                     Ingresa latitud y longitud dentro de sus rangos válidos. No se modificaron los datos guardados.
                 </div>
@@ -83,6 +84,7 @@
                         <thead>
                             <tr>
                                 <th scope="col">Ruta y parada</th>
+                                <th scope="col">Accesibilidad</th>
                                 <th scope="col">Ubicación actual</th>
                                 <th scope="col">Registrar ubicación</th>
                             </tr>
@@ -93,6 +95,28 @@
                                     <strong th:text="${parada.nombre}">Parada</strong>
                                     <span th:text="${(parada.ruta != null ? parada.ruta.nombre : 'Sin ruta') + (parada.barrio != null ? ' · ' + parada.barrio : '')}">Ruta · Barrio</span>
                                     <small th:text="${parada.orden != null ? 'Orden ' + parada.orden : 'Orden no definido'}">Orden</small>
+                                </td>
+                                <td>
+                                    <form class="coordinates-form" method="post"
+                                          th:action="@{/admin/paradas/{id}/accesibilidad(id=${parada.id})}">
+                                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                                        <label th:for="'accesibilidad-' + ${parada.id}">Estado de accesibilidad</label>
+                                        <select th:id="'accesibilidad-' + ${parada.id}" name="accesibleMovilidadReducida">
+                                            <option value="" th:selected="${parada.accesibleMovilidadReducida == null}">Sin información verificada</option>
+                                            <option value="true" th:selected="${parada.accesibleMovilidadReducida == true}">Registrada como accesible</option>
+                                            <option value="false" th:selected="${parada.accesibleMovilidadReducida == false}">Registrada como no accesible</option>
+                                        </select>
+                                        <label th:for="'observaciones-' + ${parada.id}">Observaciones</label>
+                                        <textarea th:id="'observaciones-' + ${parada.id}" name="observacionesAccesibilidad"
+                                                  rows="3" maxlength="2000"
+                                                  placeholder="Describe condiciones comprobadas de acceso"
+                                                  th:text="${parada.observacionesAccesibilidad}"></textarea>
+                                        <div class="coordinates-actions">
+                                            <button class="coordinates-save" type="submit">
+                                                <i class="fas fa-floppy-disk" aria-hidden="true"></i> Guardar accesibilidad
+                                            </button>
+                                        </div>
+                                    </form>
                                 </td>
                                 <td>
                                     <span th:if="${parada.latitud != null and parada.longitud != null}" class="coordinates-state coordinates-state--saved">

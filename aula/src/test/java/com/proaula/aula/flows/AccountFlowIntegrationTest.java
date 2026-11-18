@@ -190,6 +190,17 @@ class AccountFlowIntegrationTest {
                 .andExpect(header().string("Location", "/perfil"));
 
         assertThat(legalConsentService.hasCurrentConsent("legacyconsent")).isTrue();
+        mockMvc.perform(get("/legal/consentir").with(user("legacyconsent")))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(header().string("Location", "/perfil"));
+        mockMvc.perform(post("/legal/consentir")
+                        .with(user("legacyconsent"))
+                        .with(csrf())
+                        .param("legalConsent", "true")
+                        .param("adultConfirmed", "true")
+                        .param("legalVersion", "2026-11-11-v1"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(header().string("Location", "/perfil"));
         mockMvc.perform(get("/perfil").with(user("legacyconsent")))
                 .andExpect(status().isOk())
                 .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content()

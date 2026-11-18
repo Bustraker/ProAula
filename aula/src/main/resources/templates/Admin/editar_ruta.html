@@ -181,6 +181,18 @@
                                 <small id="ayuda-orden-barrios" class="route-editor-help">Escribe todos los barrios separados por comas, desde el inicio hasta el final del recorrido.</small>
                             </div>
 
+                            <div class="route-editor-field">
+                                <label for="accesibleMovilidadReducida">
+                                    <span>Accesibilidad para movilidad reducida</span>
+                                </label>
+                                <select id="accesibleMovilidadReducida" name="accesibleMovilidadReducida">
+                                    <option value="" th:selected="${ruta.accesibleMovilidadReducida == null}">Sin información verificada</option>
+                                    <option value="true" th:selected="${ruta.accesibleMovilidadReducida == true}">Registrada como accesible</option>
+                                    <option value="false" th:selected="${ruta.accesibleMovilidadReducida == false}">Registrada como no accesible</option>
+                                </select>
+                                <small class="route-editor-help">Selecciona “Sin información” si no se ha comprobado con el operador.</small>
+                            </div>
+
                             <label class="route-verification" for="verificada">
                                 <input type="checkbox" id="verificada" name="verificada" value="true" th:checked="${ruta.verificada}">
                                 <span class="route-verification__box"><i class="fas fa-check" aria-hidden="true"></i></span>

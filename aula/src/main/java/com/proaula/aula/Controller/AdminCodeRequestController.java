@@ -1,6 +1,8 @@
 package com.proaula.aula.Controller;
 
 import com.proaula.aula.Entity.AdminCodeRequest;
+import com.proaula.aula.Entity.AdminAccessLog;
+import com.proaula.aula.Service.AdminAccessLogService;
 import com.proaula.aula.Service.AdminCodeRequestService;
 import com.proaula.aula.Service.AdminPushNotificationService;
 import com.proaula.aula.Service.UsuarioService;
@@ -9,6 +11,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,7 +27,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,21 +38,47 @@ import org.slf4j.LoggerFactory;
 public class AdminCodeRequestController {
 
     private static final Logger log = LoggerFactory.getLogger(AdminCodeRequestController.class);
+    private static final int ACCESS_LOG_PAGE_SIZE = 25;
+    private static final DateTimeFormatter ACCESS_TIME_FORMATTER =
+        DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss 'hora Colombia'", Locale.forLanguageTag("es-CO"))
+            .withZone(ZoneId.of("America/Bogota"));
 
     private final AdminCodeRequestService requestService;
+    private final AdminAccessLogService adminAccessLogService;
     private final AdminPushNotificationService pushNotificationService;
     private final UsuarioService usuarioService;
     private final String approverEmail;
 
     public AdminCodeRequestController(
             AdminCodeRequestService requestService,
+            AdminAccessLogService adminAccessLogService,
             AdminPushNotificationService pushNotificationService,
             UsuarioService usuarioService,
             @Value("${app.admin.approver-email:}") String approverEmail) {
         this.requestService = requestService;
+        this.adminAccessLogService = adminAccessLogService;
         this.pushNotificationService = pushNotificationService;
         this.usuarioService = usuarioService;
         this.approverEmail = approverEmail;
+    }
+
+    @GetMapping("/admin/accesos")
+    public String adminAccessLogs(@RequestParam(defaultValue = "0") int page,
+                                  Principal principal,
+                                  Model model) {
+        requireApprover(principal);
+        if (page < 0) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                org.springframework.http.HttpStatus.BAD_REQUEST, "El número de página no puede ser negativo.");
+        }
+
+        Page<AdminAccessLog> accessLogs = adminAccessLogService.findAccessLogs(
+            PageRequest.of(page, ACCESS_LOG_PAGE_SIZE,
+                Sort.by(Sort.Order.desc("accessedAt"), Sort.Order.desc("id"))));
+        model.addAttribute("accessLogs", accessLogs.map(this::toAccessLogView));
+        model.addAttribute("usuario", usuarioService.findByUsername(principal.getName()));
+        model.addAttribute("isAdminApprover", true);
+        return "Admin/admin_access_logs";
     }
 
     @PostMapping("/admin/solicitudes-codigo")
@@ -188,6 +222,35 @@ public class AdminCodeRequestController {
             && user.getEmail() != null && user.getEmail().equalsIgnoreCase(approverEmail);
     }
 
+    private AdminAccessLogView toAccessLogView(AdminAccessLog accessLog) {
+        String nombres = accessLog.getNombres() == null ? "" : accessLog.getNombres().trim();
+        String apellidos = accessLog.getApellidos() == null ? "" : accessLog.getApellidos().trim();
+        String fullName = (nombres + " " + apellidos).trim();
+        if (fullName.isBlank()) {
+            fullName = accessLog.getUsername();
+        }
+        String codeOwner = accessLog.getCodeOwnerEmail() == null || accessLog.getCodeOwnerEmail().isBlank()
+            ? "Sin titular asociado (código antiguo)"
+            : accessLog.getCodeOwnerEmail();
+        return new AdminAccessLogView(
+            fullName,
+            accessLog.getUsername(),
+            accessLog.getEmail(),
+            "Registro #" + accessLog.getAdminCodeId(),
+            codeOwner,
+            ACCESS_TIME_FORMATTER.format(accessLog.getAccessedAt()));
+    }
+
     public record PushTokenRequest(@NotBlank @Size(max = 4096) String token) {
+    }
+
+    public record AdminAccessLogView(
+        String fullName,
+        String username,
+        String email,
+        String codeReference,
+        String codeOwner,
+        String accessedAt
+    ) {
     }
 }

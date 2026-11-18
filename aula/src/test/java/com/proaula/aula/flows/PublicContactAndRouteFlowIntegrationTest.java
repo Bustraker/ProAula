@@ -267,6 +267,128 @@ class PublicContactAndRouteFlowIntegrationTest {
         assertThat(editorHtml).doesNotContain("Zona provisional A " + suffix + ", Zona provisional B " + suffix);
     }
 
+    @Test
+    void accessibilityStatusIsMaintainedFilteredAndExposedWithoutTreatingMissingDataAsNo() throws Exception {
+        String suffix = java.util.UUID.randomUUID().toString().replace("-", "").substring(0, 8);
+        Ruta ruta = new Ruta();
+        ruta.setNombre("Ruta accesible " + suffix);
+        ruta.setVerificada(true);
+        ruta.setAccesibleMovilidadReducida(true);
+        ruta.setObservacionesAccesibilidad("Dato comprobado para prueba");
+        ruta.setBarrios(List.of("Centro " + suffix, "Manga " + suffix));
+        ruta.setBarriosOrdenados(ruta.getBarrios());
+        Ruta rutaGuardada = rutaRepository.saveAndFlush(ruta);
+
+        Parada paradaAccesible = new Parada();
+        paradaAccesible.setNombre("Parada accesible " + suffix);
+        paradaAccesible.setOrden(1);
+        paradaAccesible.setRuta(rutaGuardada);
+        paradaAccesible.setAccesibleMovilidadReducida(true);
+        paradaAccesible.setObservacionesAccesibilidad("Rampa comprobada");
+        paradaAccesible = paradaRepository.saveAndFlush(paradaAccesible);
+
+        Parada paradaDesconocida = new Parada();
+        paradaDesconocida.setNombre("Parada sin datos " + suffix);
+        paradaDesconocida.setOrden(2);
+        paradaDesconocida.setRuta(rutaGuardada);
+        paradaDesconocida = paradaRepository.saveAndFlush(paradaDesconocida);
+
+        RutaParada relacion = new RutaParada();
+        relacion.setRuta(rutaGuardada);
+        relacion.setParada(paradaAccesible);
+        relacion.setOrden(1);
+        relacion.setSentido(RutaParada.Sentido.IDA);
+        rutaParadaRepository.saveAndFlush(relacion);
+        RutaParada relacionDesconocida = new RutaParada();
+        relacionDesconocida.setRuta(rutaGuardada);
+        relacionDesconocida.setParada(paradaDesconocida);
+        relacionDesconocida.setOrden(2);
+        relacionDesconocida.setSentido(RutaParada.Sentido.IDA);
+        rutaParadaRepository.saveAndFlush(relacionDesconocida);
+
+        Bus bus = new Bus();
+        bus.setPlaca("A" + suffix);
+        bus.setModelo("Bus de prueba");
+        bus.setRuta(rutaGuardada);
+        bus.setAccesibleMovilidadReducida(false);
+        busRepository.saveAndFlush(bus);
+
+        String listHtml = mockMvc.perform(get("/rutas").param("accesibilidad", "accesible"))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        assertThat(listHtml).contains("Ruta accesible " + suffix, "accessibilityContrast",
+                "accessibilityTextIncrease", "La accesibilidad se muestra según los datos registrados");
+
+        String excludedHtml = mockMvc.perform(get("/rutas").param("accesibilidad", "no-accesible"))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        assertThat(excludedHtml).doesNotContain("Ruta accesible " + suffix);
+
+        String detailHtml = mockMvc.perform(get("/ruta/{id}", rutaGuardada.getId()))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        assertThat(detailHtml).contains("Registrada como accesible", "Registrada como no accesible",
+                "Sin información", "Rampa comprobada", "data-accessibility-status=\"yes\"",
+                "data-accessibility-status=\"unknown\"", "stopAccessibilityFilter");
+
+        String mapJson = mockMvc.perform(get("/api/rutas-con-coordenadas"))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        JsonNode routeJson = buscarRuta(objectMapper.readTree(mapJson), rutaGuardada.getId());
+        assertThat(routeJson.path("accesibleMovilidadReducida").asBoolean()).isTrue();
+        assertThat(routeJson.path("paradasPorSentido").path("IDA").get(0)
+                .path("accesibleMovilidadReducida").asBoolean()).isTrue();
+        assertThat(routeJson.path("buses").get(0).path("accesibleMovilidadReducida").asBoolean()).isFalse();
+    }
+
+    @Test
+    void adminCanRecordStopAccessibilityWithoutChangingItsCoordinates() throws Exception {
+        Ruta ruta = new Ruta();
+        ruta.setNombre("Ruta para editar accesibilidad " + java.util.UUID.randomUUID());
+        Ruta rutaGuardada = rutaRepository.saveAndFlush(ruta);
+        Parada parada = new Parada();
+        parada.setNombre("Parada para editar accesibilidad");
+        parada.setRuta(rutaGuardada);
+        parada.setOrden(1);
+        parada = paradaRepository.saveAndFlush(parada);
+        Long paradaId = parada.getId();
+
+        mockMvc.perform(get("/rutas/admin")
+                        .with(user("admin").roles("ADMIN"))
+                        .sessionAttr("rolUsuario", "ADMIN"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("accesibleMovilidadReducida")));
+        mockMvc.perform(get("/editar-ruta/{id}", rutaGuardada.getId())
+                        .with(user("admin").roles("ADMIN"))
+                        .sessionAttr("rolUsuario", "ADMIN"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Sin información verificada")));
+        mockMvc.perform(get("/registro-buses")
+                        .with(user("admin").roles("ADMIN"))
+                        .sessionAttr("rolUsuario", "ADMIN"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Accesibilidad para movilidad reducida")));
+        mockMvc.perform(get("/admin/coordenadas-paradas")
+                        .with(user("admin").roles("ADMIN"))
+                        .sessionAttr("rolUsuario", "ADMIN"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Guardar accesibilidad")));
+
+        mockMvc.perform(post("/admin/paradas/{id}/accesibilidad", paradaId)
+                        .with(user("admin").roles("ADMIN"))
+                        .sessionAttr("rolUsuario", "ADMIN")
+                        .with(csrf())
+                        .param("accesibleMovilidadReducida", "false")
+                        .param("observacionesAccesibilidad", "Barrera física reportada"))
+                .andExpect(status().is3xxRedirection());
+
+        Parada actualizada = paradaRepository.findById(paradaId).orElseThrow();
+        assertThat(actualizada.getAccesibleMovilidadReducida()).isFalse();
+        assertThat(actualizada.getObservacionesAccesibilidad()).isEqualTo("Barrera física reportada");
+        assertThat(actualizada.getLatitud()).isNull();
+        assertThat(actualizada.getLongitud()).isNull();
+    }
+
     private void addRouteStop(Ruta ruta, String name, int stopOrder, int routeOrder,
                               RutaParada.Sentido sentido) {
         addRouteStop(ruta, name, stopOrder, routeOrder, sentido, Parada.Estado.ACTIVA);

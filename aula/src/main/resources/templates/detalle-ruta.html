@@ -8,6 +8,7 @@
     <title>Detalle de Ruta - Bustraker</title>
     <link rel="stylesheet" th:href="@{/css/style_detalle.css}">
     <link rel="stylesheet" th:href="@{/css/style_common.css}">
+    <link rel="stylesheet" th:href="@{/css/accessibility.css}">
     <link rel="stylesheet" th:href="@{/css/logout.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" th:href="@{/images/logo.png}" type="image/png">
@@ -48,6 +49,7 @@
 
     <!-- Contenido principal -->
     <main class="container">
+        <div th:replace="~{fragments/accessibility :: controls}"></div>
         <!-- Botón Volver -->
         <div class="mb-3">
             <a th:href="@{/rutas}" class="btn btn-secondary">
@@ -133,6 +135,12 @@
                             <i class="fas fa-circle-info" aria-hidden="true"></i>
                             <p th:text="${ruta.descripcion}">Información del recorrido</p>
                         </div>
+                        <div class="accessibility-detail" aria-label="Accesibilidad de la ruta">
+                            <strong>Accesibilidad de la ruta:</strong>
+                            <span th:replace="~{fragments/accessibility :: status(${ruta.accesibleMovilidadReducida})}">Sin información</span>
+                            <p th:if="${not #strings.isEmpty(ruta.observacionesAccesibilidad)}"
+                               th:text="${ruta.observacionesAccesibilidad}"></p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -172,6 +180,7 @@
                                     <th>Color</th>
                                     <th>Conductor</th>
                                     <th>Estado</th>
+                                    <th>Accesibilidad</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -186,6 +195,9 @@
                                         <span th:if="${bus.estado == T(com.proaula.aula.Entity.Bus.Estado).ACTIVO}" class="badge badge-success">Activo</span>
                                         <span th:if="${bus.estado == T(com.proaula.aula.Entity.Bus.Estado).MANTENIMIENTO}" class="badge badge-warning">En mantenimiento</span>
                                         <span th:if="${bus.estado == T(com.proaula.aula.Entity.Bus.Estado).FUERA_SERVICIO}" class="badge badge-danger">Fuera de servicio</span>
+                                    </td>
+                                    <td>
+                                        <span th:replace="~{fragments/accessibility :: status(${bus.accesibleMovilidadReducida})}">Sin información</span>
                                     </td>
                                 </tr>
                             </tbody>
@@ -206,6 +218,16 @@
                     <h3><i class="fas fa-map-marked-alt"></i> Paradas por sentido</h3>
                 </div>
                 <div class="card-body">
+                    <label class="stop-accessibility-filter" for="stopAccessibilityFilter">
+                        Mostrar paradas:
+                        <select id="stopAccessibilityFilter">
+                            <option value="all">Todas</option>
+                            <option value="yes">Registradas como accesibles</option>
+                            <option value="no">Registradas como no accesibles</option>
+                            <option value="unknown">Sin información</option>
+                        </select>
+                    </label>
+                    <output id="stopAccessibilityFilterStatus" class="accessibility-filter-status" role="status" aria-live="polite"></output>
                     <div th:if="${not #lists.isEmpty(paradasIda)}" class="table-container">
                         <h4>Ida <span th:if="${not ruta.verificada}" class="badge badge-warning">Secuencia provisional</span></h4>
                         <table class="table">
@@ -215,14 +237,21 @@
                                     <th>Nombre</th>
                                     <th>Barrio</th>
                                     <th>Dirección o referencia</th>
+                                    <th>Accesibilidad</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr th:each="rutaParada : ${paradasIda}">
+                                <tr th:each="rutaParada : ${paradasIda}"
+                                    th:attr="data-accessibility-status=${rutaParada.parada.accesibleMovilidadReducida == null ? 'unknown' : (rutaParada.parada.accesibleMovilidadReducida ? 'yes' : 'no')}">
                                     <td th:text="${rutaParada.orden}">1</td>
                                     <td><strong th:text="${rutaParada.parada.nombre}">Parada 1</strong></td>
                                     <td th:text="${rutaParada.parada.barrio} ?: 'Sin barrio confirmado'">Barrio</td>
                                     <td th:text="${rutaParada.parada.direccion != null ? rutaParada.parada.direccion : (rutaParada.parada.referencia != null ? rutaParada.parada.referencia : 'Sin detalle registrado')}">Dirección o referencia</td>
+                                    <td>
+                                        <span th:replace="~{fragments/accessibility :: status(${rutaParada.parada.accesibleMovilidadReducida})}">Sin información</span>
+                                        <small th:if="${not #strings.isEmpty(rutaParada.parada.observacionesAccesibilidad)}"
+                                               th:text="${rutaParada.parada.observacionesAccesibilidad}"></small>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -236,14 +265,21 @@
                                     <th>Nombre</th>
                                     <th>Barrio</th>
                                     <th>Dirección o referencia</th>
+                                    <th>Accesibilidad</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr th:each="rutaParada : ${paradasVuelta}">
+                                <tr th:each="rutaParada : ${paradasVuelta}"
+                                    th:attr="data-accessibility-status=${rutaParada.parada.accesibleMovilidadReducida == null ? 'unknown' : (rutaParada.parada.accesibleMovilidadReducida ? 'yes' : 'no')}">
                                     <td th:text="${rutaParada.orden}">1</td>
                                     <td><strong th:text="${rutaParada.parada.nombre}">Parada 1</strong></td>
                                     <td th:text="${rutaParada.parada.barrio} ?: 'Sin barrio confirmado'">Barrio</td>
                                     <td th:text="${rutaParada.parada.direccion != null ? rutaParada.parada.direccion : (rutaParada.parada.referencia != null ? rutaParada.parada.referencia : 'Sin detalle registrado')}">Dirección o referencia</td>
+                                    <td>
+                                        <span th:replace="~{fragments/accessibility :: status(${rutaParada.parada.accesibleMovilidadReducida})}">Sin información</span>
+                                        <small th:if="${not #strings.isEmpty(rutaParada.parada.observacionesAccesibilidad)}"
+                                               th:text="${rutaParada.parada.observacionesAccesibilidad}"></small>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -257,14 +293,21 @@
                                     <th>Nombre</th>
                                     <th>Barrio</th>
                                     <th>Dirección o referencia</th>
+                                    <th>Accesibilidad</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr th:each="parada, iterStat : ${paradasRuta}">
+                                <tr th:each="parada, iterStat : ${paradasRuta}"
+                                    th:attr="data-accessibility-status=${parada.accesibleMovilidadReducida == null ? 'unknown' : (parada.accesibleMovilidadReducida ? 'yes' : 'no')}">
                                     <td th:text="${parada.orden} ?: ${iterStat.count}">1</td>
                                     <td><strong th:text="${parada.nombre}">Parada 1</strong></td>
                                     <td th:text="${parada.barrio} ?: 'Sin barrio confirmado'">Barrio</td>
                                     <td th:text="${parada.direccion != null ? parada.direccion : (parada.referencia != null ? parada.referencia : 'Sin detalle registrado')}">Dirección o referencia</td>
+                                    <td>
+                                        <span th:replace="~{fragments/accessibility :: status(${parada.accesibleMovilidadReducida})}">Sin información</span>
+                                        <small th:if="${not #strings.isEmpty(parada.observacionesAccesibilidad)}"
+                                               th:text="${parada.observacionesAccesibilidad}"></small>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -307,6 +350,7 @@
     </footer>
 
     <script th:src="@{/js/common.js}"></script>
+    <script th:src="@{/js/accessibility.js}" defer></script>
     <script th:src="@{/js/detalle_ruta.js}"></script>
 </body>
 </html>

@@ -28,7 +28,8 @@ public class ProductionAdminSchemaBootstrapService implements ApplicationRunner 
         "classpath:db/migration/mysql/V20261101_01__align_favorite_creation_timestamp.sql",
         "classpath:db/migration/mysql/V20261106_01__enhance_notificacion_table.sql",
         "classpath:db/migration/mysql/V20261111_01__create_legal_consent.sql",
-        "classpath:db/migration/mysql/V20261112_01__align_user_and_legal_consent.sql"
+        "classpath:db/migration/mysql/V20261112_01__align_user_and_legal_consent.sql",
+        "classpath:db/migration/mysql/V20261114_01__create_admin_access_logs.sql"
     };
 
     private final DataSource dataSource;

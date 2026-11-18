@@ -358,7 +358,6 @@ public class SyntheticDataSeederService implements ApplicationRunner {
             bus.setCapacidadPasajeros(List.of(30, 35, 40, 45).get(random.nextInt(4)));
             bus.setAnio(2012 + random.nextInt(13));
             bus.setEstado(random.nextInt(100) < 92 ? Bus.Estado.ACTIVO : Bus.Estado.MANTENIMIENTO);
-            bus.setAccesibleMovilidadReducida(random.nextInt(100) < 12);
             bus.setNivelOcupacionActual(randomOccupancy(random));
             bus.setUltimaActualizacionOcupacion(LocalDateTime.now().minusMinutes(random.nextInt(60)));
             bus.setRuta(routes.get(i % routes.size()));

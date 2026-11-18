@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -17,16 +18,19 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 import jakarta.servlet.http.HttpSession;
 
 import com.proaula.aula.Entity.AdminInviteCode;
+import com.proaula.aula.Entity.AdminAccessLog;
 import com.proaula.aula.Entity.AdminCode;
 import com.proaula.aula.Entity.AdminCodeRequest;
 import com.proaula.aula.Entity.Usuario;
 import com.proaula.aula.Repository.AdminCodeRequestRepository;
+import com.proaula.aula.Repository.AdminAccessLogRepository;
 import com.proaula.aula.Repository.AdminCodeRepository;
 import com.proaula.aula.Repository.AdminInviteCodeRepository;
 import com.proaula.aula.Repository.UsuarioRepository;
@@ -38,6 +42,7 @@ import com.proaula.aula.Service.LegalConsentService;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("validation")
+@TestPropertySource(properties = "app.admin.approver-email=approver@example.test")
 @Transactional
 class AdminCodeApprovalFlowIntegrationTest {
 
@@ -61,6 +66,9 @@ class AdminCodeApprovalFlowIntegrationTest {
 
     @Autowired
     private AdminCodeRequestRepository requestRepository;
+
+    @Autowired
+    private AdminAccessLogRepository adminAccessLogRepository;
 
     @Autowired
     private UsuarioRepository usuarioRepository;
@@ -244,6 +252,16 @@ class AdminCodeApprovalFlowIntegrationTest {
                 .param("password", "candidate-password-26"))
             .andExpect(status().is3xxRedirection())
             .andExpect(header().string("Location", "/admin-login?verified=true"));
+        assertThat(adminAccessLogRepository.count()).isZero();
+
+        mockMvc.perform(post("/admin/login")
+                .with(csrf())
+                .session((org.springframework.mock.web.MockHttpSession) loginSession)
+                .param("username", "approvedadmin")
+                .param("password", "incorrect-password"))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(header().string("Location", "/admin-login?verified=true"));
+        assertThat(adminAccessLogRepository.count()).isZero();
 
         mockMvc.perform(post("/admin/login")
                 .with(csrf())
@@ -252,6 +270,64 @@ class AdminCodeApprovalFlowIntegrationTest {
                 .param("password", "candidate-password-26"))
             .andExpect(status().is3xxRedirection())
             .andExpect(header().string("Location", "/index_2"));
+
+        assertThat(adminAccessLogRepository.findAll()).singleElement().satisfies(accessLog -> {
+            assertThat(accessLog.getAdminUserId()).isEqualTo(registered.getId());
+            assertThat(accessLog.getUsername()).isEqualTo("approvedadmin");
+            assertThat(accessLog.getEmail()).isEqualTo("approved-candidate@example.test");
+            assertThat(accessLog.getAdminCodeId()).isEqualTo(adminCodeService.findByCodigo(accessCode).getId());
+            assertThat(accessLog.getCodeOwnerEmail()).isEqualTo("approved-candidate@example.test");
+            assertThat(accessLog.getAccessedAt()).isNotNull();
+        });
+    }
+
+    @Test
+    void onlyTheConfiguredApproverCanViewAdminAccessHistory() throws Exception {
+        Usuario approver = new Usuario();
+        approver.setUsername("configured-approver");
+        approver.setEmail("approver@example.test");
+        approver.setPassword(passwordEncoder.encode("approver-password-26"));
+        approver.setNombres("Responsable");
+        approver.setApellidos("Aprobador");
+        approver.setRole("ROLE_ADMIN");
+        approver = usuarioRepository.saveAndFlush(approver);
+        LegalConsentTestSupport.recordConsent(approver, legalConsentService);
+
+        AdminCode code = new AdminCode("sha256$" + "a".repeat(64), "Código de prueba");
+        code.setEmail(approver.getEmail());
+        code = adminCodeRepository.saveAndFlush(code);
+        AdminAccessLog accessLog = new AdminAccessLog();
+        accessLog.setAdminUserId(approver.getId());
+        accessLog.setUsername(approver.getUsername());
+        accessLog.setNombres(approver.getNombres());
+        accessLog.setApellidos(approver.getApellidos());
+        accessLog.setEmail(approver.getEmail());
+        accessLog.setAdminCodeId(code.getId());
+        accessLog.setCodeOwnerEmail(code.getEmail());
+        accessLog.setAccessedAt(java.time.Instant.parse("2026-11-14T15:00:00Z"));
+        adminAccessLogRepository.saveAndFlush(accessLog);
+
+        mockMvc.perform(get("/index_2")
+                .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
+                    .user("configured-approver").roles("ADMIN"))
+                .sessionAttr("rolUsuario", "ADMIN"))
+            .andExpect(status().isOk())
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("/admin/accesos")));
+
+        mockMvc.perform(get("/admin/accesos")
+                .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
+                    .user("configured-approver").roles("ADMIN"))
+                .sessionAttr("rolUsuario", "ADMIN"))
+            .andExpect(status().isOk())
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("configured-approver")))
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("Registro #" + code.getId())))
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("14/11/2026 10:00:00 hora Colombia")));
+
+        mockMvc.perform(get("/admin/accesos")
+                .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
+                    .user("not-the-approver").roles("ADMIN"))
+                .sessionAttr("rolUsuario", "ADMIN"))
+            .andExpect(status().isForbidden());
     }
 
     @Test

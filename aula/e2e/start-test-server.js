@@ -10,6 +10,7 @@ const server = spawn(command, [], {
   env: {
     ...process.env,
     JWT_SECRET: "validation-only-key-with-more-than-32-characters",
+    SPRING_PROFILES_ACTIVE: "validation",
     SPRING_FLYWAY_ENABLED: "false",
     SPRING_DATASOURCE_URL: "jdbc:h2:mem:bustraker-e2e;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE",
     SPRING_DATASOURCE_USERNAME: "sa",
@@ -17,7 +18,7 @@ const server = spawn(command, [], {
     SPRING_DATASOURCE_DRIVER_CLASS_NAME: "org.h2.Driver",
     SPRING_JPA_DATABASE_PLATFORM: "org.hibernate.dialect.H2Dialect",
     SPRING_JPA_HIBERNATE_DDL_AUTO: "create-drop",
-    SERVER_PORT: "3466"
+    SERVER_PORT: process.env.SERVER_PORT || "3466"
   },
   stdio: "inherit"
 });

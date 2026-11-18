@@ -63,8 +63,8 @@ public class Bus {
     @Column(nullable = false, length = 20)
     private Estado estado = Estado.ACTIVO;
 
-    @Column(name = "accesible_movilidad_reducida", nullable = false)
-    private Boolean accesibleMovilidadReducida = false;
+    @Column(name = "accesible_movilidad_reducida")
+    private Boolean accesibleMovilidadReducida;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "nivel_ocupacion_actual", length = 20)

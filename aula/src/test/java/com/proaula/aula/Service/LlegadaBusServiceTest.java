@@ -66,16 +66,19 @@ class LlegadaBusServiceTest {
 
         assertThat(resultado.estado()).isEqualTo("SIN_REPORTES");
         assertThat(resultado.llegadas()).isEmpty();
-        assertThat(resultado.mensaje()).contains("no está disponible");
+        assertThat(resultado.mensaje()).contains("recorrido seleccionado sigue visible");
     }
 
     @Test
     void calculaUnRangoOrientativoSoloTrasObservarMovimientoReciente() {
-        service.reportarUbicacion(RUTA_ID, RutaParada.Sentido.IDA, REPORTANTE, ubicacion(10.421));
+        service.reportarUbicacion(RUTA_ID, RutaParada.Sentido.IDA, REPORTANTE,
+            ubicacion(10.42134, -75.5495));
         clock.avanzarSegundos(15);
-        service.reportarUbicacion(RUTA_ID, RutaParada.Sentido.IDA, REPORTANTE, ubicacion(10.423));
+        service.reportarUbicacion(RUTA_ID, RutaParada.Sentido.IDA, REPORTANTE,
+            ubicacion(10.42334, -75.5495));
         clock.avanzarSegundos(15);
-        service.reportarUbicacion(RUTA_ID, RutaParada.Sentido.IDA, REPORTANTE, ubicacion(10.425));
+        service.reportarUbicacion(RUTA_ID, RutaParada.Sentido.IDA, REPORTANTE,
+            ubicacion(10.42534, -75.5495));
 
         var resultado = service.obtenerLlegadas(RUTA_ID, RutaParada.Sentido.IDA);
 
@@ -87,7 +90,7 @@ class LlegadaBusServiceTest {
         assertThat(resultado.llegadas().get(0).minutosMaximos())
             .isGreaterThanOrEqualTo(resultado.llegadas().get(0).minutosMinimos());
         assertThat(resultado.llegadas().get(0).confianza()).isEqualTo("MEDIA");
-        assertThat(resultado.toString()).doesNotContain("10.425", REPORTANTE);
+        assertThat(resultado.toString()).doesNotContain("10.42534", "-75.5495", REPORTANTE);
     }
 
     @Test
@@ -102,6 +105,20 @@ class LlegadaBusServiceTest {
     }
 
     @Test
+    void estimaLaUbicacionSobreLaRutaSinExponerLasCoordenadasGpsExactas() {
+        service.reportarUbicacion(RUTA_ID, RutaParada.Sentido.IDA, REPORTANTE,
+            new UbicacionBusReporteRequest(10.42544, -75.5495, 10.0));
+
+        var resultado = service.obtenerLlegadas(RUTA_ID, RutaParada.Sentido.IDA);
+
+        assertThat(resultado.ubicacionEstimada()).isNotNull();
+        assertThat(resultado.ubicacionEstimada().latitud()).isEqualTo(10.425);
+        assertThat(resultado.ubicacionEstimada().longitud()).isEqualTo(-75.55);
+        assertThat(resultado.ubicacionEstimada().confianza()).isEqualTo("BAJA");
+        assertThat(resultado.toString()).doesNotContain("10.42544", "-75.5495", REPORTANTE);
+    }
+
+    @Test
     void expiraLosReportesDespuesDeNoventaSegundos() {
         service.reportarUbicacion(RUTA_ID, RutaParada.Sentido.IDA, REPORTANTE, ubicacion(10.421));
         clock.avanzarSegundos(91);
@@ -110,6 +127,7 @@ class LlegadaBusServiceTest {
 
         assertThat(resultado.estado()).isEqualTo("SIN_REPORTES");
         assertThat(resultado.reportantesActivos()).isZero();
+        assertThat(resultado.ubicacionEstimada()).isNull();
     }
 
     @Test
@@ -170,6 +188,10 @@ class LlegadaBusServiceTest {
 
     private UbicacionBusReporteRequest ubicacion(double latitud) {
         return new UbicacionBusReporteRequest(latitud, -75.550, 10.0);
+    }
+
+    private UbicacionBusReporteRequest ubicacion(double latitud, double longitud) {
+        return new UbicacionBusReporteRequest(latitud, longitud, 10.0);
     }
 
     private RutaParada relacion(Long paradaId, String nombre, Double latitud, Double longitud, int orden) {

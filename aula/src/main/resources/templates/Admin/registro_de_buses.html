@@ -76,6 +76,14 @@
                         <div class="legacy-input-wrap"><i class="fas fa-route" aria-hidden="true"></i><select id="ruta" th:field="*{ruta}"><option value="">Seleccionar ruta</option><option th:each="ruta : ${rutas}" th:value="${ruta.id}" th:text="${ruta.nombre}"></option></select></div>
                         <small>Podrás asignar o cambiar el recorrido más adelante.</small>
                     </div>
+                    <div class="legacy-field legacy-field--wide">
+                        <label for="accesibleMovilidadReducida">Accesibilidad para movilidad reducida</label>
+                        <select id="accesibleMovilidadReducida" th:field="*{accesibleMovilidadReducida}">
+                            <option value="">Sin información verificada</option>
+                            <option value="true">Registrado como accesible</option>
+                            <option value="false">Registrado como no accesible</option>
+                        </select>
+                    </div>
                     <div class="legacy-form-actions legacy-field--wide">
                         <a class="legacy-button legacy-button--secondary" th:href="@{/index_2}">Cancelar</a>
                         <button type="submit" class="legacy-button"><i class="fas fa-plus" aria-hidden="true"></i> Registrar bus</button>
