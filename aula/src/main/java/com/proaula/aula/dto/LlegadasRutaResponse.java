@@ -11,6 +11,7 @@ public record LlegadasRutaResponse(
     String mensaje,
     Instant actualizadoEn,
     int reportantesActivos,
-    List<LlegadaParadaEstimada> llegadas
+    List<LlegadaParadaEstimada> llegadas,
+    UbicacionBusEstimada ubicacionEstimada
 ) {
 }

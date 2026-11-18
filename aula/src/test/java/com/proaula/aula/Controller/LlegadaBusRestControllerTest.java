@@ -40,7 +40,7 @@ class LlegadaBusRestControllerTest {
     void permiteConsultarLlegadasDeUnaRutaYUnSentido() {
         LlegadasRutaResponse respuesta = new LlegadasRutaResponse(
             12L, "Centro - Manga", "VUELTA", "SIN_REPORTES", "Sin reportes",
-            null, 0, List.of());
+            null, 0, List.of(), null);
         when(llegadaBusService.obtenerLlegadas(12L, RutaParada.Sentido.VUELTA))
             .thenReturn(respuesta);
 

@@ -25,6 +25,7 @@ import com.proaula.aula.Repository.RutaParadaRepository;
 import com.proaula.aula.Repository.RutaRepository;
 import com.proaula.aula.dto.LlegadaParadaEstimada;
 import com.proaula.aula.dto.LlegadasRutaResponse;
+import com.proaula.aula.dto.UbicacionBusEstimada;
 import com.proaula.aula.dto.UbicacionBusReporteRequest;
 
 @Service
@@ -63,17 +64,19 @@ public class LlegadaBusService {
         List<TrackStop> paradas = cargarParadas(rutaId, sentido);
         if (paradas.size() < 2) {
             return respuesta(ruta, sentido, "SIN_COORDENADAS",
-                "La ruta necesita al menos dos paradas activas con coordenadas registradas para calcular llegadas.",
+                "La ruta necesita al menos dos paradas activas con coordenadas para estimar la ubicación; " +
+                    "el recorrido seleccionado sigue visible.",
                 null, 0, List.of());
         }
 
         List<ReportSnapshot> activos = reportesDeRuta(rutaId, sentido, ahora);
         if (activos.isEmpty()) {
             return respuesta(ruta, sentido, "SIN_REPORTES",
-                "No hay reportes recientes de pasajeros en esta ruta. El tiempo de llegada no está disponible.",
+                "No hay reportes recientes de pasajeros en esta ruta; el recorrido seleccionado sigue visible.",
                 null, 0, List.of());
         }
 
+        UbicacionBusEstimada ubicacionEstimada = estimarUbicacion(activos, paradas);
         List<LlegadaParadaEstimada> llegadas = new ArrayList<>();
         Instant actualizadoEn = activos.stream().map(ReportSnapshot::actualizadoEn)
             .max(Comparator.naturalOrder()).orElse(null);
@@ -110,14 +113,13 @@ public class LlegadaBusService {
                 movimientoValido
                     ? "Hay movimiento reciente, pero no quedan paradas registradas por delante en este sentido."
                     : "Hay ubicación compartida, pero aún no hay suficientes reportes en movimiento para estimar llegadas.",
-                actualizadoEn, activos.size(), List.of());
+                actualizadoEn, activos.size(), List.of(), ubicacionEstimada);
         }
         return respuesta(ruta, sentido, "ESTIMADO",
             "Estimación orientativa basada en reportes GPS recientes. El tráfico y los desvíos pueden cambiarla.",
-            actualizadoEn, activos.size(), llegadas);
+            actualizadoEn, activos.size(), llegadas, ubicacionEstimada);
     }
 
-    @Transactional(readOnly = true)
     public void reportarUbicacion(Long rutaId, RutaParada.Sentido sentido, String reportante,
                                   UbicacionBusReporteRequest ubicacion) {
         if (reportante == null || reportante.isBlank()) {
@@ -264,11 +266,46 @@ public class LlegadaBusService {
         return mejor;
     }
 
+    private UbicacionBusEstimada estimarUbicacion(List<ReportSnapshot> reportes, List<TrackStop> paradas) {
+        ReportSnapshot reciente = reportes.stream()
+            .max(Comparator.comparing(ReportSnapshot::actualizadoEn))
+            .orElseThrow();
+        double progreso = reciente.progresoMetros;
+        TrackStop inicio = paradas.get(0);
+        for (int indice = 1; indice < paradas.size(); indice++) {
+            TrackStop fin = paradas.get(indice);
+            if (progreso <= fin.progresoMetros || indice == paradas.size() - 1) {
+                double distancia = fin.progresoMetros - inicio.progresoMetros;
+                double fraccion = distancia <= 0 ? 0
+                    : Math.max(0, Math.min(1, (progreso - inicio.progresoMetros) / distancia));
+                double latitud = inicio.parada.getLatitud()
+                    + fraccion * (fin.parada.getLatitud() - inicio.parada.getLatitud());
+                double longitud = inicio.parada.getLongitud()
+                    + fraccion * (fin.parada.getLongitud() - inicio.parada.getLongitud());
+                return new UbicacionBusEstimada(redondearCoordenada(latitud), redondearCoordenada(longitud),
+                    reciente.actualizadoEn, reciente.confianza());
+            }
+            inicio = fin;
+        }
+        throw new IllegalStateException("No se pudo proyectar la ubicación estimada sobre la ruta.");
+    }
+
+    private double redondearCoordenada(double coordenada) {
+        return Math.round(coordenada * 1000.0) / 1000.0;
+    }
+
     private LlegadasRutaResponse respuesta(Ruta ruta, RutaParada.Sentido sentido, String estado, String mensaje,
                                             Instant actualizadoEn, int reportantes,
                                             List<LlegadaParadaEstimada> llegadas) {
+        return respuesta(ruta, sentido, estado, mensaje, actualizadoEn, reportantes, llegadas, null);
+    }
+
+    private LlegadasRutaResponse respuesta(Ruta ruta, RutaParada.Sentido sentido, String estado, String mensaje,
+                                            Instant actualizadoEn, int reportantes,
+                                            List<LlegadaParadaEstimada> llegadas,
+                                            UbicacionBusEstimada ubicacionEstimada) {
         return new LlegadasRutaResponse(ruta.getId(), ruta.getNombre(), sentido.name(), estado, mensaje,
-            actualizadoEn, reportantes, llegadas);
+            actualizadoEn, reportantes, llegadas, ubicacionEstimada);
     }
 
     private static double distanciaMetros(double lat1, double lon1, double lat2, double lon2) {

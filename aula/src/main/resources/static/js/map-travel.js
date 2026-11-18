@@ -133,6 +133,7 @@
             gpsError: '',
             reportandoLlegadas: null,
             tarjetasLlegadas: [],
+            alertasBusCercano: new Set(),
             temporizadorLlegadas: null,
             movimientoRuta: { ultimaMuestra: null, avances: 0, detectado: false },
             llegadaCandidata: 0,
@@ -149,7 +150,7 @@
         var capas = {
             paradas: L.layerGroup(), pinOrigen: null, pinDestino: null,
             base: null, linea: null, flujo: null, caminatas: null,
-            usuario: null, precision: null,
+            usuario: null, precision: null, ubicacionesEstimadas: L.layerGroup(),
             marcadorClick: null
         };
         var el = {};
@@ -166,6 +167,7 @@
         var temporizadorConfirmacionMapa = null;
         var dobleClickZoomDesactivado = false;
         capas.paradas.addTo(mapa);
+        capas.ubicacionesEstimadas.addTo(mapa);
         agregarLeyenda();
         agregarPanelSeguimiento();
 
@@ -1823,6 +1825,8 @@
             vaciar(panel);
             panel.hidden = !tramo.tramos.length;
             estado.tarjetasLlegadas = [];
+            estado.alertasBusCercano.clear();
+            capas.ubicacionesEstimadas.clearLayers();
             if (panel.hidden) return;
 
             panel.appendChild(h('h3', 'arrival-panel__title', 'Llegadas estimadas'));
@@ -1833,7 +1837,8 @@
             tramo.tramos.forEach(function (parte) {
                 var tarjeta = h('article', 'arrival-card');
                 var cabecera = h('div', 'arrival-card__header');
-                cabecera.appendChild(h('h4', 'arrival-card__title', nombreRutaEnSentido(parte.ruta)));
+                var tituloRuta = h('h4', 'arrival-card__title', nombreRutaEnSentido(parte.ruta));
+                cabecera.appendChild(tituloRuta);
                 var selector = document.createElement('select');
                 selector.className = 'arrival-card__direction';
                 selector.setAttribute('aria-label', 'Sentido para ' + parte.ruta.nombre);
@@ -1858,18 +1863,30 @@
 
                 var control = {
                     rutaId: parte.ruta.id,
+                    ruta: parte.ruta,
                     rutaNombre: nombreRutaEnSentido(parte.ruta),
+                    titulo: tituloRuta,
                     sentido: parte.sentido || 'IDA',
                     selector: selector,
                     estado: estadoLlegada,
                     lista: lista,
+                    marcadorUbicacion: null,
                     boton: null,
                     estadoCompartir: null,
                     cargando: false,
                     solicitud: 0
                 };
                 selector.addEventListener('change', function () {
-                    control.sentido = selector.value;
+                    if (selector.value !== control.sentido) {
+                        var prefijoAlerta = String(control.rutaId) + ':';
+                        estado.alertasBusCercano.delete(prefijoAlerta + 'IDA');
+                        estado.alertasBusCercano.delete(prefijoAlerta + 'VUELTA');
+                        control.sentido = selector.value;
+                        control.rutaNombre = control.ruta.nombre + ' · ' +
+                            (control.sentido === 'VUELTA' ? 'Vuelta' : 'Ida');
+                        control.titulo.textContent = control.rutaNombre;
+                        actualizarEtiquetaMarcador(control);
+                    }
                     control.solicitud++;
                     control.cargando = false;
                     actualizarBotonesCompartir();
@@ -1937,13 +1954,21 @@
                 if (!respuesta.ok) throw new Error('HTTP ' + respuesta.status);
                 var datos = await respuesta.json();
                 if (solicitud !== tarjeta.solicitud || !estado.tarjetasLlegadas.includes(tarjeta)) return;
+                actualizarMarcadorUbicacionEstimada(tarjeta, datos.ubicacionEstimada);
                 tarjeta.estado.textContent = datos.mensaje || 'No hay información de llegada disponible.';
                 tarjeta.estado.className = 'arrival-card__status' +
                     (datos.estado === 'ESTIMADO' ? ' arrival-card__status--ready' : '');
                 var detalles = [];
+                detalles.push(datos.ubicacionEstimada
+                    ? 'ubicación aproximada marcada en el mapa'
+                    : 'sin ubicación estimada; el recorrido seleccionado sigue visible');
                 if (Number.isFinite(datos.reportantesActivos)) {
                     detalles.push(datos.reportantesActivos + (datos.reportantesActivos === 1
                         ? ' pasajero compartiendo' : ' pasajeros compartiendo'));
+                }
+                if (datos.ubicacionEstimada) {
+                    detalles.push('confianza ' +
+                        String(datos.ubicacionEstimada.confianza || 'BAJA').toLowerCase());
                 }
                 if (datos.actualizadoEn) {
                     var actualizado = Date.parse(datos.actualizadoEn);
@@ -1972,13 +1997,90 @@
                 if (solicitud !== tarjeta.solicitud || !estado.tarjetasLlegadas.includes(tarjeta)) return;
                 console.error('Error consultando llegadas estimadas:', error);
                 tarjeta.estado.className = 'arrival-card__status arrival-card__status--error';
-                tarjeta.estado.textContent = 'No se pudieron consultar las llegadas. Revisa tu conexión e inténtalo de nuevo.';
+                tarjeta.estado.textContent =
+                    'No se pudieron consultar las llegadas ni la ubicación estimada. Revisa tu conexión e inténtalo de nuevo.';
+                quitarMarcadorUbicacionEstimada(tarjeta);
                 vaciar(tarjeta.lista);
             } finally {
                 if (solicitud === tarjeta.solicitud) {
                     tarjeta.cargando = false;
                     tarjeta.estado.removeAttribute('aria-busy');
                 }
+            }
+        }
+
+        function quitarMarcadorUbicacionEstimada(tarjeta) {
+            if (tarjeta.marcadorUbicacion) {
+                capas.ubicacionesEstimadas.removeLayer(tarjeta.marcadorUbicacion);
+            }
+            tarjeta.marcadorUbicacion = null;
+            estado.alertasBusCercano.delete(String(tarjeta.rutaId) + ':' + tarjeta.sentido);
+        }
+
+        function actualizarEtiquetaMarcador(tarjeta) {
+            if (!tarjeta.marcadorUbicacion) return;
+            var titulo = 'Ubicación aproximada del bus de ' + tarjeta.rutaNombre;
+            tarjeta.marcadorUbicacion.options.title = titulo;
+            var nodo = tarjeta.marcadorUbicacion.getElement();
+            if (nodo) nodo.setAttribute('title', titulo);
+            tarjeta.marcadorUbicacion.unbindTooltip();
+            tarjeta.marcadorUbicacion.bindTooltip(
+                'Ubicación aproximada · ' + tarjeta.rutaNombre,
+                { direction: 'top', offset: [0, -18] });
+        }
+
+        function actualizarMarcadorUbicacionEstimada(tarjeta, ubicacion) {
+            var latitud = ubicacion && Number(ubicacion.latitud);
+            var longitud = ubicacion && Number(ubicacion.longitud);
+            var actualizado = ubicacion && Date.parse(ubicacion.actualizadoEn);
+            if (!Number.isFinite(latitud) || latitud < -90 || latitud > 90
+                    || !Number.isFinite(longitud) || longitud < -180 || longitud > 180
+                    || !Number.isFinite(actualizado) || Date.now() - actualizado > 90000) {
+                quitarMarcadorUbicacionEstimada(tarjeta);
+                return;
+            }
+
+            if (!tarjeta.marcadorUbicacion) {
+                var icono = L.divIcon({
+                    className: 'arrival-bus-marker',
+                    html: '<span class="arrival-bus-marker__glyph" aria-hidden="true">' +
+                        '<i class="fas fa-bus"></i></span>',
+                    iconSize: [40, 40],
+                    iconAnchor: [20, 20]
+                });
+                tarjeta.marcadorUbicacion = L.marker([latitud, longitud], {
+                    icon: icono,
+                    title: 'Ubicación aproximada del bus de ' + tarjeta.rutaNombre,
+                    keyboard: true
+                }).addTo(capas.ubicacionesEstimadas);
+                actualizarEtiquetaMarcador(tarjeta);
+            } else {
+                tarjeta.marcadorUbicacion.setLatLng([latitud, longitud]);
+            }
+            evaluarAlertaBusCercano(tarjeta, latitud, longitud);
+        }
+
+        function evaluarAlertaBusCercano(tarjeta, latitudBus, longitudBus) {
+            var ubicacion = estado.ubicacion;
+            var tramos = estado.activo && estado.activo.tramos;
+            var estaEnRutaSeleccionada = Array.isArray(tramos) && tramos.some(function (tramo) {
+                return String(tramo.ruta.id) === String(tarjeta.rutaId)
+                    && (tramo.sentido || 'IDA') === tarjeta.sentido;
+            });
+            if (!ubicacion || estado.seguimiento === null || estado.gpsError || !estaEnRutaSeleccionada
+                    || !Number.isFinite(ubicacion.precision) || ubicacion.precision > 65
+                    || Date.now() - ubicacion.timestamp > 30000) return;
+
+            var distancia = haversineKm(ubicacion.lat, ubicacion.lng, latitudBus, longitudBus) * 1000;
+            var clave = String(tarjeta.rutaId) + ':' + tarjeta.sentido;
+            if (distancia <= 500 + ubicacion.precision) {
+                if (!estado.alertasBusCercano.has(clave)) {
+                    estado.alertasBusCercano.add(clave);
+                    M.mostrarAviso('El bus estimado de ' + tarjeta.rutaNombre + ' está a unos ' +
+                        Math.round(distancia) + ' m de tu ubicación.', 'ok', 8000);
+                }
+            } else if (distancia > 700 + ubicacion.precision) {
+                estado.alertasBusCercano.delete(clave);
             }
         }
 

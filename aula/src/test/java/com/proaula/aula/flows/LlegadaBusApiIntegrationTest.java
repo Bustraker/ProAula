@@ -99,7 +99,7 @@ class LlegadaBusApiIntegrationTest {
 
     @Test
     void publicarUbicacionRequiereSesionYProteccionCsrf() throws Exception {
-        String ubicacion = "{\"latitud\":10.401,\"longitud\":-75.500,\"precisionMetros\":10}";
+        String ubicacion = "{\"latitud\":10.40134,\"longitud\":-75.4995,\"precisionMetros\":10}";
         String endpoint = "/api/llegadas/" + ruta.getId() + "/reportes?sentido=IDA";
 
         mockMvc.perform(post(endpoint)
@@ -125,8 +125,11 @@ class LlegadaBusApiIntegrationTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.estado").value("SIN_VELOCIDAD"))
             .andExpect(jsonPath("$.reportantesActivos").value(1))
+            .andExpect(jsonPath("$.ubicacionEstimada.latitud").value(10.401))
+            .andExpect(jsonPath("$.ubicacionEstimada.longitud").value(-75.5))
             .andExpect(content().string(org.hamcrest.Matchers.not(containsString(usuario))))
-            .andExpect(content().string(org.hamcrest.Matchers.not(containsString("10.401"))));
+            .andExpect(content().string(org.hamcrest.Matchers.not(containsString("10.40134"))))
+            .andExpect(content().string(org.hamcrest.Matchers.not(containsString("-75.4995"))));
     }
 
     @Test
