@@ -50,6 +50,12 @@ public class UsuarioService {
     public Usuario register(Usuario usuario) {
         usuario.setUsername(normalizarIdentificador(usuario.getUsername()));
         usuario.setEmail(normalizarIdentificador(usuario.getEmail()));
+        if (usuario.getProvider() == null || usuario.getProvider().isBlank()) {
+            usuario.setProvider("LOCAL");
+        }
+        if ("LOCAL".equalsIgnoreCase(usuario.getProvider()) && !usuario.isEmailVerified()) {
+            usuario.setEmailVerified(true);
+        }
 
         String role = usuario.getRole();
         if (role == null || role.trim().isEmpty()) {
@@ -64,9 +70,7 @@ public class UsuarioService {
         }
 
         String password = usuario.getPassword();
-        if (password == null || password.length() < 6 || password.length() > 72) {
-            throw new IllegalArgumentException("La contraseña debe tener entre 6 y 72 caracteres");
-        }
+        PasswordPolicy.validateNewPassword(password);
         usuario.setPassword(passwordEncoder.encode(password));
 
         String nombreRol = usuario.getRole();
@@ -176,6 +180,7 @@ public class UsuarioService {
     // Cambia y encripta contraseña existente
     @Transactional
     public Usuario changePassword(Long id, String newPassword) {
+        PasswordPolicy.validateNewPassword(newPassword);
         Usuario usuario = usuarioRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Usuario no encontrado con id: " + id));
 
@@ -186,6 +191,7 @@ public class UsuarioService {
 
     @Transactional
     public Usuario completePasswordSetup(String username, String newPassword) {
+        PasswordPolicy.validateNewPassword(newPassword);
         Usuario usuario = usuarioRepository.findByUsername(username);
         if (usuario == null) {
             throw new UsuarioNotFoundException(username);

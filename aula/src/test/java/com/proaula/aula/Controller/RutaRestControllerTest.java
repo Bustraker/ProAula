@@ -45,15 +45,20 @@ class RutaRestControllerTest {
         Map<?, ?> bus = (Map<?, ?>) buses.get(0);
 
         assertThat(datosRuta.get("barriosOrdenados")).isEqualTo(List.of("Centro", "Manga"));
+        assertThat(datosRuta.get("origen")).isEqualTo("Centro");
+        assertThat(datosRuta.get("destino")).isEqualTo("Manga");
+        assertThat(datosRuta.get("descripcion")).isEqualTo("Recorrido de prueba");
+        assertThat(datosRuta.get("accesibleMovilidadReducida")).isEqualTo(true);
         assertThat(datosRuta.get("ordenBarriosConfirmado")).isEqualTo(true);
         assertThat(datosRuta.get("coordenadasEstimadas")).isEqualTo(List.of("Manga"));
         assertThat(buses).hasSize(1);
         assertThat(bus.get("placa")).isEqualTo("ABC123");
+        assertThat(bus.get("accesibleMovilidadReducida")).isEqualTo(true);
         assertThat(bus.containsKey("conductor")).isFalse();
     }
 
     @Test
-    void rutasConCoordenadasIncluyeConductorSoloParaUsuariosAutenticados() {
+    void rutasConCoordenadasMuestraConductorAnonimoParaUsuariosAutenticados() {
         Ruta ruta = rutaVerificadaConBus();
         when(rutaService.getRutasVerificadas()).thenReturn(List.of(ruta));
         when(barrioService.obtenerCoordenadas(anyList())).thenReturn(Map.of());
@@ -65,7 +70,26 @@ class RutaRestControllerTest {
         List<?> buses = (List<?>) datosRuta.get("buses");
         Map<?, ?> bus = (Map<?, ?>) buses.get(0);
 
-        assertThat(bus.get("conductor")).isEqualTo("Conductor privado");
+        assertThat(bus.get("conductor")).isEqualTo("Anónimo");
+    }
+
+    @Test
+    void rutasEndpointSoloIncluyeRutasActivasConDetalleDelRecorrido() {
+        Ruta activa = rutaVerificadaConBus();
+        Ruta inactiva = new Ruta();
+        inactiva.setId(3L);
+        inactiva.setNombre("Ruta anterior");
+        inactiva.setVerificada(true);
+        inactiva.setEstado(Ruta.Estado.INACTIVA);
+        when(rutaService.getRutasVerificadas()).thenReturn(List.of(activa, inactiva));
+
+        List<Map<String, Object>> rutas = rutaRestController.getAllRutas().getBody();
+
+        assertThat(rutas).hasSize(1);
+        assertThat(rutas.get(0)).containsEntry("descripcion", "Recorrido de prueba")
+            .containsEntry("accesibleMovilidadReducida", true)
+            .containsEntry("origen", "Centro")
+            .containsEntry("destino", "Manga");
     }
 
     private Ruta rutaVerificadaConBus() {
@@ -74,12 +98,18 @@ class RutaRestControllerTest {
         ruta.setNombre("Centro - Manga");
         ruta.setBarrios(List.of("Centro", "Manga"));
         ruta.setBarriosOrdenados(List.of("Centro", "Manga"));
+        ruta.setOrigen("Centro");
+        ruta.setDestino("Manga");
+        ruta.setDescripcion("Recorrido de prueba");
+        ruta.setAccesibleMovilidadReducida(true);
         ruta.setVerificada(true);
+        ruta.setEstado(Ruta.Estado.ACTIVA);
         Bus bus = new Bus();
         bus.setId(2L);
         bus.setPlaca("ABC123");
         bus.setModelo("Bus");
         bus.setConductor("Conductor privado");
+        bus.setAccesibleMovilidadReducida(true);
         ruta.getBuses().add(bus);
         return ruta;
     }

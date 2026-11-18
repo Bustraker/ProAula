@@ -3,12 +3,20 @@ package com.proaula.aula.Repository;
 import com.proaula.aula.Entity.Usuario;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
  
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
+    @Modifying
+    @Query("UPDATE Usuario usuario SET usuario.nombres = 'Conductor', "
+        + "usuario.apellidos = 'Anónimo' "
+        + "WHERE EXISTS (SELECT conductor.id FROM Conductor conductor "
+        + "WHERE conductor.usuario = usuario)")
+    int anonimizarUsuariosConductores();
+
     @Query("SELECT u FROM Usuario u WHERE LOWER(u.username) = LOWER(:username)")
     @EntityGraph(attributePaths = "roles")
     Usuario findByUsername(@Param("username") String username); // Para login

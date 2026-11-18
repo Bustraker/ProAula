@@ -10,7 +10,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.List;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,12 +25,16 @@ import com.proaula.aula.Entity.RutaParada;
 import com.proaula.aula.Entity.Parada;
 import com.proaula.aula.Entity.Agencia;
 import com.proaula.aula.Entity.Bus;
+import com.proaula.aula.Entity.ContactoMensaje;
 import com.proaula.aula.Repository.AgenciaRepository;
 import com.proaula.aula.Repository.BusRepository;
 import com.proaula.aula.Repository.ContactoMensajeRepository;
 import com.proaula.aula.Repository.ParadaRepository;
 import com.proaula.aula.Repository.RutaParadaRepository;
 import com.proaula.aula.Repository.RutaRepository;
+import com.proaula.aula.Repository.UsuarioRepository;
+import com.proaula.aula.Service.LegalConsentService;
+import com.proaula.aula.LegalConsentTestSupport;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -36,6 +43,9 @@ class PublicContactAndRouteFlowIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Autowired
     private ContactoMensajeRepository contactoMensajeRepository;
@@ -54,6 +64,20 @@ class PublicContactAndRouteFlowIntegrationTest {
 
     @Autowired
     private AgenciaRepository agenciaRepository;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private LegalConsentService legalConsentService;
+
+    @BeforeEach
+    void consentedMockUsersExist() {
+        LegalConsentTestSupport.ensureConsentedUser(
+                usuarioRepository, legalConsentService, "admin", "ROLE_ADMIN");
+        LegalConsentTestSupport.ensureConsentedUser(
+                usuarioRepository, legalConsentService, "viewer", "ROLE_USER");
+    }
 
     @Test
     void publicContactSubmissionPersistsAndShowsAcknowledgement() throws Exception {
@@ -76,6 +100,36 @@ class PublicContactAndRouteFlowIntegrationTest {
     }
 
     @Test
+    @org.springframework.transaction.annotation.Transactional
+    void publicContactEndpointCannotOverwriteAnExistingMessageById() throws Exception {
+        ContactoMensaje existing = new ContactoMensaje();
+        existing.setNombre("Nombre original");
+        existing.setApellido("Apellido original");
+        existing.setTelefono("3005550101");
+        existing.setEmail("original@example.test");
+        existing.setMensaje("Contenido original");
+        existing = contactoMensajeRepository.saveAndFlush(existing);
+        Long existingId = existing.getId();
+        long messageCount = contactoMensajeRepository.count();
+
+        mockMvc.perform(post("/contacto")
+                        .with(csrf())
+                        .param("id", existingId.toString())
+                        .param("nombre", "Nombre atacante")
+                        .param("apellido", "Apellido atacante")
+                        .param("telefono", "3005550199")
+                        .param("email", "attacker@example.test")
+                        .param("mensaje", "Contenido modificado"))
+                .andExpect(status().is3xxRedirection());
+
+        ContactoMensaje unchanged = contactoMensajeRepository.findById(existingId).orElseThrow();
+        assertThat(unchanged.getNombre()).isEqualTo("Nombre original");
+        assertThat(unchanged.getEmail()).isEqualTo("original@example.test");
+        assertThat(unchanged.getMensaje()).isEqualTo("Contenido original");
+        assertThat(contactoMensajeRepository.count()).isEqualTo(messageCount + 1);
+    }
+
+    @Test
     void verifiedRoutesAreAvailableInPublicHtmlAndJsonMapEndpoints() throws Exception {
         Ruta ruta = new Ruta();
         ruta.setNombre("Ruta Integracion Publica");
@@ -85,22 +139,78 @@ class PublicContactAndRouteFlowIntegrationTest {
         ruta.setBarrios(List.of("Centro", "Manga"));
         ruta.setBarriosOrdenados(List.of("Centro", "Manga"));
         Ruta guardada = rutaRepository.saveAndFlush(ruta);
+        addRouteStop(guardada, "Centro ida", 1, 1, RutaParada.Sentido.IDA);
+        addRouteStop(guardada, "Manga ida", 2, 2, RutaParada.Sentido.IDA);
+        addRouteStop(guardada, "Manga vuelta", 3, 1, RutaParada.Sentido.VUELTA);
+        addRouteStop(guardada, "Centro vuelta", 4, 2, RutaParada.Sentido.VUELTA);
+        addRouteStop(guardada, "Parada inactiva", 5, 3, RutaParada.Sentido.IDA, Parada.Estado.INACTIVA);
 
-        mockMvc.perform(get("/rutas"))
+        String suffix = java.util.UUID.randomUUID().toString().replace("-", "").substring(0, 8);
+        Ruta soloVuelta = new Ruta();
+        soloVuelta.setNombre("Ruta solo vuelta " + suffix);
+        soloVuelta.setVerificada(true);
+        soloVuelta.setBarrios(List.of("Barrio Vuelta A " + suffix, "Barrio Vuelta B " + suffix));
+        soloVuelta.setBarriosOrdenados(soloVuelta.getBarrios());
+        soloVuelta = rutaRepository.saveAndFlush(soloVuelta);
+        addRouteStop(soloVuelta, "Parada exclusiva Vuelta " + suffix, 1, 1, RutaParada.Sentido.VUELTA);
+
+        Ruta rutaLegacy = new Ruta();
+        rutaLegacy.setNombre("Ruta legacy " + suffix);
+        rutaLegacy.setVerificada(true);
+        rutaLegacy.setBarrios(List.of("Barrio legacy A " + suffix, "Barrio legacy B " + suffix));
+        rutaLegacy.setBarriosOrdenados(rutaLegacy.getBarrios());
+        rutaLegacy = rutaRepository.saveAndFlush(rutaLegacy);
+        addLegacyStop(rutaLegacy, "Parada legacy " + suffix, 1);
+
+        Ruta inactiva = new Ruta();
+        inactiva.setNombre("Ruta inactiva " + java.util.UUID.randomUUID());
+        inactiva.setVerificada(true);
+        inactiva.setEstado(Ruta.Estado.INACTIVA);
+        inactiva.setBarrios(List.of("Barrio inactivo A", "Barrio inactivo B"));
+        inactiva.setBarriosOrdenados(inactiva.getBarrios());
+        rutaRepository.saveAndFlush(inactiva);
+
+        String rutasHtml = mockMvc.perform(get("/rutas"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("Ruta Integracion Publica")));
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Ruta Integracion Publica")))
+                .andReturn().getResponse().getContentAsString();
+        assertThat(rutasHtml).contains("CAMPETRE-CENTRO · IDA").doesNotContain("Ruta inactiva");
 
         mockMvc.perform(get("/ruta/{id}", guardada.getId()))
                 .andExpect(status().isOk())
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Ruta Integracion Publica")));
 
-        mockMvc.perform(get("/api/rutas-con-coordenadas"))
+        String mapaJson = mockMvc.perform(get("/api/rutas-con-coordenadas"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("Ruta Integracion Publica")));
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Ruta Integracion Publica")))
+                .andReturn().getResponse().getContentAsString();
+        JsonNode rutasEnMapa = objectMapper.readTree(mapaJson);
+        JsonNode rutaEnMapa = buscarRuta(rutasEnMapa, guardada.getId());
+        assertThat(rutaEnMapa).isNotNull();
+        assertThat(rutaEnMapa.path("paradasPorSentido").path("IDA").findValuesAsText("nombre"))
+                .containsExactly("Centro ida", "Manga ida");
+        assertThat(rutaEnMapa.path("paradasPorSentido").path("VUELTA").findValuesAsText("nombre"))
+                .containsExactly("Manga vuelta", "Centro vuelta");
+        JsonNode soloVueltaEnMapa = buscarRuta(rutasEnMapa, soloVuelta.getId());
+        assertThat(soloVueltaEnMapa.path("paradasPorSentido").path("IDA").size()).isZero();
+        assertThat(soloVueltaEnMapa.path("paradasPorSentido").path("VUELTA").findValuesAsText("nombre"))
+                .containsExactly("Parada exclusiva Vuelta " + suffix);
+        JsonNode rutaLegacyEnMapa = buscarRuta(rutasEnMapa, rutaLegacy.getId());
+        assertThat(rutaLegacyEnMapa.path("paradasPorSentido").path("IDA").findValuesAsText("nombre"))
+                .containsExactly("Parada legacy " + suffix);
+        assertThat(mapaJson).doesNotContain("Parada inactiva", "Ruta inactiva");
+        assertThat(mapaJson).contains("Cooperativa: COOINTRACAR", "Punto de despacho:");
 
         mockMvc.perform(get("/api/rutas"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("Ruta Integracion Publica")));
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("CAMPETRE-CENTRO · IDA")));
+
+        Ruta tpcIda = rutaRepository.findByCodigo("TPC-CAM-CEN-IDA").orElseThrow();
+        String tpcDetail = mockMvc.perform(get("/ruta/{id}", tpcIda.getId()))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        assertThat(tpcDetail).contains("Activa · referencia aportada", "Cooperativa: COOINTRACAR",
+                "Punto de despacho: El Campestre", "Ida:", "Vuelta:");
 
         mockMvc.perform(get("/viajar_public"))
                 .andExpect(status().isOk())
@@ -149,20 +259,149 @@ class PublicContactAndRouteFlowIntegrationTest {
         assertThat(routeJson).doesNotContain("Ruta provisional " + suffix);
 
         String editorHtml = mockMvc.perform(get("/editar-ruta/{id}", rutaGuardada.getId())
-                        .with(user("admin").roles("ADMIN")))
+                        .with(user("admin").roles("ADMIN"))
+                        .sessionAttr("rolUsuario", "ADMIN"))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         assertThat(editorHtml).contains("Orden pendiente de confirmar", "Zona provisional A " + suffix);
         assertThat(editorHtml).doesNotContain("Zona provisional A " + suffix + ", Zona provisional B " + suffix);
     }
 
+    @Test
+    void accessibilityStatusIsMaintainedFilteredAndExposedWithoutTreatingMissingDataAsNo() throws Exception {
+        String suffix = java.util.UUID.randomUUID().toString().replace("-", "").substring(0, 8);
+        Ruta ruta = new Ruta();
+        ruta.setNombre("Ruta accesible " + suffix);
+        ruta.setVerificada(true);
+        ruta.setAccesibleMovilidadReducida(true);
+        ruta.setObservacionesAccesibilidad("Dato comprobado para prueba");
+        ruta.setBarrios(List.of("Centro " + suffix, "Manga " + suffix));
+        ruta.setBarriosOrdenados(ruta.getBarrios());
+        Ruta rutaGuardada = rutaRepository.saveAndFlush(ruta);
+
+        Parada paradaAccesible = new Parada();
+        paradaAccesible.setNombre("Parada accesible " + suffix);
+        paradaAccesible.setOrden(1);
+        paradaAccesible.setRuta(rutaGuardada);
+        paradaAccesible.setAccesibleMovilidadReducida(true);
+        paradaAccesible.setObservacionesAccesibilidad("Rampa comprobada");
+        paradaAccesible = paradaRepository.saveAndFlush(paradaAccesible);
+
+        Parada paradaDesconocida = new Parada();
+        paradaDesconocida.setNombre("Parada sin datos " + suffix);
+        paradaDesconocida.setOrden(2);
+        paradaDesconocida.setRuta(rutaGuardada);
+        paradaDesconocida = paradaRepository.saveAndFlush(paradaDesconocida);
+
+        RutaParada relacion = new RutaParada();
+        relacion.setRuta(rutaGuardada);
+        relacion.setParada(paradaAccesible);
+        relacion.setOrden(1);
+        relacion.setSentido(RutaParada.Sentido.IDA);
+        rutaParadaRepository.saveAndFlush(relacion);
+        RutaParada relacionDesconocida = new RutaParada();
+        relacionDesconocida.setRuta(rutaGuardada);
+        relacionDesconocida.setParada(paradaDesconocida);
+        relacionDesconocida.setOrden(2);
+        relacionDesconocida.setSentido(RutaParada.Sentido.IDA);
+        rutaParadaRepository.saveAndFlush(relacionDesconocida);
+
+        Bus bus = new Bus();
+        bus.setPlaca("A" + suffix);
+        bus.setModelo("Bus de prueba");
+        bus.setRuta(rutaGuardada);
+        bus.setAccesibleMovilidadReducida(false);
+        busRepository.saveAndFlush(bus);
+
+        String listHtml = mockMvc.perform(get("/rutas").param("accesibilidad", "accesible"))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        assertThat(listHtml).contains("Ruta accesible " + suffix, "accessibilityContrast",
+                "accessibilityTextIncrease", "La accesibilidad se muestra según los datos registrados");
+
+        String excludedHtml = mockMvc.perform(get("/rutas").param("accesibilidad", "no-accesible"))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        assertThat(excludedHtml).doesNotContain("Ruta accesible " + suffix);
+
+        String detailHtml = mockMvc.perform(get("/ruta/{id}", rutaGuardada.getId()))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        assertThat(detailHtml).contains("Registrada como accesible", "Registrada como no accesible",
+                "Sin información", "Rampa comprobada", "data-accessibility-status=\"yes\"",
+                "data-accessibility-status=\"unknown\"", "stopAccessibilityFilter");
+
+        String mapJson = mockMvc.perform(get("/api/rutas-con-coordenadas"))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        JsonNode routeJson = buscarRuta(objectMapper.readTree(mapJson), rutaGuardada.getId());
+        assertThat(routeJson.path("accesibleMovilidadReducida").asBoolean()).isTrue();
+        assertThat(routeJson.path("paradasPorSentido").path("IDA").get(0)
+                .path("accesibleMovilidadReducida").asBoolean()).isTrue();
+        assertThat(routeJson.path("buses").get(0).path("accesibleMovilidadReducida").asBoolean()).isFalse();
+    }
+
+    @Test
+    void adminCanRecordStopAccessibilityWithoutChangingItsCoordinates() throws Exception {
+        Ruta ruta = new Ruta();
+        ruta.setNombre("Ruta para editar accesibilidad " + java.util.UUID.randomUUID());
+        Ruta rutaGuardada = rutaRepository.saveAndFlush(ruta);
+        Parada parada = new Parada();
+        parada.setNombre("Parada para editar accesibilidad");
+        parada.setRuta(rutaGuardada);
+        parada.setOrden(1);
+        parada = paradaRepository.saveAndFlush(parada);
+        Long paradaId = parada.getId();
+
+        mockMvc.perform(get("/rutas/admin")
+                        .with(user("admin").roles("ADMIN"))
+                        .sessionAttr("rolUsuario", "ADMIN"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("accesibleMovilidadReducida")));
+        mockMvc.perform(get("/editar-ruta/{id}", rutaGuardada.getId())
+                        .with(user("admin").roles("ADMIN"))
+                        .sessionAttr("rolUsuario", "ADMIN"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Sin información verificada")));
+        mockMvc.perform(get("/registro-buses")
+                        .with(user("admin").roles("ADMIN"))
+                        .sessionAttr("rolUsuario", "ADMIN"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Accesibilidad para movilidad reducida")));
+        mockMvc.perform(get("/admin/coordenadas-paradas")
+                        .with(user("admin").roles("ADMIN"))
+                        .sessionAttr("rolUsuario", "ADMIN"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Guardar accesibilidad")));
+
+        mockMvc.perform(post("/admin/paradas/{id}/accesibilidad", paradaId)
+                        .with(user("admin").roles("ADMIN"))
+                        .sessionAttr("rolUsuario", "ADMIN")
+                        .with(csrf())
+                        .param("accesibleMovilidadReducida", "false")
+                        .param("observacionesAccesibilidad", "Barrera física reportada"))
+                .andExpect(status().is3xxRedirection());
+
+        Parada actualizada = paradaRepository.findById(paradaId).orElseThrow();
+        assertThat(actualizada.getAccesibleMovilidadReducida()).isFalse();
+        assertThat(actualizada.getObservacionesAccesibilidad()).isEqualTo("Barrera física reportada");
+        assertThat(actualizada.getLatitud()).isNull();
+        assertThat(actualizada.getLongitud()).isNull();
+    }
+
     private void addRouteStop(Ruta ruta, String name, int stopOrder, int routeOrder,
                               RutaParada.Sentido sentido) {
+        addRouteStop(ruta, name, stopOrder, routeOrder, sentido, Parada.Estado.ACTIVA);
+    }
+
+    private void addRouteStop(Ruta ruta, String name, int stopOrder, int routeOrder,
+                              RutaParada.Sentido sentido, Parada.Estado estado) {
         Parada parada = new Parada();
         parada.setNombre(name);
         parada.setOrden(stopOrder);
         parada.setBarrio("Barrio de prueba");
         parada.setRuta(ruta);
+        parada.setEstado(estado);
         Parada paradaGuardada = paradaRepository.saveAndFlush(parada);
 
         RutaParada relacion = new RutaParada();
@@ -171,6 +410,24 @@ class PublicContactAndRouteFlowIntegrationTest {
         relacion.setOrden(routeOrder);
         relacion.setSentido(sentido);
         rutaParadaRepository.saveAndFlush(relacion);
+    }
+
+    private void addLegacyStop(Ruta ruta, String name, int stopOrder) {
+        Parada parada = new Parada();
+        parada.setNombre(name);
+        parada.setOrden(stopOrder);
+        parada.setBarrio(ruta.getBarriosOrdenados().get(0));
+        parada.setRuta(ruta);
+        paradaRepository.saveAndFlush(parada);
+    }
+
+    private JsonNode buscarRuta(JsonNode rutas, Long rutaId) {
+        for (JsonNode ruta : rutas) {
+            if (ruta.path("id").asLong() == rutaId) {
+                return ruta;
+            }
+        }
+        return null;
     }
 
     @Test

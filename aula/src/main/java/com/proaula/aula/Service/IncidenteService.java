@@ -8,6 +8,7 @@ import com.proaula.aula.Repository.RutaRepository;
 import com.proaula.aula.Repository.UsuarioRepository;
 import com.proaula.aula.dto.IncidentePanelResponse;
 import com.proaula.aula.dto.IncidenteReportRequest;
+import com.proaula.aula.dto.IncidenteRutaResponse;
 import com.proaula.aula.exception.AulaException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,17 +24,21 @@ public class IncidenteService {
 
     private static final Set<String> ESTADOS_PERMITIDOS =
             Set.of("PENDIENTE", "EN_ATENCION", "RESUELTO", "DESCARTADO");
+    private static final List<String> ESTADOS_ACTIVOS = List.of("PENDIENTE", "EN_ATENCION");
 
     private final IncidenteRepository incidenteRepository;
     private final RutaRepository rutaRepository;
     private final UsuarioRepository usuarioRepository;
+    private final AvisoFavoritoService avisoFavoritoService;
 
     public IncidenteService(IncidenteRepository incidenteRepository,
                             RutaRepository rutaRepository,
-                            UsuarioRepository usuarioRepository) {
+                            UsuarioRepository usuarioRepository,
+                            AvisoFavoritoService avisoFavoritoService) {
         this.incidenteRepository = incidenteRepository;
         this.rutaRepository = rutaRepository;
         this.usuarioRepository = usuarioRepository;
+        this.avisoFavoritoService = avisoFavoritoService;
     }
 
     @Transactional(readOnly = true)
@@ -42,10 +47,11 @@ public class IncidenteService {
     }
 
     @Transactional(readOnly = true)
-    public Page<IncidentePanelResponse> listar(String tipo, String ruta, Pageable pageable) {
+    public Page<IncidentePanelResponse> listar(String tipo, String ruta, String estado, Pageable pageable) {
         String tipoFiltro = normalizarFiltro(tipo);
         String rutaFiltro = normalizarFiltro(ruta);
-        return incidenteRepository.findForPanel(tipoFiltro, rutaFiltro, pageable)
+        String estadoFiltro = normalizarEstadoFiltro(estado);
+        return incidenteRepository.findForPanel(tipoFiltro, rutaFiltro, estadoFiltro, pageable)
                 .map(incidente -> new IncidentePanelResponse(
                         incidente.getId(),
                         incidente.getRuta() == null ? "General" : incidente.getRuta().getNombre(),
@@ -53,6 +59,25 @@ public class IncidenteService {
                         incidente.getDescripcion(),
                         incidente.getFechaReporte(),
                         incidente.getEstado()));
+    }
+
+    @Transactional(readOnly = true)
+    public List<IncidenteRutaResponse> listarActivosDeRuta(Long rutaId) {
+        if (rutaId == null || rutaId <= 0) {
+            throw new AulaException("El identificador de la ruta no es válido.", "VALIDATION_ERROR");
+        }
+        if (!rutaRepository.existsById(rutaId)) {
+            throw new AulaException("La ruta seleccionada no existe.", "ROUTE_NOT_FOUND");
+        }
+
+        return incidenteRepository
+                .findByRuta_IdAndEstadoInOrderByFechaReporteDescIdDesc(rutaId, ESTADOS_ACTIVOS)
+                .stream()
+                .map(incidente -> new IncidenteRutaResponse(
+                        incidente.getTipo(),
+                        incidente.getEstado(),
+                        incidente.getFechaReporte()))
+                .toList();
     }
 
     @Transactional
@@ -71,7 +96,9 @@ public class IncidenteService {
         incidente.setTipo(solicitud.getTipo().name());
         incidente.setTitulo(tituloPara(solicitud.getTipo()));
         incidente.setDescripcion(solicitud.getDescripcion().trim());
-        return incidenteRepository.saveAndFlush(incidente);
+        Incidente guardado = incidenteRepository.saveAndFlush(incidente);
+        avisoFavoritoService.notificarIncidenteNuevo(guardado);
+        return guardado;
     }
 
     @Transactional
@@ -91,12 +118,29 @@ public class IncidenteService {
         Incidente incidente = incidenteRepository.findById(incidenteId)
                 .orElseThrow(() -> new AulaException(
                         "No se encontró el incidente solicitado.", "INCIDENT_NOT_FOUND"));
+        boolean cambio = !estadoNormalizado.equals(incidente.getEstado());
         incidente.setEstado(estadoNormalizado);
-        return incidenteRepository.saveAndFlush(incidente);
+        Incidente actualizado = incidenteRepository.saveAndFlush(incidente);
+        if (cambio) {
+            avisoFavoritoService.notificarCambioDeEstado(actualizado);
+        }
+        return actualizado;
     }
 
     private String normalizarFiltro(String filtro) {
         return filtro == null || filtro.isBlank() ? null : filtro.trim();
+    }
+
+    private String normalizarEstadoFiltro(String estado) {
+        if (estado == null || estado.isBlank()) {
+            return null;
+        }
+
+        String estadoNormalizado = estado.trim().toUpperCase(Locale.ROOT);
+        if (!ESTADOS_PERMITIDOS.contains(estadoNormalizado)) {
+            throw new AulaException("El estado indicado no es válido.", "VALIDATION_ERROR");
+        }
+        return estadoNormalizado;
     }
 
     private String tituloPara(IncidenteReportRequest.TipoIncidente tipo) {

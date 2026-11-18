@@ -4,6 +4,7 @@ import com.proaula.aula.Barrios.Localidades;
 import com.proaula.aula.Entity.Barrio;
 import com.proaula.aula.Entity.Usuario;
 import com.proaula.aula.Repository.BarrioRepository;
+import com.proaula.aula.Repository.BusRepository;
 import com.proaula.aula.Repository.UsuarioRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +14,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.nio.charset.StandardCharsets;
 import java.text.Normalizer;
 import java.util.Locale;
 import java.util.Set;
@@ -25,6 +25,7 @@ public class DataSeederService implements CommandLineRunner {
     private static final Logger log = LoggerFactory.getLogger(DataSeederService.class);
 
     private final BarrioRepository barrioRepository;
+    private final BusRepository busRepository;
     private final BarrioService barrioService;
     private final AdminCodeService adminCodeService;
     private final UsuarioRepository usuarioRepository;
@@ -46,11 +47,13 @@ public class DataSeederService implements CommandLineRunner {
     private String adminApproverEmail;
 
     public DataSeederService(BarrioRepository barrioRepository,
+                             BusRepository busRepository,
                              BarrioService barrioService,
                              AdminCodeService adminCodeService,
                              UsuarioRepository usuarioRepository,
                              UsuarioService usuarioService) {
         this.barrioRepository = barrioRepository;
+        this.busRepository = busRepository;
         this.barrioService = barrioService;
         this.adminCodeService = adminCodeService;
         this.usuarioRepository = usuarioRepository;
@@ -62,6 +65,14 @@ public class DataSeederService implements CommandLineRunner {
     public void run(String... args) {
         adminCodeService.migrateLegacyAdminCodes();
         seedBarrios();
+        int conductoresAnonimizados = busRepository.anonimizarConductores();
+        if (conductoresAnonimizados > 0) {
+            log.info("Se anonimizaron los datos de conductor de {} buses.", conductoresAnonimizados);
+        }
+        int usuariosConductoresAnonimizados = usuarioRepository.anonimizarUsuariosConductores();
+        if (usuariosConductoresAnonimizados > 0) {
+            log.info("Se anonimizaron los nombres de {} cuentas de conductor.", usuariosConductoresAnonimizados);
+        }
         bootstrapAdminIfConfigured();
     }
 
@@ -92,9 +103,7 @@ public class DataSeederService implements CommandLineRunner {
             return;
         }
         if (isBlank(bootstrapAdminUsername) || isBlank(bootstrapAdminEmail)
-                || isBlank(bootstrapAdminPassword) || isBlank(adminApproverEmail)
-                || bootstrapAdminPassword.length() < 12 || bootstrapAdminPassword.length() > 72
-                || bootstrapAdminPassword.getBytes(StandardCharsets.UTF_8).length > 72) {
+                || !PasswordPolicy.isValidNewPassword(bootstrapAdminPassword) || isBlank(adminApproverEmail)) {
             throw new IllegalStateException(
                 "El aprovisionamiento requiere usuario, correo aprobador y contraseña segura (12 a 72 bytes UTF-8)");
         }

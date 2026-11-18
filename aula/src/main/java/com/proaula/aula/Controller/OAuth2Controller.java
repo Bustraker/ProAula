@@ -1,6 +1,7 @@
 package com.proaula.aula.Controller;
 
 import com.proaula.aula.Entity.Usuario;
+import com.proaula.aula.Service.PasswordPolicy;
 import com.proaula.aula.Service.UsuarioService;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -36,8 +37,8 @@ public class OAuth2Controller {
         if (authentication == null || authentication.getName() == null) {
             return "redirect:/inicio-de-sesion-mejorado";
         }
-        if (password == null || password.length() < 6) {
-            redirectAttributes.addFlashAttribute("error", "La contraseña debe tener al menos 6 caracteres.");
+        if (!PasswordPolicy.isValidNewPassword(password)) {
+            redirectAttributes.addFlashAttribute("error", PasswordPolicy.ERROR_MESSAGE);
             return "redirect:/oauth2/complete-password";
         }
         if (!password.equals(confirmPassword)) {

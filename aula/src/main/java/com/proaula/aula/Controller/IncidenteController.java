@@ -16,6 +16,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -38,9 +39,13 @@ public class IncidenteController {
     }
 
     @GetMapping("/nuevo")
-    public String mostrarFormulario(Model model) {
+    public String mostrarFormulario(@RequestParam(name = "tipo", required = false) String tipo, Model model) {
         if (!model.containsAttribute("incidenteForm")) {
-            model.addAttribute("incidenteForm", new IncidenteReportRequest());
+            IncidenteReportRequest formulario = new IncidenteReportRequest();
+            if ("ACCIDENTE".equalsIgnoreCase(tipo)) {
+                formulario.setTipo(IncidenteReportRequest.TipoIncidente.ACCIDENTE);
+            }
+            model.addAttribute("incidenteForm", formulario);
         }
         cargarOpciones(model);
         return FORM_VIEW;
@@ -81,5 +86,9 @@ public class IncidenteController {
     private void cargarOpciones(Model model) {
         model.addAttribute("rutas", incidenteService.getRutas());
         model.addAttribute("tiposIncidente", IncidenteReportRequest.TipoIncidente.values());
+        Object formulario = model.getAttribute("incidenteForm");
+        model.addAttribute("reportandoAccidente",
+                formulario instanceof IncidenteReportRequest solicitud
+                        && solicitud.getTipo() == IncidenteReportRequest.TipoIncidente.ACCIDENTE);
     }
 }

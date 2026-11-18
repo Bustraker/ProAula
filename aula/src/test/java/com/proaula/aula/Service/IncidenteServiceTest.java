@@ -40,6 +40,9 @@ class IncidenteServiceTest {
     @Mock
     private UsuarioRepository usuarioRepository;
 
+    @Mock
+    private AvisoFavoritoService avisoFavoritoService;
+
     @InjectMocks
     private IncidenteService incidenteService;
 
@@ -68,6 +71,7 @@ class IncidenteServiceTest {
         assertThat(incidente.getDescripcion()).isEqualTo("Colisión en la vía.");
         assertThat(incidente.getEstado()).isEqualTo("PENDIENTE");
         verify(incidenteRepository).saveAndFlush(incidente);
+        verify(avisoFavoritoService).notificarIncidenteNuevo(incidente);
     }
 
     @Test
@@ -79,18 +83,27 @@ class IncidenteServiceTest {
         incidente.setTipo("RETRASO");
         incidente.setDescripcion("Demora en el recorrido");
         PageRequest pageable = PageRequest.of(0, 20);
-        when(incidenteRepository.findForPanel("RETRASO", "Centro", pageable))
+        when(incidenteRepository.findForPanel("RETRASO", "Centro", "RESUELTO", pageable))
                 .thenReturn(new PageImpl<>(List.of(incidente), pageable, 1));
 
         Page<IncidentePanelResponse> respuesta =
-                incidenteService.listar(" RETRASO ", " Centro ", pageable);
+                incidenteService.listar(" RETRASO ", " Centro ", " resuelto ", pageable);
 
         assertThat(respuesta.getContent()).singleElement().satisfies(item -> {
             assertThat(item.ruta()).isEqualTo("Centro - Manga");
             assertThat(item.tipo()).isEqualTo("RETRASO");
             assertThat(item.descripcion()).isEqualTo("Demora en el recorrido");
         });
-        verify(incidenteRepository).findForPanel("RETRASO", "Centro", pageable);
+        verify(incidenteRepository).findForPanel("RETRASO", "Centro", "RESUELTO", pageable);
+    }
+
+    @Test
+    void listarRejectsUnsupportedStatusFilter() {
+        assertThatThrownBy(() -> incidenteService.listar(null, null, "CANCELADO", PageRequest.of(0, 20)))
+                .isInstanceOf(AulaException.class)
+                .hasMessage("El estado indicado no es válido.");
+
+        verify(incidenteRepository, never()).findForPanel(any(), any(), any(), any());
     }
 
     @Test
@@ -129,6 +142,19 @@ class IncidenteServiceTest {
 
         assertThat(resultado.getEstado()).isEqualTo("RESUELTO");
         verify(incidenteRepository).saveAndFlush(incidente);
+        verify(avisoFavoritoService).notificarCambioDeEstado(incidente);
+    }
+
+    @Test
+    void cambiarEstadoDoesNotNotifyWhenStatusIsUnchanged() {
+        Incidente incidente = new Incidente();
+        incidente.setEstado("RESUELTO");
+        when(incidenteRepository.findById(12L)).thenReturn(Optional.of(incidente));
+        when(incidenteRepository.saveAndFlush(incidente)).thenReturn(incidente);
+
+        incidenteService.cambiarEstado(12L, "resuelto");
+
+        verify(avisoFavoritoService, never()).notificarCambioDeEstado(any());
     }
 
     @Test

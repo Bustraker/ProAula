@@ -104,6 +104,11 @@
                         <span>Usuario o contraseña incorrectos.</span>
                     </div>
 
+                    <div th:if="${param.rateLimited}" class="alert alert-danger" role="alert">
+                        <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
+                        <span>Se alcanzó el límite de intentos. Espera un minuto antes de volver a intentarlo.</span>
+                    </div>
+
                     <!-- Estado de éxito -->
                     <div th:if="${param.registrado}" class="alert alert-success" role="status">
                         <i class="fas fa-check-circle"></i>
@@ -112,7 +117,15 @@
 
                     <div th:if="${param.logout}" class="alert alert-info" role="status">
                         <i class="fas fa-info-circle"></i>
-                        <span>Has cerrado sesión correctamente.</span>
+                        <span>Has cerrado sesión de ProAula. Si el proveedor externo mantiene tu sesión abierta, puede ofrecerte entrar sin volver a escribir su contraseña.</span>
+                    </div>
+                    <div th:if="${param.consentRevoked}" class="alert alert-info" role="status">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Retiraste tu autorización de tratamiento de datos y se cerró tu sesión. Para usar de nuevo las funciones protegidas, tendrás que aceptar los documentos vigentes.</span>
+                    </div>
+                    <div th:if="${param.consentRevocationMissing}" class="alert alert-info" role="status">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Se cerró tu sesión. No había una autorización vigente que retirar.</span>
                     </div>
 
                     <form th:action="@{/login}" method="post" id="loginForm">
@@ -127,9 +140,10 @@
                                     class="form-control" 
                                     placeholder="Ingresa tu nombre de usuario"
                                     autocomplete="username"
+                                    minlength="4"
+                                    maxlength="20"
                                     required
-                                    autofocus
-                                    th:value="${param.username}">
+                                    autofocus>
                         </div>
 
                         <!-- Contraseña -->
@@ -144,6 +158,7 @@
                                         class="form-control" 
                                         placeholder="••••••••"
                                         autocomplete="current-password"
+                                        maxlength="72"
                                         required>
                                 <button type="button" class="auth-password-toggle" data-password-toggle data-show-label="Mostrar contraseña" data-hide-label="Ocultar contraseña" aria-controls="password" aria-label="Mostrar contraseña" aria-pressed="false" title="Mostrar contraseña">
                                     <i class="fas fa-eye" aria-hidden="true"></i>
@@ -190,21 +205,13 @@
                 <div class="card-body">
                     <div class="auth-social-grid">
                         <a th:if="${!#strings.isEmpty(@environment.getProperty('spring.security.oauth2.client.registration.google.client-id')) and !#strings.startsWith(@environment.getProperty('spring.security.oauth2.client.registration.google.client-id'), 'placeholder-') and !#strings.isEmpty(@environment.getProperty('spring.security.oauth2.client.registration.google.client-secret')) and !#strings.startsWith(@environment.getProperty('spring.security.oauth2.client.registration.google.client-secret'), 'placeholder-')}"
-                           th:href="@{/oauth2/authorization/google}" class="btn btn-outline btn-block d-inline-flex align-center justify-center">
-                            <i class="fab fa-google text-google auth-social-icon" aria-hidden="true"></i> Google
-                        </a>
+                           th:href="@{/oauth2/consentir(provider='google')}" class="btn btn-outline btn-block d-inline-flex align-center justify-center"><i class="fab fa-google text-google auth-social-icon" aria-hidden="true"></i> Google</a>
                         <a th:if="${!#strings.isEmpty(@environment.getProperty('spring.security.oauth2.client.registration.github.client-id')) and !#strings.startsWith(@environment.getProperty('spring.security.oauth2.client.registration.github.client-id'), 'placeholder-') and !#strings.isEmpty(@environment.getProperty('spring.security.oauth2.client.registration.github.client-secret')) and !#strings.startsWith(@environment.getProperty('spring.security.oauth2.client.registration.github.client-secret'), 'placeholder-')}"
-                           th:href="@{/oauth2/authorization/github}" class="btn btn-outline btn-block d-inline-flex align-center justify-center">
-                            <i class="fab fa-github auth-social-icon" aria-hidden="true"></i> GitHub
-                        </a>
+                           th:href="@{/oauth2/consentir(provider='github')}" class="btn btn-outline btn-block d-inline-flex align-center justify-center"><i class="fab fa-github auth-social-icon" aria-hidden="true"></i> GitHub</a>
                         <a th:if="${!#strings.isEmpty(@environment.getProperty('spring.security.oauth2.client.registration.discord.client-id')) and !#strings.startsWith(@environment.getProperty('spring.security.oauth2.client.registration.discord.client-id'), 'placeholder-') and !#strings.isEmpty(@environment.getProperty('spring.security.oauth2.client.registration.discord.client-secret')) and !#strings.startsWith(@environment.getProperty('spring.security.oauth2.client.registration.discord.client-secret'), 'placeholder-')}"
-                           th:href="@{/oauth2/authorization/discord}" class="btn btn-outline btn-block d-inline-flex align-center justify-center">
-                            <i class="fab fa-discord auth-social-icon auth-social-icon--discord" aria-hidden="true"></i> Discord
-                        </a>
+                           th:href="@{/oauth2/consentir(provider='discord')}" class="btn btn-outline btn-block d-inline-flex align-center justify-center"><i class="fab fa-discord auth-social-icon auth-social-icon--discord" aria-hidden="true"></i> Discord</a>
                         <a th:if="${!#strings.isEmpty(@environment.getProperty('spring.security.oauth2.client.registration.facebook.client-id')) and !#strings.startsWith(@environment.getProperty('spring.security.oauth2.client.registration.facebook.client-id'), 'placeholder-') and !#strings.isEmpty(@environment.getProperty('spring.security.oauth2.client.registration.facebook.client-secret')) and !#strings.startsWith(@environment.getProperty('spring.security.oauth2.client.registration.facebook.client-secret'), 'placeholder-')}"
-                           th:href="@{/oauth2/authorization/facebook}" class="btn btn-outline btn-block d-inline-flex align-center justify-center">
-                            <i class="fab fa-facebook-f auth-social-icon auth-social-icon--facebook" aria-hidden="true"></i> Facebook
-                        </a>
+                           th:href="@{/oauth2/consentir(provider='facebook')}" class="btn btn-outline btn-block d-inline-flex align-center justify-center"><i class="fab fa-facebook-f auth-social-icon auth-social-icon--facebook" aria-hidden="true"></i> Facebook</a>
                     </div>
                 </div>
             </div>

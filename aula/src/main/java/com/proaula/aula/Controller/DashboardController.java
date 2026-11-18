@@ -2,30 +2,46 @@ package com.proaula.aula.Controller;
 
 import com.proaula.aula.Entity.ContactoMensaje;
 import com.proaula.aula.Entity.Usuario;
+import com.proaula.aula.Service.AvisoFavoritoService;
 import com.proaula.aula.Service.BusService;
 import com.proaula.aula.Service.ContactoMensajeService;
+import com.proaula.aula.Service.FavoritoService;
 import com.proaula.aula.Service.RutaService;
+import com.proaula.aula.Service.TrayectoFavoritoService;
 import com.proaula.aula.Service.UsuarioService;
 import org.springframework.security.core.Authentication;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class DashboardController {
+    @Value("${app.admin.approver-email:}")
+    private String approverEmail;
+
     private final UsuarioService usuarioService;
     private final RutaService rutaService;
     private final BusService busService;
     private final ContactoMensajeService contactoMensajeService;
+    private final FavoritoService favoritoService;
+    private final AvisoFavoritoService avisoFavoritoService;
+    private final TrayectoFavoritoService trayectoFavoritoService;
 
     public DashboardController(UsuarioService usuarioService,
                                RutaService rutaService,
                                BusService busService,
-                               ContactoMensajeService contactoMensajeService) {
+                               ContactoMensajeService contactoMensajeService,
+                               FavoritoService favoritoService,
+                               AvisoFavoritoService avisoFavoritoService,
+                               TrayectoFavoritoService trayectoFavoritoService) {
         this.usuarioService = usuarioService;
         this.rutaService = rutaService;
         this.busService = busService;
         this.contactoMensajeService = contactoMensajeService;
+        this.favoritoService = favoritoService;
+        this.avisoFavoritoService = avisoFavoritoService;
+        this.trayectoFavoritoService = trayectoFavoritoService;
     }
 
     @GetMapping("/dashboard")
@@ -46,6 +62,10 @@ public class DashboardController {
         model.addAttribute("busesActivos", rutaService.countActiveBuses());
         model.addAttribute("buses", busService.getAllBuses()); // Para la sección de buses activos
         model.addAttribute("contactoMensaje", new ContactoMensaje());
+        model.addAttribute("favoritos", favoritoService.listar(username));
+        model.addAttribute("avisosFavoritos", avisoFavoritoService.listar(usuario.getId()));
+        model.addAttribute("avisosFavoritosNoLeidos", avisoFavoritoService.contarNoLeidos(usuario.getId()));
+        model.addAttribute("trayectosFavoritos", trayectoFavoritoService.listar(username));
         
         return "Usuario/index_3";
     }
@@ -71,6 +91,8 @@ public class DashboardController {
         
         // Añade datos al modelo
         model.addAttribute("usuario", usuario);
+        model.addAttribute("isAdminApprover", usuario.getEmail() != null
+            && !approverEmail.isBlank() && usuario.getEmail().equalsIgnoreCase(approverEmail));
         model.addAttribute("totalUsuarios", totalUsuarios);
         model.addAttribute("totalBuses", totalBuses);
         model.addAttribute("totalRutas", totalRutas);

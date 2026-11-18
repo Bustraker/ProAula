@@ -38,24 +38,26 @@ spring:
           google:
             client-id: ${GOOGLE_CLIENT_ID:placeholder-google-client-id}
             client-secret: ${GOOGLE_CLIENT_SECRET:placeholder-google-client-secret}
+            redirect-uri: "${app.public-base-url}/login/oauth2/code/{registrationId}"
             scope: openid,profile,email
           github:
             client-id: ${GITHUB_CLIENT_ID:placeholder-github-client-id}
             client-secret: ${GITHUB_CLIENT_SECRET:placeholder-github-client-secret}
+            redirect-uri: "${app.public-base-url}/login/oauth2/code/{registrationId}"
             scope: user:email
           discord:
             client-id: ${DISCORD_CLIENT_ID:placeholder-discord-client-id}
             client-secret: ${DISCORD_CLIENT_SECRET:placeholder-discord-client-secret}
             client-authentication-method: client_secret_post
             authorization-grant-type: authorization_code
-            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            redirect-uri: "${app.public-base-url}/login/oauth2/code/{registrationId}"
             scope: identify,email
           facebook:
             client-id: ${FACEBOOK_CLIENT_ID:placeholder-facebook-client-id}
             client-secret: ${FACEBOOK_CLIENT_SECRET:placeholder-facebook-client-secret}
             client-authentication-method: client_secret_post
             authorization-grant-type: authorization_code
-            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            redirect-uri: "${app.public-base-url}/login/oauth2/code/{registrationId}"
             scope: email,public_profile
         provider:
           github:
@@ -105,6 +107,8 @@ jwt:
 carto:
   api-key: ${CARTO_API_KEY:}
 app:
+  models:
+    base-url: ${MODELS_API_BASE_URL:http://localhost:8000}
   admin:
     approver-email: ${ADMIN_APPROVER_EMAIL:}
   public-base-url: ${APP_PUBLIC_BASE_URL:http://localhost:${PORT:5679}}

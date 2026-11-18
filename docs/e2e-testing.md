@@ -1,0 +1,26 @@
+# Browser flow tests
+
+Run these commands from `aula/e2e/`:
+
+```powershell
+npm ci
+npx playwright install chromium
+npm test
+```
+
+Playwright starts the Spring Boot application on port `3466` with an isolated
+in-memory H2 database and a validation-only schema. No production database or
+credentials are used. The browser journeys cover public route planning's
+empty-state behavior, public contact submission, authenticated voice settings
+(including Colombian voice preference and persistence), and user registration,
+login, protected-page access, and logout. Public route planning intentionally
+does not expose synthesized-voice controls or playback.
+
+The related MockMvc journeys can be run from the `aula/` project root:
+
+```powershell
+.\mvnw.cmd -Dtest="*FlowIntegrationTest" test
+```
+
+OAuth provider redirects and routes that require external map services are not
+part of this deterministic local suite.

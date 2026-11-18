@@ -26,12 +26,13 @@
                 <a th:href="@{/reportes}" aria-label="Reportes" title="Reportes"><i class="fas fa-chart-column" aria-hidden="true"></i><span>Reportes</span></a>
                 <a th:href="@{/mensajes_contacto}" aria-label="Mensajes" title="Mensajes"><i class="fas fa-envelope" aria-hidden="true"></i><span>Mensajes</span></a>
                 <a th:href="@{/rutas/admin}" class="is-current" aria-current="page" aria-label="Gestión de rutas" title="Gestión de rutas"><i class="fas fa-route" aria-hidden="true"></i><span>Gestión de rutas</span></a>
+                <a th:href="@{/admin/coordenadas-paradas}" aria-label="Coordenadas de paradas" title="Coordenadas de paradas"><i class="fas fa-location-crosshairs" aria-hidden="true"></i><span>Coordenadas de paradas</span></a>
                 <a th:href="@{/registro-buses}" aria-label="Buses" title="Buses"><i class="fas fa-bus-simple" aria-hidden="true"></i><span>Buses</span></a>
             </nav>
 
             <div class="route-editor-sidebar__bottom">
                 <span class="route-editor-status"><i aria-hidden="true"></i> Sistema operativo</span>
-                <form th:action="@{/logout}" method="post" class="logout-form">
+                <form th:action="@{/logout}" method="post" class="logout-form" onsubmit="return confirm('¿Cerrar sesión de ProAula? El proveedor externo podría mantener tu sesión activa.');">
                     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                     <button type="submit" class="route-editor-logout logout-form__button"><i class="fas fa-arrow-right-from-bracket" aria-hidden="true"></i> Cerrar sesión</button>
                 </form>
@@ -178,6 +179,18 @@
                                           placeholder="Ej. Zaragoza, El Bosque, Centro"
                                           required rows="3" aria-describedby="ayuda-orden-barrios"></textarea>
                                 <small id="ayuda-orden-barrios" class="route-editor-help">Escribe todos los barrios separados por comas, desde el inicio hasta el final del recorrido.</small>
+                            </div>
+
+                            <div class="route-editor-field">
+                                <label for="accesibleMovilidadReducida">
+                                    <span>Accesibilidad para movilidad reducida</span>
+                                </label>
+                                <select id="accesibleMovilidadReducida" name="accesibleMovilidadReducida">
+                                    <option value="" th:selected="${ruta.accesibleMovilidadReducida == null}">Sin información verificada</option>
+                                    <option value="true" th:selected="${ruta.accesibleMovilidadReducida == true}">Registrada como accesible</option>
+                                    <option value="false" th:selected="${ruta.accesibleMovilidadReducida == false}">Registrada como no accesible</option>
+                                </select>
+                                <small class="route-editor-help">Selecciona “Sin información” si no se ha comprobado con el operador.</small>
                             </div>
 
                             <label class="route-verification" for="verificada">

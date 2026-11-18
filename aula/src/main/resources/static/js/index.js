@@ -1,7 +1,55 @@
 const modal = document.getElementById('modalAdmin');
+const gate = document.getElementById('adminAccessGate');
+const gateTrigger = document.getElementById('openAdminGate');
 const openBtn = document.getElementById('LoginAdminBtn');
 const closeBtn = document.getElementById('closeModalAdmin');
 const continueBtn = document.getElementById('continueAdmin');
+let handingOffToAdminModal = false;
+
+const landingFrame = document.querySelector('.landing-frame');
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+if (landingFrame && !prefersReducedMotion.matches) {
+    let pointerPosition = null;
+    let pointerFrame = 0;
+
+    landingFrame.addEventListener('pointermove', function(event) {
+        if (event.pointerType === 'touch' || prefersReducedMotion.matches) return;
+
+        pointerPosition = { x: event.clientX, y: event.clientY };
+        if (pointerFrame) return;
+
+        pointerFrame = window.requestAnimationFrame(function() {
+            pointerFrame = 0;
+            if (!pointerPosition || prefersReducedMotion.matches) return;
+
+            const bounds = landingFrame.getBoundingClientRect();
+            const pointerX = Math.min(1, Math.max(0, (pointerPosition.x - bounds.left) / bounds.width));
+            const pointerY = Math.min(1, Math.max(0, (pointerPosition.y - bounds.top) / bounds.height));
+            const centerDistance = Math.hypot(pointerX - 0.5, pointerY - 0.5);
+            const lift = Math.max(0, 1 - centerDistance * 1.8) * -7.2;
+
+            landingFrame.style.setProperty('--landing-tilt-x', `${((0.5 - pointerY) * 5.6).toFixed(2)}deg`);
+            landingFrame.style.setProperty('--landing-tilt-y', `${((pointerX - 0.5) * 6.4).toFixed(2)}deg`);
+            landingFrame.style.setProperty('--landing-lift', `${lift.toFixed(2)}px`);
+            landingFrame.style.setProperty('--landing-shadow-x', `${((0.5 - pointerX) * 20).toFixed(2)}px`);
+            landingFrame.style.setProperty('--landing-shadow-y', `${((0.5 - pointerY) * 18).toFixed(2)}px`);
+        });
+    });
+
+    landingFrame.addEventListener('pointerleave', function() {
+        pointerPosition = null;
+        if (pointerFrame) {
+            window.cancelAnimationFrame(pointerFrame);
+            pointerFrame = 0;
+        }
+        landingFrame.style.setProperty('--landing-tilt-x', '0deg');
+        landingFrame.style.setProperty('--landing-tilt-y', '0deg');
+        landingFrame.style.setProperty('--landing-lift', '0px');
+        landingFrame.style.setProperty('--landing-shadow-x', '0px');
+        landingFrame.style.setProperty('--landing-shadow-y', '0px');
+    });
+}
 
 function setModalOpen(isOpen) {
     if (!modal) return;
@@ -15,9 +63,28 @@ function setModalOpen(isOpen) {
     }
 }
 
-if (openBtn && modal) {
+if (gateTrigger && gate) {
+    gateTrigger.addEventListener('click', function() {
+        if (!gate.open) {
+            gate.showModal();
+        }
+    });
+}
+
+if (openBtn && modal && gate) {
     openBtn.addEventListener('click', function() {
+        handingOffToAdminModal = true;
+        gate.close();
         setModalOpen(true);
+    });
+}
+
+if (gate && gateTrigger) {
+    gate.addEventListener('close', function() {
+        if (!handingOffToAdminModal) {
+            gateTrigger.focus();
+        }
+        handingOffToAdminModal = false;
     });
 }
 
@@ -41,7 +108,7 @@ window.addEventListener('keydown', function(event) {
 
 if (modal && openBtn) {
     modal.addEventListener('close', function() {
-        openBtn.focus();
+        gateTrigger?.focus();
     });
 }
 

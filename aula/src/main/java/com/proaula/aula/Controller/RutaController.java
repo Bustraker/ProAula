@@ -6,6 +6,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,6 +19,8 @@ import jakarta.validation.Valid;
 import com.proaula.aula.Entity.Ruta;
 import com.proaula.aula.Entity.RutaParada;
 import com.proaula.aula.Service.RutaService;
+
+import java.util.Objects;
 
 @Controller
 public class RutaController {
@@ -54,7 +58,9 @@ public class RutaController {
 
     @PostMapping("/editar-ruta/{id}")
     public String guardarEdicionRuta(@PathVariable Long id, @ModelAttribute Ruta ruta,
-                                     @RequestParam String barriosOrdenadosTexto) {
+                                     @RequestParam String barriosOrdenadosTexto,
+                                     @RequestParam(value = "accesibleMovilidadReducida", required = false)
+                                     Boolean accesibleMovilidadReducida) {
         Ruta rutaExistente = rutaService.getRutaById(id);
         if (rutaExistente == null) {
             return "redirect:/editar-ruta";
@@ -64,10 +70,15 @@ public class RutaController {
         if (barriosOrdenados.stream().distinct().count() < 2) {
             return "redirect:/editar-ruta/" + id + "?error=barrios";
         }
+        boolean cambio = !Objects.equals(rutaExistente.getBarrios(), barriosOrdenados)
+                || !Objects.equals(rutaExistente.getBarriosOrdenados(), barriosOrdenados)
+                || !Objects.equals(rutaExistente.getVerificada(), Boolean.TRUE.equals(ruta.getVerificada()))
+                || !Objects.equals(rutaExistente.getAccesibleMovilidadReducida(), accesibleMovilidadReducida);
         rutaExistente.setBarrios(new ArrayList<>(barriosOrdenados));
         rutaExistente.setBarriosOrdenados(barriosOrdenados);
         rutaExistente.setVerificada(Boolean.TRUE.equals(ruta.getVerificada()));
-        rutaService.saveRuta(rutaExistente);
+        rutaExistente.setAccesibleMovilidadReducida(accesibleMovilidadReducida);
+        rutaService.saveRuta(rutaExistente, cambio);
         return "redirect:/editar-ruta";
     }
 
@@ -75,8 +86,15 @@ public class RutaController {
     @GetMapping("/rutas")
     public String listarRutas(Model model,
                              @RequestParam(required = false) String buscar,
-                             @RequestParam(required = false) String barrio) {
-        List<Ruta> todasLasRutas = rutaService.getAllRutas();
+                             @RequestParam(required = false) String barrio,
+                             @RequestParam(required = false) String accesibilidad) {
+        if (accesibilidad != null && !accesibilidad.isBlank()
+                && !List.of("accesible", "no-accesible", "sin-datos").contains(accesibilidad)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Filtro de accesibilidad no válido.");
+        }
+        List<Ruta> todasLasRutas = rutaService.getAllRutas().stream()
+            .filter(ruta -> ruta.getEstado() == Ruta.Estado.ACTIVA)
+            .collect(Collectors.toCollection(ArrayList::new));
         List<Ruta> rutas = new ArrayList<>(todasLasRutas);
         
         // Filtros
@@ -89,6 +107,17 @@ public class RutaController {
         if (barrio != null && !barrio.isEmpty()) {
             rutas = rutas.stream()
                 .filter(r -> r.getBarrios() != null && r.getBarrios().contains(barrio))
+                .collect(Collectors.toList());
+        }
+
+        if (accesibilidad != null && !accesibilidad.isBlank()) {
+            rutas = rutas.stream()
+                .filter(ruta -> switch (accesibilidad) {
+                    case "accesible" -> Boolean.TRUE.equals(ruta.getAccesibleMovilidadReducida());
+                    case "no-accesible" -> Boolean.FALSE.equals(ruta.getAccesibleMovilidadReducida());
+                    case "sin-datos" -> ruta.getAccesibleMovilidadReducida() == null;
+                    default -> false;
+                })
                 .collect(Collectors.toList());
         }
         
@@ -105,6 +134,7 @@ public class RutaController {
         model.addAttribute("barriosDisponibles", barrios);
         model.addAttribute("buscar", buscar);
         model.addAttribute("barrioSeleccionado", barrio);
+        model.addAttribute("accesibilidadSeleccionada", accesibilidad);
         
         return "rutas-lista";
     }

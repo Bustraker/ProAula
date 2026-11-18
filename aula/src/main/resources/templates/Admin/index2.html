@@ -24,11 +24,12 @@
             <nav class="sidebar-nav">
                 <a th:href="@{/index_2}" class="active"><i class="fas fa-home"></i> Inicio</a>
                 <a th:href="@{/gestionar-usuarios}"><i class="fas fa-users"></i> Gestionar Usuarios</a>
+                <a th:if="${isAdminApprover}" th:href="@{/admin/accesos}"><i class="fas fa-user-clock"></i> Registro de accesos</a>
                 <a th:href="@{/reportes}"><i class="fas fa-chart-bar"></i> Reportes</a>
                 <a th:href="@{/mensajes_contacto}"><i class="fas fa-envelope"></i> Mensajes</a>
                 <a th:href="@{/rutas/admin}"><i class="fas fa-route"></i> Rutas</a>
                 <a th:href="@{/registro-buses}"><i class="fas fa-bus"></i> Buses</a>
-                <form th:action="@{/logout}" method="post" class="logout-form">
+                <form th:action="@{/logout}" method="post" class="logout-form" onsubmit="return confirm('¿Cerrar sesión de ProAula? El proveedor externo podría mantener tu sesión activa.');">
                     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                     <button type="submit" class="logout-form__button"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</button>
                 </form>
@@ -221,6 +222,11 @@
                             <a th:href="@{/gestionar-usuarios}" class="quick-action">
                                 <i class="fas fa-users"></i>
                                 <span>Gestionar Usuarios</span>
+                            </a>
+
+                            <a th:if="${isAdminApprover}" th:href="@{/admin/accesos}" class="quick-action">
+                                <i class="fas fa-user-clock"></i>
+                                <span>Registro de accesos ADMIN</span>
                             </a>
                             
                             <a th:href="@{/registro-buses}" class="quick-action">

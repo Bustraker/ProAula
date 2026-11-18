@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f3f0e8">
+    <title>Confirmación legal | Bustraker</title>
+    <link rel="icon" th:href="@{/images/logo.png}" type="image/png">
+    <link rel="stylesheet" th:href="@{/css/style-legal.css(v='20261111-1')}">
+</head>
+<body class="legal-page">
+    <main class="legal-consent-card">
+        <a class="legal-brand" th:href="@{/perfil}" aria-label="Bustraker, volver a mi perfil">
+            <img th:src="@{/images/logo.png}" alt="">
+            <span>Bustraker<small>Confirmación de privacidad</small></span>
+        </a>
+        <p class="legal-eyebrow"><span></span> ACTUALIZACIÓN LEGAL</p>
+        <h1>Confirma tus <em>preferencias</em></h1>
+        <p class="legal-consent-intro">Para continuar con las funciones que comparten ubicación o procesan información de tu cuenta, revisa la versión vigente de los documentos y confirma que eres mayor de edad.</p>
+        <div th:if="${error}" class="legal-consent-alert" role="alert" th:text="${error}"></div>
+        <div th:if="${success}" class="legal-consent-alert legal-consent-alert--success" role="status" th:text="${success}"></div>
+        <form th:action="@{/legal/consentir}" method="post">
+            <input type="hidden" name="legalVersion" th:value="${legalVersion}">
+            <label class="legal-consent-check">
+                <input type="checkbox" name="legalConsent" value="true" required>
+                <span>He leído y acepto los <a th:href="@{/terminos}" target="_blank" rel="noopener">Términos y condiciones</a> y la <a th:href="@{/privacidad}" target="_blank" rel="noopener">Política de privacidad</a>. Autorizo el tratamiento de mis datos personales para las finalidades allí descritas.</span>
+            </label>
+            <label class="legal-consent-check">
+                <input type="checkbox" name="adultConfirmed" value="true" required>
+                <span>Confirmo que tengo 18 años o más y puedo aceptar estas condiciones por mí mismo.</span>
+            </label>
+            <button type="submit" class="legal-consent-submit">Guardar mi aceptación</button>
+        </form>
+        <p class="legal-consent-footnote">La aplicación registra la versión aceptada y la fecha. Puedes solicitar información sobre tus datos desde el formulario de <a th:href="@{/contacto}">contacto</a>.</p>
+    </main>
+</body>
+</html>

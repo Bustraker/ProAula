@@ -28,6 +28,10 @@ public class LocalDatabaseBootstrapService implements ApplicationRunner {
         "classpath:db/seed/local-reference-data.sql";
     private static final String MYSQL_ANALYTICS_SCRIPT =
         "classpath:db/seed/mysql-analytics-schema.sql";
+    private static final String MYSQL_FAVORITE_TIMESTAMP_MIGRATION =
+        "classpath:db/migration/mysql/V20261101_01__align_favorite_creation_timestamp.sql";
+    private static final String MYSQL_NOTIFICATION_MIGRATION =
+        "classpath:db/migration/mysql/V20261106_01__enhance_notificacion_table.sql";
 
     private final DataSource dataSource;
     private final ResourceLoader resourceLoader;
@@ -50,6 +54,8 @@ public class LocalDatabaseBootstrapService implements ApplicationRunner {
         if ("MySQL".equalsIgnoreCase(databaseProduct)
                 && environment.acceptsProfiles(Profiles.of("local"))) {
             executeScript(MYSQL_ANALYTICS_SCRIPT);
+            executeScript(MYSQL_FAVORITE_TIMESTAMP_MIGRATION);
+            executeScript(MYSQL_NOTIFICATION_MIGRATION);
             ensureSyntheticDemandSourceValue();
         }
 

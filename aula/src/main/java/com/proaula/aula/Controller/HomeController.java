@@ -1,11 +1,12 @@
 package com.proaula.aula.Controller;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.validation.BindingResult;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Comparator;
 import java.util.Locale;
+import java.nio.charset.StandardCharsets;
 
 import com.proaula.aula.Entity.Bus;
 import com.proaula.aula.Entity.ContactoMensaje;
@@ -21,11 +23,14 @@ import com.proaula.aula.Entity.Viaje;
 import com.proaula.aula.Repository.UsuarioRepository;
 import com.proaula.aula.dto.ContactoMensajeDto;
 import com.proaula.aula.dto.BusConsultaDto;
-import com.proaula.aula.dto.BusConsultaMapper;
 import com.proaula.aula.dto.UsuarioFormDto;
+import com.proaula.aula.Service.AvisoFavoritoService;
 import com.proaula.aula.Service.BusService;
 import com.proaula.aula.Service.ContactoMensajeService;
+import com.proaula.aula.Service.FavoritoService;
+import com.proaula.aula.Service.LegalConsentService;
 import com.proaula.aula.Service.RutaService;
+import com.proaula.aula.Service.TrayectoFavoritoService;
 import com.proaula.aula.Service.UsuarioService;
 import com.proaula.aula.Service.ViajeService;
 
@@ -53,19 +58,31 @@ public class HomeController {
     private final ViajeService viajeService;
     private final UsuarioRepository usuarioRepository;
     private final ContactoMensajeService contactoMensajeService;
+    private final FavoritoService favoritoService;
+    private final AvisoFavoritoService avisoFavoritoService;
+    private final TrayectoFavoritoService trayectoFavoritoService;
+    private final LegalConsentService legalConsentService;
 
     public HomeController(BusService busService,
                           RutaService rutaService,
                           UsuarioService usuarioService,
                           ViajeService viajeService,
                           UsuarioRepository usuarioRepository,
-                          ContactoMensajeService contactoMensajeService) {
+                          ContactoMensajeService contactoMensajeService,
+                          FavoritoService favoritoService,
+                          AvisoFavoritoService avisoFavoritoService,
+                          TrayectoFavoritoService trayectoFavoritoService,
+                          LegalConsentService legalConsentService) {
         this.busService = busService;
         this.rutaService = rutaService;
         this.usuarioService = usuarioService;
         this.viajeService = viajeService;
         this.usuarioRepository = usuarioRepository;
         this.contactoMensajeService = contactoMensajeService;
+        this.favoritoService = favoritoService;
+        this.avisoFavoritoService = avisoFavoritoService;
+        this.trayectoFavoritoService = trayectoFavoritoService;
+        this.legalConsentService = legalConsentService;
     }
 
     @GetMapping("/")
@@ -76,22 +93,61 @@ public class HomeController {
     @GetMapping({"/inicio-de-sesion-mejorado.html", "/inicio-de-sesion-mejorado", "/inicio_de_sesion"})
     public String login(Model model) {
         model.addAttribute(MODEL_ATTR_USUARIO, new UsuarioFormDto());
+        model.addAttribute("legalVersion", LegalConsentService.CURRENT_VERSION);
         return "inicio-de-sesion-mejorado";
     }
 
     @GetMapping({"/registro-mejorado.html", "/registro-mejorado", "/registro"})
     public String registro(Model model) {
         model.addAttribute(MODEL_ATTR_USUARIO, new UsuarioFormDto());
+        model.addAttribute("legalVersion", LegalConsentService.CURRENT_VERSION);
         return VIEW_REGISTRO_MEJORADO;
     }
 
     @PostMapping("/registro")
     @Transactional
-    public String registrar(@ModelAttribute UsuarioFormDto usuarioForm,
+    public String registrar(@Valid @ModelAttribute("usuarioForm") UsuarioFormDto usuarioForm,
+                           BindingResult bindingResult,
+                           @RequestParam(required = false) String passwordConfirm,
                            @RequestParam(required = false) Boolean terminos,
+                           @RequestParam(required = false) Boolean mayorEdad,
+                           @RequestParam(required = false) String legalVersion,
                            Model model) {
-        if (Boolean.FALSE.equals(terminos)) {
-            model.addAttribute(MODEL_ATTR_ERROR, "Debes aceptar los términos y condiciones para registrarte");
+        model.addAttribute("legalVersion", LegalConsentService.CURRENT_VERSION);
+        if (bindingResult.hasErrors()) {
+            model.addAttribute(MODEL_ATTR_ERROR, "Revisa los datos ingresados y corrige los campos marcados.");
+            model.addAttribute(MODEL_ATTR_USUARIO, usuarioForm);
+            return VIEW_REGISTRO_MEJORADO;
+        }
+
+        if (passwordConfirm == null || !usuarioForm.getPassword().equals(passwordConfirm)) {
+            model.addAttribute(MODEL_ATTR_ERROR, "Las contraseñas no coinciden.");
+            model.addAttribute(MODEL_ATTR_USUARIO, usuarioForm);
+            return VIEW_REGISTRO_MEJORADO;
+        }
+
+        if (usuarioForm.getPassword().getBytes(StandardCharsets.UTF_8).length > 72) {
+            model.addAttribute(MODEL_ATTR_ERROR, "La contraseña no puede superar 72 bytes en UTF-8.");
+            model.addAttribute(MODEL_ATTR_USUARIO, usuarioForm);
+            return VIEW_REGISTRO_MEJORADO;
+        }
+
+        if (!Boolean.TRUE.equals(terminos)) {
+            model.addAttribute(MODEL_ATTR_ERROR,
+                "Debes aceptar los Términos, la Política de privacidad y el tratamiento descrito para registrarte.");
+            model.addAttribute(MODEL_ATTR_USUARIO, usuarioForm);
+            return VIEW_REGISTRO_MEJORADO;
+        }
+
+        if (!Boolean.TRUE.equals(mayorEdad)) {
+            model.addAttribute(MODEL_ATTR_ERROR, "Debes confirmar que tienes al menos 18 años para crear una cuenta.");
+            model.addAttribute(MODEL_ATTR_USUARIO, usuarioForm);
+            return VIEW_REGISTRO_MEJORADO;
+        }
+
+        if (!LegalConsentService.CURRENT_VERSION.equals(legalVersion)) {
+            model.addAttribute(MODEL_ATTR_ERROR,
+                "La información legal cambió. Recarga la página y vuelve a aceptar antes de registrarte.");
             model.addAttribute(MODEL_ATTR_USUARIO, usuarioForm);
             return VIEW_REGISTRO_MEJORADO;
         }
@@ -111,15 +167,16 @@ public class HomeController {
         Usuario usuario = new Usuario();
         usuario.setUsername(usuarioForm.getUsername());
         usuario.setPassword(usuarioForm.getPassword());
-        usuario.setNombres(usuarioForm.getNombres());
-        usuario.setApellidos(usuarioForm.getApellidos());
+        usuario.setNombres(usuarioForm.getNombres().trim());
+        usuario.setApellidos(usuarioForm.getApellidos().trim());
         usuario.setEmail(usuarioForm.getEmail());
-        usuario.setProvider(usuarioForm.getProvider());
-        usuario.setProviderId(usuarioForm.getProviderId());
+        usuario.setProvider("LOCAL");
+        usuario.setProviderId(null);
 
         usuario.setRole(ROLE_USER);
 
-        usuarioService.register(usuario);
+        Usuario creado = usuarioService.register(usuario);
+        legalConsentService.recordAcceptance(creado, legalVersion, true, "REGISTRATION");
 
         return "redirect:/inicio-de-sesion-mejorado?registrado=true";
     }
@@ -139,8 +196,11 @@ public class HomeController {
         model.addAttribute("viajesRealizados", 0);
         model.addAttribute("proximoViaje", "--");
         model.addAttribute("busesActivos", rutaService.countActiveBuses());
-        model.addAttribute(MODEL_ATTR_BUSES, busService.getAllBuses());
         model.addAttribute(MODEL_ATTR_CONTACTO_MENSAJE, new ContactoMensaje());
+        model.addAttribute("favoritos", favoritoService.listar(username));
+        model.addAttribute("avisosFavoritos", avisoFavoritoService.listar(usuario.getId()));
+        model.addAttribute("avisosFavoritosNoLeidos", avisoFavoritoService.contarNoLeidos(usuario.getId()));
+        model.addAttribute("trayectosFavoritos", trayectoFavoritoService.listar(username));
 
         return VIEW_USUARIO_INDEX_3;
     }
@@ -340,14 +400,8 @@ public class HomeController {
     }
 
     @GetMapping("/consultas")
-    public String consultas(Model model, Authentication authentication) {
-        boolean autenticado = authentication != null
-                && authentication.isAuthenticated()
-                && !(authentication instanceof AnonymousAuthenticationToken);
-        List<Bus> todosLosBuses = busService.getAllBuses();
-        List<BusConsultaDto> buses = autenticado
-                ? BusConsultaMapper.authenticatedBuses(todosLosBuses)
-                : BusConsultaMapper.publicRoutes(todosLosBuses);
+    public String consultas(Model model) {
+        List<BusConsultaDto> buses = busService.getBusConsultations();
         long rutasConBuses = buses.stream()
                 .map(bus -> bus.getRutaNombre())
                 .filter(nombre -> nombre != null && !nombre.isBlank())
@@ -357,7 +411,7 @@ public class HomeController {
                 .flatMap(bus -> bus.getBarrios().stream())
                 .distinct()
                 .count();
-        model.addAttribute("autenticado", autenticado);
+        model.addAttribute("autenticado", true);
         model.addAttribute(MODEL_ATTR_BUSES, buses);
         model.addAttribute("totalBuses", buses.size());
         model.addAttribute("rutasConBuses", rutasConBuses);

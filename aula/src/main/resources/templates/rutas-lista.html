@@ -8,6 +8,7 @@
     <title>Rutas Disponibles - Bustraker</title>
     <link rel="stylesheet" th:href="@{/css/style_rutas.css}">
     <link rel="stylesheet" th:href="@{/css/style_common.css}">
+    <link rel="stylesheet" th:href="@{/css/accessibility.css}">
     <link rel="stylesheet" th:href="@{/css/logout.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" th:href="@{/images/logo.png}" type="image/png">
@@ -36,7 +37,7 @@
                 <a th:href="@{/viajar}" class="nav-link">
                     <i class="fas fa-bus" aria-hidden="true"></i> Viajar
                 </a>
-                <form th:action="@{/logout}" method="post" class="logout-form">
+                <form th:action="@{/logout}" method="post" class="logout-form" onsubmit="return confirm('¿Cerrar sesión de ProAula? El proveedor externo podría mantener tu sesión activa.');">
                     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                     <button type="submit" class="nav-link nav-link--outline logout-form__button">
                     <i class="fas fa-sign-out-alt" aria-hidden="true"></i> Cerrar Sesión
@@ -48,6 +49,7 @@
 
     <!-- Contenido principal -->
     <main class="container">
+        <div th:replace="~{fragments/accessibility :: controls}"></div>
         <section class="routes-hero" aria-labelledby="routesTitle">
             <div class="routes-hero-copy">
                 <span class="routes-eyebrow"><i class="fas fa-compass" aria-hidden="true"></i> Muévete por la ciudad</span>
@@ -97,6 +99,15 @@
                         </option>
                     </select>
                 </label>
+                <label class="routes-field">
+                    <span><i class="fas fa-wheelchair" aria-hidden="true"></i> Accesibilidad</span>
+                    <select name="accesibilidad" class="form-control">
+                        <option value="" th:selected="${#strings.isEmpty(accesibilidadSeleccionada)}">Todas</option>
+                        <option value="accesible" th:selected="${accesibilidadSeleccionada == 'accesible'}">Registrada como accesible</option>
+                        <option value="no-accesible" th:selected="${accesibilidadSeleccionada == 'no-accesible'}">Registrada como no accesible</option>
+                        <option value="sin-datos" th:selected="${accesibilidadSeleccionada == 'sin-datos'}">Sin información</option>
+                    </select>
+                </label>
                 <div class="routes-filter-actions">
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-sliders" aria-hidden="true"></i> Aplicar filtros
@@ -113,6 +124,10 @@
                 </button>
             </div>
         </section>
+
+        <p class="accessibility-disclaimer" role="note">
+            La accesibilidad se muestra según los datos registrados y puede estar incompleta. Confirma las condiciones con el operador antes de viajar.
+        </p>
 
         <div th:if="${hayRutasProvisionales}" class="alert alert-warning routes-provisional-notice" role="note">
             <i class="fas fa-triangle-exclamation" aria-hidden="true"></i>
@@ -167,6 +182,13 @@
                                 </span>
                             </div>
                             <div class="ruta-info-item">
+                                <i class="fas fa-wheelchair" aria-hidden="true"></i>
+                                <span class="route-info-copy">
+                                    <span class="route-info-label">Accesibilidad de la ruta</span>
+                                    <span th:replace="~{fragments/accessibility :: status(${ruta.accesibleMovilidadReducida})}">Sin información</span>
+                                </span>
+                            </div>
+                            <div class="ruta-info-item">
                                 <i class="fas fa-bus" aria-hidden="true"></i>
                                 <span class="route-info-copy">
                                     <span class="route-info-label">Flota vinculada</span>
@@ -203,15 +225,15 @@
                     </svg>
                 </span>
                 <span class="routes-eyebrow"
-                      th:text="${#strings.isEmpty(buscar) and #strings.isEmpty(barrioSeleccionado) ? 'PRÓXIMAMENTE' : 'SIN RESULTADOS'}">SIN RESULTADOS</span>
-                <h2 th:text="${#strings.isEmpty(buscar) and #strings.isEmpty(barrioSeleccionado) ? 'Aún no hay rutas publicadas' : 'No encontramos ese recorrido'}">No encontramos ese recorrido</h2>
-                <p th:text="${#strings.isEmpty(buscar) and #strings.isEmpty(barrioSeleccionado) ? 'Estamos preparando la información de los recorridos. Vuelve pronto para explorar las rutas.' : 'Prueba con otro nombre o barrio, o limpia los filtros para volver a ver todas las rutas.'}">
+                      th:text="${#strings.isEmpty(buscar) and #strings.isEmpty(barrioSeleccionado) and #strings.isEmpty(accesibilidadSeleccionada) ? 'PRÓXIMAMENTE' : 'SIN RESULTADOS'}">SIN RESULTADOS</span>
+                <h2 th:text="${#strings.isEmpty(buscar) and #strings.isEmpty(barrioSeleccionado) and #strings.isEmpty(accesibilidadSeleccionada) ? 'Aún no hay rutas publicadas' : 'No encontramos ese recorrido'}">No encontramos ese recorrido</h2>
+                <p th:text="${#strings.isEmpty(buscar) and #strings.isEmpty(barrioSeleccionado) and #strings.isEmpty(accesibilidadSeleccionada) ? 'Estamos preparando la información de los recorridos. Vuelve pronto para explorar las rutas.' : 'Prueba con otro nombre o barrio, o limpia los filtros para volver a ver todas las rutas.'}">
                     Prueba con otro nombre o barrio, o limpia los filtros para volver a ver todas las rutas.
                 </p>
-                <a th:if="${not (#strings.isEmpty(buscar) and #strings.isEmpty(barrioSeleccionado))}" th:href="@{/rutas}" class="btn btn-primary">
+                <a th:if="${not (#strings.isEmpty(buscar) and #strings.isEmpty(barrioSeleccionado) and #strings.isEmpty(accesibilidadSeleccionada))}" th:href="@{/rutas}" class="btn btn-primary">
                     <i class="fas fa-rotate-left" aria-hidden="true"></i> Ver todas las rutas
                 </a>
-                <a th:unless="${not (#strings.isEmpty(buscar) and #strings.isEmpty(barrioSeleccionado))}" th:href="@{/dashboard}" class="btn btn-primary">
+                <a th:unless="${not (#strings.isEmpty(buscar) and #strings.isEmpty(barrioSeleccionado) and #strings.isEmpty(accesibilidadSeleccionada))}" th:href="@{/dashboard}" class="btn btn-primary">
                     <i class="fas fa-arrow-left" aria-hidden="true"></i> Volver al panel
                 </a>
             </div>
@@ -233,6 +255,7 @@
     </footer>
 
     <script th:src="@{/js/common.js}"></script>
+    <script th:src="@{/js/accessibility.js}" defer></script>
     <script th:src="@{/js/rutas_lista.js}"></script>
 </body>
 </html>

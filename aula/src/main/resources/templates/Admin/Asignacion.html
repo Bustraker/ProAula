@@ -18,7 +18,7 @@
     <label for="conductor">Conductor:</label>
     <select id="conductor" th:field="*{conductor.id}" required>
         <option value="" disabled selected>Selecciona un conductor</option>
-        <option th:each="cond : ${conductores}" th:value="${cond.id}" th:text="${cond.nombre} + ' ' + ${cond.apellido}"></option>
+        <option th:each="cond : ${conductores}" th:value="${cond.id}" th:text="'Conductor anónimo #' + ${cond.id}"></option>
     </select>
 
     <label for="ruta">Ruta:</label>

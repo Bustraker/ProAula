@@ -1,9 +1,11 @@
 package com.proaula.aula.Controller;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -14,6 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.proaula.aula.Service.BarrioService;
 import com.proaula.aula.Service.RutaService;
+import com.proaula.aula.Entity.Parada;
+import com.proaula.aula.Entity.Ruta;
+import com.proaula.aula.Entity.RutaParada;
 
 @RestController
 @RequestMapping("/api")
@@ -37,21 +42,30 @@ public class RutaRestController {
             && !(authentication instanceof AnonymousAuthenticationToken);
         List<Map<String, Object>> rutasConCoords = new ArrayList<>();
         
-        rutaService.getRutasVerificadas().forEach(ruta -> {
+        rutaService.getRutasVerificadas().stream()
+            .filter(ruta -> ruta.getEstado() == Ruta.Estado.ACTIVA)
+            .forEach(ruta -> {
             Map<String, Object> mapa = new HashMap<>();
             mapa.put("id", ruta.getId());
             mapa.put(CAMPO_NOMBRE, ruta.getNombre());
+            mapa.put("origen", ruta.getOrigen());
+            mapa.put("destino", ruta.getDestino());
+            mapa.put("descripcion", ruta.getDescripcion());
+            mapa.put("accesibleMovilidadReducida", ruta.getAccesibleMovilidadReducida());
+            mapa.put("observacionesAccesibilidad", ruta.getObservacionesAccesibilidad());
             mapa.put(CAMPO_BARRIOS, ruta.getBarrios());
             mapa.put("barriosOrdenados", ruta.getBarriosOrdenados());
             mapa.put("ordenBarriosConfirmado", ruta.isOrdenBarriosConfirmado());
             mapa.put("horaAproximada", ruta.getHoraAproximada() != null ? ruta.getHoraAproximada().toString() : null);
             List<Map<String, Object>> paradas = new ArrayList<>();
             ruta.getParadas().stream()
+                .filter(parada -> parada.getEstado() == Parada.Estado.ACTIVA)
                 .sorted((primera, segunda) -> Integer.compare(
                     primera.getOrden() == null ? Integer.MAX_VALUE : primera.getOrden(),
                     segunda.getOrden() == null ? Integer.MAX_VALUE : segunda.getOrden()))
                 .forEach(parada -> {
                     Map<String, Object> datosParada = new HashMap<>();
+                    datosParada.put("id", parada.getId());
                     datosParada.put("nombre", parada.getNombre());
                     datosParada.put("ubicacion", parada.getUbicacion());
                     datosParada.put("referencia", parada.getReferencia());
@@ -59,9 +73,28 @@ public class RutaRestController {
                     datosParada.put("orden", parada.getOrden());
                     datosParada.put("latitud", parada.getLatitud());
                     datosParada.put("longitud", parada.getLongitud());
+                    datosParada.put("estado", parada.getEstado().name());
+                    datosParada.put("accesibleMovilidadReducida", parada.getAccesibleMovilidadReducida());
+                    datosParada.put("observacionesAccesibilidad", parada.getObservacionesAccesibilidad());
                     paradas.add(datosParada);
                 });
             mapa.put("paradas", paradas);
+            Map<RutaParada.Sentido, List<Map<String, Object>>> paradasPorSentido =
+                new EnumMap<>(RutaParada.Sentido.class);
+            boolean tieneParadasPorSentido = false;
+            for (RutaParada.Sentido sentido : RutaParada.Sentido.values()) {
+                List<RutaParada> relaciones = rutaService.getParadasPorSentido(ruta.getId(), sentido);
+                tieneParadasPorSentido |= !relaciones.isEmpty();
+                List<Map<String, Object>> paradasDelSentido = relaciones.stream()
+                    .filter(relacion -> relacion.getParada().getEstado() == Parada.Estado.ACTIVA)
+                    .map(relacion -> mapearParada(relacion.getParada(), relacion.getOrden()))
+                    .collect(Collectors.toList());
+                paradasPorSentido.put(sentido, paradasDelSentido);
+            }
+            if (!tieneParadasPorSentido) {
+                paradasPorSentido.put(RutaParada.Sentido.IDA, paradas);
+            }
+            mapa.put("paradasPorSentido", paradasPorSentido);
 
             // Obtener coordenadas reales para cada barrio
             List<String> barriosCoordenadas = ruta.isOrdenBarriosConfirmado()
@@ -80,8 +113,9 @@ public class RutaRestController {
                 datosBus.put("placa", bus.getPlaca());
                 datosBus.put("modelo", bus.getModelo());
                 datosBus.put("color", bus.getColor());
+                datosBus.put("accesibleMovilidadReducida", bus.getAccesibleMovilidadReducida());
                 if (autenticado) {
-                    datosBus.put("conductor", bus.getConductor());
+                    datosBus.put("conductor", "Anónimo");
                 }
                 buses.add(datosBus);
             });
@@ -98,10 +132,17 @@ public class RutaRestController {
     public ResponseEntity<List<Map<String, Object>>> getAllRutas() {
         List<Map<String, Object>> rutas = new ArrayList<>();
         
-        rutaService.getRutasVerificadas().forEach(ruta -> {
+        rutaService.getRutasVerificadas().stream()
+            .filter(ruta -> ruta.getEstado() == Ruta.Estado.ACTIVA)
+            .forEach(ruta -> {
             Map<String, Object> mapa = new HashMap<>();
             mapa.put("id", ruta.getId());
             mapa.put(CAMPO_NOMBRE, ruta.getNombre());
+            mapa.put("origen", ruta.getOrigen());
+            mapa.put("destino", ruta.getDestino());
+            mapa.put("descripcion", ruta.getDescripcion());
+            mapa.put("accesibleMovilidadReducida", ruta.getAccesibleMovilidadReducida());
+            mapa.put("observacionesAccesibilidad", ruta.getObservacionesAccesibilidad());
             mapa.put(CAMPO_BARRIOS, ruta.getBarrios());
             mapa.put("barriosOrdenados", ruta.getBarriosOrdenados());
             mapa.put("ordenBarriosConfirmado", ruta.isOrdenBarriosConfirmado());
@@ -110,5 +151,21 @@ public class RutaRestController {
         });
         
         return ResponseEntity.ok(rutas);
+    }
+
+    private Map<String, Object> mapearParada(Parada parada, Integer orden) {
+        Map<String, Object> datos = new HashMap<>();
+        datos.put("id", parada.getId());
+        datos.put("nombre", parada.getNombre());
+        datos.put("ubicacion", parada.getUbicacion());
+        datos.put("referencia", parada.getReferencia());
+        datos.put("barrio", parada.getBarrio());
+        datos.put("orden", orden);
+        datos.put("latitud", parada.getLatitud());
+        datos.put("longitud", parada.getLongitud());
+        datos.put("estado", parada.getEstado().name());
+        datos.put("accesibleMovilidadReducida", parada.getAccesibleMovilidadReducida());
+        datos.put("observacionesAccesibilidad", parada.getObservacionesAccesibilidad());
+        return datos;
     }
 }

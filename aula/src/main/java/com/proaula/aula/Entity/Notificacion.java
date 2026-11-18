@@ -47,8 +47,27 @@ public class Notificacion {
     @Column(name = "fecha_leido")
     private LocalDateTime fechaLeido;
 
+    @Column(name = "canal_envio", nullable = false, length = 20)
+    private String canalEnvio = "IN_APP";
+
+    @Column(name = "fecha_creacion", nullable = false)
+    private LocalDateTime fechaCreacion;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "usuario_id", nullable = false)
     @JsonIgnore
     private Usuario usuario;
+
+    @jakarta.persistence.PrePersist
+    public void prePersist() {
+        if (this.fechaCreacion == null) {
+            this.fechaCreacion = LocalDateTime.now();
+        }
+        if (this.leido == null) {
+            this.leido = false;
+        }
+        if (this.canalEnvio == null || this.canalEnvio.isBlank()) {
+            this.canalEnvio = "IN_APP";
+        }
+    }
 }

@@ -3,6 +3,7 @@ package com.proaula.aula.config;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -17,9 +18,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.mock.web.MockHttpSession;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @SpringBootTest(properties = {
+    "app.public-base-url=http://localhost:5679",
     "spring.security.oauth2.client.registration.google.client-id=placeholder-google-test",
     "spring.security.oauth2.client.registration.google.client-secret=placeholder-google-test",
     "spring.security.oauth2.client.registration.github.client-id=test-github-client",
@@ -41,13 +45,52 @@ class ExternalProviderLoginPageTest {
         mockMvc.perform(get("/inicio-de-sesion-mejorado"))
             .andExpect(status().isOk())
             .andExpect(content().string(org.hamcrest.Matchers.containsString(
-                "href=\"/oauth2/authorization/github\"")))
+                "/css/accessibility.css")))
             .andExpect(content().string(org.hamcrest.Matchers.containsString(
-                "href=\"/oauth2/authorization/discord\"")))
+                "/js/accessibility.js")))
             .andExpect(content().string(org.hamcrest.Matchers.containsString(
-                "href=\"/oauth2/authorization/facebook\"")))
+                "/oauth2/consentir?provider=github")))
+            .andExpect(content().string(org.hamcrest.Matchers.containsString(
+                "/oauth2/consentir?provider=discord")))
+            .andExpect(content().string(org.hamcrest.Matchers.containsString(
+                "/oauth2/consentir?provider=facebook")))
             .andExpect(content().string(org.hamcrest.Matchers.not(
-                org.hamcrest.Matchers.containsString("/oauth2/authorization/google"))));
+                org.hamcrest.Matchers.containsString("/oauth2/consentir?provider=google"))))
+            .andExpect(content().string(org.hamcrest.Matchers.not(
+                org.hamcrest.Matchers.containsString("oauth-legal-check"))));
+    }
+
+    @Test
+    void legalChecksAreShownOnlyAfterChoosingAnExternalProvider() throws Exception {
+        mockMvc.perform(get("/oauth2/consentir").param("provider", "github"))
+            .andExpect(status().isOk())
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("Continúa con")))
+            .andExpect(content().string(org.hamcrest.Matchers.containsString(
+                "name=\"legalConsent\"")))
+            .andExpect(content().string(org.hamcrest.Matchers.containsString(
+                "name=\"adultConfirmed\"")))
+            .andExpect(content().string(org.hamcrest.Matchers.containsString(
+                "name=\"provider\" value=\"github\"")));
+
+        mockMvc.perform(get("/oauth2/consentir").param("provider", "unknown"))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(header().string("Location", "/inicio-de-sesion-mejorado"));
+    }
+
+    @Test
+    void externalProviderCannotContinueUntilBothLegalChecksAreAccepted() throws Exception {
+        MvcResult panelResult = mockMvc.perform(get("/oauth2/consentir").param("provider", "github"))
+            .andExpect(status().isOk())
+            .andReturn();
+        MockHttpSession session = (MockHttpSession) panelResult.getRequest().getSession(false);
+
+        mockMvc.perform(post("/oauth2/preauthorize")
+                .session(session)
+                .with(csrf())
+                .param("provider", "github")
+                .param("legalVersion", "2026-11-11-v1"))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(header().string("Location", "/oauth2/consentir?provider=github"));
     }
 
     @Test
@@ -61,12 +104,37 @@ class ExternalProviderLoginPageTest {
     }
 
     @Test
+    void socialLoginCannotStartWithoutRecordedPreauthorization() throws Exception {
+        mockMvc.perform(get("/oauth2/authorization/github"))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(header().string("Location",
+                org.hamcrest.Matchers.containsString("/oauth2/consentir?provider=github")));
+    }
+
+    @Test
+    void consentForOneProviderCannotAuthorizeAnotherProvider() throws Exception {
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("oauthLegalConsentVersion", "2026-11-11-v1");
+        session.setAttribute("oauthAdultConfirmed", Boolean.TRUE);
+        session.setAttribute("oauthConsentAcceptedAt", java.time.LocalDateTime.now());
+        session.setAttribute("oauthConsentSource", "google");
+
+        mockMvc.perform(get("/oauth2/authorization/github").session(session))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(header().string("Location", "/oauth2/consentir?provider=github"));
+    }
+
+    @Test
     void authenticationPagesShowTheirDistinctPurposeScenes() throws Exception {
         mockMvc.perform(get("/inicio-de-sesion-mejorado"))
             .andExpect(status().isOk())
             .andExpect(content().string(org.hamcrest.Matchers.containsString("auth-scene--access")))
             .andExpect(content().string(org.hamcrest.Matchers.containsString("ENTRAR A MI CUENTA")))
             .andExpect(content().string(org.hamcrest.Matchers.containsString("IDENTIDAD VERIFICADA")))
+            .andExpect(content().string(org.hamcrest.Matchers.not(
+                org.hamcrest.Matchers.containsString("name=\"legalConsent\""))))
+            .andExpect(content().string(org.hamcrest.Matchers.not(
+                org.hamcrest.Matchers.containsString("name=\"adultConfirmed\""))))
             .andExpect(content().string(org.hamcrest.Matchers.not(
                 org.hamcrest.Matchers.containsString("route-map__bus"))))
             .andExpect(content().string(org.hamcrest.Matchers.containsString("style_auth_experience.css?v=20261024-3")));
@@ -82,53 +150,53 @@ class ExternalProviderLoginPageTest {
     }
 
     @Test
-    void configuredProvidersRedirectToAuthorizationEndpointsWithLocalCallbacks() throws Exception {
+    void configuredProvidersUseTheConfiguredCanonicalLocalCallbacks() throws Exception {
         assertAuthorizationRedirect(
             "/oauth2/authorization/google",
             "accounts.google.com",
-            "http://localhost/login/oauth2/code/google",
+            "http://localhost:5679/login/oauth2/code/google",
             "openid profile email");
         assertAuthorizationRedirect(
             "/oauth2/authorization/github",
             "github.com",
-            "http://localhost/login/oauth2/code/github",
+            "http://localhost:5679/login/oauth2/code/github",
             "user:email");
         assertAuthorizationRedirect(
             "/oauth2/authorization/discord",
             "discord.com",
-            "http://localhost/login/oauth2/code/discord",
+            "http://localhost:5679/login/oauth2/code/discord",
             "identify email");
         assertAuthorizationRedirect(
             "/oauth2/authorization/facebook",
             "www.facebook.com",
-            "http://localhost/login/oauth2/code/facebook",
+            "http://localhost:5679/login/oauth2/code/facebook",
             "email public_profile");
     }
 
     @Test
-    void configuredProvidersRedirectToHttpsCallbacksWhenLocalApplicationUsesHttps() throws Exception {
+    void configuredCallbacksDoNotChangeBasedOnIncomingRequestScheme() throws Exception {
         assertAuthorizationRedirect(
             "/oauth2/authorization/google",
             "accounts.google.com",
-            "https://localhost:5679/login/oauth2/code/google",
+            "http://localhost:5679/login/oauth2/code/google",
             "openid profile email",
             true);
         assertAuthorizationRedirect(
             "/oauth2/authorization/github",
             "github.com",
-            "https://localhost:5679/login/oauth2/code/github",
+            "http://localhost:5679/login/oauth2/code/github",
             "user:email",
             true);
         assertAuthorizationRedirect(
             "/oauth2/authorization/discord",
             "discord.com",
-            "https://localhost:5679/login/oauth2/code/discord",
+            "http://localhost:5679/login/oauth2/code/discord",
             "identify email",
             true);
         assertAuthorizationRedirect(
             "/oauth2/authorization/facebook",
             "www.facebook.com",
-            "https://localhost:5679/login/oauth2/code/facebook",
+            "http://localhost:5679/login/oauth2/code/facebook",
             "email public_profile",
             true);
     }
@@ -140,7 +208,22 @@ class ExternalProviderLoginPageTest {
 
     private void assertAuthorizationRedirect(String path, String expectedHost, String expectedCallback,
                                              String expectedScope, boolean secure) throws Exception {
-        MvcResult result = mockMvc.perform(get(path).with(request -> {
+        String provider = path.substring(path.lastIndexOf('/') + 1);
+        MvcResult panelResult = mockMvc.perform(get("/oauth2/consentir").param("provider", provider))
+            .andExpect(status().isOk())
+            .andReturn();
+        MockHttpSession session = (MockHttpSession) panelResult.getRequest().getSession(false);
+        MvcResult consentResult = mockMvc.perform(post("/oauth2/preauthorize")
+                .session(session)
+                .with(csrf())
+                .param("provider", provider)
+                .param("legalConsent", "true")
+                .param("adultConfirmed", "true")
+                .param("legalVersion", "2026-11-11-v1"))
+            .andExpect(status().is3xxRedirection())
+            .andReturn();
+
+        MvcResult result = mockMvc.perform(get(path).session(session).with(request -> {
                 request.setSecure(secure);
                 request.setScheme(secure ? "https" : "http");
                 request.setServerPort(secure ? 5679 : 80);

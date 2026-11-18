@@ -191,7 +191,10 @@ public class SyntheticDataSeederService implements ApplicationRunner {
         Random random = new Random(seed);
         Faker faker = new Faker(Locale.forLanguageTag("es"), random);
 
-        List<Ruta> routes = rutaRepository.findAll();
+        List<Ruta> routes = rutaRepository.findAll().stream()
+            .filter(route -> route.getEstado() == Ruta.Estado.ACTIVA
+                && Boolean.TRUE.equals(route.getVerificada()))
+            .collect(Collectors.toList());
         List<Parada> stops = paradaRepository.findAll();
         List<Usuario> demoUsers = seedUsers(faker);
         List<Usuario> customers = demoUsers.stream()
@@ -239,6 +242,18 @@ public class SyntheticDataSeederService implements ApplicationRunner {
             .filter(user -> user.getUsername() != null && user.getUsername().startsWith(SYNTHETIC_USER_PREFIX)
                 && "SYNTHETIC".equalsIgnoreCase(user.getProvider()))
             .collect(Collectors.toCollection(ArrayList::new));
+        boolean anonymizedDrivers = false;
+        for (Usuario user : existingDemoUsers) {
+            if ("ROLE_CONDUCTOR".equalsIgnoreCase(user.getRole())
+                    && (!"Conductor".equals(user.getNombres()) || !"Anónimo".equals(user.getApellidos()))) {
+                user.setNombres("Conductor");
+                user.setApellidos("Anónimo");
+                anonymizedDrivers = true;
+            }
+        }
+        if (anonymizedDrivers) {
+            usuarioRepository.saveAll(existingDemoUsers);
+        }
         if (existingDemoUsers.size() >= userCount) {
             return existingDemoUsers;
         }
@@ -276,8 +291,8 @@ public class SyntheticDataSeederService implements ApplicationRunner {
             user.setUsername(username);
             user.setEmail(username + "@example.com");
             user.setPassword(passwordEncoder.encode(faker.internet().password(12, 16, true, true)));
-            user.setNombres(limit(faker.name().firstName(), 100));
-            user.setApellidos(limit(faker.name().lastName(), 100));
+            user.setNombres(isDriver ? "Conductor" : limit(faker.name().firstName(), 100));
+            user.setApellidos(isDriver ? "Anónimo" : limit(faker.name().lastName(), 100));
             user.setProvider("SYNTHETIC");
             user.setRole(role.getNombre());
             user.setRoles(new HashSet<>(Set.of(role)));
@@ -339,11 +354,10 @@ public class SyntheticDataSeederService implements ApplicationRunner {
             bus.setMarca(BUS_MAKES.get(random.nextInt(BUS_MAKES.size())));
             bus.setModelo(BUS_MODELS.get(random.nextInt(BUS_MODELS.size())));
             bus.setColor(BUS_COLORS.get(random.nextInt(BUS_COLORS.size())));
-            bus.setConductor(faker.name().fullName());
+            bus.setConductor("Anónimo");
             bus.setCapacidadPasajeros(List.of(30, 35, 40, 45).get(random.nextInt(4)));
             bus.setAnio(2012 + random.nextInt(13));
             bus.setEstado(random.nextInt(100) < 92 ? Bus.Estado.ACTIVO : Bus.Estado.MANTENIMIENTO);
-            bus.setAccesibleMovilidadReducida(random.nextInt(100) < 12);
             bus.setNivelOcupacionActual(randomOccupancy(random));
             bus.setUltimaActualizacionOcupacion(LocalDateTime.now().minusMinutes(random.nextInt(60)));
             bus.setRuta(routes.get(i % routes.size()));
@@ -563,6 +577,8 @@ public class SyntheticDataSeederService implements ApplicationRunner {
         }
         if (!tickets.isEmpty()) {
             pasajeRepository.saveAll(tickets);
+        } else if (ticketCount > 0) {
+            log.warn("No se generaron pasajes: las rutas elegidas no tienen al menos dos paradas registradas.");
         }
     }
 
@@ -679,8 +695,7 @@ public class SyntheticDataSeederService implements ApplicationRunner {
                 tipo VARCHAR(10) NOT NULL,
                 ruta_id BIGINT,
                 parada_id BIGINT,
-                etiqueta VARCHAR(100),
-                created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                fecha_creacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 UNIQUE (usuario_id, ruta_id),
                 UNIQUE (usuario_id, parada_id),
                 FOREIGN KEY (usuario_id) REFERENCES usuario(id),
@@ -731,7 +746,7 @@ public class SyntheticDataSeederService implements ApplicationRunner {
                 "total_consultas", "reportes_ocupacion_baja", "reportes_ocupacion_media",
                 "reportes_ocupacion_alta", "promedio_ocupacion", "nivel_demanda_estimado",
                 "datos_suficientes", "fuente_datos"),
-            "favorito", Set.of("usuario_id", "tipo", "ruta_id", "parada_id", "etiqueta", "created_at"),
+            "favorito", Set.of("usuario_id", "tipo", "ruta_id", "parada_id", "fecha_creacion"),
             "incidente", Set.of("usuario_id", "ruta_id", "bus_id", "tipo", "titulo",
                 "descripcion", "estado", "fecha_reporte", "fecha_resolucion", "comentario_admin"),
             "reporte_ocupacion", Set.of("bus_id", "usuario_id", "nivel", "cantidad_pasajeros",
@@ -937,25 +952,25 @@ public class SyntheticDataSeederService implements ApplicationRunner {
             Ruta route = routes.isEmpty() ? null : routes.get(i % routes.size());
             if (route != null) {
                 rows.add(new Object[] {customer.getId(), "RUTA", route.getId(), null,
-                    "Ruta frecuente", Timestamp.valueOf(LocalDate.now().minusDays(i % 90).atStartOfDay())});
+                    Timestamp.valueOf(LocalDate.now().minusDays(i % 90).atStartOfDay())});
                 List<Parada> routeStops = stops.stream()
                     .filter(stop -> stop.getRuta() != null && stop.getRuta().getId().equals(route.getId()))
                     .collect(Collectors.toList());
                 if (!routeStops.isEmpty()) {
                     Parada stop = routeStops.get(i % routeStops.size());
                     rows.add(new Object[] {customer.getId(), "PARADA", null, stop.getId(),
-                        "Parada habitual", Timestamp.valueOf(LocalDate.now().minusDays(i % 90).atStartOfDay())});
+                        Timestamp.valueOf(LocalDate.now().minusDays(i % 90).atStartOfDay())});
                 }
             } else if (!stops.isEmpty()) {
                 Parada stop = stops.get(i % stops.size());
                 rows.add(new Object[] {customer.getId(), "PARADA", null, stop.getId(),
-                    "Parada habitual", Timestamp.valueOf(LocalDate.now().minusDays(i % 90).atStartOfDay())});
+                    Timestamp.valueOf(LocalDate.now().minusDays(i % 90).atStartOfDay())});
             }
         }
         if (!rows.isEmpty()) {
             jdbcTemplate.batchUpdate(
-                "INSERT INTO favorito (usuario_id, tipo, ruta_id, parada_id, etiqueta, created_at) "
-                    + "VALUES (?, ?, ?, ?, ?, ?)", rows);
+                "INSERT INTO favorito (usuario_id, tipo, ruta_id, parada_id, fecha_creacion) "
+                    + "VALUES (?, ?, ?, ?, ?)", rows);
         }
     }
 

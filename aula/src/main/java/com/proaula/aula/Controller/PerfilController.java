@@ -6,6 +6,8 @@ import com.proaula.aula.Entity.Usuario;
 import com.proaula.aula.Entity.Viaje;
 import com.proaula.aula.Service.UsuarioService;
 import com.proaula.aula.Service.ViajeService;
+import com.proaula.aula.Service.LegalConsentService;
+import com.proaula.aula.Service.PasswordPolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -25,13 +27,16 @@ public class PerfilController {
     private final UsuarioService usuarioService;
     private final ViajeService viajeService;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final LegalConsentService legalConsentService;
 
     public PerfilController(UsuarioService usuarioService,
                             ViajeService viajeService,
-                            BCryptPasswordEncoder passwordEncoder) {
+                            BCryptPasswordEncoder passwordEncoder,
+                            LegalConsentService legalConsentService) {
         this.usuarioService = usuarioService;
         this.viajeService = viajeService;
         this.passwordEncoder = passwordEncoder;
+        this.legalConsentService = legalConsentService;
     }
 
     @GetMapping("/perfil")
@@ -51,6 +56,7 @@ public class PerfilController {
                         && "Completado".equalsIgnoreCase(viaje.getEstado().trim()))
                 .count());
         model.addAttribute("providerLabel", providerLabel(usuario.getProvider()));
+        model.addAttribute("legalConsentCurrent", legalConsentService.hasCurrentConsent(username));
 
         return "perfil-usuario";
     }
@@ -135,8 +141,8 @@ public class PerfilController {
                 return "redirect:/perfil";
             }
 
-            if (passwordNuevo.length() < 6) {
-                redirectAttributes.addFlashAttribute("error", "❌ La contraseña debe tener al menos 6 caracteres");
+            if (!PasswordPolicy.isValidNewPassword(passwordNuevo)) {
+                redirectAttributes.addFlashAttribute("error", "❌ " + PasswordPolicy.ERROR_MESSAGE);
                 return "redirect:/perfil";
             }
 

@@ -53,6 +53,9 @@ public class RutaService {
     @Autowired
     private IncidenteRepository incidenteRepository;
 
+    @Autowired
+    private AvisoFavoritoService avisoFavoritoService;
+
     @Transactional(readOnly = true)
     public List<Ruta> getAllRutas() {
         List<Ruta> rutas = rutaRepository.findAll();
@@ -63,6 +66,9 @@ public class RutaService {
     @Transactional(readOnly = true)
     public List<Ruta> getRutasVerificadas() {
         List<Ruta> rutas = rutaRepository.findAllByVerificadaTrue();
+        if (rutas.isEmpty()) {
+            rutas = rutaRepository.findAll();
+        }
         rutas.forEach(this::initializeDisplayCollections);
         return rutas;
     }
@@ -88,6 +94,15 @@ public class RutaService {
 
     public Ruta saveRuta(Ruta ruta) {
         return rutaRepository.save(ruta);
+    }
+
+    @Transactional
+    public Ruta saveRuta(Ruta ruta, boolean notificarCambio) {
+        Ruta guardada = rutaRepository.save(ruta);
+        if (notificarCambio && guardada.getId() != null) {
+            avisoFavoritoService.notificarCambioDeRuta(guardada);
+        }
+        return guardada;
     }
 
     @Transactional

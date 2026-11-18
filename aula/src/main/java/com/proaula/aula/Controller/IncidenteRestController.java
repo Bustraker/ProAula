@@ -7,6 +7,7 @@ import com.proaula.aula.dto.IncidentePageResponse;
 import com.proaula.aula.dto.IncidentePanelResponse;
 import com.proaula.aula.dto.IncidenteReportRequest;
 import com.proaula.aula.dto.IncidenteReportResponse;
+import com.proaula.aula.dto.IncidenteRutaResponse;
 import com.proaula.aula.exception.AulaException;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -23,6 +24,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/incidentes")
 public class IncidenteRestController {
@@ -35,10 +38,16 @@ public class IncidenteRestController {
         this.incidenteService = incidenteService;
     }
 
+    @GetMapping("/ruta/{rutaId}")
+    public List<IncidenteRutaResponse> listarActivosDeRuta(@PathVariable Long rutaId) {
+        return incidenteService.listarActivosDeRuta(rutaId);
+    }
+
     @GetMapping
     public IncidentePageResponse listar(
             @RequestParam(required = false) String tipo,
             @RequestParam(required = false) String ruta,
+            @RequestParam(required = false) String estado,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         if (page < 0 || size < 1 || size > MAX_TAMANO_PAGINA) {
@@ -49,7 +58,7 @@ public class IncidenteRestController {
         }
 
         Page<IncidentePanelResponse> resultado =
-                incidenteService.listar(tipo, ruta, PageRequest.of(page, size));
+                incidenteService.listar(tipo, ruta, estado, PageRequest.of(page, size));
         return new IncidentePageResponse(
                 resultado.getContent(),
                 resultado.getNumber(),

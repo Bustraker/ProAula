@@ -65,8 +65,8 @@ public class Ruta {
     @Column(columnDefinition = "text")
     private String descripcion;
 
-    @Column(name = "accesible_movilidad_reducida", nullable = false)
-    private Boolean accesibleMovilidadReducida = false;
+    @Column(name = "accesible_movilidad_reducida")
+    private Boolean accesibleMovilidadReducida;
 
     @Column(name = "observaciones_accesibilidad", columnDefinition = "text")
     private String observacionesAccesibilidad;

@@ -4,7 +4,9 @@ import com.proaula.aula.Entity.AdminCode;
 import com.proaula.aula.Entity.AdminCodeRequest;
 import com.proaula.aula.Entity.Usuario;
 import com.proaula.aula.Service.AdminCodeRequestService;
+import com.proaula.aula.Service.AdminAccessLogService;
 import com.proaula.aula.Service.AdminCodeService;
+import com.proaula.aula.Service.LegalConsentService;
 import com.proaula.aula.Service.UsuarioService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,7 +22,9 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,24 +42,31 @@ public class AdminLoginController {
 
     private final UsuarioService usuarioService;
     private final AdminCodeService adminCodeService;
+    private final AdminAccessLogService adminAccessLogService;
     private final AdminCodeRequestService requestService;
+    private final LegalConsentService legalConsentService;
     private final AuthenticationManager authenticationManager;
     private final SecurityContextRepository securityContextRepository;
 
     public AdminLoginController(UsuarioService usuarioService,
                                 AdminCodeService adminCodeService,
+                                AdminAccessLogService adminAccessLogService,
                                 AdminCodeRequestService requestService,
+                                LegalConsentService legalConsentService,
                                 AuthenticationManager authenticationManager,
                                 SecurityContextRepository securityContextRepository) {
         this.usuarioService = usuarioService;
         this.adminCodeService = adminCodeService;
+        this.adminAccessLogService = adminAccessLogService;
         this.requestService = requestService;
+        this.legalConsentService = legalConsentService;
         this.authenticationManager = authenticationManager;
         this.securityContextRepository = securityContextRepository;
     }
 
     @GetMapping("/admin-login")
     public String mostrarLoginAdmin(HttpSession session, Model model) {
+        model.addAttribute("legalVersion", LegalConsentService.CURRENT_VERSION);
         Long codeId = longSessionAttribute(session, SESSION_CODE_ID);
         AdminCode verifiedCode = codeId == null ? null : adminCodeService.findById(codeId).orElse(null);
         boolean verified = Boolean.TRUE.equals(session.getAttribute("adminCodeVerified"))
@@ -110,9 +121,13 @@ public class AdminLoginController {
     }
 
     @PostMapping("/admin/registrar")
+    @Transactional
     public String completarRegistroAdmin(@RequestParam String username,
                                          @RequestParam String password,
                                          @RequestParam String passwordConfirm,
+                                         @RequestParam(required = false) Boolean legalConsent,
+                                         @RequestParam(required = false) Boolean adultConfirmed,
+                                         @RequestParam(required = false) String legalVersion,
                                          HttpSession session,
                                          RedirectAttributes redirectAttributes) {
         Long requestId = longSessionAttribute(session, SESSION_REQUEST_ID);
@@ -126,9 +141,16 @@ public class AdminLoginController {
             redirectAttributes.addFlashAttribute("error", "Las contraseñas no coinciden.");
             return "redirect:/admin-login?verified=true";
         }
+        if (!Boolean.TRUE.equals(legalConsent) || !Boolean.TRUE.equals(adultConfirmed)
+                || !LegalConsentService.CURRENT_VERSION.equals(legalVersion)) {
+            redirectAttributes.addFlashAttribute("error",
+                "Debes aceptar los documentos legales vigentes y confirmar que tienes al menos 18 años.");
+            return "redirect:/admin-login?verified=true";
+        }
 
         try {
-            requestService.completeRegistration(requestId, codeId, username, password);
+            Usuario created = requestService.completeRegistration(requestId, codeId, username, password);
+            legalConsentService.recordAcceptance(created, legalVersion, true, "ADMIN");
             session.removeAttribute(SESSION_REQUEST_ID);
             redirectAttributes.addFlashAttribute("success",
                 "Tu cuenta ADMIN quedó registrada. Ingresa con el usuario y la contraseña que acabas de crear.");
@@ -181,6 +203,7 @@ public class AdminLoginController {
                 return "redirect:/admin-login?verified=true";
             }
 
+            adminAccessLogService.recordSuccessfulLogin(user, code);
             clearCodeVerification(session);
             session.invalidate();
             HttpSession authenticatedSession = request.getSession(true);
@@ -194,6 +217,11 @@ public class AdminLoginController {
         } catch (AuthenticationException exception) {
             log.warn("Login administrativo fallido para el usuario indicado.");
             redirectAttributes.addFlashAttribute("error", "El código o las credenciales no son válidos.");
+            return "redirect:/admin-login?verified=true";
+        } catch (DataAccessException exception) {
+            log.error("Could not record successful ADMIN access for user id {}.", user.getId(), exception);
+            redirectAttributes.addFlashAttribute("error",
+                "No se pudo registrar el acceso administrativo. No se inició sesión; inténtalo de nuevo.");
             return "redirect:/admin-login?verified=true";
         }
     }

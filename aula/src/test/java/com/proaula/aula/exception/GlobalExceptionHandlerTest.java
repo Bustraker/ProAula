@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.ui.ExtendedModelMap;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Map;
 
@@ -55,5 +56,24 @@ class GlobalExceptionHandlerTest {
         assertThat(response.getStatus()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
         assertThat(model.get("errorCode")).isEqualTo("INTERNAL_ERROR");
         assertThat(model.get("errorMessage")).isEqualTo("Ha ocurrido un error interno en el servidor");
+    }
+
+    @Test
+    void preservesResponseStatusForApiErrors() {
+        Environment environment = mock(Environment.class);
+        when(environment.getActiveProfiles()).thenReturn(new String[0]);
+        GlobalExceptionHandler handler = new GlobalExceptionHandler(environment);
+        HttpServletRequest request = new MockHttpServletRequest("POST", "/api/modelos/retrasos/riesgo");
+
+        Object result = handler.handleResponseStatusException(
+            new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "El servicio de modelos no está disponible."),
+            new ExtendedModelMap(), request, new MockHttpServletResponse());
+
+        assertThat(result).isInstanceOf(ResponseEntity.class);
+        ResponseEntity<?> response = (ResponseEntity<?>) result;
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE);
+        assertThat(response.getBody()).isInstanceOf(Map.class);
+        assertThat(((Map<?, ?>) response.getBody()).get("message"))
+            .isEqualTo("El servicio de modelos no está disponible.");
     }
 }

@@ -3,10 +3,10 @@ package com.proaula.aula.Controller;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-import java.time.LocalTime;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,10 +18,13 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.ActiveProfiles;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.proaula.aula.Entity.Bus;
-import com.proaula.aula.Entity.Ruta;
+import com.proaula.aula.dto.BusConsultaDto;
 import com.proaula.aula.Service.BusService;
+import com.proaula.aula.Repository.UsuarioRepository;
+import com.proaula.aula.Service.LegalConsentService;
+import com.proaula.aula.LegalConsentTestSupport;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -34,25 +37,65 @@ class ConsultasPageIntegrationTest {
     @MockitoBean
     private BusService busService;
 
-    @Test
-    void publicPageRendersOnlyRoutesAndNeighborhoods() throws Exception {
-        when(busService.getAllBuses()).thenReturn(List.of(bus()));
+    @Autowired
+    private UsuarioRepository usuarioRepository;
 
-        String page = mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/consultas"))
+    @Autowired
+    private LegalConsentService legalConsentService;
+
+    @BeforeEach
+    void consentedSessionUserExists() {
+        LegalConsentTestSupport.ensureConsentedUser(
+                usuarioRepository, legalConsentService, "usuario", "ROLE_USER");
+    }
+
+    @Test
+    void busConsultationPageRequiresAuthentication() throws Exception {
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/consultas"))
+                .andExpect(status().is3xxRedirection());
+
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/api/buses/todos"))
+                .andExpect(status().is3xxRedirection());
+    }
+
+    @Test
+    void publicLandingDoesNotLinkToBusConsultation() throws Exception {
+        String page = mockMvc.perform(
+                        org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/index_3_public"))
+                .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
 
         assertThat(page)
-                .contains("Ruta Centro", "Centro", "inicio-de-sesion-mejorado",
-                        "bus-directory-page--public", "content=\"#f5f9fd\"")
-                .doesNotContain("bus-directory-page--authenticated",
-                        "ABC123", "Conductora Confidencial", "07:30", "Verificada");
+                .contains("Planifica tu recorrido sin iniciar sesión.",
+                        "Cartagena,",
+                        "MOVILIDAD LOCAL",
+                        "scene-map",
+                        "scene-bus",
+                        "map-route",
+                        "Moverse por Cartagena debería sentirse más claro.",
+                        "Menos búsquedas. Más claridad para moverte.",
+                        "Busca por barrios",
+                        "id=\"como-funciona\"",
+                        "Tu camino, en tres momentos.",
+                        "La información de tu viaje no debería estar dispersa.",
+                        "Lo que imaginamos para el siguiente tramo.",
+                        "Idea por evaluar",
+                        "/css/public-home.css?v=cartagena-contacto-15",
+                        "/js/index_3_public.js?v=route-map-3",
+                        "name=\"_csrf\"",
+                        "name=\"_csrf_header\"")
+                .doesNotContain("/consultas", "Consulta de buses", "Consultar buses",
+                        "puzzle-piece--origin", "puzzle-shuttle");
     }
 
     @Test
     void authenticatedPageShowsPrivateBusInformationWithoutLoginLink() throws Exception {
-        when(busService.getAllBuses()).thenReturn(List.of(bus()));
+        when(busService.getBusConsultations()).thenReturn(List.of(
+                new BusConsultaDto(44L, "ABC123", "Bus Urbano Test", "Azul",
+                        "Conductora Confidencial", "Ruta Centro",
+                        List.of("Centro", "Getsemaní"), "07:30", true)));
         MockHttpSession session = new MockHttpSession();
         SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
         securityContext.setAuthentication(new UsernamePasswordAuthenticationToken(
@@ -63,15 +106,26 @@ class ConsultasPageIntegrationTest {
         String page = mockMvc.perform(
                         org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/consultas")
                                 .session(session))
+                .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
 
         assertThat(page)
                 .contains("bus-directory-page--authenticated", "content=\"#101715\"",
-                        "ABC123", "Conductora Confidencial", "Iniciar sesión", "07:30", "Verificada")
+                        "ABC123", "Anónimo", "Mi cuenta", "07:30", "Verificada")
                 .doesNotContain("bus-directory-page--public")
-                .contains("href=\"/inicio-de-sesion-mejorado\"");
+                .contains("href=\"/dashboard\"")
+                .doesNotContain("href=\"/inicio-de-sesion-mejorado\"");
+
+        String busApi = mockMvc.perform(
+                        org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/api/buses/todos")
+                                .session(session))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        assertThat(busApi).contains("ABC123", "Anónimo").doesNotContain("Conductora Confidencial");
     }
 
     @Test
@@ -83,12 +137,11 @@ class ConsultasPageIntegrationTest {
                 .getContentAsString();
 
         assertThat(publicPage)
-                .contains("id=\"btnPlanificar\"", "id=\"plannerStatus\"", "Mejor ruta para llegar",
-                        "Se recomienda una sola ruta: primero se prioriza una ruta directa",
-                        "/css/travel.css?v=map-polish-8",
-                        "/css/map-ui.css?v=map-polish-9",
-                        "/js/map-base.js?v=map-polish-6",
-                        "/js/map-travel.js?v=map-polish-7");
+                .contains("id=\"btnPlanificar\"", "id=\"plannerStatus\"", "Rutas disponibles",
+                        "/css/travel.css?v=route-polish-13",
+                        "/css/map-ui.css?v=trips-4",
+                        "/js/map-base.js?v=map-polish-8",
+                        "/js/map-travel.js?v=trips-10");
 
         MockHttpSession session = new MockHttpSession();
         SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
@@ -105,29 +158,10 @@ class ConsultasPageIntegrationTest {
                 .getContentAsString();
 
         assertThat(authenticatedPage)
-                .contains("id=\"btnPlanificar\"", "id=\"plannerStatus\"", "Mejor ruta para llegar",
-                        "Se recomienda una sola ruta: primero se prioriza una ruta directa",
-                        "/css/travel.css?v=map-polish-8",
-                        "/css/map-ui.css?v=map-polish-9",
-                        "/js/map-base.js?v=map-polish-6",
-                        "/js/map-travel.js?v=map-polish-7");
-    }
-
-    private Bus bus() {
-        Ruta ruta = new Ruta();
-        ruta.setId(21L);
-        ruta.setNombre("Ruta Centro");
-        ruta.setBarrios(List.of("Centro", "Getsemaní"));
-        ruta.setHoraAproximada(LocalTime.of(7, 30));
-        ruta.setVerificada(true);
-
-        Bus bus = new Bus();
-        bus.setId(44L);
-        bus.setPlaca("ABC123");
-        bus.setModelo("Bus Urbano Test");
-        bus.setColor("Azul");
-        bus.setConductor("Conductora Confidencial");
-        bus.setRuta(ruta);
-        return bus;
+                .contains("id=\"btnPlanificar\"", "id=\"plannerStatus\"", "Rutas disponibles",
+                        "/css/travel.css?v=route-polish-13",
+                        "/css/map-ui.css?v=trips-5",
+                        "/js/map-base.js?v=map-polish-8",
+                        "/js/map-travel.js?v=trips-10");
     }
 }

@@ -106,6 +106,108 @@
         return bases;
     }
 
+    function crearCapasCartografia(mapa) {
+        var capas = [
+            {
+                etiqueta: 'Barrios · límites catastrales',
+                ruta: '/data/cartografia/barrios-cartografia.geojson',
+                color: '#14b8a6',
+                tipo: 'Barrio',
+                capa: L.layerGroup(),
+                cargada: false,
+                cargando: null
+            },
+            {
+                etiqueta: 'Localidades · límites catastrales',
+                ruta: '/data/cartografia/localidades-cartografia.geojson',
+                color: '#f59e0b',
+                tipo: 'Localidad',
+                capa: L.layerGroup(),
+                cargada: false,
+                cargando: null
+            }
+        ];
+        var atribucionAgregada = false;
+        var superposiciones = {};
+
+        capas.forEach(function (config) {
+            superposiciones[config.etiqueta] = config.capa;
+        });
+
+        L.control.layers(null, superposiciones, {
+            collapsed: true,
+            position: 'topleft'
+        }).addTo(mapa);
+
+        mapa.on('overlayadd', function (evento) {
+            var config = capas.find(function (item) { return item.capa === evento.layer; });
+            if (!config || config.cargada || config.cargando) return;
+
+            config.cargando = fetchJSON(urlAplicacion(config.ruta), 30000)
+                .then(function (datos) {
+                    if (!datos || datos.type !== 'FeatureCollection' || !Array.isArray(datos.features)) {
+                        throw new Error('El archivo cartográfico no contiene una colección GeoJSON válida.');
+                    }
+
+                    L.geoJSON(datos, {
+                        style: {
+                            color: config.color,
+                            weight: 1.5,
+                            opacity: 0.9,
+                            fillColor: config.color,
+                            fillOpacity: 0.035
+                        },
+                        onEachFeature: function (feature, elemento) {
+                            var propiedades = feature.properties || {};
+                            var nombre = String(propiedades.nombre || '').trim();
+                            if (!nombre) return;
+
+                            elemento.bindTooltip(escapeHtml(nombre), {
+                                sticky: true,
+                                direction: 'auto',
+                                className: 'mu-tooltip'
+                            });
+
+                            var texto = config.tipo === 'Barrio'
+                                ? 'Barrio según cartografía catastral.'
+                                : 'Localidad según cartografía catastral.';
+                            var html = '<div class="mu-popup mu-popup--pro">' +
+                                '<div class="mu-popup__banner mu-popup__banner--barrio">' +
+                                '<i class="fas fa-map-location-dot" aria-hidden="true"></i>' +
+                                '<span>' + escapeHtml(config.tipo) + '</span></div>' +
+                                '<div class="mu-popup__body"><strong class="mu-popup__title">' +
+                                escapeHtml(nombre) + '</strong><div class="mu-popup__meta">' +
+                                '<span>' + texto + '</span></div></div>';
+
+                            if (config.tipo === 'Barrio') {
+                                html += '<div class="mu-popup__actions">' +
+                                    '<button type="button" class="mu-popup__btn-action mu-popup__btn--orig" data-set-origin="' +
+                                    escapeHtml(nombre) + '"><i class="fas fa-play" aria-hidden="true"></i> Origen (A)</button>' +
+                                    '<button type="button" class="mu-popup__btn-action mu-popup__btn--dest" data-set-dest="' +
+                                    escapeHtml(nombre) + '"><i class="fas fa-flag" aria-hidden="true"></i> Destino (B)</button>' +
+                                    '</div>';
+                            }
+                            elemento.bindPopup(html + '</div>');
+                        }
+                    }).addTo(config.capa);
+
+                    config.cargada = true;
+                    if (!atribucionAgregada && mapa.attributionControl) {
+                        mapa.attributionControl.addAttribution('Cartografía catastral de Cartagena · barrios y localidades');
+                        atribucionAgregada = true;
+                    }
+                })
+                .catch(function (error) {
+                    mapa.removeLayer(config.capa);
+                    mostrarAviso('No se pudo cargar la capa de ' + config.tipo.toLowerCase() +
+                        ': ' + (error && error.message ? error.message : 'error desconocido'), 'warn', 7000);
+                })
+                .finally(function () {
+                    config.cargando = null;
+                });
+        });
+    }
+
     function capaPrincipal(capa) {
         return capa.getLayers ? capa.getLayers()[0] : capa;
     }
@@ -363,6 +465,7 @@
 
         L.control.zoom({ position: 'topleft', zoomInTitle: 'Acercar', zoomOutTitle: 'Alejar' }).addTo(mapa);
         new ControlVista({ obtenerLimites: opciones.obtenerLimites }).addTo(mapa);
+        crearCapasCartografia(mapa);
 
         var bases = crearMapasBase();
         var nombre = leerPreferencia();
@@ -389,6 +492,37 @@
                     selector.marcar(clave);
                 }
             });
+        });
+
+        mapa.on('popupopen', function (e) {
+            var popEl = e.popup.getElement();
+            if (!popEl) return;
+            var btnSpeak = popEl.querySelector('.mu-popup__btn-speak');
+            if (btnSpeak) {
+                btnSpeak.addEventListener('click', function () {
+                    var texto = btnSpeak.getAttribute('data-speak');
+                    if (global.BustrakerNotificaciones && global.BustrakerNotificaciones.hablar) {
+                        global.BustrakerNotificaciones.chime();
+                        global.BustrakerNotificaciones.hablar(texto, true);
+                    }
+                });
+            }
+            var btnOrig = popEl.querySelector('[data-set-origin]');
+            if (btnOrig) {
+                btnOrig.addEventListener('click', function () {
+                    var barrio = btnOrig.getAttribute('data-set-origin');
+                    global.dispatchEvent(new CustomEvent('bustraker:fijar-origen', { detail: { barrio: barrio } }));
+                    mapa.closePopup();
+                });
+            }
+            var btnDest = popEl.querySelector('[data-set-dest]');
+            if (btnDest) {
+                btnDest.addEventListener('click', function () {
+                    var barrio = btnDest.getAttribute('data-set-dest');
+                    global.dispatchEvent(new CustomEvent('bustraker:fijar-destino', { detail: { barrio: barrio } }));
+                    mapa.closePopup();
+                });
+            }
         });
 
         // Si el proveedor activo no responde (sin internet, bloqueo, caída), pasamos a OpenStreetMap.
@@ -443,75 +577,137 @@
 
     /* ===================== MARCADORES ===================== */
     function contenidoPopup(titulo, nombre, nota) {
-        return '<div class="mu-popup"><span class="mu-popup__titulo">' + escapeHtml(titulo) +
-            '</span><strong>' + escapeHtml(nombre) + '</strong>' +
-            (nota ? '<span class="mu-popup__nota">' + escapeHtml(nota) + '</span>' : '') + '</div>';
+        return '<div class="mu-popup mu-popup--pro">' +
+            '<div class="mu-popup__banner"><i class="fas fa-location-dot"></i><span>' + escapeHtml(titulo) + '</span></div>' +
+            '<div class="mu-popup__body"><strong>' + escapeHtml(nombre) + '</strong>' +
+            (nota ? '<p class="mu-popup__nota">' + escapeHtml(nota) + '</p>' : '') +
+            '</div>' +
+            (global.BustrakerNotificaciones ? '<div class="mu-popup__actions">' +
+            '  <button type="button" class="mu-popup__btn-speak" data-speak="' + escapeHtml(titulo + ': ' + nombre) + '"><i class="fas fa-volume-high"></i> Escuchar por voz</button>' +
+            '</div>' : '') + '</div>';
     }
 
-    /** Pin con letra: tipo 'origen' (A, verde) o 'destino' (B, rojo). */
+    /** Pin 3D profesional con radar de pulso y diseño de navegación. */
     function crearPin(lat, lng, tipo, nombre, nota) {
         var esOrigen = tipo === 'origen';
-        var titulo = esOrigen ? 'Origen' : 'Destino';
-        var etiqueta = escapeHtml(nombre) + (nota ? ' · <small>Ubicación aproximada</small>' : '');
+        var titulo = esOrigen ? 'Origen (Punto de Salida)' : 'Destino (Llegada)';
+        var etiqueta = escapeHtml(nombre) + (nota ? ' · <small>Aproximada</small>' : '');
+        var iconoFa = esOrigen ? 'fa-location-arrow' : 'fa-flag-checkered';
+        var textoHablar = (esOrigen ? 'Origen del viaje: ' : 'Destino del viaje: ') + nombre + (nota ? '. ' + nota : '');
+
+        var htmlPin =
+            '<div class="bp-pin-wrapper bp-pin-wrapper--' + tipo + '">' +
+            '  <div class="bp-pin-pulse"></div>' +
+            '  <div class="bp-pin">' +
+            '    <span class="bp-pin-icon"><i class="fas ' + iconoFa + '"></i></span>' +
+            '    <span class="bp-pin-badge">' + (esOrigen ? 'A' : 'B') + '</span>' +
+            '  </div>' +
+            '  <div class="bp-pin-tip"></div>' +
+            '  <div class="bp-pin-shadow"></div>' +
+            '</div>';
+
         var icono = L.divIcon({
-            className: 'mu-pin-contenedor',
-            html: '<span class="mu-pin mu-pin--' + tipo + '"><b>' + (esOrigen ? 'A' : 'B') + '</b></span>',
-            iconSize: [34, 34],
-            iconAnchor: [17, 41],
-            tooltipAnchor: [0, -48],
-            popupAnchor: [0, -48]
+            className: 'bp-pin-contenedor',
+            html: htmlPin,
+            iconSize: [42, 54],
+            iconAnchor: [21, 52],
+            tooltipAnchor: [0, -56],
+            popupAnchor: [0, -52]
         });
+
+        var popupHtml =
+            '<div class="mu-popup mu-popup--pro">' +
+            '  <div class="mu-popup__banner mu-popup__banner--' + tipo + '">' +
+            '    <i class="fas ' + iconoFa + '"></i>' +
+            '    <span>' + escapeHtml(titulo) + '</span>' +
+            '  </div>' +
+            '  <div class="mu-popup__body">' +
+            '    <strong class="mu-popup__title">' + escapeHtml(nombre) + '</strong>' +
+            '    ' + (nota ? '<p class="mu-popup__nota"><i class="fas fa-circle-info"></i> ' + escapeHtml(nota) + '</p>' : '') +
+            '  </div>' +
+            (global.BustrakerNotificaciones ? '  <div class="mu-popup__actions">' +
+            '    <button type="button" class="mu-popup__btn-speak" data-speak="' + escapeHtml(textoHablar) + '"><i class="fas fa-volume-high"></i> Escuchar por voz</button>' +
+            '  </div>' : '') +
+            '</div>';
+
         return L.marker([lat, lng], { icon: icono, riseOnHover: true, keyboard: true, title: titulo + ': ' + nombre })
-            .bindTooltip('<b>' + titulo + '</b> · ' + etiqueta, {
+            .bindTooltip('<b>' + (esOrigen ? 'A' : 'B') + '</b> · ' + etiqueta, {
                 permanent: true, direction: 'top', className: 'mu-tooltip mu-tooltip--' + tipo
             })
-            .bindPopup(contenidoPopup(titulo + ' del tramo', nombre, nota));
+            .bindPopup(popupHtml);
     }
 
     /** Punto pequeño para paradas / barrios intermedios. */
     function crearPuntoIntermedio(lat, lng, titulo, nombre) {
         var punto = L.circleMarker([lat, lng], {
-            radius: 6, weight: 2, color: '#ffffff', fillColor: '#38bdf8', fillOpacity: 1
+            radius: 7, weight: 2.5, color: '#ffffff', fillColor: '#38bdf8', fillOpacity: 0.95
         })
-            .bindTooltip(escapeHtml(nombre), { direction: 'top', offset: [0, -6], className: 'mu-tooltip' })
+            .bindTooltip(escapeHtml(nombre), { direction: 'top', offset: [0, -7], className: 'mu-tooltip' })
             .bindPopup(contenidoPopup(titulo, nombre));
-        punto.on('mouseover', function () { punto.setRadius(8); });
-        punto.on('mouseout', function () { punto.setRadius(6); });
+        punto.on('mouseover', function () { punto.setRadius(9); });
+        punto.on('mouseout', function () { punto.setRadius(7); });
         return punto;
     }
 
+    /** Marcador moderno de nodo de transporte para paradas, transbordos y cabeceras. */
     function crearMarcadorParada(lat, lng, numero, datos) {
         datos = datos || {};
         var esParada = datos.tipo !== 'barrio';
         var esTransbordo = datos.transbordo === true;
+        var iconoClase = esTransbordo ? 'fa-right-left' : (esParada ? 'fa-bus-simple' : 'fa-location-crosshairs');
+        var claseNodo = esTransbordo ? 'bp-stop--transbordo' : (esParada ? 'bp-stop--parada' : 'bp-stop--barrio');
+
+        var htmlMarcador =
+            '<div class="bp-stop ' + claseNodo + '">' +
+            '  <div class="bp-stop__icon"><i class="fas ' + iconoClase + '"></i></div>' +
+            '  <div class="bp-stop__badge">' + escapeHtml(numero) + '</div>' +
+            '  <div class="bp-stop__ring"></div>' +
+            '</div>';
+
         var icono = L.divIcon({
-            className: 'mu-parada-contenedor',
-            html: '<span class="mu-parada' + (esParada ? '' : ' mu-parada--barrio') +
-                (esTransbordo ? ' mu-parada--transbordo' : '') + '">' +
-                escapeHtml(numero) + '</span>',
-            iconSize: [26, 26],
-            iconAnchor: [13, 13],
-            popupAnchor: [0, -14],
-            tooltipAnchor: [0, -14]
+            className: 'bp-stop-contenedor',
+            html: htmlMarcador,
+            iconSize: [32, 32],
+            iconAnchor: [16, 16],
+            popupAnchor: [0, -20],
+            tooltipAnchor: [0, -18]
         });
+
         var detalle = [];
-        if (datos.barrio) detalle.push('<span>Barrio: ' + escapeHtml(datos.barrio) + '</span>');
-        if (datos.ubicacion) detalle.push('<span>' + escapeHtml(datos.ubicacion) + '</span>');
-        if (datos.referencia) detalle.push('<span>Ref.: ' + escapeHtml(datos.referencia) + '</span>');
-        if (!esParada) detalle.push('<span class="mu-popup__nota">Referencia al centro del barrio; no hay parada física registrada.</span>');
+        if (datos.barrio) detalle.push('<div class="mu-popup__meta-item"><i class="fas fa-map-pin"></i> <span>Barrio: <strong>' + escapeHtml(datos.barrio) + '</strong></span></div>');
+        if (datos.ubicacion) detalle.push('<div class="mu-popup__meta-item"><i class="fas fa-road"></i> <span>' + escapeHtml(datos.ubicacion) + '</span></div>');
+        if (datos.referencia) detalle.push('<div class="mu-popup__meta-item"><i class="fas fa-landmark"></i> <span>Ref.: ' + escapeHtml(datos.referencia) + '</span></div>');
+        if (!esParada) detalle.push('<p class="mu-popup__nota"><i class="fas fa-info-circle"></i> Centro del barrio (sin parada física registrada).</p>');
         if (esTransbordo && datos.rutaSiguiente) {
-            detalle.push('<span class="mu-popup__nota">Transbordo: cambiar a ' + escapeHtml(datos.rutaSiguiente) + ' aquí.</span>');
+            detalle.push('<div class="mu-popup__transfer-alert"><i class="fas fa-arrow-right-arrow-left"></i> <strong>Transbordo necesario</strong>: Cambiar a la ruta <em>' + escapeHtml(datos.rutaSiguiente) + '</em> aquí.</div>');
         }
-        var titulo = esTransbordo ? 'Transbordo ' + numero : (esParada ? 'Parada ' : 'Barrio ') + numero;
-        return L.marker([lat, lng], { icon: icono, keyboard: true, title: titulo + ': ' + (datos.nombre || '') })
-            .bindTooltip(escapeHtml(datos.nombre || titulo) +
-                (datos.coordenadaEstimada ? ' · <small>Ubicación aproximada</small>' : ''),
-                { direction: 'top', className: 'mu-tooltip' })
-            .bindPopup('<div class="mu-popup"><span class="mu-popup__titulo">' + titulo + '</span><strong>' +
-                escapeHtml(datos.nombre || '') + '</strong>' +
-                (datos.coordenadaEstimada
-                    ? '<span class="mu-popup__nota">Ubicación aproximada; verifica el recorrido antes de viajar.</span>'
-                    : '') + detalle.join('') + '</div>');
+
+        var titulo = esTransbordo ? 'Transbordo #' + numero : (esParada ? 'Parada #' + numero : 'Punto de Barrio #' + numero);
+        var nombreLimpio = datos.nombre || titulo;
+        var textoHablar = titulo + ': ' + nombreLimpio + (datos.barrio ? ', en barrio ' + datos.barrio : '') + (esTransbordo && datos.rutaSiguiente ? '. Cambiar a la ruta ' + datos.rutaSiguiente + ' aquí' : '');
+
+        var bannerClase = esTransbordo ? 'mu-popup__banner--transbordo' : (esParada ? 'mu-popup__banner--parada' : 'mu-popup__banner--barrio');
+
+        var popupHtml =
+            '<div class="mu-popup mu-popup--pro">' +
+            '  <div class="mu-popup__banner ' + bannerClase + '">' +
+            '    <i class="fas ' + iconoClase + '"></i>' +
+            '    <span>' + escapeHtml(titulo) + '</span>' +
+            '  </div>' +
+            '  <div class="mu-popup__body">' +
+            '    <strong class="mu-popup__title">' + escapeHtml(nombreLimpio) + '</strong>' +
+            '    <div class="mu-popup__meta">' + detalle.join('') + '</div>' +
+            '  </div>' +
+            '  <div class="mu-popup__actions">' +
+            '    <button type="button" class="mu-popup__btn-action mu-popup__btn--orig" data-set-origin="' + escapeHtml(datos.barrio || nombreLimpio) + '"><i class="fas fa-play"></i> Origen (A)</button>' +
+            '    <button type="button" class="mu-popup__btn-action mu-popup__btn--dest" data-set-dest="' + escapeHtml(datos.barrio || nombreLimpio) + '"><i class="fas fa-flag"></i> Destino (B)</button>' +
+            (global.BustrakerNotificaciones ? '    <button type="button" class="mu-popup__btn-speak" data-speak="' + escapeHtml(textoHablar) + '"><i class="fas fa-volume-high"></i> Escuchar</button>' : '') +
+            '  </div>' +
+            '</div>';
+
+        return L.marker([lat, lng], { icon: icono, keyboard: true, title: titulo + ': ' + nombreLimpio })
+            .bindTooltip(escapeHtml(nombreLimpio) + (datos.coordenadaEstimada ? ' · <small>Aproximada</small>' : ''), { direction: 'top', className: 'mu-tooltip' })
+            .bindPopup(popupHtml);
     }
 
     /** Decide qué punto es el origen y cuál el destino (por nombre; si no hay coincidencia, primero y último). */

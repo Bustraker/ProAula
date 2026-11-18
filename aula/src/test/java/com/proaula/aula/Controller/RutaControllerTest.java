@@ -8,6 +8,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.ui.ExtendedModelMap;
 
 import java.util.List;
 
@@ -56,11 +57,53 @@ class RutaControllerTest {
         formulario.setVerificada(true);
         when(rutaService.getRutaById(5L)).thenReturn(existente);
 
-        rutaController.guardarEdicionRuta(5L, formulario, "Centro, Manga, Crespo");
+        rutaController.guardarEdicionRuta(5L, formulario, "Centro, Manga, Crespo", null);
 
-        verify(rutaService).saveRuta(existente);
+        verify(rutaService).saveRuta(existente, true);
         assertThat(existente.getBarriosOrdenados()).containsExactly("Centro", "Manga", "Crespo");
         assertThat(existente.isOrdenBarriosConfirmado()).isTrue();
         assertThat(existente.getVerificada()).isTrue();
+    }
+
+    @Test
+    void guardarEdicionRutaActualizaAccesibilidadYMarcaLaRutaComoModificada() {
+        Ruta existente = new Ruta();
+        existente.setId(8L);
+        existente.setBarrios(List.of("Centro", "Manga"));
+        existente.setBarriosOrdenados(List.of("Centro", "Manga"));
+        existente.setVerificada(true);
+        Ruta formulario = new Ruta();
+        formulario.setVerificada(true);
+        when(rutaService.getRutaById(8L)).thenReturn(existente);
+
+        rutaController.guardarEdicionRuta(8L, formulario, "Centro, Manga", true);
+
+        assertThat(existente.getAccesibleMovilidadReducida()).isTrue();
+        verify(rutaService).saveRuta(existente, true);
+    }
+
+    @Test
+    void listarRutasPermiteFiltrarAccesiblesNoAccesiblesYSinDatos() {
+        Ruta accesible = rutaActiva("Accesible", true);
+        Ruta noAccesible = rutaActiva("No accesible", false);
+        Ruta sinDatos = rutaActiva("Sin datos", null);
+        when(rutaService.getAllRutas()).thenReturn(List.of(accesible, noAccesible, sinDatos));
+
+        ExtendedModelMap model = new ExtendedModelMap();
+        rutaController.listarRutas(model, null, null, "accesible");
+        assertThat(model.getAttribute("rutas")).isEqualTo(List.of(accesible));
+
+        rutaController.listarRutas(model, null, null, "no-accesible");
+        assertThat(model.getAttribute("rutas")).isEqualTo(List.of(noAccesible));
+
+        rutaController.listarRutas(model, null, null, "sin-datos");
+        assertThat(model.getAttribute("rutas")).isEqualTo(List.of(sinDatos));
+    }
+
+    private Ruta rutaActiva(String nombre, Boolean accesible) {
+        Ruta ruta = new Ruta();
+        ruta.setNombre(nombre);
+        ruta.setAccesibleMovilidadReducida(accesible);
+        return ruta;
     }
 }

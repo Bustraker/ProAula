@@ -16,6 +16,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
@@ -46,6 +47,10 @@ public class GlobalExceptionHandler {
         boolean conflict = "RESOURCE_IN_USE".equals(ex.getErrorCode())
                 || "EMAIL_ALREADY_EXISTS".equals(ex.getErrorCode());
         HttpStatus status = "INCIDENT_NOT_FOUND".equals(ex.getErrorCode())
+                || "ROUTE_NOT_FOUND".equals(ex.getErrorCode())
+                || "FAVORITE_NOT_FOUND".equals(ex.getErrorCode())
+                || "NOTIFICATION_NOT_FOUND".equals(ex.getErrorCode())
+                || "STOP_NOT_FOUND".equals(ex.getErrorCode())
                 ? HttpStatus.NOT_FOUND
                 : conflict ? HttpStatus.CONFLICT : HttpStatus.BAD_REQUEST;
         return respond(status, ex.getErrorCode(), ex.getMessage(),
@@ -95,6 +100,16 @@ public class GlobalExceptionHandler {
         logger.error("DataAccessException: {}", ex.getMessage(), ex);
         return respond(HttpStatus.INTERNAL_SERVER_ERROR, "DATABASE_ERROR",
             "Error de conexión con la base de datos", "error/500", model, request, response, Map.of());
+    }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public Object handleResponseStatusException(ResponseStatusException ex, Model model,
+                                                HttpServletRequest request, HttpServletResponse response) {
+        HttpStatus status = HttpStatus.valueOf(ex.getStatusCode().value());
+        String message = ex.getReason() == null ? status.getReasonPhrase() : ex.getReason();
+        logger.warn("Request rejected with HTTP {}: {}", status.value(), message);
+        return respond(status, status.name(), message, "error/500",
+            model, request, response, Map.of());
     }
 
     @ExceptionHandler(Exception.class)
