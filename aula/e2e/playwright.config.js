@@ -5,6 +5,7 @@ const baseURL = process.env.BASE_URL || "http://127.0.0.1:3466";
 module.exports = defineConfig({
   testDir: "./tests",
   fullyParallel: false,
+  workers: 2,
   retries: 0,
   reporter: "list",
   use: {
