@@ -48,10 +48,12 @@ class RutaRestControllerTest {
         assertThat(datosRuta.get("origen")).isEqualTo("Centro");
         assertThat(datosRuta.get("destino")).isEqualTo("Manga");
         assertThat(datosRuta.get("descripcion")).isEqualTo("Recorrido de prueba");
+        assertThat(datosRuta.get("accesibleMovilidadReducida")).isEqualTo(true);
         assertThat(datosRuta.get("ordenBarriosConfirmado")).isEqualTo(true);
         assertThat(datosRuta.get("coordenadasEstimadas")).isEqualTo(List.of("Manga"));
         assertThat(buses).hasSize(1);
         assertThat(bus.get("placa")).isEqualTo("ABC123");
+        assertThat(bus.get("accesibleMovilidadReducida")).isEqualTo(true);
         assertThat(bus.containsKey("conductor")).isFalse();
     }
 
@@ -85,6 +87,7 @@ class RutaRestControllerTest {
 
         assertThat(rutas).hasSize(1);
         assertThat(rutas.get(0)).containsEntry("descripcion", "Recorrido de prueba")
+            .containsEntry("accesibleMovilidadReducida", true)
             .containsEntry("origen", "Centro")
             .containsEntry("destino", "Manga");
     }
@@ -98,6 +101,7 @@ class RutaRestControllerTest {
         ruta.setOrigen("Centro");
         ruta.setDestino("Manga");
         ruta.setDescripcion("Recorrido de prueba");
+        ruta.setAccesibleMovilidadReducida(true);
         ruta.setVerificada(true);
         ruta.setEstado(Ruta.Estado.ACTIVA);
         Bus bus = new Bus();
@@ -105,6 +109,7 @@ class RutaRestControllerTest {
         bus.setPlaca("ABC123");
         bus.setModelo("Bus");
         bus.setConductor("Conductor privado");
+        bus.setAccesibleMovilidadReducida(true);
         ruta.getBuses().add(bus);
         return ruta;
     }

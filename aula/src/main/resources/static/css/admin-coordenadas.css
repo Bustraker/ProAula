@@ -78,6 +78,7 @@
     vertical-align: top;
 }
 .coordinates-table td:first-child { min-width: 210px; }
+.coordinates-table td:nth-child(2) { min-width: 260px; }
 .coordinates-table td:last-child { min-width: 370px; }
 .coordinates-table td > strong, .coordinates-table td > span, .coordinates-table td > small {
     display: block;
@@ -103,6 +104,21 @@
     font: inherit;
 }
 .coordinates-fields input:focus-visible { outline: 2px solid #78dfcc; outline-offset: 2px; }
+.coordinates-form select, .coordinates-form textarea {
+    width: 100%;
+    min-height: 38px;
+    padding: 7px 9px;
+    border: 1px solid rgba(164, 213, 203, 0.22);
+    border-radius: 8px;
+    color: #f1f8f6;
+    background: rgba(3, 10, 12, 0.58);
+    font: inherit;
+}
+.coordinates-form label { color: #a9bfbb; font-size: 0.72rem; }
+.coordinates-form select:focus-visible, .coordinates-form textarea:focus-visible {
+    outline: 2px solid #78dfcc;
+    outline-offset: 2px;
+}
 .coordinates-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .coordinates-actions button {
     min-height: 36px;

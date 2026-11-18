@@ -51,4 +51,19 @@ public class CoordenadasParadaController {
             "Coordenadas guardadas para " + parada.getNombre() + ".");
         return "redirect:/admin/coordenadas-paradas";
     }
+
+    @PostMapping("/admin/paradas/{id}/accesibilidad")
+    public String guardarAccesibilidad(
+            @PathVariable Long id,
+            @RequestParam(value = "accesibleMovilidadReducida", required = false) Boolean accesible,
+            @RequestParam(value = "observacionesAccesibilidad", required = false) String observaciones,
+            RedirectAttributes redirectAttributes) {
+        Parada parada = paradaCoordenadasService.actualizarAccesibilidad(id, accesible, observaciones).orElse(null);
+        if (parada == null) {
+            return "redirect:/admin/coordenadas-paradas?error=parada";
+        }
+        redirectAttributes.addFlashAttribute("accesibilidadGuardada",
+            "Accesibilidad actualizada para " + parada.getNombre() + ".");
+        return "redirect:/admin/coordenadas-paradas";
+    }
 }

@@ -43,6 +43,7 @@ class BusControllerTest {
         Bus formulario = new Bus();
         formulario.setPlaca("XYZ-987");
         formulario.setModelo("Modelo actualizado");
+        formulario.setAccesibleMovilidadReducida(true);
 
         when(busService.getBusById(12L)).thenReturn(existente);
 
@@ -51,6 +52,7 @@ class BusControllerTest {
         assertThat(resultado).isEqualTo("redirect:/index_2");
         assertThat(existente.getPlaca()).isEqualTo("XYZ-987");
         assertThat(existente.getModelo()).isEqualTo("Modelo actualizado");
+        assertThat(existente.getAccesibleMovilidadReducida()).isTrue();
         assertThat(existente.getColor()).isEqualTo("Azul");
         assertThat(existente.getConductor()).isEqualTo("Anónimo");
         assertThat(existente.getRuta()).isSameAs(ruta);

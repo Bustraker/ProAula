@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+    <span th:fragment="status(value)" class="accessibility-status"
+          th:classappend="${value == null ? ' accessibility-status--unknown' : (value ? ' accessibility-status--yes' : ' accessibility-status--no')}"
+          th:text="${value == null ? 'Sin información' : (value ? 'Registrada como accesible' : 'Registrada como no accesible')}">
+        Sin información
+    </span>
+
+    <section th:fragment="controls" class="accessibility-controls" aria-label="Opciones de visualización">
+        <strong>Visualización</strong>
+        <div class="accessibility-controls__actions">
+            <button type="button" id="accessibilityTextDecrease" aria-label="Reducir tamaño del texto">A-</button>
+            <button type="button" id="accessibilityTextIncrease" aria-label="Aumentar tamaño del texto">A+</button>
+            <button type="button" id="accessibilityTextReset">Restablecer texto</button>
+            <button type="button" id="accessibilityContrast" aria-pressed="false">Alto contraste</button>
+        </div>
+        <span id="accessibilityControlsStatus" class="accessibility-controls__status" role="status" aria-live="polite"></span>
+    </section>
+</body>
+</html>

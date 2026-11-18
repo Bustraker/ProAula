@@ -58,8 +58,8 @@ public class Parada {
     @Column(nullable = false, length = 20)
     private Estado estado = Estado.ACTIVA;
 
-    @Column(name = "accesible_movilidad_reducida", nullable = false)
-    private Boolean accesibleMovilidadReducida = false;
+    @Column(name = "accesible_movilidad_reducida")
+    private Boolean accesibleMovilidadReducida;
 
     @Column(name = "tiene_sombra")
     private Boolean tieneSombra = false;

@@ -1,0 +1,131 @@
+.accessibility-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.6rem;
+    margin: 1rem 0;
+    padding: 0.75rem 1rem;
+    border: 1px solid #9ca3af;
+    border-radius: 0.75rem;
+    background: #fff;
+    color: #111827;
+}
+
+.accessibility-controls__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.accessibility-controls button {
+    min-height: 2.5rem;
+    padding: 0.45rem 0.75rem;
+    border: 2px solid #01315f;
+    border-radius: 0.4rem;
+    background: #fff;
+    color: #01315f;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.accessibility-controls button:focus-visible {
+    outline: 3px solid #ffb347;
+    outline-offset: 2px;
+}
+
+.accessibility-controls__status {
+    flex-basis: 100%;
+}
+
+.accessibility-status {
+    display: inline-block;
+    font-weight: 700;
+}
+
+.accessibility-status--yes {
+    color: #166534;
+}
+
+.accessibility-status--no {
+    color: #991b1b;
+}
+
+.accessibility-status--unknown {
+    color: #4b5563;
+}
+
+.accessibility-disclaimer,
+.accessibility-detail,
+.stop-accessibility-filter,
+.accessibility-filter-status {
+    display: block;
+    margin: 0.75rem 0;
+}
+
+.accessibility-detail {
+    padding: 0.9rem;
+    border: 1px solid #9ca3af;
+    border-radius: 0.5rem;
+}
+
+.accessibility-detail p {
+    margin-top: 0.4rem;
+}
+
+.stop-accessibility-filter select {
+    min-height: 2.5rem;
+    margin-left: 0.5rem;
+    padding: 0.4rem;
+}
+
+html.accessibility-text-110 {
+    font-size: clamp(15px, 2.2vw, 20px) !important;
+}
+
+html.accessibility-text-125 {
+    font-size: clamp(17px, 2.5vw, 22px) !important;
+}
+
+html.accessibility-high-contrast body {
+    background: #000 !important;
+    color: #fff !important;
+}
+
+html.accessibility-high-contrast body * {
+    background-color: transparent !important;
+    background-image: none !important;
+    color: #fff !important;
+    border-color: #fff !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+}
+
+html.accessibility-high-contrast body a {
+    color: #ff0 !important;
+    text-decoration: underline !important;
+}
+
+html.accessibility-high-contrast body :is(button, input, select, textarea) {
+    background: #000 !important;
+    color: #fff !important;
+    border: 2px solid #fff !important;
+}
+
+html.accessibility-high-contrast body :is(button, .btn) {
+    background: #ff0 !important;
+    color: #000 !important;
+    border-color: #fff !important;
+}
+
+html.accessibility-high-contrast body :is(a, button, input, select, textarea):focus-visible {
+    outline: 3px solid #ff0 !important;
+    outline-offset: 3px;
+}
+
+html.accessibility-high-contrast .accessibility-controls {
+    background: #000 !important;
+    color: #fff !important;
+    border: 2px solid #fff !important;
+}

@@ -31,4 +31,14 @@ public class ParadaCoordenadasService {
             return paradaRepository.saveAndFlush(parada);
         });
     }
+
+    @Transactional
+    public Optional<Parada> actualizarAccesibilidad(Long paradaId, Boolean accesible, String observaciones) {
+        return paradaRepository.findById(paradaId).map(parada -> {
+            parada.setAccesibleMovilidadReducida(accesible);
+            parada.setObservacionesAccesibilidad(
+                observaciones == null || observaciones.isBlank() ? null : observaciones.trim());
+            return paradaRepository.saveAndFlush(parada);
+        });
+    }
 }

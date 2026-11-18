@@ -84,6 +84,13 @@
                         <input type="time" id="horaAproximada" th:field="*{horaAproximada}">
                         <span th:if="${#fields.hasErrors('horaAproximada')}" th:errors="*{horaAproximada}" class="legacy-field-error"></span>
 
+                        <label for="accesibleMovilidadReducida">Accesibilidad para movilidad reducida</label>
+                        <select id="accesibleMovilidadReducida" th:field="*{accesibleMovilidadReducida}">
+                            <option value="">Sin información verificada</option>
+                            <option value="true">Registrada como accesible</option>
+                            <option value="false">Registrada como no accesible</option>
+                        </select>
+
                         <label class="legacy-checkbox">
                             <input type="checkbox" id="verificada" th:field="*{verificada}">
                             <span>Confirmo que la ruta y el orden de sus barrios fueron verificados.</span>

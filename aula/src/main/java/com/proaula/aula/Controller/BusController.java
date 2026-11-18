@@ -52,6 +52,7 @@ public class BusController {
         Bus busExistente = busService.getBusById(id);
         busExistente.setPlaca(bus.getPlaca());
         busExistente.setModelo(bus.getModelo());
+        busExistente.setAccesibleMovilidadReducida(bus.getAccesibleMovilidadReducida());
         busService.saveBus(busExistente);
         return "redirect:/index_2";
     }

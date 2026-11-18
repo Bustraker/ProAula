@@ -202,6 +202,15 @@
                                 </div>
                             </div>
 
+                            <div class="fleet-field">
+                                <label for="accesibleMovilidadReducida">Accesibilidad para movilidad reducida</label>
+                                <select id="accesibleMovilidadReducida" th:field="*{accesibleMovilidadReducida}">
+                                    <option value="">Sin información verificada</option>
+                                    <option value="true">Registrado como accesible</option>
+                                    <option value="false">Registrado como no accesible</option>
+                                </select>
+                            </div>
+
                             <div class="fleet-immutable-details">
                                 <div class="fleet-details-heading"><span>DATOS OPERATIVOS</span><i class="fas fa-lock" aria-hidden="true"></i> Se mantienen sin cambios</div>
                                 <div class="fleet-detail-grid">

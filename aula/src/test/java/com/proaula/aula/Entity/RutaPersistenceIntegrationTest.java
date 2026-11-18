@@ -387,7 +387,7 @@ class RutaPersistenceIntegrationTest {
 
         Ruta formularioEdicion = new Ruta();
         formularioEdicion.setVerificada(true);
-        rutaController.guardarEdicionRuta(idNueva, formularioEdicion, "Crespo, Manga, Centro");
+        rutaController.guardarEdicionRuta(idNueva, formularioEdicion, "Crespo, Manga, Centro", null);
         entityManager.flush();
         entityManager.clear();
         Ruta recargada = rutaRepository.findById(idNueva).orElseThrow();

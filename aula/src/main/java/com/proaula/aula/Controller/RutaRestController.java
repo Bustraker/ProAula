@@ -51,6 +51,8 @@ public class RutaRestController {
             mapa.put("origen", ruta.getOrigen());
             mapa.put("destino", ruta.getDestino());
             mapa.put("descripcion", ruta.getDescripcion());
+            mapa.put("accesibleMovilidadReducida", ruta.getAccesibleMovilidadReducida());
+            mapa.put("observacionesAccesibilidad", ruta.getObservacionesAccesibilidad());
             mapa.put(CAMPO_BARRIOS, ruta.getBarrios());
             mapa.put("barriosOrdenados", ruta.getBarriosOrdenados());
             mapa.put("ordenBarriosConfirmado", ruta.isOrdenBarriosConfirmado());
@@ -72,6 +74,8 @@ public class RutaRestController {
                     datosParada.put("latitud", parada.getLatitud());
                     datosParada.put("longitud", parada.getLongitud());
                     datosParada.put("estado", parada.getEstado().name());
+                    datosParada.put("accesibleMovilidadReducida", parada.getAccesibleMovilidadReducida());
+                    datosParada.put("observacionesAccesibilidad", parada.getObservacionesAccesibilidad());
                     paradas.add(datosParada);
                 });
             mapa.put("paradas", paradas);
@@ -109,6 +113,7 @@ public class RutaRestController {
                 datosBus.put("placa", bus.getPlaca());
                 datosBus.put("modelo", bus.getModelo());
                 datosBus.put("color", bus.getColor());
+                datosBus.put("accesibleMovilidadReducida", bus.getAccesibleMovilidadReducida());
                 if (autenticado) {
                     datosBus.put("conductor", "Anónimo");
                 }
@@ -136,6 +141,8 @@ public class RutaRestController {
             mapa.put("origen", ruta.getOrigen());
             mapa.put("destino", ruta.getDestino());
             mapa.put("descripcion", ruta.getDescripcion());
+            mapa.put("accesibleMovilidadReducida", ruta.getAccesibleMovilidadReducida());
+            mapa.put("observacionesAccesibilidad", ruta.getObservacionesAccesibilidad());
             mapa.put(CAMPO_BARRIOS, ruta.getBarrios());
             mapa.put("barriosOrdenados", ruta.getBarriosOrdenados());
             mapa.put("ordenBarriosConfirmado", ruta.isOrdenBarriosConfirmado());
@@ -157,6 +164,8 @@ public class RutaRestController {
         datos.put("latitud", parada.getLatitud());
         datos.put("longitud", parada.getLongitud());
         datos.put("estado", parada.getEstado().name());
+        datos.put("accesibleMovilidadReducida", parada.getAccesibleMovilidadReducida());
+        datos.put("observacionesAccesibilidad", parada.getObservacionesAccesibilidad());
         return datos;
     }
 }
