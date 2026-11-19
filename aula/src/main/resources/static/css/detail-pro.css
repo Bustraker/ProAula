@@ -8,15 +8,15 @@
    VARIABLES DETALLE
 ══════════════════════════════════════════════ */
 :root {
-    --det-acento:  #5da8e8;
+    --det-acento:  #37c8ba;
     --det-origen:  #22c55e;
     --det-destino: #ef4444;
     --det-bg:      rgba(6, 18, 24, 0.97);
     --det-sup:     rgba(13, 32, 38, 0.95);
-    --det-borde:   rgba(106, 170, 223, 0.24);
+    --det-borde:   rgba(86, 191, 181, 0.22);
     --det-sombra:  0 24px 64px rgba(0, 10, 15, 0.52);
-    --sim-verde:   #327fbd;
-    --sim-azul:    #5da8e8;
+    --sim-verde:   #10b981;
+    --sim-azul:    #3b82f6;
     --radio-det:   16px;
 }
 
@@ -41,7 +41,7 @@
     position: absolute;
     inset: 0;
     background:
-        radial-gradient(ellipse 60% 40% at 90% 0%, rgba(93, 168, 232, 0.14), transparent),
+        radial-gradient(ellipse 60% 40% at 90% 0%, rgba(55, 200, 186, 0.14), transparent),
         radial-gradient(ellipse 40% 60% at 10% 100%, rgba(37, 99, 235, 0.07), transparent);
     pointer-events: none;
 }
@@ -152,8 +152,8 @@
     font-weight: 800;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    background: rgba(93, 168, 232, 0.15);
-    border: 1px solid rgba(93, 168, 232, 0.3);
+    background: rgba(55, 200, 186, 0.15);
+    border: 1px solid rgba(55, 200, 186, 0.3);
     color: var(--det-acento);
     white-space: nowrap;
 }
@@ -181,7 +181,7 @@
 .det-hero__pill--a {
     background: rgba(34, 197, 94, 0.14);
     border: 1px solid rgba(34, 197, 94, 0.28);
-    color: #a9d8ff;
+    color: #86efac;
 }
 .det-hero__pill--b {
     background: rgba(239, 68, 68, 0.14);
@@ -206,11 +206,11 @@
     flex-direction: column;
     align-items: center;
     gap: 2px;
-    color: rgba(93, 168, 232, 0.6);
+    color: rgba(55, 200, 186, 0.6);
     font-size: 0.65rem;
     flex-shrink: 0;
 }
-.det-hero__flecha i { font-size: 1rem; color: rgba(93, 168, 232, 0.5); }
+.det-hero__flecha i { font-size: 1rem; color: rgba(55, 200, 186, 0.5); }
 
 /* Fila meta (hora, transbordo) */
 .det-hero__meta {
@@ -233,7 +233,7 @@
     color: #bbd0ce;
 }
 .det-hero__tag i { color: var(--det-acento); font-size: 0.6rem; }
-.det-hero__tag--directo { border-color: rgba(34, 197, 94, 0.2); color: #a9d8ff; }
+.det-hero__tag--directo { border-color: rgba(34, 197, 94, 0.2); color: #86efac; }
 .det-hero__tag--transbordo { border-color: rgba(234, 179, 8, 0.25); color: #fde68a; }
 
 /* Acciones hero (compartir, favoritos) */
@@ -267,7 +267,7 @@
     text-align: center;
     transition: transform 200ms ease, border-color 200ms ease;
 }
-.det-stat:hover { transform: translateY(-1px); border-color: rgba(93, 168, 232, 0.28); }
+.det-stat:hover { transform: translateY(-1px); border-color: rgba(55, 200, 186, 0.28); }
 
 .det-stat__icono {
     display: grid;
@@ -275,15 +275,15 @@
     width: 32px; height: 32px;
     border-radius: 10px;
     font-size: 0.85rem;
-    background: rgba(93, 168, 232, 0.1);
-    border: 1px solid rgba(93, 168, 232, 0.15);
+    background: rgba(55, 200, 186, 0.1);
+    border: 1px solid rgba(55, 200, 186, 0.15);
     color: var(--det-acento);
     margin-bottom: 2px;
 }
 .det-stat__icono--dist  { background: rgba(59, 130, 246, 0.12); border-color: rgba(59, 130, 246, 0.2); color: #93c5fd; }
 .det-stat__icono--time  { background: rgba(234, 179, 8, 0.1);  border-color: rgba(234, 179, 8, 0.2); color: #fde68a; }
-.det-stat__icono--stops { background: rgba(93, 168, 232, 0.1); border-color: rgba(93, 168, 232, 0.2); color: var(--det-acento); }
-.det-stat__icono--fare  { background: rgba(34, 197, 94, 0.1);  border-color: rgba(34, 197, 94, 0.2); color: #a9d8ff; }
+.det-stat__icono--stops { background: rgba(55, 200, 186, 0.1); border-color: rgba(55, 200, 186, 0.2); color: var(--det-acento); }
+.det-stat__icono--fare  { background: rgba(34, 197, 94, 0.1);  border-color: rgba(34, 197, 94, 0.2); color: #86efac; }
 
 .det-stat__valor {
     font-size: 1.05rem;
@@ -295,7 +295,7 @@
 .det-stat__etiq {
     font-size: 0.63rem;
     font-weight: 600;
-    color: #7ba3c5;
+    color: #7ba5a0;
     text-transform: uppercase;
     letter-spacing: 0.06em;
 }
@@ -321,17 +321,17 @@
     gap: 8px;
     padding: 9px 14px;
     margin: 10px 0 4px;
-    border: 1px solid rgba(93, 168, 232, 0.22);
+    border: 1px solid rgba(55, 200, 186, 0.22);
     border-radius: 10px;
-    background: rgba(93, 168, 232, 0.08);
+    background: rgba(55, 200, 186, 0.08);
     color: var(--det-acento);
     font: 600 0.8rem/1.2 inherit;
     cursor: pointer;
     transition: background 180ms ease, border-color 180ms ease;
 }
 .btn--asistente-voz:hover {
-    background: rgba(93, 168, 232, 0.15);
-    border-color: rgba(93, 168, 232, 0.4);
+    background: rgba(55, 200, 186, 0.15);
+    border-color: rgba(55, 200, 186, 0.4);
 }
 
 /* ═══════════════════════════════════════════════
@@ -357,7 +357,7 @@
     border-radius: 9px;
     font-size: 0.69rem;
     font-weight: 700;
-    color: #6b849c;
+    color: #6b8c88;
     letter-spacing: 0.03em;
     transition: all 220ms ease;
     border: 1px solid transparent;
@@ -371,7 +371,7 @@
     background: linear-gradient(180deg,
         rgba(43, 155, 138, 0.26),
         rgba(22, 97, 90, 0.18));
-    border-color: rgba(93, 168, 232, 0.22);
+    border-color: rgba(55, 200, 186, 0.22);
     box-shadow: 0 2px 8px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.05);
 }
 .pestana .contador {
@@ -384,7 +384,7 @@
     border-radius: 8px;
     font-size: 0.6rem;
     font-weight: 800;
-    background: rgba(93, 168, 232, 0.15);
+    background: rgba(55, 200, 186, 0.15);
     color: #9af0dd;
 }
 
@@ -411,8 +411,8 @@
     bottom: -4px;
     width: 2px;
     background: linear-gradient(180deg,
-        rgba(93, 168, 232, 0.45) 0%,
-        rgba(93, 168, 232, 0.08) 100%);
+        rgba(55, 200, 186, 0.45) 0%,
+        rgba(55, 200, 186, 0.08) 100%);
     border-radius: 1px;
 }
 .parada:not(:last-child)::before { display: none; }
@@ -431,7 +431,7 @@
     cursor: pointer;
     transition: background 200ms ease, padding-left 200ms cubic-bezier(0.2,0.8,0.2,1);
 }
-.parada__boton:hover { background: rgba(93, 168, 232, 0.06); padding-left: 6px; }
+.parada__boton:hover { background: rgba(55, 200, 186, 0.06); padding-left: 6px; }
 
 /* Punto numerado */
 .parada__punto {
@@ -444,7 +444,7 @@
     font-weight: 900;
     color: #fff;
     border: 2px solid rgba(255,255,255,0.18);
-    background: linear-gradient(145deg, #246da9, #163e6a);
+    background: linear-gradient(145deg, #1e8a7d, #0d5852);
     box-shadow: 0 4px 12px rgba(0,0,0,0.3), 0 0 0 4px rgba(55,200,186,0.07);
     position: relative;
     z-index: 1;
@@ -494,11 +494,11 @@
     font-weight: 700;
     border: 1px solid rgba(90, 212, 190, 0.2);
     background: rgba(30, 100, 88, 0.3);
-    color: #b8e0ff;
+    color: #a7f3d0;
     white-space: nowrap;
     margin-top: 3px;
 }
-.chip--origen   { background: rgba(22,126,79,0.22); border-color: rgba(34,197,94,0.25); color: #a9d8ff; }
+.chip--origen   { background: rgba(22,126,79,0.22); border-color: rgba(34,197,94,0.25); color: #86efac; }
 .chip--destino  { background: rgba(153,27,27,0.22); border-color: rgba(239,68,68,0.25); color: #fca5a5; }
 .chip--transbordo { background: rgba(120,80,0,0.28); border-color: rgba(234,179,8,0.3); color: #fde68a; }
 .chip--transbordo-larga { background: rgba(180,30,10,0.22); border-color: rgba(239,68,68,0.28); color: #fca5a5; }
@@ -529,7 +529,7 @@
 }
 .bus-card:hover {
     transform: translateY(-1px);
-    border-color: rgba(93, 168, 232, 0.28);
+    border-color: rgba(55, 200, 186, 0.28);
     box-shadow: 0 10px 24px rgba(0,0,0,0.22);
 }
 .bus-card::before {
@@ -551,13 +551,13 @@
     color: #fff;
     flex-shrink: 0;
     border: 1px solid rgba(255,255,255,0.1);
-    background: color-mix(in srgb, var(--bus-color, #246da9) 25%, rgba(5,18,24,0.9));
+    background: color-mix(in srgb, var(--bus-color, #1e8a7d) 25%, rgba(5,18,24,0.9));
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
 /* Cuerpo de tarjeta bus */
 .bus-card__cuerpo { flex: 1; min-width: 0; }
-.bus-card__ruta { font-size: 0.65rem; color: #6b849c; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 4px; }
+.bus-card__ruta { font-size: 0.65rem; color: #6b8c88; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 4px; }
 .bus-card__placa {
     font-size: 1.0rem;
     font-weight: 900;
@@ -584,7 +584,7 @@
 .bus-card__color-dot {
     width: 8px; height: 8px;
     border-radius: 50%;
-    background: var(--bus-color, #5da8e8);
+    background: var(--bus-color, #37c8ba);
     display: inline-block;
 }
 
@@ -596,23 +596,23 @@
     margin-top: 8px;
     padding: 7px 10px;
     border-radius: 10px;
-    background: rgba(93, 168, 232, 0.06);
-    border: 1px solid rgba(93, 168, 232, 0.12);
+    background: rgba(55, 200, 186, 0.06);
+    border: 1px solid rgba(55, 200, 186, 0.12);
 }
 .bus-card__conductor-avatar {
     display: grid;
     place-items: center;
     width: 32px; height: 32px;
     border-radius: 50%;
-    background: linear-gradient(145deg, #246da9, #163e6a);
+    background: linear-gradient(145deg, #1e8a7d, #0d5852);
     border: 2px solid rgba(55,200,186,0.3);
     font-size: 0.75rem;
     color: #fff;
     flex-shrink: 0;
 }
 .bus-card__conductor-info { flex: 1; min-width: 0; }
-.bus-card__conductor-nombre { font-size: 0.78rem; font-weight: 700; color: #d4e5f4; }
-.bus-card__conductor-cargo { font-size: 0.63rem; color: #6b849c; }
+.bus-card__conductor-nombre { font-size: 0.78rem; font-weight: 700; color: #d4ede9; }
+.bus-card__conductor-cargo { font-size: 0.63rem; color: #6b8c88; }
 
 /* Amenidades (iconos de servicio) */
 .bus-card__amenidades {
@@ -649,15 +649,15 @@
     margin-top: 4px;
 }
 .bus-login-cta i { font-size: 1.6rem; color: var(--det-acento); }
-.bus-login-cta strong { font-size: 0.84rem; color: #d4e5f4; }
-.bus-login-cta p { font-size: 0.72rem; color: #7ba3c5; margin: 0; }
+.bus-login-cta strong { font-size: 0.84rem; color: #d4ede9; }
+.bus-login-cta p { font-size: 0.72rem; color: #7ba5a0; margin: 0; }
 .bus-login-cta a {
     display: inline-flex;
     align-items: center;
     gap: 6px;
     padding: 8px 18px;
     border-radius: 10px;
-    background: linear-gradient(135deg, #246da9, #5da8e8);
+    background: linear-gradient(135deg, #0f766e, #14b8a6);
     color: #fff;
     font-size: 0.78rem;
     font-weight: 700;
@@ -678,7 +678,7 @@
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: #6b849c;
+    color: #6b8c88;
     margin-bottom: 10px;
 }
 .info-seccion__titulo i { color: var(--det-acento); font-size: 0.75rem; }
@@ -702,21 +702,21 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.07em;
-    color: #6b849c;
+    color: #6b8c88;
     margin-bottom: 4px;
 }
 .info-card__valor {
     font-size: 0.9rem;
     font-weight: 800;
-    color: #d4e5f4;
+    color: #d4ede9;
     line-height: 1.2;
 }
 .info-card__sub {
     font-size: 0.63rem;
-    color: #7ba3c5;
+    color: #7ba5a0;
     margin-top: 2px;
 }
-.info-card--tarifa .info-card__valor { color: #a9d8ff; }
+.info-card--tarifa .info-card__valor { color: #86efac; }
 .info-card--hora .info-card__valor   { color: #fde68a; }
 .info-card--frec .info-card__valor   { color: var(--det-acento); }
 .info-card--acc .info-card__valor    { color: #c4b5fd; }
@@ -745,8 +745,8 @@
     margin-right: 7px;
     flex-shrink: 0;
 }
-.itinerario-paso__ruta { font-size: 0.8rem; font-weight: 700; color: #d4e5f4; margin-bottom: 5px; }
-.itinerario-paso__tramo { font-size: 0.72rem; color: #7ba3c5; margin-bottom: 4px; }
+.itinerario-paso__ruta { font-size: 0.8rem; font-weight: 700; color: #d4ede9; margin-bottom: 5px; }
+.itinerario-paso__tramo { font-size: 0.72rem; color: #7ba5a0; margin-bottom: 4px; }
 .itinerario-paso__detalle { font-size: 0.7rem; color: #9bb5b2; }
 
 /* Barrios chips */
@@ -764,7 +764,7 @@
 /* Nota legal */
 .nota {
     font-size: 0.69rem;
-    color: #6b849c;
+    color: #6b8c88;
     line-height: 1.6;
     padding: 8px 10px;
     border-radius: 8px;
@@ -787,7 +787,7 @@
     border-radius: 12px;
     border: 1px solid rgba(16, 185, 129, 0.3);
     background: rgba(16, 185, 129, 0.08);
-    color: #a9d8ff;
+    color: #6ee7b7;
     font: 700 0.84rem/1.2 inherit;
     cursor: pointer;
     transition: all 200ms ease;
@@ -841,13 +841,13 @@
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    color: #a9d8ff;
+    color: #6ee7b7;
 }
 .simulador-hud__velocidad {
     margin-left: auto;
     font-size: 0.72rem;
     font-weight: 700;
-    color: #b8e0ff;
+    color: #a7f3d0;
     background: rgba(16,185,129,0.1);
     border: 1px solid rgba(16,185,129,0.2);
     padding: 2px 8px;
@@ -867,7 +867,7 @@
 .simulador-hud__barra-fill {
     height: 100%;
     border-radius: 3px;
-    background: linear-gradient(90deg, #327fbd, #82c5ef);
+    background: linear-gradient(90deg, #10b981, #34d399);
     transition: width 1s ease;
     box-shadow: 0 0 10px rgba(16,185,129,0.4);
 }
@@ -900,7 +900,7 @@
 .simulador-hud__metrica-val {
     font-size: 0.95rem;
     font-weight: 800;
-    color: #b8e0ff;
+    color: #a7f3d0;
     letter-spacing: -0.02em;
     font-variant-numeric: tabular-nums;
 }
@@ -909,7 +909,7 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.07em;
-    color: #345e82;
+    color: #3b6e62;
 }
 
 /* Próxima parada */
@@ -931,9 +931,9 @@
     flex-shrink: 0;
 }
 .simulador-hud__proxima-info { flex: 1; min-width: 0; }
-.simulador-hud__proxima-label { font-size: 0.6rem; font-weight: 700; color: #345e82; text-transform: uppercase; letter-spacing: 0.08em; }
-.simulador-hud__proxima-nombre { font-size: 0.82rem; font-weight: 700; color: #d4e5f4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.simulador-hud__proxima-dist { font-size: 0.65rem; color: #6b849c; margin-top: 1px; }
+.simulador-hud__proxima-label { font-size: 0.6rem; font-weight: 700; color: #3b6e62; text-transform: uppercase; letter-spacing: 0.08em; }
+.simulador-hud__proxima-nombre { font-size: 0.82rem; font-weight: 700; color: #d4ede9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.simulador-hud__proxima-dist { font-size: 0.65rem; color: #6b8c88; margin-top: 1px; }
 
 /* Controles simulador */
 .simulador-hud__controles {
@@ -958,11 +958,11 @@
     color: #9bb5b2;
     transition: all 180ms ease;
 }
-.simulador-hud__ctrl:hover { background: rgba(255,255,255,0.08); color: #d4e5f4; }
+.simulador-hud__ctrl:hover { background: rgba(255,255,255,0.08); color: #d4ede9; }
 .simulador-hud__ctrl--play {
     border-color: rgba(16,185,129,0.3);
     background: rgba(16,185,129,0.1);
-    color: #a9d8ff;
+    color: #6ee7b7;
 }
 .simulador-hud__ctrl--play:hover { background: rgba(16,185,129,0.18); border-color: rgba(16,185,129,0.5); }
 
@@ -981,13 +981,13 @@
     cursor: pointer;
     border: 1px solid rgba(255,255,255,0.08);
     background: rgba(255,255,255,0.03);
-    color: #6b849c;
+    color: #6b8c88;
     transition: all 160ms ease;
 }
 .simulador-hud__speed-btn--activo {
     border-color: rgba(16,185,129,0.4);
     background: rgba(16,185,129,0.14);
-    color: #a9d8ff;
+    color: #6ee7b7;
 }
 
 /* Alerta de parada próxima */
@@ -1019,8 +1019,8 @@
     color: var(--sim-verde);
     animation: check-pop 500ms cubic-bezier(0.16, 1, 0.3, 1);
 }
-.simulador-fin__titulo { font-size: 0.95rem; font-weight: 800; color: #d4e5f4; }
-.simulador-fin__sub { font-size: 0.72rem; color: #6b849c; }
+.simulador-fin__titulo { font-size: 0.95rem; font-weight: 800; color: #d4ede9; }
+.simulador-fin__sub { font-size: 0.72rem; color: #6b8c88; }
 
 /* ═══════════════════════════════════════════════
    MARCADOR BUS SIMULADO (en el mapa)
@@ -1036,7 +1036,7 @@
     place-items: center;
     width: 36px; height: 36px;
     border-radius: 50%;
-    background: linear-gradient(145deg, #327fbd, #246da9);
+    background: linear-gradient(145deg, #10b981, #059669);
     border: 3px solid rgba(255,255,255,0.9);
     color: #fff;
     font-size: 1rem;
@@ -1112,8 +1112,8 @@
     color: #9bb5b2;
 }
 .paradas-sin-mapa__datos { flex: 1; min-width: 0; }
-.paradas-sin-mapa__datos strong { display: block; color: #c4d7e8; font-size: 0.78rem; }
-.paradas-sin-mapa__datos small { color: #6b849c; font-size: 0.65rem; }
+.paradas-sin-mapa__datos strong { display: block; color: #c4dbd6; font-size: 0.78rem; }
+.paradas-sin-mapa__datos small { color: #6b8c88; font-size: 0.65rem; }
 
 /* ═══════════════════════════════════════════════
    ESTADO VACÍO
@@ -1141,8 +1141,8 @@
     font-size: 1.1rem;
     box-shadow: 0 6px 18px rgba(0,0,0,0.2);
 }
-.estado-vacio strong { font-size: 0.88rem; color: #c4d7e8; }
-.estado-vacio p { font-size: 0.74rem; color: #6b849c; max-width: 28ch; margin: 0; line-height: 1.5; }
+.estado-vacio strong { font-size: 0.88rem; color: #c4dbd6; }
+.estado-vacio p { font-size: 0.74rem; color: #6b8c88; max-width: 28ch; margin: 0; line-height: 1.5; }
 
 /* ═══════════════════════════════════════════════
    BOTÓN FAVORITO
@@ -1155,7 +1155,7 @@
     border-radius: 8px;
     font-size: 0.72rem;
     font-weight: 600;
-    color: #6b849c;
+    color: #6b8c88;
     background: transparent;
     border: 1px solid rgba(86,191,181,0.12);
     cursor: pointer;

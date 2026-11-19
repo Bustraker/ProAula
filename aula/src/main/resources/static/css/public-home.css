@@ -1,15 +1,15 @@
 .public-home {
-    --home-forest: #123b66;
-    --home-forest-deep: #092746;
-    --home-green: #24659a;
-    --home-mint: #a9cbea;
-    --home-lime: #8ec9ff;
-    --home-coral: #d85d6b;
-    --home-paper: #f2f6fb;
-    --home-paper-deep: #e6eef7;
-    --home-ink: #173c60;
-    --home-muted: #60768d;
-    --home-white: #f6f9fd;
+    --home-forest: #123d30;
+    --home-forest-deep: #09271f;
+    --home-green: #246548;
+    --home-mint: #a9d8bd;
+    --home-lime: #d7f36a;
+    --home-coral: #ef7c72;
+    --home-paper: #f2f3e8;
+    --home-paper-deep: #e6ecdc;
+    --home-ink: #173c30;
+    --home-muted: #607367;
+    --home-white: #f6f7ed;
     --home-content: 1216px;
     margin: 0;
     background: var(--home-paper);
@@ -42,7 +42,7 @@
         linear-gradient(90deg, transparent 0 49.9%, rgba(232, 247, 215, 0.045) 50%, transparent 50.1%),
         linear-gradient(0deg, transparent 0 49.9%, rgba(232, 247, 215, 0.04) 50%, transparent 50.1%),
         radial-gradient(ellipse at 75% 42%, rgba(75, 151, 100, 0.32), transparent 34%),
-        linear-gradient(120deg, #082746 0%, #104b38 57%, #123b66 100%);
+        linear-gradient(120deg, #08271f 0%, #104b38 57%, #123d30 100%);
     background-size: 88px 88px, 88px 88px, auto, auto;
     color: var(--home-white);
     text-align: left;
@@ -55,10 +55,10 @@
     bottom: 1%;
     width: 60%;
     height: 54%;
-    border: 1px solid rgba(142, 201, 255, 0.12);
+    border: 1px solid rgba(215, 243, 106, 0.12);
     border-left: 0;
     border-radius: 50% 0 0 0;
-    background: repeating-linear-gradient(165deg, transparent 0 26px, rgba(142, 201, 255, 0.035) 27px 28px);
+    background: repeating-linear-gradient(165deg, transparent 0 26px, rgba(215, 243, 106, 0.035) 27px 28px);
     content: "";
     transform: rotate(-8deg);
     pointer-events: none;
@@ -116,7 +116,7 @@
     border-radius: 3px;
     background: transparent;
     box-shadow: none;
-    color: #eef4fc;
+    color: #eef4e9;
     font-size: 13px;
     font-weight: 700;
     text-decoration: none;
@@ -126,7 +126,7 @@
 .public-home #Registro {
     border-color: var(--home-lime);
     background: var(--home-lime);
-    color: #173b60;
+    color: #173b2d;
 }
 
 .public-home #login:hover,
@@ -181,7 +181,7 @@
     flex: 0 0 7px;
     border-radius: 50%;
     background: var(--home-lime);
-    box-shadow: 0 0 0 4px rgba(142, 201, 255, 0.13);
+    box-shadow: 0 0 0 4px rgba(215, 243, 106, 0.13);
 }
 
 .public-home .hero-copy h1 {
@@ -243,12 +243,12 @@
 .public-home .action-primary {
     background: var(--home-lime);
     box-shadow: 0 10px 30px rgba(162, 199, 75, 0.15);
-    color: #173b60;
+    color: #173b2d;
 }
 
 .public-home .action-primary:hover {
-    background: #b8e0ff;
-    color: #173b60;
+    background: #e8ff9b;
+    color: #173b2d;
 }
 
 .public-home .action-primary span,
@@ -266,12 +266,12 @@
 
 .public-home .action-secondary {
     border-color: rgba(230, 245, 225, 0.33);
-    color: #eef4fc;
+    color: #eef4e9;
 }
 
 .public-home .action-secondary:hover {
-    border-color: #eef4fc;
-    background: #eef4fc;
+    border-color: #eef4e9;
+    background: #eef4e9;
     color: var(--home-forest);
 }
 
@@ -487,7 +487,7 @@
     position: absolute;
     width: 76%;
     height: 58%;
-    background: linear-gradient(130deg, rgba(142, 201, 255, 0.22), rgba(130, 219, 177, 0.1) 54%, transparent 76%);
+    background: linear-gradient(130deg, rgba(215, 243, 106, 0.22), rgba(130, 219, 177, 0.1) 54%, transparent 76%);
     filter: blur(25px);
     transform: rotate(-17deg);
 }
@@ -629,7 +629,7 @@
 .public-home .public-nav ul li a:hover,
 .public-home .public-nav ul li a:focus-visible,
 .public-home .public-nav ul li a.is-current {
-    background: rgba(142, 201, 255, 0.1);
+    background: rgba(215, 243, 106, 0.1);
     box-shadow: none;
     color: var(--home-lime);
     transform: none;
@@ -814,7 +814,7 @@
     border-radius: 2px;
     background:
         linear-gradient(135deg, rgba(210, 232, 200, 0.74), rgba(237, 242, 222, 0.62));
-    color: #24659a;
+    color: #246548;
 }
 
 .public-home .feature-icon::before,
@@ -926,9 +926,9 @@
     gap: clamp(48px, 9vw, 120px);
     padding: 100px max(32px, calc((100% - var(--home-content)) / 2));
     background:
-        linear-gradient(118deg, transparent 0 56%, rgba(142, 201, 255, 0.045) 56.1% 56.3%, transparent 56.4%),
-        linear-gradient(152deg, #123f66, #092746 76%);
-    color: #eff5fb;
+        linear-gradient(118deg, transparent 0 56%, rgba(215, 243, 106, 0.045) 56.1% 56.3%, transparent 56.4%),
+        linear-gradient(152deg, #123f33, #09271f 76%);
+    color: #eff5e8;
 }
 
 .public-home .city-story-art {
@@ -955,8 +955,8 @@
     left: 4%;
     width: 93%;
     height: 66%;
-    border-top: 3px solid rgba(142, 201, 255, 0.75);
-    border-right: 3px solid rgba(142, 201, 255, 0.75);
+    border-top: 3px solid rgba(215, 243, 106, 0.75);
+    border-right: 3px solid rgba(215, 243, 106, 0.75);
     border-radius: 0 45% 0 0;
     content: "";
     transform: rotate(-15deg);
@@ -987,7 +987,7 @@
     left: 13%;
     width: 74%;
     height: 0;
-    border-top: 2px dashed #8ec9ff;
+    border-top: 2px dashed #d7f36a;
     transform: rotate(-22deg);
 }
 
@@ -996,7 +996,7 @@
     z-index: 3;
     width: 18px;
     height: 18px;
-    border: 4px solid #eff5fb;
+    border: 4px solid #eff5e8;
     border-radius: 50%;
     background: var(--home-coral);
     box-shadow: 0 0 0 5px rgba(239, 124, 114, 0.17);
@@ -1011,7 +1011,7 @@
     right: 18%;
     bottom: 26%;
     background: var(--home-lime);
-    box-shadow: 0 0 0 5px rgba(142, 201, 255, 0.15);
+    box-shadow: 0 0 0 5px rgba(215, 243, 106, 0.15);
 }
 
 .public-home .city-story-city {
@@ -1050,7 +1050,7 @@
 
 .public-home .city-story-copy h2 {
     max-width: 650px;
-    color: #f2f6fb;
+    color: #f2f5e9;
     font-size: clamp(40px, 5vw, 63px);
 }
 
@@ -1284,7 +1284,7 @@
     background:
         linear-gradient(90deg, transparent 0 63%, rgba(216, 245, 180, 0.06) 63.1% 63.2%, transparent 63.3%),
         linear-gradient(125deg, #0d382b, #164b36 58%, #0b3026);
-    color: #eff5fb;
+    color: #eff5e8;
 }
 
 .public-home .member-copy .section-kicker {
@@ -1292,7 +1292,7 @@
 }
 
 .public-home .member-copy h2 {
-    color: #f2f6fb;
+    color: #f2f5e9;
 }
 
 .public-home .member-copy > p:not(.section-kicker) {
@@ -1306,12 +1306,12 @@
 .public-home .member-cta {
     margin-top: 24px;
     background: var(--home-lime);
-    color: #173b60;
+    color: #173b2d;
 }
 
 .public-home .member-cta:hover {
-    background: #b8e0ff;
-    color: #173b60;
+    background: #e8ff9b;
+    color: #173b2d;
 }
 
 .public-home .member-list {
@@ -1350,7 +1350,7 @@
 
 .public-home .member-item h3 {
     margin: 0;
-    color: #f1f5fc;
+    color: #f1f5e9;
     font-family: Georgia, "Times New Roman", serif;
     font-size: 21px;
     font-weight: 500;
@@ -1443,7 +1443,7 @@
     background:
         linear-gradient(90deg, transparent 0 69%, rgba(216, 245, 180, 0.06) 69.1% 69.2%, transparent 69.3%),
         linear-gradient(132deg, #123e31, #0a2b22 72%);
-    color: #eff5fb;
+    color: #eff5e8;
 }
 
 .public-home .future-heading {
@@ -1457,7 +1457,7 @@
     align-items: center;
     margin-bottom: 20px;
     padding: 6px 10px;
-    border: 1px solid rgba(142, 201, 255, 0.36);
+    border: 1px solid rgba(215, 243, 106, 0.36);
     color: var(--home-lime);
     font-family: "Courier New", monospace;
     font-size: 8px;
@@ -1470,7 +1470,7 @@
 }
 
 .public-home .future-heading h2 {
-    color: #f1f5fc;
+    color: #f1f5e9;
 }
 
 .public-home .future-heading > p:last-child {
@@ -1513,8 +1513,8 @@
 
 .public-home .future-card:hover {
     transform: translateY(-4px);
-    border-color: rgba(142, 201, 255, 0.4);
-    background-color: rgba(142, 201, 255, 0.035);
+    border-color: rgba(215, 243, 106, 0.4);
+    background-color: rgba(215, 243, 106, 0.035);
 }
 
 .public-home .future-number {
@@ -1527,7 +1527,7 @@
 .public-home .future-card h3 {
     max-width: 260px;
     margin: 23px 0 9px;
-    color: #f1f5fc;
+    color: #f1f5e9;
     font-family: Georgia, "Times New Roman", serif;
     font-size: 22px;
     font-weight: 500;
@@ -1544,7 +1544,7 @@
 .public-home .future-status {
     margin-top: auto;
     padding: 6px 9px;
-    border: 1px solid rgba(142, 201, 255, 0.26);
+    border: 1px solid rgba(215, 243, 106, 0.26);
     color: #d5e6a3;
     font-size: 9px;
     font-weight: 700;
@@ -1565,9 +1565,9 @@
     gap: clamp(38px, 7vw, 90px);
     padding: 89px max(32px, calc((100% - var(--home-content)) / 2)) 94px;
     background:
-        linear-gradient(90deg, transparent 0 48%, rgba(142, 201, 255, 0.06) 48.1% 48.2%, transparent 48.3%),
-        linear-gradient(116deg, #0d3027, #123b66 54%, #082746);
-    color: #eff5fb;
+        linear-gradient(90deg, transparent 0 48%, rgba(215, 243, 106, 0.06) 48.1% 48.2%, transparent 48.3%),
+        linear-gradient(116deg, #0d3027, #123d30 54%, #08271f);
+    color: #eff5e8;
 }
 
 .public-home .contact-copy {
@@ -1592,7 +1592,7 @@
 
 .public-home .contact-copy h2 {
     max-width: 470px;
-    color: #f2f6fb;
+    color: #f2f5e9;
 }
 
 .public-home .contact-copy > p:not(.section-kicker) {
@@ -1613,8 +1613,8 @@
     overflow: hidden;
     border: 1px solid rgba(216, 239, 208, 0.16);
     background:
-        linear-gradient(90deg, transparent 0 24%, rgba(142, 201, 255, 0.055) 24.2%, transparent 24.4%),
-        linear-gradient(0deg, transparent 0 49%, rgba(142, 201, 255, 0.055) 49.2%, transparent 49.4%),
+        linear-gradient(90deg, transparent 0 24%, rgba(215, 243, 106, 0.055) 24.2%, transparent 24.4%),
+        linear-gradient(0deg, transparent 0 49%, rgba(215, 243, 106, 0.055) 49.2%, transparent 49.4%),
         rgba(5, 30, 22, 0.2);
 }
 
@@ -1624,7 +1624,7 @@
     left: 50%;
     width: 148px;
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(142, 201, 255, 0.55), transparent);
+    background: linear-gradient(90deg, transparent, rgba(215, 243, 106, 0.55), transparent);
     transform: translate(-50%, -50%) rotate(-18deg);
 }
 
@@ -1711,7 +1711,7 @@
     height: 29px;
     flex: 0 0 29px;
     place-items: center;
-    border: 1px solid rgba(142, 201, 255, 0.24);
+    border: 1px solid rgba(215, 243, 106, 0.24);
     color: var(--home-lime);
     font-family: "Courier New", monospace;
     font-size: 9px;
@@ -1780,7 +1780,7 @@
 
 .public-home .contact-form-heading h3 {
     margin: 10px 0 0;
-    color: #f1f5fc;
+    color: #f1f5e9;
     font-family: Georgia, "Times New Roman", serif;
     font-size: clamp(24px, 2.5vw, 31px);
     font-weight: 400;
@@ -1876,7 +1876,7 @@
 .public-home .contact-progress-stage.is-complete i {
     border-color: #99c79d;
     background: #99c79d;
-    color: #173b60;
+    color: #173b2d;
 }
 
 .public-home .contact-progress-status {
@@ -1996,7 +1996,7 @@
     border: 0;
     border-radius: 2px;
     background: var(--home-lime);
-    color: #173b60;
+    color: #173b2d;
     font-size: 11px;
     font-weight: 750;
     cursor: pointer;
@@ -2005,7 +2005,7 @@
 
 .public-home .submit-button:hover {
     transform: translateY(-2px);
-    background: #b8e0ff;
+    background: #e8ff9b;
 }
 
 .public-home .public-footer {
@@ -2017,7 +2017,7 @@
     max-width: none;
     margin: 0;
     padding: 25px max(32px, calc((100% - var(--home-content)) / 2));
-    border-top: 1px solid rgba(142, 201, 255, 0.12);
+    border-top: 1px solid rgba(215, 243, 106, 0.12);
     border-radius: 0;
     background: #061f19;
     color: #dce8da;
@@ -2025,7 +2025,7 @@
 }
 
 .public-home .footer-brand {
-    color: #f2f6fb;
+    color: #f2f5e9;
     font-family: Georgia, "Times New Roman", serif;
     font-size: 23px;
     font-weight: 500;
@@ -2522,13 +2522,13 @@
 
 .public-home .public-header {
     background:
-        linear-gradient(119deg, transparent 0 58%, rgba(142, 201, 255, 0.075) 58.1% 58.25%, transparent 58.4%),
+        linear-gradient(119deg, transparent 0 58%, rgba(215, 243, 106, 0.075) 58.1% 58.25%, transparent 58.4%),
         linear-gradient(28deg, transparent 0 73%, rgba(169, 216, 189, 0.08) 73.1% 73.25%, transparent 73.4%),
         repeating-linear-gradient(154deg, transparent 0 73px, rgba(225, 245, 220, 0.025) 74px 75px, transparent 76px 138px),
         linear-gradient(90deg, transparent 0 49.9%, rgba(232, 247, 215, 0.045) 50%, transparent 50.1%),
         linear-gradient(0deg, transparent 0 49.9%, rgba(232, 247, 215, 0.04) 50%, transparent 50.1%),
         radial-gradient(ellipse at 75% 42%, rgba(75, 151, 100, 0.32), transparent 34%),
-        linear-gradient(120deg, #082746 0%, #104b38 57%, #123b66 100%);
+        linear-gradient(120deg, #08271f 0%, #104b38 57%, #123d30 100%);
 }
 
 .public-home .explore-section {
@@ -2541,17 +2541,17 @@
 
 .public-home .city-story {
     background:
-        linear-gradient(28deg, transparent 0 19%, rgba(142, 201, 255, 0.045) 19.1% 19.25%, transparent 19.4%),
-        linear-gradient(118deg, transparent 0 56%, rgba(142, 201, 255, 0.045) 56.1% 56.3%, transparent 56.4%),
+        linear-gradient(28deg, transparent 0 19%, rgba(215, 243, 106, 0.045) 19.1% 19.25%, transparent 19.4%),
+        linear-gradient(118deg, transparent 0 56%, rgba(215, 243, 106, 0.045) 56.1% 56.3%, transparent 56.4%),
         repeating-linear-gradient(163deg, transparent 0 104px, rgba(183, 220, 190, 0.035) 105px 106px, transparent 107px 176px),
-        linear-gradient(152deg, #123f66, #092746 76%);
+        linear-gradient(152deg, #123f33, #09271f 76%);
 }
 
 .public-home .city-story-art {
     background:
         linear-gradient(24deg, transparent 0 49.7%, rgba(174, 218, 178, 0.22) 50%, transparent 50.4%),
         linear-gradient(146deg, transparent 0 49.7%, rgba(174, 218, 178, 0.18) 50%, transparent 50.4%),
-        linear-gradient(33deg, transparent 0 34%, rgba(142, 201, 255, 0.06) 34.1% 34.3%, transparent 34.4%),
+        linear-gradient(33deg, transparent 0 34%, rgba(215, 243, 106, 0.06) 34.1% 34.3%, transparent 34.4%),
         repeating-linear-gradient(0deg, transparent 0 34px, rgba(210, 236, 203, 0.08) 35px),
         repeating-linear-gradient(90deg, transparent 0 34px, rgba(210, 236, 203, 0.08) 35px),
         linear-gradient(145deg, #1d5b41, #0d3429);
@@ -2584,7 +2584,7 @@
 
 .public-home .future-section {
     background:
-        linear-gradient(28deg, transparent 0 14%, rgba(142, 201, 255, 0.05) 14.1% 14.25%, transparent 14.4%),
+        linear-gradient(28deg, transparent 0 14%, rgba(215, 243, 106, 0.05) 14.1% 14.25%, transparent 14.4%),
         linear-gradient(151deg, transparent 0 77%, rgba(216, 245, 180, 0.05) 77.1% 77.25%, transparent 77.4%),
         repeating-linear-gradient(157deg, transparent 0 92px, rgba(216, 245, 180, 0.025) 93px 94px, transparent 95px 163px),
         linear-gradient(132deg, #123e31, #0a2b22 72%);
@@ -2592,16 +2592,16 @@
 
 .public-home .contact-section {
     background:
-        linear-gradient(29deg, transparent 0 15%, rgba(142, 201, 255, 0.045) 15.1% 15.25%, transparent 15.4%),
+        linear-gradient(29deg, transparent 0 15%, rgba(215, 243, 106, 0.045) 15.1% 15.25%, transparent 15.4%),
         linear-gradient(147deg, transparent 0 83%, rgba(169, 216, 189, 0.06) 83.1% 83.3%, transparent 83.45%),
-        repeating-linear-gradient(0deg, transparent 0 76px, rgba(142, 201, 255, 0.025) 77px),
-        linear-gradient(116deg, #0d3027, #123b66 54%, #082746);
+        repeating-linear-gradient(0deg, transparent 0 76px, rgba(215, 243, 106, 0.025) 77px),
+        linear-gradient(116deg, #0d3027, #123d30 54%, #08271f);
 }
 
 .public-home .public-footer {
     background:
-        linear-gradient(115deg, transparent 0 48%, rgba(142, 201, 255, 0.045) 48.1% 48.25%, transparent 48.4%),
-        linear-gradient(145deg, #082746, #061f19 72%);
+        linear-gradient(115deg, transparent 0 48%, rgba(215, 243, 106, 0.045) 48.1% 48.25%, transparent 48.4%),
+        linear-gradient(145deg, #08271f, #061f19 72%);
 }
 
 .public-home .journey-heading .section-kicker,
@@ -2638,11 +2638,11 @@
 }
 
 .public-home .feature-item-accent {
-    border-color: rgba(142, 201, 255, 0.28);
+    border-color: rgba(215, 243, 106, 0.28);
     background:
         linear-gradient(140deg, rgba(29, 91, 61, 0.98), rgba(10, 48, 36, 0.99));
     box-shadow: 0 12px 30px rgba(13, 54, 35, 0.14);
-    color: #f2f6fb;
+    color: #f2f5e9;
 }
 
 .public-home .feature-item-accent::before {
@@ -2653,8 +2653,8 @@
 
 .public-home .feature-item-accent:hover,
 .public-home .feature-item-accent:focus-visible {
-    border-color: rgba(142, 201, 255, 0.62);
-    color: #f2f6fb;
+    border-color: rgba(215, 243, 106, 0.62);
+    color: #f2f5e9;
 }
 
 .public-home .feature-item-accent .feature-index,
@@ -2663,8 +2663,8 @@
 }
 
 .public-home .feature-item-accent .feature-icon {
-    border-color: rgba(142, 201, 255, 0.3);
-    background: rgba(142, 201, 255, 0.1);
+    border-color: rgba(215, 243, 106, 0.3);
+    background: rgba(215, 243, 106, 0.1);
     color: var(--home-lime);
 }
 
@@ -2693,7 +2693,7 @@
 
 .public-home .future-card:nth-child(2) {
     background:
-        linear-gradient(145deg, rgba(142, 201, 255, 0.075), rgba(225, 243, 218, 0.018));
+        linear-gradient(145deg, rgba(215, 243, 106, 0.075), rgba(225, 243, 218, 0.018));
 }
 
 .public-home .future-card:nth-child(3) {
@@ -2926,11 +2926,11 @@
 }
 
 .public-home .hero-copy h1 span {
-    color: #a9cbea;
+    color: #e8c77d;
 }
 
 .public-home .action-primary {
-    background: #a9cbea;
+    background: #e8c77d;
     box-shadow: 0 10px 30px rgba(232, 199, 125, 0.16);
 }
 
@@ -2947,12 +2947,12 @@
 }
 
 .public-home .map-route {
-    stroke: #8ec9ff;
+    stroke: #f0c77b;
 }
 
 .public-home .map-stop--start,
 .public-home .map-stop--end {
-    fill: #d85d6b;
+    fill: #e27e61;
 }
 
 .public-home .public-nav {
@@ -2961,7 +2961,7 @@
 }
 
 .public-home .public-nav::before {
-    background: linear-gradient(90deg, #d85d6b, #a9cbea 45%, #48a99a);
+    background: linear-gradient(90deg, #e27e61, #e8c77d 45%, #48a99a);
 }
 
 .public-home .explore-section {
@@ -2978,7 +2978,7 @@
 }
 
 .public-home .explore-section .section-kicker {
-    color: #a52a3a;
+    color: #a45b3e;
 }
 
 .public-home .feature-item,
@@ -3001,14 +3001,14 @@
 
 .public-home .feature-item-accent {
     border-color: rgba(232, 199, 125, 0.32);
-    background: linear-gradient(145deg, #174d79, #0d352f);
+    background: linear-gradient(145deg, #174d40, #0d352f);
     box-shadow: 0 14px 32px rgba(19, 59, 45, 0.15);
-    color: #f1f5fc;
+    color: #f1f5e9;
 }
 
 .public-home .feature-item-accent h3,
 .public-home .feature-item-accent p {
-    color: #f1f5fc;
+    color: #f1f5e9;
 }
 
 .public-home .feature-item-accent p {
@@ -3018,7 +3018,7 @@
 .public-home .feature-item-accent .feature-index,
 .public-home .feature-item-accent .feature-link,
 .public-home .feature-item-accent .feature-index span {
-    color: #a9cbea;
+    color: #e8c77d;
 }
 
 .public-home .feature-icon {
@@ -3029,17 +3029,17 @@
 .public-home .feature-item:nth-child(3) .feature-icon {
     border-color: rgba(177, 108, 65, 0.25);
     background: linear-gradient(145deg, #f9e9d7, #f0deca);
-    color: #a52a3a;
+    color: #a45b3e;
 }
 
 .public-home .feature-item-accent .feature-icon {
     border-color: rgba(232, 199, 125, 0.3);
     background: rgba(232, 199, 125, 0.1);
-    color: #a9cbea;
+    color: #e8c77d;
 }
 
 .public-home .feature-item-accent .feature-icon--community::before {
-    box-shadow: -10px 5px 0 -3px #174d79, -10px 5px 0 -1px currentColor, 10px 5px 0 -3px #174d79, 10px 5px 0 -1px currentColor;
+    box-shadow: -10px 5px 0 -3px #174d40, -10px 5px 0 -1px currentColor, 10px 5px 0 -3px #174d40, 10px 5px 0 -1px currentColor;
 }
 
 .public-home .feature-item-accent .feature-link {
@@ -3131,7 +3131,7 @@
 .public-home .journey-step:nth-child(3) .journey-step-number {
     border-color: rgba(164, 91, 62, 0.18);
     background: #f9ead9;
-    color: #a52a3a;
+    color: #a45b3e;
 }
 
 .public-home .journey-step-icon {
@@ -3143,7 +3143,7 @@
 .public-home .journey-step:nth-child(3) .journey-step-icon {
     border-color: rgba(164, 91, 62, 0.2);
     background: linear-gradient(145deg, #f9ead9, #f2ddc7);
-    color: #a52a3a;
+    color: #a45b3e;
 }
 
 .public-home .journey-step:not(:last-child)::after {
@@ -3175,12 +3175,12 @@
 }
 
 .public-home .member-copy .section-kicker {
-    color: #a9cbea;
+    color: #e8c77d;
 }
 
 .public-home .member-cta {
     border-radius: 5px;
-    background: #a9cbea;
+    background: #e8c77d;
 }
 
 .public-home .member-list {
@@ -3224,7 +3224,7 @@
 }
 
 .public-home .member-item-mark {
-    color: #a9cbea;
+    color: #e8c77d;
 }
 
 .public-home .trust-section {
@@ -3235,7 +3235,7 @@
 }
 
 .public-home .trust-heading .section-kicker {
-    color: #376d98;
+    color: #287c72;
 }
 
 .public-home .trust-grid {
@@ -3274,7 +3274,7 @@
 }
 
 .public-home .trust-card-label {
-    color: #376d98;
+    color: #287c72;
 }
 
 .public-home .trust-card h3 {
@@ -3289,7 +3289,7 @@
 }
 
 .public-home .trust-privacy-link {
-    color: #376d98;
+    color: #287c72;
 }
 
 .public-home .future-section {
@@ -3325,7 +3325,7 @@
 .public-home .future-card::before {
     left: 25px;
     width: 46px;
-    background: linear-gradient(90deg, #a9cbea, #d85d6b);
+    background: linear-gradient(90deg, #e8c77d, #e27e61);
 }
 
 .public-home .future-card:nth-child(2)::before {
@@ -3380,7 +3380,7 @@
 }
 
 .public-home .contact-kicker-mark {
-    background: #a9cbea;
+    background: #e8c77d;
     box-shadow: 0 0 0 4px rgba(232, 199, 125, 0.14);
 }
 
@@ -3396,7 +3396,7 @@
 
 .public-home .contact-signal-core {
     border-radius: 50%;
-    background: #a9cbea;
+    background: #e8c77d;
 }
 
 .public-home .contact-form {
@@ -3410,18 +3410,18 @@
 .public-home .contact-form::before {
     left: 0;
     width: 150px;
-    background: linear-gradient(90deg, #a9cbea, #52b69c, transparent);
+    background: linear-gradient(90deg, #e8c77d, #52b69c, transparent);
 }
 
 .public-home .submit-button {
     border-radius: 5px;
-    background: #a9cbea;
-    color: #173b60;
+    background: #e8c77d;
+    color: #173b2d;
 }
 
 .public-home .submit-button:hover {
     background: #f4dda3;
-    color: #173b60;
+    color: #173b2d;
 }
 
 .public-home .public-footer {
@@ -3432,7 +3432,7 @@
 }
 
 .public-home .footer-brand span {
-    color: #a9cbea;
+    color: #e8c77d;
 }
 
 @media (max-width: 760px) {
@@ -3483,27 +3483,27 @@
 }
 
 .public-home {
-    --home-forest: #0b3158;
-    --home-forest-deep: #071f3b;
-    --home-green: #21669f;
-    --home-coral: #dc6472;
-    --home-mint: #a8cfee;
-    --home-lime: #8ec9ff;
-    --home-paper: #edf4fb;
-    --home-paper-deep: #dceafa;
-    --home-ink: #123d60;
-    --home-muted: #456b8c;
-    --home-white: #f3f8ff;
-    --home-map-line: rgba(30, 91, 145, 0.12);
+    --home-forest: #073b2e;
+    --home-forest-deep: #052d27;
+    --home-green: #137b50;
+    --home-coral: #71d99c;
+    --home-mint: #a8e8c1;
+    --home-lime: #d7f36a;
+    --home-paper: #edf8ed;
+    --home-paper-deep: #d9f0df;
+    --home-ink: #123d2e;
+    --home-muted: #456b55;
+    --home-white: #f3fff2;
+    --home-map-line: rgba(30, 111, 71, 0.11);
 }
 
 .public-home .public-header {
     background:
-        radial-gradient(ellipse at 79% 18%, rgba(67, 151, 221, 0.38), transparent 36%),
-        radial-gradient(ellipse at 12% 100%, rgba(97, 169, 225, 0.2), transparent 38%),
-        linear-gradient(90deg, transparent 0 49.8%, rgba(200, 225, 255, 0.07) 50%, transparent 50.2%),
-        linear-gradient(0deg, transparent 0 49.8%, rgba(200, 225, 255, 0.06) 50%, transparent 50.2%),
-        linear-gradient(125deg, #082746 0%, #14558f 54%, #0c426f 100%);
+        radial-gradient(ellipse at 79% 18%, rgba(39, 190, 125, 0.42), transparent 36%),
+        radial-gradient(ellipse at 12% 100%, rgba(97, 213, 147, 0.2), transparent 38%),
+        linear-gradient(90deg, transparent 0 49.8%, rgba(200, 255, 215, 0.07) 50%, transparent 50.2%),
+        linear-gradient(0deg, transparent 0 49.8%, rgba(200, 255, 215, 0.06) 50%, transparent 50.2%),
+        linear-gradient(125deg, #06372c 0%, #08734d 54%, #0c5841 100%);
 }
 
 .public-home .public-header::after {
@@ -3520,27 +3520,27 @@
 }
 
 .public-home .status-mark {
-    background: #8ec9ff;
-    box-shadow: 0 0 0 4px rgba(142, 201, 255, 0.18);
+    background: #d7f36a;
+    box-shadow: 0 0 0 4px rgba(215, 243, 106, 0.18);
 }
 
 .public-home .hero-copy h1 span,
 .public-home .action-primary,
 .public-home .action-primary:hover {
-    color: #123d60;
+    color: #123d2e;
 }
 
 .public-home .hero-copy h1 span {
-    color: #8ec9ff;
+    color: #d7f36a;
 }
 
 .public-home .action-primary {
-    background: #8ec9ff;
-    box-shadow: 0 10px 32px rgba(91, 160, 220, 0.24);
+    background: #d7f36a;
+    box-shadow: 0 10px 32px rgba(160, 229, 94, 0.24);
 }
 
 .public-home .action-primary:hover {
-    background: #b8e0ff;
+    background: #e5ff86;
 }
 
 .public-home .route-scene {
@@ -3556,7 +3556,7 @@
 }
 
 .public-home .map-stop--end {
-    fill: #8ec9ff;
+    fill: #d7f36a;
 }
 
 .public-home .public-nav {
@@ -3565,7 +3565,7 @@
 }
 
 .public-home .public-nav::before {
-    background: linear-gradient(90deg, #d85d6b, #8ec9ff 48%, #4f9bd3);
+    background: linear-gradient(90deg, #75dfa1, #d7f36a 48%, #20a879);
 }
 
 .public-home .explore-section {
@@ -3578,7 +3578,7 @@
 }
 
 .public-home .explore-section::before {
-    background: linear-gradient(90deg, transparent, #63c985, #b5e85f, #4f9bd3, transparent);
+    background: linear-gradient(90deg, transparent, #63c985, #b5e85f, #20a879, transparent);
 }
 
 .public-home .explore-section .section-kicker,
@@ -3612,7 +3612,7 @@
 .public-home .feature-item-accent .feature-index,
 .public-home .feature-item-accent .feature-link,
 .public-home .feature-item-accent .feature-index span {
-    color: #8ec9ff;
+    color: #d7f36a;
 }
 
 .public-home .feature-icon {
@@ -3630,7 +3630,7 @@
 .public-home .feature-item-accent .feature-icon {
     border-color: rgba(186, 244, 140, 0.35);
     background: rgba(177, 239, 133, 0.12);
-    color: #8ec9ff;
+    color: #d7f36a;
 }
 
 .public-home .feature-item-accent .feature-icon--community::before {
@@ -3638,7 +3638,7 @@
 }
 
 .public-home .feature-item-accent .feature-link {
-    color: #8ec9ff;
+    color: #d7f36a;
 }
 
 .public-home .city-story {
@@ -3760,12 +3760,12 @@
 .public-home .member-copy .section-kicker,
 .public-home .member-item-number,
 .public-home .member-item-mark {
-    color: #8ec9ff;
+    color: #d7f36a;
 }
 
 .public-home .member-cta,
 .public-home .member-cta:hover {
-    background: #8ec9ff;
+    background: #d7f36a;
     color: #123d2e;
 }
 
@@ -3812,7 +3812,7 @@
 }
 
 .public-home .trust-card + .trust-card::before {
-    background: linear-gradient(90deg, #4f9bd3, #9bdf74 65%, transparent);
+    background: linear-gradient(90deg, #20a879, #9bdf74 65%, transparent);
 }
 
 .public-home .trust-card:last-child::before {
@@ -3835,7 +3835,7 @@
 
 .public-home .future-stamp {
     border-color: rgba(192, 240, 130, 0.45);
-    color: #8ec9ff;
+    color: #d7f36a;
 }
 
 .public-home .future-card {
@@ -3848,7 +3848,7 @@
 .public-home .future-card::before,
 .public-home .future-card:nth-child(2)::before,
 .public-home .future-card:nth-child(3)::before {
-    background: linear-gradient(90deg, #8ec9ff, #a9d8ff);
+    background: linear-gradient(90deg, #d7f36a, #69dfa0);
 }
 
 .public-home .future-card:nth-child(2)::before {
@@ -3856,7 +3856,7 @@
 }
 
 .public-home .future-card:nth-child(3)::before {
-    background: linear-gradient(90deg, #a9d8ff, #8ec9ff);
+    background: linear-gradient(90deg, #69dfa0, #d7f36a);
 }
 
 .public-home .future-number,
@@ -3881,7 +3881,7 @@
 
 .public-home .contact-copy .section-kicker,
 .public-home .contact-form-index b {
-    color: #8ec9ff;
+    color: #d7f36a;
 }
 
 .public-home .contact-kicker-mark {
@@ -3900,7 +3900,7 @@
 
 .public-home .contact-signal-core {
     border-color: rgba(232, 255, 215, 0.9);
-    background: #8ec9ff;
+    background: #d7f36a;
 }
 
 .public-home .contact-signal-line,
@@ -3910,14 +3910,14 @@
 }
 
 .public-home .contact-signal-line {
-    background: #a9d8ff;
+    background: #69dfa0;
 }
 
 .public-home .contact-signal-line--two,
 .public-home .contact-guidance-icon--coral {
-    border-color: rgba(105, 169, 225, 0.38);
+    border-color: rgba(105, 223, 160, 0.38);
     background: #9ade69;
-    color: #8ec9ff;
+    color: #d7f36a;
 }
 
 .public-home .contact-form {
@@ -3928,12 +3928,12 @@
 }
 
 .public-home .contact-form::before {
-    background: linear-gradient(90deg, #8ec9ff, #4fda9c, transparent);
+    background: linear-gradient(90deg, #d7f36a, #4fda9c, transparent);
 }
 
 .public-home .submit-button,
 .public-home .submit-button:hover {
-    background: #8ec9ff;
+    background: #d7f36a;
     color: #123d2e;
 }
 
@@ -3945,7 +3945,7 @@
 }
 
 .public-home .footer-brand span {
-    color: #8ec9ff;
+    color: #d7f36a;
 }
 
 .public-home .scene-map--activity {
@@ -3959,25 +3959,25 @@
 }
 
 .public-home .map-route {
-    stroke: #8ec9ff;
+    stroke: #d7f36a;
     stroke-dasharray: 1;
     stroke-dashoffset: 1;
     animation: route-draw 1.8s cubic-bezier(0.3, 0.75, 0.35, 1) 250ms both;
 }
 
 .public-home .route-runner {
-    color: #8ec9ff;
-    filter: drop-shadow(0 0 7px rgba(142, 201, 255, 0.9));
+    color: #d7f36a;
+    filter: drop-shadow(0 0 7px rgba(215, 243, 106, 0.9));
 }
 
 .public-home .route-runner-halo {
-    fill: rgba(142, 201, 255, 0.22);
+    fill: rgba(215, 243, 106, 0.22);
     animation: route-runner-pulse 1.8s ease-in-out infinite;
 }
 
 .public-home .route-runner-core {
     fill: #f4ffd8;
-    stroke: #8ec9ff;
+    stroke: #d7f36a;
     stroke-width: 2;
 }
 
@@ -4028,8 +4028,8 @@
 }
 
 .public-home .scene-destination::after {
-    background: #8ec9ff;
-    box-shadow: 0 0 0 0 rgba(142, 201, 255, 0.35);
+    background: #d7f36a;
+    box-shadow: 0 0 0 0 rgba(215, 243, 106, 0.35);
     animation-delay: 1.4s;
 }
 
@@ -4066,12 +4066,12 @@
 @keyframes stop-pulse {
     0%, 100% {
         transform: scale(1);
-        filter: drop-shadow(0 0 0 rgba(142, 201, 255, 0));
+        filter: drop-shadow(0 0 0 rgba(215, 243, 106, 0));
     }
 
     50% {
         transform: scale(1.14);
-        filter: drop-shadow(0 0 5px rgba(142, 201, 255, 0.6));
+        filter: drop-shadow(0 0 5px rgba(215, 243, 106, 0.6));
     }
 }
 
@@ -4128,7 +4128,7 @@
 
 @media (max-width: 420px) {
     .public-home .route-runner {
-        filter: drop-shadow(0 0 5px rgba(142, 201, 255, 0.72));
+        filter: drop-shadow(0 0 5px rgba(215, 243, 106, 0.72));
     }
 }
 
@@ -4177,8 +4177,8 @@
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: #8ec9ff;
-    box-shadow: 0 0 10px rgba(142, 201, 255, 0.9);
+    background: #d7f36a;
+    box-shadow: 0 0 10px rgba(215, 243, 106, 0.9);
     animation: route-key-beacon 2s ease-in-out infinite;
 }
 
@@ -4203,8 +4203,8 @@
 }
 
 .public-home .scene-route-key-destination {
-    border-color: rgba(142, 201, 255, 0.6);
-    color: #8ec9ff;
+    border-color: rgba(215, 243, 106, 0.6);
+    color: #d7f36a;
 }
 
 .public-home .map-route-branch,
@@ -4231,16 +4231,16 @@
 }
 
 .public-home .map-route {
-    stroke: #8ec9ff;
+    stroke: #d7f36a;
     stroke-width: 4;
     stroke-dasharray: 1;
     stroke-dashoffset: 1;
-    filter: drop-shadow(0 0 5px rgba(142, 201, 255, 0.58));
+    filter: drop-shadow(0 0 5px rgba(215, 243, 106, 0.58));
     animation: route-draw 1.6s cubic-bezier(0.3, 0.75, 0.35, 1) 450ms forwards;
 }
 
 .public-home .map-route-glow {
-    stroke: rgba(142, 201, 255, 0.8);
+    stroke: rgba(215, 243, 106, 0.8);
     stroke-width: 10;
     opacity: 0;
     filter: blur(7px);
@@ -4262,7 +4262,7 @@
 }
 
 .public-home .map-stop-ring--end {
-    stroke: rgba(142, 201, 255, 0.9);
+    stroke: rgba(215, 243, 106, 0.9);
     animation-delay: 2.1s;
 }
 
@@ -4497,12 +4497,12 @@
 
 @keyframes route-key-beacon {
     0%, 100% {
-        box-shadow: 0 0 5px rgba(142, 201, 255, 0.45);
+        box-shadow: 0 0 5px rgba(215, 243, 106, 0.45);
         transform: scale(0.88);
     }
 
     50% {
-        box-shadow: 0 0 13px rgba(142, 201, 255, 1);
+        box-shadow: 0 0 13px rgba(215, 243, 106, 1);
         transform: scale(1.18);
     }
 }
@@ -4620,7 +4620,7 @@
 .public-home .scene-route-key {
     top: 61px;
     padding-inline: 12px;
-    color: #d3e8fa;
+    color: #d3f0d7;
     letter-spacing: 0.1em;
 }
 
@@ -4691,7 +4691,7 @@
 }
 
 .public-home .scene-readout-count b {
-    color: #8ec9ff;
+    color: #d7f36a;
     font-size: 12px;
 }
 
@@ -4720,7 +4720,7 @@
 }
 
 .public-home .scene-compass svg circle {
-    fill: #8ec9ff;
+    fill: #d7f36a;
     stroke: #ecffd0;
     stroke-width: 1;
 }
@@ -4801,11 +4801,11 @@
 }
 
 .public-home .route-minibus {
-    filter: drop-shadow(0 0 8px rgba(142, 201, 255, 0.82));
+    filter: drop-shadow(0 0 8px rgba(215, 243, 106, 0.82));
 }
 
 .public-home .route-minibus-body {
-    fill: #8ec9ff;
+    fill: #d7f36a;
     stroke: #f0ffd0;
     stroke-width: 1;
 }
@@ -4823,7 +4823,7 @@
 }
 
 .public-home .route-minibus-wheel {
-    fill: #092746;
+    fill: #092d27;
     stroke: #dff3cc;
     stroke-width: 1;
 }
@@ -5096,7 +5096,7 @@
 }
 
 .public-home .story-sea-line--two {
-    stroke: rgba(142, 201, 255, 0.38);
+    stroke: rgba(215, 243, 106, 0.38);
     stroke-dasharray: 1 11;
     animation-duration: 19s;
     animation-direction: reverse;
@@ -5118,7 +5118,7 @@
 .public-home .story-house-detail,
 .public-home .story-building-detail {
     fill: none;
-    stroke: rgba(142, 201, 255, 0.72);
+    stroke: rgba(215, 243, 106, 0.72);
     stroke-width: 1.5;
     stroke-linecap: round;
     stroke-linejoin: round;
@@ -5139,7 +5139,7 @@
 }
 
 .public-home .story-clock {
-    fill: #8ec9ff;
+    fill: #d7f36a;
     stroke: rgba(248, 255, 215, 0.94);
     stroke-width: 1.5;
 }
@@ -5201,7 +5201,7 @@
 }
 
 .public-home .story-bus-body {
-    fill: #8ec9ff;
+    fill: #d7f36a;
     stroke: #f1ffd7;
     stroke-width: 0.8;
 }
@@ -5213,14 +5213,14 @@
 }
 
 .public-home .story-bus-wheel {
-    fill: #092746;
+    fill: #092d27;
     stroke: #dff3cc;
     stroke-width: 0.8;
 }
 
 .public-home .city-story-city {
     z-index: 3;
-    color: #8ec9ff;
+    color: #d7f36a;
     text-shadow: 0 8px 36px rgba(177, 255, 117, 0.32), 0 18px 45px rgba(0, 20, 12, 0.36);
 }
 
@@ -5341,7 +5341,7 @@
 }
 
 .public-home .contact-map-wave--two {
-    stroke: rgba(142, 201, 255, 0.42);
+    stroke: rgba(215, 243, 106, 0.42);
     stroke-dasharray: 1 8;
     animation-duration: 17s;
     animation-direction: reverse;
@@ -5377,7 +5377,7 @@
 }
 
 .public-home .contact-map-clock {
-    fill: #8ec9ff;
+    fill: #d7f36a;
     stroke: rgba(241, 255, 212, 0.9);
     stroke-width: 1;
 }
@@ -5408,11 +5408,11 @@
 }
 
 .public-home .contact-route-flow {
-    stroke: #8ec9ff;
+    stroke: #d7f36a;
     stroke-width: 1.8;
     stroke-dasharray: 0.05 0.95;
     stroke-dashoffset: 1;
-    filter: drop-shadow(0 0 3px rgba(142, 201, 255, 0.85));
+    filter: drop-shadow(0 0 3px rgba(215, 243, 106, 0.85));
     animation: contact-route-draw 7s linear infinite;
 }
 
@@ -5429,7 +5429,7 @@
 
 .public-home .contact-beacon-ring {
     fill: none;
-    stroke: rgba(142, 201, 255, 0.7);
+    stroke: rgba(215, 243, 106, 0.7);
     stroke-width: 1;
     transform-box: fill-box;
     transform-origin: center;
@@ -5441,10 +5441,10 @@
 }
 
 .public-home .contact-beacon {
-    fill: #8ec9ff;
+    fill: #d7f36a;
     stroke: rgba(241, 255, 212, 0.95);
     stroke-width: 1.5;
-    filter: drop-shadow(0 0 8px rgba(142, 201, 255, 0.58));
+    filter: drop-shadow(0 0 8px rgba(215, 243, 106, 0.58));
 }
 
 .public-home .contact-beacon-icon {
@@ -5459,11 +5459,11 @@
 }
 
 .public-home .contact-route-bus {
-    filter: drop-shadow(0 0 4px rgba(142, 201, 255, 0.9));
+    filter: drop-shadow(0 0 4px rgba(215, 243, 106, 0.9));
 }
 
 .public-home .contact-bus-body {
-    fill: #8ec9ff;
+    fill: #d7f36a;
     stroke: #f1ffd7;
     stroke-width: 0.7;
 }
@@ -5475,7 +5475,7 @@
 }
 
 .public-home .contact-bus-wheel {
-    fill: #092746;
+    fill: #092d27;
     stroke: #e6f4ce;
     stroke-width: 0.7;
 }
@@ -5509,13 +5509,13 @@
 .public-home .contact-guidance-icon {
     position: relative;
     border-radius: 7px 7px 7px 2px;
-    background: linear-gradient(145deg, rgba(142, 201, 255, 0.14), rgba(142, 201, 255, 0.04));
+    background: linear-gradient(145deg, rgba(215, 243, 106, 0.14), rgba(215, 243, 106, 0.04));
     box-shadow: inset 0 1px 0 rgba(242, 255, 213, 0.08);
     transition: transform 180ms ease, background 180ms ease;
 }
 
 .public-home .contact-guidance + .contact-guidance .contact-guidance-icon {
-    background: linear-gradient(145deg, rgba(105, 169, 225, 0.18), rgba(105, 169, 225, 0.05));
+    background: linear-gradient(145deg, rgba(105, 223, 160, 0.18), rgba(105, 223, 160, 0.05));
 }
 
 .public-home .contact-guidance:hover .contact-guidance-icon {
@@ -5584,54 +5584,4 @@
     .public-home .contact-guidance-icon {
         transition: none;
     }
-}
-
-.public-home .public-header {
-    background:
-        radial-gradient(ellipse at 75% 42%, rgba(75, 151, 210, 0.32), transparent 34%),
-        linear-gradient(120deg, #082746 0%, #14558f 57%, #123b66 100%);
-}
-
-.public-home .public-header::after {
-    border-color: rgba(142, 201, 255, 0.28);
-    background:
-        radial-gradient(ellipse at 70% 76%, transparent 0 35%, rgba(142, 201, 255, 0.13) 35.2% 35.5%, transparent 35.7%),
-        repeating-linear-gradient(165deg, transparent 0 28px, rgba(142, 201, 255, 0.055) 29px 30px);
-}
-
-.public-home .eyebrow {
-    border-color: rgba(142, 201, 255, 0.38);
-    background: rgba(142, 201, 255, 0.1);
-    color: #b8e0ff;
-}
-
-.public-home .route-scene {
-    border-color: rgba(142, 201, 255, 0.3);
-    background:
-        radial-gradient(ellipse at 68% 32%, rgba(62, 139, 202, 0.28), transparent 38%),
-        linear-gradient(145deg, #164f80, #082746 82%);
-    box-shadow: 0 30px 90px rgba(0, 27, 55, 0.34), inset 0 1px 0 rgba(198, 225, 255, 0.14);
-}
-
-.public-home .public-nav {
-    border-bottom-color: rgba(142, 201, 255, 0.24);
-    background: rgba(7, 31, 59, 0.97);
-}
-
-.public-home .public-nav::before {
-    background: linear-gradient(90deg, #d85d6b, #8ec9ff 48%, #4f9bd3);
-}
-
-.public-home .explore-section {
-    background:
-        repeating-linear-gradient(0deg, transparent 0 38px, var(--home-map-line) 39px 40px),
-        repeating-linear-gradient(90deg, transparent 0 58px, var(--home-map-line) 59px 60px),
-        linear-gradient(135deg, #f3f7fc, #e8f0fa 54%, #dceafa);
-}
-
-.public-home .city-story {
-    background:
-        linear-gradient(28deg, transparent 0 19%, rgba(142, 201, 255, 0.045) 19.1% 19.25%, transparent 19.4%),
-        linear-gradient(118deg, transparent 0 56%, rgba(142, 201, 255, 0.045) 56.1% 56.3%, transparent 56.4%),
-        linear-gradient(152deg, #123f67, #092746 76%);
 }

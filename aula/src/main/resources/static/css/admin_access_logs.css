@@ -1,8 +1,8 @@
 .admin-audit {
-    --audit-ink: #302328;
-    --audit-muted: #78696e;
-    --audit-border: #eadfe1;
-    --audit-blue: #a52a3a;
+    --audit-ink: #172640;
+    --audit-muted: #718097;
+    --audit-border: #e4e9f1;
+    --audit-blue: #4568d9;
 }
 
 .audit-notice {
@@ -11,9 +11,9 @@
     gap: 0.8rem;
     margin-bottom: 1.1rem;
     padding: 1rem 1.15rem;
-    color: #71323c;
-    background: #fff2f4;
-    border: 1px solid #efd6da;
+    color: #35547f;
+    background: #edf4ff;
+    border: 1px solid #d5e4ff;
     border-radius: 10px;
     font-size: 0.86rem;
     line-height: 1.55;
@@ -33,7 +33,7 @@
     background: #fff;
     border: 1px solid var(--audit-border);
     border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(66, 24, 33, 0.065);
+    box-shadow: 0 8px 24px rgba(32, 51, 83, 0.065);
 }
 
 .audit-card__header {
@@ -92,8 +92,8 @@
 
 .audit-table th {
     padding: 0.85rem 1.2rem;
-    color: #78696e;
-    background: #faf6f6;
+    color: #61728b;
+    background: #f7f9fc;
     font-size: 0.72rem;
     font-weight: 700;
     letter-spacing: 0.055em;
@@ -109,7 +109,7 @@
 }
 
 .audit-table tbody tr:hover {
-    background: #fff7f8;
+    background: #f8faff;
 }
 
 .audit-table td:first-child {
