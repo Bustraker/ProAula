@@ -12,10 +12,11 @@
     <link rel="stylesheet" th:href="@{/css/style.css}">
     <link rel="icon" th:href="@{/images/logo.png}" type="image/png">
     <link rel="stylesheet" th:href="@{/css/index.css}">
+    <link rel="stylesheet" th:href="@{/css/accessibility.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" th:href="@{/css/style-index-landing.css(v='puerta-reloj-sunset-1')}">
+    <link rel="stylesheet" th:href="@{/css/style-index-landing.css(v='puerta-reloj-cartagena-3')}">
 </head>
-<body class="landing-page">
+<body class="landing-page" data-accessibility-scope="global">
     <main class="landing-main">
         <div class="landing-frame">
             <header class="landing-header">
@@ -26,6 +27,11 @@
                     <span><strong>Bustraker</strong><small>Movilidad en Cartagena</small></span>
                 </button>
                 <nav class="landing-nav" aria-label="Acceso a la cuenta">
+                    <button type="button" class="accessibility-trigger" data-accessibility-trigger
+                            aria-controls="accessibilityControls" aria-expanded="false"
+                            aria-label="Abrir configuraciones de accesibilidad" title="Configuraciones de accesibilidad">
+                        <i class="fas fa-sliders" aria-hidden="true"></i><span>Configuraciones</span>
+                    </button>
                     <a th:href="@{/inicio-de-sesion-mejorado}">Iniciar sesión</a>
                     <a class="landing-nav-register" th:href="@{/registro-mejorado}">Crear cuenta</a>
                 </nav>
@@ -40,9 +46,9 @@
                         <a th:href="@{/index_3_public}" class="landing-primary-action">Entrar al menú público <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
                     </div>
                 </div>
-                <div class="landing-cartagena-art" role="img" aria-label="Buseta en una calle de Cartagena frente a la Puerta del Reloj, con sus ruedas y el pavimento en movimiento">
+                <div class="landing-cartagena-art" role="img" aria-label="Escena de Cartagena al atardecer con palmeras, la bandera colombiana, la Puerta del Reloj y una buseta en movimiento">
                     <span class="route-art-coordinate route-art-coordinate--top">CENTRO <i>·</i> CARTAGENA</span>
-                    <svg class="ctg-v2-scene" viewBox="0 0 360 240" aria-hidden="true" focusable="false">
+                    <svg class="ctg-v2-scene" viewBox="0 0 360 220" aria-hidden="true" focusable="false">
                         <defs>
                             <linearGradient id="ctg-v2-sky" x1="0" y1="0" x2="0" y2="1">
                                 <stop stop-color="#183448"></stop>
@@ -66,9 +72,19 @@
                                 <stop offset="1" stop-color="#263b45"></stop>
                             </linearGradient>
                             <linearGradient id="ctg-v2-bus" x1="0" y1="0" x2="0" y2="1">
-                                <stop stop-color="#f58b78"></stop>
-                                <stop offset=".58" stop-color="#d95461"></stop>
-                                <stop offset="1" stop-color="#96394e"></stop>
+                                <stop stop-color="#fff8ed"></stop>
+                                <stop offset=".54" stop-color="#e8ece8"></stop>
+                                <stop offset="1" stop-color="#b8c8ca"></stop>
+                            </linearGradient>
+                            <linearGradient id="ctg-v2-bus-roof" x1="0" y1="0" x2="1" y2="1">
+                                <stop stop-color="#ffffff"></stop>
+                                <stop offset=".62" stop-color="#cfdedc"></stop>
+                                <stop offset="1" stop-color="#91a7aa"></stop>
+                            </linearGradient>
+                            <linearGradient id="ctg-v2-bus-red" x1="0" y1="0" x2="1" y2="1">
+                                <stop stop-color="#cf4553"></stop>
+                                <stop offset=".58" stop-color="#b31f31"></stop>
+                                <stop offset="1" stop-color="#7f1727"></stop>
                             </linearGradient>
                             <linearGradient id="ctg-v2-glass" x1="0" y1="0" x2="1" y2="1">
                                 <stop stop-color="#d8eee0"></stop>
@@ -85,10 +101,24 @@
                                 <stop offset="1" stop-color="#f4a36f"></stop>
                             </radialGradient>
                         </defs>
-                        <path class="ctg-v2-sky" d="M0 0h360v240H0z"></path>
+                        <path class="ctg-v2-sky" d="M0 0h360v220H0z"></path>
                         <ellipse class="ctg-v2-sunset" cx="270" cy="85" rx="112" ry="64"></ellipse>
                         <circle class="ctg-v2-sun-halo" cx="270" cy="85" r="31"></circle>
                         <circle class="ctg-v2-sun" cx="270" cy="85" r="22"></circle>
+                        <g class="ctg-v2-cloud ctg-v2-cloud--left" aria-hidden="true">
+                            <path d="M24 47c2-6 10-8 15-4 4-9 17-9 21 0 6-1 10 2 12 6H23c-2-1-1-2 1-2z"></path>
+                        </g>
+                        <g class="ctg-v2-cloud ctg-v2-cloud--right" aria-hidden="true">
+                            <path d="M265 37c2-5 8-7 12-3 4-8 15-8 19 0 5-1 9 2 10 6h-42c-2-1-1-2 1-3z"></path>
+                        </g>
+                        <g class="ctg-v2-palm ctg-v2-palm--left" aria-hidden="true">
+                            <path class="ctg-v2-palm-trunk" d="M21 147q12-36 8-73"></path>
+                            <path class="ctg-v2-palm-fronds" d="M29 75Q12 54 1 57q17-7 29 11Q16 38 10 31q15 9 22 36Q30 34 39 25q-7 18-6 43Q47 46 59 45q-12 8-27 31Q53 59 68 64q-18 0-37 16"></path>
+                        </g>
+                        <g class="ctg-v2-palm ctg-v2-palm--right" aria-hidden="true">
+                            <path class="ctg-v2-palm-trunk" d="M339 147q-13-41-6-78"></path>
+                            <path class="ctg-v2-palm-fronds" d="M333 72q-15-21-28-18 16-7 30 10-12-27-6-35 10 12 9 34 7-28 18-35-9 16-12 36 20-23 32-19-14 8-31 31 25-16 37-8-19 1-36 20"></path>
+                        </g>
                         <path class="ctg-v2-horizon" d="M0 116q45-13 87 0t89 0 91 0 93-2v24H0z"></path>
                         <g class="ctg-v2-gateway">
                             <path class="ctg-v2-gate-shadow" d="M0 148V111h17v-9h18v9h18V99h32V85h28V99h21V83h11V52h9V38h8V29q17-17 34 0v9h8v14h9v31h11v16h21V85h28v14h32v12h17v-9h18v9h16v37z"></path>
@@ -112,25 +142,38 @@
                             <path class="ctg-v2-stone-joints" d="M7 123h78m35 0h27m66 0h42m30 0h68M8 135h43m63 0h36m69 0h45m30 0h58"></path>
                             <path class="ctg-v2-gate-highlight" d="M7 115h17m21-13h15m45-12h14m27-38h11m38 0h10m28 48h14m58 12h22m20 0h18m8 12h19"></path>
                         </g>
+                        <g class="ctg-v2-flag" aria-hidden="true">
+                            <path class="ctg-v2-flag-pole" d="M287 105V56"></path>
+                            <path class="ctg-v2-flag-yellow" d="M288 58h23v7h-23z"></path>
+                            <path class="ctg-v2-flag-blue" d="M288 65h23v5h-23z"></path>
+                            <path class="ctg-v2-flag-red" d="M288 70h23v5h-23z"></path>
+                        </g>
                         <path class="ctg-v2-sidewalk" d="M0 147h360v11q-180-4-360 0z"></path>
-                        <path class="ctg-v2-road" d="M0 158q180-4 360 0v82H0z"></path>
+                        <path class="ctg-v2-road" d="M0 158q180-4 360 0v62H0z"></path>
                         <path class="ctg-v2-road-edge" d="M0 158q180-4 360 0"></path>
                         <path class="ctg-v2-road-flow ctg-v2-road-flow--center" d="M-360 194h1080"></path>
                         <path class="ctg-v2-road-flow ctg-v2-road-flow--left" d="M-360 171h1080m-1080 46h1080"></path>
                         <path class="ctg-v2-road-grain" d="M0 165h360m-360 16h360m-360 27h360m-360 16h360"></path>
                         <path class="ctg-v2-road-glow" d="M0 160h360"></path>
+                        <g class="ctg-v2-perspective" aria-hidden="true">
+                            <path d="M180 158 55 220m125-62 125 62M180 158l-48 62m48-62 48 62"></path>
+                            <path d="M-8 178h376M0 196h360"></path>
+                        </g>
                         <g class="ctg-v2-bus" aria-hidden="true">
                             <ellipse class="ctg-v2-bus-shadow" cx="180" cy="211" rx="49" ry="6"></ellipse>
                             <g class="ctg-v2-bus-body">
                                 <path class="ctg-v2-bus-shell" d="M134 192v-17q0-9 10-11h43q8 0 13 6l12 13 2 8v13q0 4-5 4h-5a8 8 0 0 0-16 0h-24a8 8 0 0 0-16 0h-9q-5 0-5-5z"></path>
                                 <path class="ctg-v2-bus-roof" d="M143 165h44q7 0 11 6l4 5h-62v-5q0-4 3-6z"></path>
+                                <path class="ctg-v2-bus-roof-glint" d="M150 166h31q8 0 12 6h-48q1-5 5-6z"></path>
                                 <path class="ctg-v2-bus-window" d="M142 169h15v14h-17v-10q0-3 2-4zm19 0h17v14h-17zm21 0h4q5 0 8 5l4 9h-16z"></path>
                                 <path class="ctg-v2-bus-window-frame" d="M159 168v16m21-16v16"></path>
                                 <path class="ctg-v2-bus-glint" d="m144 171 8-2m10 1h10m15 0 4 2"></path>
                                 <path class="ctg-v2-bus-door" d="M184 184v19m6-19v14"></path>
-                                <path class="ctg-v2-bus-band" d="M136 187q25 3 48 1l27-1v9l-28 2q-24 2-47-1z"></path>
+                                <path class="ctg-v2-bus-band" d="M136 188q25 3 48 1l27-1v9l-28 2q-24 2-47-1z"></path>
                                 <path class="ctg-v2-bus-pinstripe" d="M138 187q23 3 46 1l27-1"></path>
+                                <text class="ctg-v2-bus-label" x="145" y="194">CARTAGENA</text>
                                 <path class="ctg-v2-bus-front" d="M205 176l7 8v15h-7z"></path>
+                                <path class="ctg-v2-bus-front-panel" d="M207 178l5 6v13l-5 2z"></path>
                                 <path class="ctg-v2-bus-grille" d="M210 189h6m-6 3h6m-6 3h5"></path>
                                 <path class="ctg-v2-bus-lamp" d="M211 182h4l2 4h-6z"></path>
                                 <path class="ctg-v2-bus-mirror" d="m207 176 7-3 2 3-5 3"></path>
@@ -149,7 +192,7 @@
                                 <circle class="ctg-v2-hub" r="1.7"></circle>
                             </g>
                         </g>
-                        <path class="ctg-v2-road-sheen" d="M18 224h36m258 0h30"></path>
+                        <path class="ctg-v2-road-sheen" d="M18 214h36m258 0h30"></path>
                     </svg>
                     <svg class="ctg-legacy-scene" viewBox="0 0 360 240" aria-hidden="true" focusable="false">
                         <defs>
@@ -364,6 +407,8 @@
 
     </main>
 
+    <div th:replace="~{fragments/accessibility :: controls}"></div>
+
     <dialog id="adminAccessGate" class="landing-admin-gate" aria-label="Acceso administrativo">
         <section class="admin-access-stage" aria-label="Centro de acceso administrativo">
             <div class="admin-access-stage__topline" aria-hidden="true">
@@ -452,5 +497,6 @@
     </dialog>
 
     <script th:src="@{/js/index.js(v='route-cartagena-13')}"></script>
+    <script th:src="@{/js/accessibility.js}" defer></script>
 </body>
 </html>

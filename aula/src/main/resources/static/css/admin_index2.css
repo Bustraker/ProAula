@@ -89,7 +89,8 @@ body.admin-dashboard {
     gap: 0.35rem;
 }
 
-.admin-dashboard .sidebar-nav a {
+.admin-dashboard .sidebar-nav a,
+.admin-dashboard .sidebar-nav .accessibility-trigger {
     position: relative;
     min-height: 44px;
     display: flex;
@@ -109,7 +110,16 @@ body.admin-dashboard {
         transform 220ms var(--admin-ease);
 }
 
-.admin-dashboard .sidebar-nav a::after {
+.admin-dashboard .sidebar-nav .accessibility-trigger {
+    width: 100%;
+    background: transparent;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.admin-dashboard .sidebar-nav a::after,
+.admin-dashboard .sidebar-nav .accessibility-trigger::after {
     position: absolute;
     inset: 0;
     background: linear-gradient(105deg, transparent 25%, rgba(255, 255, 255, 0.07) 50%, transparent 75%);
@@ -119,11 +129,13 @@ body.admin-dashboard {
     pointer-events: none;
 }
 
-.admin-dashboard .sidebar-nav a:hover::after {
+.admin-dashboard .sidebar-nav a:hover::after,
+.admin-dashboard .sidebar-nav .accessibility-trigger:hover::after {
     transform: translateX(115%);
 }
 
-.admin-dashboard .sidebar-nav a i {
+.admin-dashboard .sidebar-nav a i,
+.admin-dashboard .sidebar-nav .accessibility-trigger i {
     width: 20px;
     flex: 0 0 20px;
     color: #8da3cc;
@@ -131,7 +143,8 @@ body.admin-dashboard {
 }
 
 .admin-dashboard .sidebar-nav a:hover,
-.admin-dashboard .sidebar-nav a.active {
+.admin-dashboard .sidebar-nav a.active,
+.admin-dashboard .sidebar-nav .accessibility-trigger:hover {
     color: #f7f9ff;
     background: linear-gradient(100deg, rgba(74, 103, 202, 0.28), rgba(63, 88, 160, 0.1));
     border-color: rgba(129, 155, 239, 0.19);
@@ -144,7 +157,8 @@ body.admin-dashboard {
 }
 
 .admin-dashboard .sidebar-nav a:hover i,
-.admin-dashboard .sidebar-nav a.active i {
+.admin-dashboard .sidebar-nav a.active i,
+.admin-dashboard .sidebar-nav .accessibility-trigger:hover i {
     color: #b4c3ff;
     transform: translateX(2px) scale(1.06);
 }

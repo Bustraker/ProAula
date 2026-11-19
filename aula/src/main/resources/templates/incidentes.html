@@ -3,20 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#0b2942">
+    <meta name="theme-color" content="#082b50">
     <meta name="csrf-token" th:content="${_csrf.token}">
     <meta name="csrf-header" th:content="${_csrf.headerName}">
     <title>Gestión de incidentes - Bustraker</title>
     <link rel="icon" th:href="@{/images/logo.png}" type="image/png">
-    <link rel="stylesheet" th:href="@{/css/incidentes-panel.css}">
+    <link rel="stylesheet" th:href="@{/css/incidentes-panel.css(v='incident-panel-20261119-2')}">
+    <link rel="stylesheet" th:href="@{/css/accessibility.css}">
 </head>
 <body class="incident-panel-page">
 <header class="panel-topbar">
-    <a class="panel-brand" th:href="@{/dashboard}" aria-label="Bustraker, volver al panel">
+    <a class="panel-brand" th:href="@{/index_2}" aria-label="Bustraker, volver al panel administrativo">
         <span class="panel-brand-mark" aria-hidden="true">B</span>
         <span>Bustraker</span>
     </a>
-    <a class="panel-back" th:href="@{/dashboard}">Volver al panel</a>
+    <a class="panel-back" th:href="@{/index_2}">Volver al panel administrativo</a>
 </header>
 
 <main class="panel-shell">
@@ -118,5 +119,6 @@
 </main>
 
 <script defer th:src="@{/incidentes.js}"></script>
+    <script th:src="@{/js/accessibility.js}" defer></script>
 </body>
 </html>

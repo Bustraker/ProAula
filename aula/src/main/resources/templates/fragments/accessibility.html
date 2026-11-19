@@ -7,18 +7,147 @@
         Sin información
     </span>
 
-    <aside th:fragment="controls" class="accessibility-controls" aria-label="Opciones de accesibilidad">
-        <div class="accessibility-controls__heading">
-            <span class="accessibility-controls__eyebrow">Accesibilidad</span>
-            <strong>Visualización</strong>
+    <dialog th:fragment="controls" id="accessibilityControls" class="accessibility-controls"
+            aria-labelledby="accessibilityControlsTitle"
+            aria-describedby="accessibilityControlsDescription">
+        <header class="accessibility-controls__header">
+            <div>
+                <span class="accessibility-controls__eyebrow" id="accessibilityControlsScope">PREFERENCIAS</span>
+                <h2 id="accessibilityControlsTitle">Accesibilidad</h2>
+                <p id="accessibilityControlsDescription">Adapta la lectura y la interacción a tus necesidades.</p>
+            </div>
+            <button type="button" class="accessibility-controls__close" data-accessibility-close
+                    aria-label="Cerrar configuraciones de accesibilidad">
+                <span aria-hidden="true">×</span>
+            </button>
+        </header>
+
+        <div class="accessibility-controls__body">
+            <details class="accessibility-group" open>
+                <summary>
+                    <span class="accessibility-group__icon" aria-hidden="true">Aa</span>
+                    <span><strong>Visión y lectura</strong><small>Texto, contraste y claridad visual</small></span>
+                    <span class="accessibility-group__chevron" aria-hidden="true">⌄</span>
+                </summary>
+                <div class="accessibility-group__content">
+                    <div class="accessibility-text-control">
+                        <div class="accessibility-text-control__label">
+                            <label for="accessibilityTextScale">Tamaño del texto</label>
+                            <output id="accessibilityTextValue" for="accessibilityTextScale">100%</output>
+                        </div>
+                        <div class="accessibility-text-control__range">
+                            <button type="button" id="accessibilityTextDecrease" aria-label="Disminuir tamaño del texto">A−</button>
+                            <input type="range" id="accessibilityTextScale" min="0" max="7" step="1" value="2"
+                                   aria-label="Tamaño del texto, de 80 a 200 por ciento">
+                            <button type="button" id="accessibilityTextIncrease" aria-label="Aumentar tamaño del texto">A+</button>
+                        </div>
+                        <button type="button" id="accessibilityTextReset" class="accessibility-text-reset">
+                            Restablecer tamaño del texto
+                        </button>
+                        <small>De 80% a 200%. El diseño se adapta al espacio disponible.</small>
+                    </div>
+
+                    <div class="accessibility-settings-grid">
+                        <button type="button" id="accessibilityContrast" class="accessibility-setting"
+                                data-accessibility-toggle="highContrast" aria-pressed="false">
+                            <span class="accessibility-setting__icon" aria-hidden="true">◐</span>
+                            <span><strong>Alto contraste</strong><small>Refuerza la separación entre contenido y fondo</small></span>
+                            <span class="accessibility-setting__state" aria-hidden="true"></span>
+                        </button>
+                        <button type="button" class="accessibility-setting"
+                                data-accessibility-toggle="readableText" aria-pressed="false">
+                            <span class="accessibility-setting__icon" aria-hidden="true">Aa</span>
+                            <span><strong>Lectura clara</strong><small>Tipografía sencilla y espaciado cómodo</small></span>
+                            <span class="accessibility-setting__state" aria-hidden="true"></span>
+                        </button>
+                        <button type="button" class="accessibility-setting"
+                                data-accessibility-toggle="underlineLinks" aria-pressed="false">
+                            <span class="accessibility-setting__icon" aria-hidden="true">↗</span>
+                            <span><strong>Identificar enlaces</strong><small>Subraya enlaces para no depender solo del color</small></span>
+                            <span class="accessibility-setting__state" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                    <button type="button" class="accessibility-preset" id="accessibilityReadingPreset">
+                        <span aria-hidden="true">✦</span>
+                        <span><strong>Activar lectura cómoda</strong><small>Combina texto amplio, lectura clara y enlaces destacados</small></span>
+                        <span aria-hidden="true">→</span>
+                    </button>
+                </div>
+            </details>
+
+            <details class="accessibility-group">
+                <summary>
+                    <span class="accessibility-group__icon" aria-hidden="true">⌨</span>
+                    <span><strong>Movimiento y navegación</strong><small>Teclado, animaciones y controles</small></span>
+                    <span class="accessibility-group__chevron" aria-hidden="true">⌄</span>
+                </summary>
+                <div class="accessibility-group__content accessibility-settings-grid">
+                    <button type="button" class="accessibility-setting"
+                            data-accessibility-toggle="reducedMotion" aria-pressed="false">
+                        <span class="accessibility-setting__icon" aria-hidden="true">Ⅱ</span>
+                        <span><strong>Reducir movimiento</strong><small>Detiene animaciones y desplazamientos suaves</small></span>
+                        <span class="accessibility-setting__state" aria-hidden="true"></span>
+                    </button>
+                    <button type="button" class="accessibility-setting"
+                            data-accessibility-toggle="enhancedFocus" aria-pressed="false">
+                        <span class="accessibility-setting__icon" aria-hidden="true">◎</span>
+                        <span><strong>Resaltar foco del teclado</strong><small>Hace más visible el elemento seleccionado</small></span>
+                        <span class="accessibility-setting__state" aria-hidden="true"></span>
+                    </button>
+                    <button type="button" class="accessibility-setting"
+                            data-accessibility-toggle="largeTargets" aria-pressed="false">
+                        <span class="accessibility-setting__icon" aria-hidden="true">↔</span>
+                        <span><strong>Controles más amplios</strong><small>Aumenta el área de interacción</small></span>
+                        <span class="accessibility-setting__state" aria-hidden="true"></span>
+                    </button>
+                    <button type="button" class="accessibility-setting"
+                            data-accessibility-toggle="visualAlerts" aria-pressed="false">
+                        <span class="accessibility-setting__icon" aria-hidden="true">▣</span>
+                        <span><strong>Reforzar avisos visuales</strong><small>Destaca mensajes y estados sin depender del sonido</small></span>
+                        <span class="accessibility-setting__state" aria-hidden="true"></span>
+                    </button>
+                    <button type="button" class="accessibility-setting"
+                            data-accessibility-toggle="readingGuide" aria-pressed="false">
+                        <span class="accessibility-setting__icon" aria-hidden="true">━</span>
+                        <span><strong>Guía de lectura</strong><small>Sigue el puntero o el foco para ayudar a mantener la línea</small></span>
+                        <span class="accessibility-setting__state" aria-hidden="true"></span>
+                    </button>
+                </div>
+            </details>
+
+            <details class="accessibility-group">
+                <summary>
+                    <span class="accessibility-group__icon" aria-hidden="true">◖</span>
+                    <span><strong>Comunicación y escucha</strong><small>Avisos visibles y lectura en voz alta</small></span>
+                    <span class="accessibility-group__chevron" aria-hidden="true">⌄</span>
+                </summary>
+                <div class="accessibility-group__content">
+                    <label class="accessibility-voice-label" for="accessibilityVoice">Voz del dispositivo</label>
+                    <select id="accessibilityVoice">
+                        <option value="">Voz predeterminada</option>
+                    </select>
+                    <div class="accessibility-text-control">
+                        <div class="accessibility-text-control__label">
+                            <label for="accessibilitySpeechRate">Velocidad de lectura</label>
+                            <output id="accessibilitySpeechRateValue" for="accessibilitySpeechRate">1.0×</output>
+                        </div>
+                        <input type="range" id="accessibilitySpeechRate" min="0.7" max="1.4" step="0.1" value="1">
+                    </div>
+                    <div class="accessibility-speech-actions">
+                        <button type="button" id="accessibilityReadAloud">Leer contenido</button>
+                        <button type="button" id="accessibilityPauseReading" aria-pressed="false">Pausar</button>
+                        <button type="button" id="accessibilityStopReading">Detener</button>
+                    </div>
+                    <p class="accessibility-group__note">La lectura en voz alta depende de las voces disponibles en tu navegador y dispositivo. El contenido también puede usarse con el lector de pantalla de tu sistema.</p>
+                </div>
+            </details>
         </div>
-        <div class="accessibility-controls__actions">
-            <button type="button" id="accessibilityTextDecrease" aria-label="Reducir tamaño del texto">A<span aria-hidden="true">−</span></button>
-            <button type="button" id="accessibilityTextIncrease" aria-label="Aumentar tamaño del texto">A<span aria-hidden="true">+</span></button>
-            <button type="button" id="accessibilityTextReset" aria-label="Restablecer tamaño del texto">100%</button>
-            <button type="button" id="accessibilityContrast" aria-pressed="false"><span aria-hidden="true">◐</span> Alto contraste</button>
-        </div>
-        <span id="accessibilityControlsStatus" class="accessibility-controls__status" role="status" aria-live="polite"></span>
-    </aside>
+
+        <footer class="accessibility-controls__footer">
+            <span id="accessibilityControlsStatus" class="accessibility-controls__status"
+                  role="status" aria-live="polite" aria-atomic="true"></span>
+            <button type="button" id="accessibilityResetAll">Restablecer preferencias</button>
+        </footer>
+    </dialog>
 </body>
 </html>

@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" th:href="@{/images/logo.png}" type="image/png">
 </head>
-<body>
+<body data-accessibility-scope="user">
         <!-- Encabezado -->
     <header class="main-header">
         <div class="header-inner">
@@ -37,6 +37,10 @@
                 <a th:href="@{/viajar}" class="nav-link">
                     <i class="fas fa-bus"></i> Viajar
                 </a>
+                <button type="button" class="nav-link accessibility-trigger" data-accessibility-trigger
+                        aria-controls="accessibilityControls" aria-expanded="false">
+                    <i class="fas fa-sliders" aria-hidden="true"></i> Configuraciones
+                </button>
                 <form th:action="@{/logout}" method="post" class="logout-form" onsubmit="return confirm('¿Cerrar sesión de ProAula? El proveedor externo podría mantener tu sesión activa.');">
                     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                     <button type="submit" class="nav-link nav-link--outline logout-form__button">

@@ -2061,7 +2061,7 @@
     --directory-muted: #607a94;
     --directory-forest: #1f70ae;
     --directory-deep: #082b50;
-    --directory-coral: #258bd0;
+    --directory-coral: #b52b3a;
     --directory-gold: #5eb7ed;
     --directory-panel: #ffffff;
     --directory-line: #d8e6f2;
@@ -2842,16 +2842,16 @@ to { opacity: 1; }
     grid-column: 1;
 }
 
-@scope (.bus-directory-page--authenticated) {
+@scope (.bus-directory-page--public) {
     :scope {
-        --directory-ink: #f0f3ed;
-        --directory-muted: #b4c0b8;
-        --directory-forest: #315a4b;
-        --directory-deep: #101715;
+        --directory-ink: #edf5fb;
+        --directory-muted: #b4c9da;
+        --directory-forest: #1f70ae;
+        --directory-deep: #082b50;
         --directory-coral: #f08a68;
-        --directory-gold: #f0c76b;
-        --directory-panel: #17211c;
-        --directory-line: rgba(155, 184, 157, 0.18);
+        --directory-gold: #82c5ef;
+        --directory-panel: #0c3b68;
+        --directory-line: rgba(160, 205, 235, 0.18);
         color: var(--directory-ink);
         background:
             radial-gradient(ellipse at 12% 8%, rgba(64, 106, 79, 0.2), transparent 570px),
@@ -3516,4 +3516,235 @@ to { opacity: 1; }
 
 .bus-directory-page .route-art-map {
     width: min(88%, 360px);
+}
+
+.bus-directory-page .directory-route-art::before {
+    border-color: rgba(160, 205, 235, 0.18);
+}
+
+.bus-directory-page .directory-route-art::after {
+    background:
+        linear-gradient(#b52b3a, #b52b3a) left 11px top 11px / 22px 1px no-repeat,
+        linear-gradient(#b52b3a, #b52b3a) left 11px top 11px / 1px 22px no-repeat,
+        linear-gradient(#3b91c9, #3b91c9) right 11px top 11px / 22px 1px no-repeat,
+        linear-gradient(#3b91c9, #3b91c9) right 11px top 11px / 1px 22px no-repeat,
+        linear-gradient(#3b91c9, #3b91c9) left 11px bottom 11px / 22px 1px no-repeat,
+        linear-gradient(#3b91c9, #3b91c9) left 11px bottom 11px / 1px 22px no-repeat,
+        linear-gradient(#b52b3a, #b52b3a) right 11px bottom 11px / 22px 1px no-repeat,
+        linear-gradient(#b52b3a, #b52b3a) right 11px bottom 11px / 1px 22px no-repeat;
+}
+
+.bus-directory-page .atlas-heading,
+.bus-directory-page .atlas-legend {
+    background: rgba(8, 43, 80, 0.91);
+    border-color: rgba(160, 205, 235, 0.2);
+}
+
+.bus-directory-page .atlas-heading {
+    border-left-color: #b52b3a;
+}
+
+.bus-directory-page .atlas-index,
+.bus-directory-page .atlas-legend-nodes {
+    color: #82c5ef;
+    border-right-color: rgba(160, 205, 235, 0.2);
+}
+
+.bus-directory-page .atlas-status {
+    color: #dcecf7;
+    border-color: rgba(160, 205, 235, 0.2);
+}
+
+.bus-directory-page .atlas-status i {
+    background: #35a97b;
+}
+
+.bus-directory-page .atlas-legend {
+    color: #e6f2fa;
+}
+
+.bus-directory-page .atlas-legend-route i {
+    background: #3b91c9;
+    box-shadow: 0 0 6px rgba(59, 145, 201, 0.48);
+}
+
+.bus-directory-page .atlas-legend-note {
+    border-left-color: rgba(160, 205, 235, 0.25);
+}
+
+.bus-directory-page .route-art-ring {
+    border-color: rgba(130, 197, 239, 0.24);
+}
+
+.bus-directory-page .map-route-shadow {
+    stroke: rgba(181, 43, 58, 0.24);
+}
+
+.bus-directory-page .map-route-line,
+.bus-directory-page .map-location-pulse {
+    stroke: #3b91c9;
+}
+
+.bus-directory-page .map-route-line {
+    filter: drop-shadow(0 0 5px rgba(59, 145, 201, 0.55));
+}
+
+.bus-directory-page .map-stop {
+    fill: #082b50;
+    stroke: #b52b3a;
+}
+
+.bus-directory-page .map-stop--end {
+    fill: #3b91c9;
+    stroke: #e6f2fa;
+}
+
+.bus-directory-page .route-art-map .map-block {
+    fill: rgba(130, 197, 239, 0.055);
+    stroke: rgba(160, 205, 235, 0.14);
+}
+
+.bus-directory-page .route-art-map .map-block--two {
+    fill: rgba(181, 43, 58, 0.07);
+}
+
+.bus-directory-page .route-art-map .map-survey-line {
+    stroke: rgba(160, 205, 235, 0.2);
+}
+
+.bus-directory-page .route-art-map .map-node-label {
+    stroke: rgba(181, 43, 58, 0.66);
+}
+
+.bus-directory-page .route-art-map .map-node-label circle {
+    fill: #b52b3a;
+    stroke: #082b50;
+}
+
+.bus-directory-page .route-art-map .map-node-label text {
+    fill: rgba(220, 237, 248, 0.92);
+}
+
+.bus-directory-page .route-art-map .map-contour,
+.bus-directory-page .route-art-map .map-contour--three {
+    stroke: rgba(130, 197, 239, 0.3);
+}
+
+.bus-directory-page .route-art-map .map-contour--two {
+    stroke: rgba(181, 43, 58, 0.35);
+}
+
+.bus-directory-page .route-survey-sweep::before {
+    background: linear-gradient(90deg, transparent, rgba(59, 145, 201, 0.04) 30%, rgba(220, 237, 248, 0.2) 48%, rgba(181, 43, 58, 0.1) 54%, transparent);
+}
+
+.bus-directory-page .route-compass {
+    color: #82c5ef;
+}
+
+.bus-directory-page .route-compass-needle {
+    background: linear-gradient(180deg, #b52b3a 0 50%, rgba(130, 197, 239, 0.72) 50%);
+    filter: drop-shadow(0 0 4px rgba(59, 145, 201, 0.45));
+}
+
+.bus-directory-page--public .directory-header {
+    background:
+        repeating-linear-gradient(90deg, transparent 0 89px, rgba(255, 255, 255, 0.035) 90px),
+        repeating-linear-gradient(0deg, transparent 0 89px, rgba(255, 255, 255, 0.025) 90px),
+        radial-gradient(ellipse at 78% 34%, rgba(45, 132, 194, 0.31), transparent 390px),
+        linear-gradient(112deg, #082b50 0%, #0c3b68 58%, #104b7d 100%);
+}
+
+.bus-directory-page--public {
+    background:
+        radial-gradient(ellipse at 12% 8%, rgba(93, 173, 226, 0.13), transparent 570px),
+        radial-gradient(ellipse at 96% 54%, rgba(59, 145, 201, 0.1), transparent 540px),
+        linear-gradient(155deg, #071e36 0%, #0c3155 48%, #082744 100%);
+}
+
+.bus-directory-page--public .overview-item,
+.bus-directory-page--public .overview-note,
+.bus-directory-page--public .directory-tools,
+.bus-directory-page--public .bus-card,
+.bus-directory-page--public .directory-empty,
+.bus-directory-page--public .bus-table-wrap {
+    background:
+        linear-gradient(145deg, rgba(12, 59, 104, 0.94), rgba(8, 43, 80, 0.96));
+    border-color: rgba(160, 205, 235, 0.22);
+}
+
+.bus-directory-page--public .directory-count,
+.bus-directory-page--public .directory-search,
+.bus-directory-page--public .directory-select,
+.bus-directory-page--public .filter-clear,
+.bus-directory-page--public .bus-card .barrios li,
+.bus-directory-page--public .directory-select select option,
+.bus-directory-page--public .bus-table-wrap th,
+.bus-directory-page--public .directory-footer {
+    background-color: #082b50;
+    border-color: rgba(160, 205, 235, 0.22);
+}
+
+.bus-directory-page--public .directory-footer {
+    background: rgba(7, 30, 54, 0.94);
+}
+
+.bus-directory-page--public .directory-brand strong,
+.bus-directory-page--public .directory-brand small,
+.bus-directory-page--public .directory-footer-brand strong,
+.bus-directory-page--public .directory-footer-brand small,
+.bus-directory-page--public .directory-primary-nav a,
+.bus-directory-page--public .directory-signin,
+.bus-directory-page--public .directory-hero h1,
+.bus-directory-page--public .directory-caption,
+.bus-directory-page--public .directory-section-heading h2,
+.bus-directory-page--public .directory-section-heading p,
+.bus-directory-page--public .directory-count,
+.bus-directory-page--public .directory-toolbar,
+.bus-directory-page--public .directory-results-meta,
+.bus-directory-page--public .bus-card,
+.bus-directory-page--public .bus-card-route-title,
+.bus-directory-page--public .bus-detail-grid strong,
+.bus-directory-page--public .directory-empty h3,
+.bus-directory-page--public .directory-empty > p,
+.bus-directory-page--public .directory-footer-copy {
+    color: #edf5fb;
+}
+
+.bus-directory-page--public .directory-primary-nav a[aria-current="page"]::after,
+.bus-directory-page--public .directory-caption i,
+.bus-directory-page--public .directory-section-kicker,
+.bus-directory-page--public .directory-count strong,
+.bus-directory-page--public .directory-subnav-note i,
+.bus-directory-page--public .overview-icon,
+.bus-directory-page--public .overview-note-mark,
+.bus-directory-page--public .overview-copy strong,
+.bus-directory-page--public .overview-note strong,
+.bus-directory-page--public .directory-search > i,
+.bus-directory-page--public .directory-select > i:first-child,
+.bus-directory-page--public .directory-select .select-chevron,
+.bus-directory-page--public .filter-clear i,
+.bus-directory-page--public .view-toggle.is-active i,
+.bus-directory-page--public .results-sort-note i,
+.bus-directory-page--public .bus-card-id i,
+.bus-directory-page--public .bus-card-route i,
+.bus-directory-page--public .bus-detail-grid > span > i,
+.bus-directory-page--public .bus-neighborhoods-title i,
+.bus-directory-page--public .bus-card-toggle,
+.bus-directory-page--public .empty-kicker,
+.bus-directory-page--public .bus-table-wrap td:first-child,
+.bus-directory-page--public .bus-table-wrap td:nth-child(2) {
+    color: #82c5ef;
+}
+
+.bus-directory-page--public .directory-action--gold,
+.bus-directory-page--public .empty-action,
+.bus-directory-page--public .bus-card.is-open .bus-card-toggle {
+    color: #082b50;
+    background: #82c5ef;
+}
+
+.bus-directory-page--public .directory-action--gold:hover,
+.bus-directory-page--public .empty-action:hover {
+    background: #b7ddf5;
 }

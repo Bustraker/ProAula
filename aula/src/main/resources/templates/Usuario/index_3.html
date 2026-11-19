@@ -15,10 +15,11 @@
     <link rel="stylesheet" th:href="@{/css/style_dashboard.css}">
     <link rel="stylesheet" th:href="@{/css/logout.css}">
     <link rel="stylesheet" th:href="@{/css/map-ui.css}">
+    <link rel="stylesheet" th:href="@{/css/accessibility.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="icon" th:href="@{/images/logo.png}" type="image/png">
 </head>
-<body class="dashboard-page">
+<body class="dashboard-page" data-accessibility-scope="user">
     <!-- Encabezado -->
     <header class="main-header">
         <div class="header-inner">
@@ -52,12 +53,13 @@
                             <a th:href="@{/incidentes/nuevo(tipo='ACCIDENTE')}" class="nav-link">
                                 <i class="fas fa-car-burst"></i> Reportar accidente
                             </a>
-                            <a th:href="@{/incidentes/panel}" class="nav-link" sec:authorize="hasRole('ADMIN')">
-                                <i class="fas fa-list"></i> Panel de incidentes
-                            </a>
                             <a th:href="@{/perfil}" class="nav-link">
                                 <i class="fas fa-user"></i> Perfil
                             </a>
+                            <button type="button" class="nav-link accessibility-trigger" data-accessibility-trigger
+                                    aria-controls="accessibilityControls" aria-expanded="false">
+                                <i class="fas fa-sliders" aria-hidden="true"></i> Configuraciones de accesibilidad
+                            </button>
                         </div>
                     </details>
                 </div>
@@ -394,8 +396,11 @@
     <!-- Región ARIA para personas con discapacidad visual -->
     <div id="srAudioAlert" role="alert" aria-live="assertive" class="sr-only"></div>
 
+    <div th:replace="~{fragments/accessibility :: controls}"></div>
+
     <script th:src="@{/js/notifications-client.js(v='browser-voice-2')}"></script>
     <script th:src="@{/js/dashboard.js}"></script>
     <script th:src="@{/js/dashboard-favorites.js(v='trips-1')}"></script>
+    <script th:src="@{/js/accessibility.js}" defer></script>
 </body>
 </html>

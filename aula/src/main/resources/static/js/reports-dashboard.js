@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    var COLORS = ['#9f3444', '#477e71', '#c1874c', '#657aa4', '#a96f84', '#7b8791'];
+    var COLORS = ['#01315f', '#246396', '#3b82b9', '#5c9bd1', '#79b5e3', '#a6d0f0'];
     var SVG_NS = 'http://www.w3.org/2000/svg';
     var REFRESH_INTERVAL_MS = 15000;
     var dashboard;

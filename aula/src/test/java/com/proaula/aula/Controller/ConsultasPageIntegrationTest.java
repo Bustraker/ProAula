@@ -112,7 +112,7 @@ class ConsultasPageIntegrationTest {
                 .getContentAsString();
 
         assertThat(page)
-                .contains("bus-directory-page--authenticated", "content=\"#101715\"",
+                .contains("bus-directory-page--authenticated", "content=\"#082b50\"",
                         "ABC123", "Anónimo", "Mi cuenta", "07:30", "Verificada")
                 .doesNotContain("bus-directory-page--public")
                 .contains("href=\"/dashboard\"")

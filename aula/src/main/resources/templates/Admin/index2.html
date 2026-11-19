@@ -12,8 +12,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/admin_index2.css(v='admin-20261005-4')}">
     <link rel="stylesheet" th:href="@{/css/logout.css}">
+    <link rel="stylesheet" th:href="@{/css/accessibility.css}">
 </head>
-<body class="admin-dashboard">
+<body class="admin-dashboard" data-accessibility-scope="admin">
     <div class="admin-container">
         <!-- Sidebar -->
         <aside class="sidebar">
@@ -26,6 +27,11 @@
                 <a th:href="@{/gestionar-usuarios}"><i class="fas fa-users"></i> Gestionar Usuarios</a>
                 <a th:if="${isAdminApprover}" th:href="@{/admin/accesos}"><i class="fas fa-user-clock"></i> Registro de accesos</a>
                 <a th:href="@{/reportes}"><i class="fas fa-chart-bar"></i> Reportes</a>
+                <a th:href="@{/incidentes/panel}"><i class="fas fa-triangle-exclamation"></i> Centro de incidentes</a>
+                <button type="button" class="accessibility-trigger" data-accessibility-trigger
+                        aria-controls="accessibilityControls" aria-expanded="false">
+                    <i class="fas fa-sliders" aria-hidden="true"></i> Configuraciones de accesibilidad
+                </button>
                 <a th:href="@{/mensajes_contacto}"><i class="fas fa-envelope"></i> Mensajes</a>
                 <a th:href="@{/rutas/admin}"><i class="fas fa-route"></i> Rutas</a>
                 <a th:href="@{/registro-buses}"><i class="fas fa-bus"></i> Buses</a>
@@ -251,6 +257,9 @@
         </main>
     </div>
 
+    <div th:replace="~{fragments/accessibility :: controls}"></div>
+
     <script th:src="@{/js/admin_index2.js(v='admin-20261005-3')}"></script>
+    <script th:src="@{/js/accessibility.js}" defer></script>
 </body>
 </html>

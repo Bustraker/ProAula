@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="app-context-path" th:content="@{/}">
-    <meta name="theme-color" content="#24191c">
+    <meta name="theme-color" content="#082b50">
     <meta name="description" content="Indicadores de flota, rutas, actividad e incidentes de Bustraker">
     <title>Reportes - Bustraker Admin</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,7 +12,8 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" th:href="@{/images/logo.png}" type="image/png">
-    <link rel="stylesheet" th:href="@{/css/reportes.css(v='reports-dashboard-2')}">
+    <link rel="stylesheet" th:href="@{/css/reportes.css(v='reports-dashboard-4')}">
+    <link rel="stylesheet" th:href="@{/css/accessibility.css}">
 </head>
 <body class="admin-reports">
     <div class="reports-shell">
@@ -25,6 +26,7 @@
                 <a th:href="@{/index_2}"><i class="fas fa-house" aria-hidden="true"></i><span>Panel principal</span></a>
                 <a th:href="@{/gestionar-usuarios}"><i class="fas fa-users" aria-hidden="true"></i><span>Gestión de usuarios</span></a>
                 <a th:href="@{/reportes}" class="active" aria-current="page"><i class="fas fa-chart-column" aria-hidden="true"></i><span>Reportes</span></a>
+                <a th:href="@{/incidentes/panel}"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i><span>Centro de incidentes</span></a>
                 <a th:href="@{/mensajes_contacto}"><i class="fas fa-envelope" aria-hidden="true"></i><span>Mensajes</span></a>
                 <a th:href="@{/rutas/admin}"><i class="fas fa-route" aria-hidden="true"></i><span>Rutas</span></a>
                 <a th:href="@{/registro-buses}"><i class="fas fa-bus-simple" aria-hidden="true"></i><span>Buses</span></a>
@@ -54,21 +56,21 @@
                         <defs>
                             <linearGradient id="reports-panel-fill" x1="0" y1="0" x2="1" y2="1">
                                 <stop offset="0" stop-color="#fff"></stop>
-                                <stop offset="1" stop-color="#f7f5f1"></stop>
+                                <stop offset="1" stop-color="#f3f8fc"></stop>
                             </linearGradient>
                             <linearGradient id="reports-column-fill" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0" stop-color="#417f75"></stop>
-                                <stop offset="1" stop-color="#b2c9bd"></stop>
+                                <stop offset="0" stop-color="#155b8f"></stop>
+                                <stop offset="1" stop-color="#82bde2"></stop>
                             </linearGradient>
                             <linearGradient id="reports-trend-fill" x1="0" y1="0" x2="1" y2="0">
-                                <stop offset="0" stop-color="#c18151"></stop>
-                                <stop offset="1" stop-color="#daa76f"></stop>
+                                <stop offset="0" stop-color="#246396"></stop>
+                                <stop offset="1" stop-color="#82bde2"></stop>
                             </linearGradient>
                             <pattern id="reports-grid" width="18" height="18" patternUnits="userSpaceOnUse">
-                                <path d="M18 0H0V18" fill="none" stroke="#536e68" stroke-opacity=".04" stroke-width=".7"></path>
+                                <path d="M18 0H0V18" fill="none" stroke="#155b8f" stroke-opacity=".06" stroke-width=".7"></path>
                             </pattern>
                             <filter id="reports-panel-shadow" x="-15%" y="-15%" width="130%" height="140%">
-                                <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#44332d" flood-opacity=".075"></feDropShadow>
+                                <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#082b50" flood-opacity=".075"></feDropShadow>
                             </filter>
                         </defs>
                         <rect class="reports-analytics-visual__frame" x="5" y="5" width="510" height="260" rx="15" fill="url(#reports-panel-fill)"></rect>
@@ -400,7 +402,7 @@
             </div>
         </main>
     </div>
-    <script th:src="@{/js/reports-dashboard.js(v='reports-dashboard-2')}"></script>
+    <script th:src="@{/js/reports-dashboard.js(v='reports-dashboard-4')}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const bars = Array.from(document.querySelectorAll('.reports-chart__bar'));
@@ -440,5 +442,6 @@
             });
         });
     </script>
+    <script th:src="@{/js/accessibility.js}" defer></script>
 </body>
 </html>

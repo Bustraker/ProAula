@@ -26,7 +26,7 @@
 .landing-page .landing-frame {
     position: relative;
     isolation: isolate;
-    width: min(100%, 940px);
+    width: min(100%, 1040px);
     padding: clamp(22px, 4vw, 42px) clamp(22px, 5vw, 56px) 20px;
     border: 1px solid rgba(169, 213, 236, 0.3);
     border-radius: 19px;
@@ -179,6 +179,35 @@
     transition: background 200ms ease, border-color 200ms ease, box-shadow 200ms ease, color 200ms ease, transform 200ms ease;
 }
 
+.landing-page .landing-nav .accessibility-trigger {
+    display: inline-flex;
+    min-height: 38px;
+    align-items: center;
+    gap: 7px;
+    padding: 0 12px;
+    border: 1px solid rgba(121, 189, 242, 0.22);
+    border-radius: 6px;
+    background: rgba(121, 189, 242, 0.06);
+    color: #d5e0e9;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 200ms ease, border-color 200ms ease, color 200ms ease, transform 200ms ease;
+}
+
+.landing-page .landing-nav .accessibility-trigger:hover {
+    transform: translateY(-1px);
+    border-color: rgba(121, 189, 242, 0.48);
+    background: rgba(121, 189, 242, 0.14);
+    color: #fff;
+}
+
+.landing-page .landing-nav .accessibility-trigger:focus-visible {
+    outline: 2px solid #a9dcff;
+    outline-offset: 3px;
+}
+
 .landing-page .landing-nav a:hover {
     transform: translateY(-1px);
     border-color: rgba(121, 189, 242, 0.34);
@@ -288,8 +317,8 @@
 .landing-page .landing-cartagena-art {
     position: relative;
     display: grid;
-    width: min(100%, 340px);
-    aspect-ratio: 1.42;
+    width: min(100%, 420px);
+    aspect-ratio: 1.64;
     justify-self: end;
     align-items: center;
     overflow: hidden;
@@ -2357,7 +2386,8 @@
         gap: 2px;
     }
 
-    .landing-page .landing-nav a {
+    .landing-page .landing-nav a,
+    .landing-page .landing-nav .accessibility-trigger {
         min-height: 34px;
         padding: 0 8px;
         font-size: 10px;
@@ -2378,7 +2408,7 @@
     }
 
     .landing-page .landing-cartagena-art {
-        width: min(100%, 320px);
+        width: min(100%, 360px);
         justify-self: center;
     }
 
@@ -2558,6 +2588,67 @@
     fill: rgba(31, 66, 75, 0.62);
 }
 
+.landing-page .ctg-v2-cloud {
+    fill: rgba(228, 237, 230, 0.68);
+    filter: drop-shadow(0 2px 3px rgba(13, 37, 49, 0.22));
+}
+
+.landing-page .ctg-v2-cloud--left {
+    animation: ctg-v2-cloud-drift 14s ease-in-out infinite alternate;
+}
+
+.landing-page .ctg-v2-cloud--right {
+    animation: ctg-v2-cloud-drift 18s ease-in-out infinite alternate-reverse;
+}
+
+.landing-page .ctg-v2-palm-trunk,
+.landing-page .ctg-v2-palm-fronds {
+    fill: none;
+    stroke: #315d5e;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.landing-page .ctg-v2-palm-trunk {
+    stroke-width: 3;
+}
+
+.landing-page .ctg-v2-palm-fronds {
+    stroke: #315d5e;
+    stroke-width: 2.4;
+}
+
+.landing-page .ctg-v2-palm--left {
+    transform-box: view-box;
+    transform-origin: 29px 76px;
+    animation: ctg-v2-palm-sway 5s ease-in-out infinite alternate;
+}
+
+.landing-page .ctg-v2-palm--right {
+    transform-box: view-box;
+    transform-origin: 333px 74px;
+    animation: ctg-v2-palm-sway 6s ease-in-out infinite alternate-reverse;
+}
+
+.landing-page .ctg-v2-flag-pole {
+    fill: none;
+    stroke: #e8dfc7;
+    stroke-linecap: round;
+    stroke-width: 1.2;
+}
+
+.landing-page .ctg-v2-flag-yellow {
+    fill: #f5c644;
+}
+
+.landing-page .ctg-v2-flag-blue {
+    fill: #28619a;
+}
+
+.landing-page .ctg-v2-flag-red {
+    fill: #cf4654;
+}
+
 .landing-page .ctg-v2-gate-shadow {
     fill: rgba(20, 42, 48, 0.55);
     transform: translateY(3px);
@@ -2679,6 +2770,13 @@
     fill: url("#ctg-v2-road");
 }
 
+.landing-page .ctg-v2-perspective {
+    fill: none;
+    stroke: rgba(179, 205, 205, 0.18);
+    stroke-width: 0.7;
+    stroke-dasharray: 3 6;
+}
+
 .landing-page .ctg-v2-road-edge {
     fill: none;
     stroke: rgba(225, 190, 149, 0.72);
@@ -2719,6 +2817,13 @@
     filter: blur(2px);
 }
 
+.landing-page .ctg-v2-bus {
+    transform-box: view-box;
+    transform-origin: center;
+    animation: ctg-v2-bus-drive 14s linear infinite;
+    filter: drop-shadow(0 5px 4px rgba(7, 20, 28, 0.28));
+}
+
 .landing-page .ctg-v2-bus-shell {
     fill: url("#ctg-v2-bus");
     stroke: rgba(255, 224, 196, 0.9);
@@ -2726,9 +2831,13 @@
 }
 
 .landing-page .ctg-v2-bus-roof {
-    fill: #f4a18c;
+    fill: url("#ctg-v2-bus-roof");
     stroke: rgba(255, 236, 208, 0.7);
     stroke-width: 0.6;
+}
+
+.landing-page .ctg-v2-bus-roof-glint {
+    fill: rgba(255, 255, 255, 0.72);
 }
 
 .landing-page .ctg-v2-bus-window {
@@ -2755,20 +2864,37 @@
 }
 
 .landing-page .ctg-v2-bus-band {
-    fill: #39838d;
-    stroke: rgba(225, 243, 220, 0.78);
+    fill: url("#ctg-v2-bus-red");
+    stroke: rgba(255, 228, 218, 0.74);
     stroke-width: 0.7;
 }
 
 .landing-page .ctg-v2-bus-pinstripe {
     fill: none;
-    stroke: #86c99f;
+    stroke: #28619a;
     stroke-linecap: round;
     stroke-width: 1.2;
 }
 
 .landing-page .ctg-v2-bus-front {
-    fill: rgba(133, 50, 65, 0.64);
+    fill: url("#ctg-v2-bus-red");
+}
+
+.landing-page .ctg-v2-bus-front-panel {
+    fill: rgba(244, 248, 242, 0.68);
+    stroke: rgba(255, 255, 255, 0.62);
+    stroke-width: 0.5;
+}
+
+.landing-page .ctg-v2-bus-label {
+    fill: #fff4e8;
+    font-family: "Segoe UI", Arial, sans-serif;
+    font-size: 4.6px;
+    font-weight: 800;
+    letter-spacing: 0.6px;
+    paint-order: stroke;
+    stroke: rgba(109, 30, 43, 0.46);
+    stroke-width: 0.22px;
 }
 
 .landing-page .ctg-v2-bus-grille {
@@ -2828,4 +2954,31 @@
 
 @keyframes ctg-v2-wheel-spin {
     to { transform: rotate(360deg); }
+}
+
+@keyframes ctg-v2-cloud-drift {
+    to { transform: translateX(5px); }
+}
+
+@keyframes ctg-v2-palm-sway {
+    to { transform: rotate(1.5deg); }
+}
+
+@keyframes ctg-v2-bus-drive {
+    0% { opacity: 0; transform: translateX(-165px); }
+    12%, 88% { opacity: 1; }
+    100% { opacity: 0; transform: translateX(165px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .landing-page .ctg-v2-cloud,
+    .landing-page .ctg-v2-palm,
+    .landing-page .ctg-v2-bus {
+        animation: none;
+    }
+
+    .landing-page .ctg-v2-bus {
+        opacity: 1;
+        transform: none;
+    }
 }

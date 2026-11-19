@@ -222,6 +222,12 @@ class IncidentReportFlowIntegrationTest {
                         .with(user(usuario.getUsername()).roles("USER")))
                 .andExpect(status().isForbidden());
 
+        mockMvc.perform(get("/dashboard")
+                        .with(user(usuario.getUsername()).roles("USER")))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.not(
+                        org.hamcrest.Matchers.containsString("/incidentes/panel"))));
+
         mockMvc.perform(get("/api/incidentes")
                         .with(user(usuario.getUsername()).roles("USER"))
                         .param("tipo", "FALLA_SERVICIO")
@@ -284,7 +290,16 @@ class IncidentReportFlowIntegrationTest {
                 .andExpect(content().string(org.hamcrest.Matchers.containsString(
                         "id=\"filtroEstado\"")))
                 .andExpect(content().string(org.hamcrest.Matchers.containsString(
-                        "value=\"EN_ATENCION\">En atención")));
+                        "value=\"EN_ATENCION\">En atención")))
+                .andExpect(content().string(org.hamcrest.Matchers.containsString(
+                        "href=\"/index_2\"")));
+
+        mockMvc.perform(get("/index_2")
+                        .with(user(administrador.getUsername()).roles("ADMIN"))
+                        .sessionAttr("rolUsuario", "ADMIN"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString(
+                        "href=\"/incidentes/panel\"")));
 
         mockMvc.perform(post("/api/incidentes")
                         .with(user(administrador.getUsername()).roles("ADMIN"))

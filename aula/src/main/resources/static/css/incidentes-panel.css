@@ -1,13 +1,13 @@
 :root {
     color-scheme: light;
-    --panel-ink: #142b3c;
-    --panel-muted: #607486;
-    --panel-border: #dce5ec;
-    --panel-bg: #f3f6f9;
-    --panel-primary: #075985;
-    --panel-primary-dark: #064766;
-    --panel-soft: #edf5f8;
-    --panel-danger: #a52b2b;
+    --panel-ink: #153451;
+    --panel-muted: #607a94;
+    --panel-border: #d8e6f2;
+    --panel-bg: #f3f7fb;
+    --panel-primary: #01315f;
+    --panel-primary-dark: #012242;
+    --panel-soft: #eaf3fb;
+    --panel-danger: #a52b3a;
 }
 
 * {
@@ -17,9 +17,11 @@
 body.incident-panel-page {
     min-height: 100vh;
     margin: 0;
-    background: var(--panel-bg);
+    background:
+        radial-gradient(ellipse at 92% 0%, rgb(93 173 226 / 10%), transparent 34rem),
+        linear-gradient(180deg, #f8fbfe 0%, var(--panel-bg) 100%);
     color: var(--panel-ink);
-    font-family: "Segoe UI", Arial, sans-serif;
+    font-family: Inter, "Segoe UI", Arial, sans-serif;
 }
 
 .panel-topbar {
@@ -29,7 +31,8 @@ body.incident-panel-page {
     justify-content: space-between;
     padding: .8rem max(calc((100vw - 1200px) / 2), 1.25rem);
     border-bottom: 1px solid var(--panel-border);
-    background: #fff;
+    background: rgb(255 255 255 / 94%);
+    box-shadow: 0 4px 20px rgb(8 43 80 / 5%);
 }
 
 .panel-brand {
@@ -47,10 +50,11 @@ body.incident-panel-page {
     width: 36px;
     height: 36px;
     place-items: center;
+    border: 1px solid #d5e8f7;
     border-radius: 11px;
-    background: var(--panel-primary);
-    color: #fff;
+    background: linear-gradient(145deg, #eaf6ff, #d5eafa);
     font-weight: 800;
+    color: var(--panel-primary);
 }
 
 .panel-back {
@@ -89,7 +93,7 @@ body.incident-panel-page {
 .panel-eyebrow,
 .section-kicker {
     margin: 0 0 .45rem;
-    color: #247286;
+    color: #287eb8;
     font-size: .72rem;
     font-weight: 800;
     letter-spacing: .13em;
@@ -108,10 +112,10 @@ body.incident-panel-page {
 
 .panel-access {
     padding: .5rem .8rem;
-    border: 1px solid #c9dce6;
+    border: 1px solid #d0e4f3;
     border-radius: 999px;
     background: #fff;
-    color: var(--panel-primary);
+    color: #155b8f;
     font-size: .82rem;
     font-weight: 700;
     white-space: nowrap;
@@ -141,7 +145,7 @@ body.incident-panel-page {
     border: 1px solid var(--panel-border);
     border-radius: 16px;
     background: #fff;
-    box-shadow: 0 8px 26px rgb(20 43 60 / 5%);
+    box-shadow: 0 12px 30px rgb(22 67 105 / 7%);
 }
 
 .filter-card,
@@ -188,7 +192,7 @@ body.incident-panel-page {
 .status-select {
     min-height: 44px;
     padding: .65rem .75rem;
-    border: 1px solid #c8d4de;
+    border: 1px solid #cbdceb;
     border-radius: 8px;
     background: #fff;
     color: var(--panel-ink);
@@ -196,14 +200,14 @@ body.incident-panel-page {
 }
 
 .filter-field input::placeholder {
-    color: #8293a1;
+    color: #8195a9;
 }
 
 .filter-field select:focus,
 .filter-field input:focus,
 .status-select:focus,
 .button:focus-visible {
-    outline: 3px solid rgb(7 89 133 / 19%);
+    outline: 3px solid rgb(36 99 150 / 18%);
     outline-offset: 1px;
     border-color: var(--panel-primary);
 }
@@ -243,14 +247,14 @@ body.incident-panel-page {
 }
 
 .button--secondary {
-    border-color: #cbd7e0;
+    border-color: #d0deea;
     background: #fff;
-    color: #344f63;
+    color: #315b7e;
 }
 
 .button--secondary:hover:not(:disabled) {
-    border-color: #8ca5b5;
-    background: #f7fafc;
+    border-color: #9acbe9;
+    background: #f1f8fd;
 }
 
 .button--small {
@@ -264,7 +268,7 @@ body.incident-panel-page {
 }
 
 .reports-heading {
-    border-bottom: 1px solid #e8eef2;
+    border-bottom: 1px solid #e1ebf3;
 }
 
 .report-count {
@@ -287,8 +291,8 @@ body.incident-panel-page {
 
 .incident-table th {
     padding: .8rem 1rem;
-    background: #f7f9fb;
-    color: #526a7c;
+    background: #edf6fc;
+    color: #315b7e;
     font-size: .72rem;
     font-weight: 800;
     letter-spacing: .055em;
@@ -297,18 +301,18 @@ body.incident-panel-page {
 
 .incident-table td {
     padding: 1rem;
-    border-top: 1px solid #e9eef2;
+    border-top: 1px solid #e3edf5;
     vertical-align: middle;
 }
 
 .incident-table tbody tr:hover {
-    background: #fbfdfe;
+    background: #f2f8fd;
 }
 
 .report-id {
     display: block;
     margin-bottom: .25rem;
-    color: #526a7c;
+    color: #607a94;
     font-size: .75rem;
     font-weight: 750;
 }
@@ -322,13 +326,13 @@ body.incident-panel-page {
 }
 
 .incident-type {
-    color: #344f63;
+    color: #315b7e;
     font-size: .88rem;
     font-weight: 650;
 }
 
 .incident-date {
-    color: #526a7c;
+    color: #607a94;
     font-size: .86rem;
     white-space: nowrap;
 }
@@ -345,12 +349,12 @@ body.incident-panel-page {
 }
 
 .status-badge--pending {
-    background: #fff3d6;
-    color: #7a4d00;
+    background: #eaf3fb;
+    color: #315b7e;
 }
 
 .status-badge--attention {
-    background: #e6f1ff;
+    background: #dceeff;
     color: #164c82;
 }
 
@@ -360,8 +364,8 @@ body.incident-panel-page {
 }
 
 .status-badge--dismissed {
-    background: #edf0f3;
-    color: #536575;
+    background: #edf3f8;
+    color: #536b80;
 }
 
 .status-control {
@@ -390,7 +394,7 @@ body.incident-panel-page {
 .table-footer {
     min-height: 70px;
     padding: .9rem 1.4rem;
-    border-top: 1px solid #e8eef2;
+    border-top: 1px solid #e1ebf3;
 }
 
 .page-summary {
@@ -407,9 +411,14 @@ body.incident-panel-page {
 
 .page-current {
     min-width: 100px;
-    color: #526a7c;
+    color: #607a94;
     font-size: .82rem;
     text-align: center;
+}
+
+.incident-panel-page :focus-visible {
+    outline: 2px solid #348fc8;
+    outline-offset: 3px;
 }
 
 @media (max-width: 980px) {
