@@ -41,7 +41,21 @@ test("landing page opens and closes accessibility settings on request", async ({
   await expect(page.locator("#accessibilityTextDecrease")).toBeFocused();
   expect(await controls.evaluate(dialog => getComputedStyle(dialog, "::backdrop").backdropFilter))
     .toContain("blur");
+  const dialogBounds = await controls.boundingBox();
+  const headerBounds = await controls.locator(".accessibility-controls__header").boundingBox();
+  const bodyBounds = await controls.locator(".accessibility-controls__body").boundingBox();
+  const footerBounds = await controls.locator(".accessibility-controls__footer").boundingBox();
+  for (const bounds of [headerBounds, bodyBounds, footerBounds]) {
+    expect(bounds.x).toBeGreaterThanOrEqual(dialogBounds.x);
+    expect(bounds.x + bounds.width).toBeLessThanOrEqual(dialogBounds.x + dialogBounds.width);
+  }
+  expect(headerBounds.y + headerBounds.height).toBeLessThanOrEqual(bodyBounds.y + 1);
+  expect(bodyBounds.y + bodyBounds.height).toBeLessThanOrEqual(footerBounds.y + 1);
   await page.keyboard.press("Escape");
+  await expect(controls).toBeHidden();
+  await expect(settingsTrigger).toBeFocused();
+  await settingsTrigger.click();
+  await controls.locator("[data-accessibility-close]").click();
   await expect(controls).toBeHidden();
   await expect(settingsTrigger).toBeFocused();
 });
