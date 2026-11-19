@@ -3,12 +3,12 @@
     --messages-ink: #302328;
     --messages-muted: #78696e;
     --messages-faint: #9a898e;
-    --messages-canvas: #f7f4f3;
+    --messages-canvas: #f8f3f4;
     --messages-paper: #fff;
-    --messages-line: #ebe2e1;
-    --messages-green: #39786c;
-    --messages-green-deep: #28594f;
-    --messages-copper: #b7784e;
+    --messages-line: #eadfe1;
+    --messages-green: #a52a3a;
+    --messages-green-deep: #76202c;
+    --messages-copper: #bd5965;
     --messages-red: #a52a3a;
     --messages-shadow: 0 12px 32px rgba(49, 31, 34, 0.06);
     --messages-radius: 15px;
@@ -26,7 +26,7 @@
     margin: 0;
     color: var(--messages-ink);
     background:
-        radial-gradient(ellipse at 92% 0%, rgba(57, 120, 108, 0.055), transparent 32%),
+        radial-gradient(ellipse at 92% 0%, rgba(165, 42, 58, 0.055), transparent 32%),
         linear-gradient(180deg, #faf8f7 0%, var(--messages-canvas) 100%);
     font-family: 'DM Sans', 'Segoe UI', sans-serif;
     font-size: 15px;
@@ -343,13 +343,13 @@
 }
 
 .messages-signal-visual__panel-heading > rect {
-    fill: #e8f1ed;
+    fill: #fff2f4;
     stroke: #d7e5de;
 }
 
 .messages-signal-visual__panel-heading > path {
     fill: none;
-    stroke: #39786c;
+    stroke: #a52a3a;
     stroke-linecap: round;
     stroke-linejoin: round;
     stroke-width: 1.2;
@@ -421,7 +421,7 @@
 .messages-signal-visual__route--four { animation-delay: -6s; }
 
 .messages-signal-visual__packet {
-    fill: #b7784e;
+    fill: #bd5965;
     offset-rotate: 0deg;
     animation: messages-packet-travel 7s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
@@ -510,7 +510,7 @@
 }
 
 .messages-signal-visual__hub-halo {
-    fill: rgba(57, 120, 108, 0.055);
+    fill: rgba(165, 42, 58, 0.055);
     animation: messages-hub-breathe 6s ease-in-out infinite;
 }
 
@@ -553,7 +553,7 @@
 }
 
 .messages-signal-visual__outbound > .messages-signal-visual__reply-badge {
-    fill: #e8f1ed;
+    fill: #fff2f4;
     stroke: #d9e6dd;
     stroke-width: 0.7;
 }
@@ -1549,14 +1549,14 @@
 
 .message-card__reply {
     color: #fff !important;
-    background: #426f5e;
-    border: 1px solid #426f5e;
-    box-shadow: 0 3px 8px rgba(55, 98, 78, 0.13);
+    background: #a52a3a;
+    border: 1px solid #a52a3a;
+    box-shadow: 0 3px 8px rgba(120, 32, 44, 0.13);
 }
 
 .message-card__reply:hover {
-    background: #315e4e;
-    border-color: #315e4e;
+    background: #76202c;
+    border-color: #76202c;
     transform: translateY(-1px);
 }
 

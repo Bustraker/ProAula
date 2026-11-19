@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#01315f">
+    <meta name="theme-color" content="#a52a3a">
     <meta name="csrf-token" th:content="${_csrf.token}">
     <meta name="csrf-header" th:content="${_csrf.headerName}">
     <title>Solicitudes de acceso ADMIN - Bustraker</title>
     <link rel="icon" th:href="@{/images/logo.png}" type="image/png">
     <link rel="stylesheet" th:href="@{/css/style_common.css}">
+    <link rel="stylesheet" th:href="@{/css/admin-legacy-pages.css(v='admin-legacy-1')}">
     <link rel="stylesheet" th:href="@{/css/accessibility.css}">
 </head>
-<body>
+<body class="admin-legacy-page">
 <main class="container" style="max-width: 960px; margin: 2rem auto; padding: 1rem;">
     <header>
         <p><a th:href="@{/index_2}">← Panel de administración</a></p>
@@ -22,7 +23,7 @@
     <div th:if="${success}" class="alert alert-success" role="status" th:text="${success}"></div>
     <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
 
-    <section aria-labelledby="pushHeading" style="margin: 1.5rem 0; padding: 1rem; border: 1px solid #ccd5df; border-radius: .5rem;">
+    <section aria-labelledby="pushHeading" style="margin: 1.5rem 0; padding: 1rem; border: 1px solid #eadfe1; border-radius: .5rem;">
         <h2 id="pushHeading">Avisos en este dispositivo</h2>
         <p id="pushStatus" role="status"
            th:text="${pushConfigured} ? 'Activa las notificaciones para recibir avisos en este dispositivo.' : 'Push no está listo. Verifica FIREBASE_VAPID_KEY, FIREBASE_ADMIN_ENABLED y las credenciales del servidor Firebase.'">
@@ -35,7 +36,7 @@
     <section aria-label="Solicitudes">
         <p th:if="${#lists.isEmpty(requests)}">Aún no hay solicitudes.</p>
         <article th:each="request : ${requests}" th:id="'solicitud-' + ${request.id}"
-                 style="margin: 1rem 0; padding: 1rem; border: 1px solid #ccd5df; border-radius: .5rem;">
+                 style="margin: 1rem 0; padding: 1rem; border: 1px solid #eadfe1; border-radius: .5rem;">
         <h2 style="font-size: 1.1rem;"
             th:text="${request.nombres != null ? request.nombres + ' ' + request.apellidos : request.email}">Nombre del candidato</h2>
         <p>Correo del candidato: <strong th:text="${request.email}">solicitante@example.com</strong></p>
@@ -63,7 +64,7 @@
                 </p>
                 <p th:unless="${request.codeEmailSentAt != null}">El código aún no se ha enviado por correo.</p>
                 <div th:if="${issuedCodeRequestId != null and issuedCodeRequestId == request.id}"
-                     style="margin: 1rem 0; padding: 1rem; border: 1px solid #387565; border-radius: .5rem;">
+                     style="margin: 1rem 0; padding: 1rem; border: 1px solid #efd6da; border-radius: .5rem;">
                     <p>Comparte el código únicamente con el candidato autorizado:</p>
                     <p><code th:text="${issuedCode}">CODIGO-ADMIN</code></p>
                     <form th:action="@{/admin/solicitudes-codigo/{id}/enviar-codigo(id=${request.id})}" method="post">

@@ -3,16 +3,16 @@
    Cárgalo ANTES de map-ui.css (controles, marcadores y avisos del mapa). */
 
 :root {
-    --bg: #071419;
-    --superficie: rgba(8, 22, 27, 0.97);
-    --superficie-2: rgba(13, 32, 37, 0.98);
-    --borde: rgba(86, 191, 181, 0.2);
+    --bg: #071421;
+    --superficie: rgba(8, 22, 36, 0.97);
+    --superficie-2: rgba(13, 32, 51, 0.98);
+    --borde: rgba(106, 170, 223, 0.24);
     --borde-suave: rgba(148, 163, 184, 0.16);
-    --texto: #ecf5f3;
-    --texto-2: #bbd0ce;
-    --texto-3: #91aaa8;
-    --acento: #37c8ba;
-    --acento-fuerte: #159c92;
+    --texto: #edf5fc;
+    --texto-2: #bbcade;
+    --texto-3: #91a8bf;
+    --acento: #5da8e8;
+    --acento-fuerte: #246da9;
     --ok: #62d6a5;
     --aviso: #f1c66b;
     --origen: #16a34a;
@@ -70,7 +70,7 @@ html, body {
     gap: 8px;
     padding: 16px 16px 14px 20px;
     border-bottom: 1px solid var(--borde-suave);
-    background: linear-gradient(90deg, rgba(55, 200, 186, 0.1), transparent 80%);
+    background: linear-gradient(90deg, rgba(93, 168, 232, 0.1), transparent 80%);
 }
 .panel-cab__titulo { flex: 1; min-width: 0; }
 .panel-kicker { display: block; color: var(--acento); font-size: 0.66rem; font-weight: 800; letter-spacing: 0.12em; }
@@ -91,7 +91,7 @@ html, body {
     border: 1px solid var(--borde);
     border-radius: 10px;
     color: var(--texto);
-    background: rgba(55, 200, 186, 0.08);
+    background: rgba(93, 168, 232, 0.08);
     font-size: 0.78rem;
     line-height: 1.55;
 }
@@ -129,7 +129,7 @@ html, body {
     cursor: pointer;
     transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
-.icon-btn:hover { color: var(--texto); border-color: var(--borde); background: rgba(55, 200, 186, 0.14); }
+.icon-btn:hover { color: var(--texto); border-color: var(--borde); background: rgba(93, 168, 232, 0.14); }
 .icon-btn--tenue { border-color: transparent; background: transparent; }
 
 .btn {
@@ -146,13 +146,13 @@ html, body {
     cursor: pointer;
     transition: filter 0.15s, opacity 0.15s;
 }
-.btn--secundario { background: linear-gradient(135deg, #176d73, #1f918f); }
-.btn--principal { width: 100%; margin-top: 10px; background: linear-gradient(135deg, #0f766e, #14b8a6); }
+.btn--secundario { background: linear-gradient(135deg, #246da9, #1f918f); }
+.btn--principal { width: 100%; margin-top: 10px; background: linear-gradient(135deg, #246da9, #327fbd); }
 .btn--texto { color: var(--texto-2); background: transparent; }
 .btn--texto:hover { color: var(--texto); background: rgba(255, 255, 255, 0.05); }
 .btn:hover { filter: brightness(1.1); }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; filter: none; }
-.btn[aria-pressed="true"] { background: linear-gradient(135deg, #0f766e, #14b8a6); }
+.btn[aria-pressed="true"] { background: linear-gradient(135deg, #246da9, #327fbd); }
 
 /* ---------- Campos origen / destino ---------- */
 .viaje { display: flex; align-items: center; gap: 6px; }
@@ -195,7 +195,7 @@ html, body {
 .options-panel input[type="search"]:hover,
 .options-panel select:hover { border-color: rgba(76, 201, 240, 0.5); }
 .options-panel input[type="search"]:focus,
-.options-panel select:focus { border-color: var(--acento); box-shadow: 0 0 0 3px rgba(55, 200, 186, 0.16); }
+.options-panel select:focus { border-color: var(--acento); box-shadow: 0 0 0 3px rgba(93, 168, 232, 0.16); }
 .options-panel input:disabled, .options-panel select:disabled { opacity: 0.55; cursor: not-allowed; }
 
 .fila { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
@@ -327,7 +327,7 @@ html, body {
     cursor: pointer;
 }
 .pestana:hover { color: var(--texto); }
-.pestana--activa { color: var(--texto); background: rgba(55, 200, 186, 0.2); }
+.pestana--activa { color: var(--texto); background: rgba(93, 168, 232, 0.2); }
 .contador {
     display: inline-block;
     min-width: 18px;
@@ -343,7 +343,7 @@ html, body {
 
 .nota { margin: 10px 0 0; color: var(--texto-3); font-size: 0.78rem; line-height: 1.55; }
 .subtitulo { margin: 0 0 8px; color: var(--texto-2); font-size: 0.82rem; }
-.enlace, .nota a, .panel-pie a { color: #79cfc4; }
+.enlace, .nota a, .panel-pie a { color: #82c5ef; }
 
 /* Línea de tiempo de paradas */
 .linea-tiempo { margin: 0; padding: 0; list-style: none; }
@@ -355,7 +355,7 @@ html, body {
     bottom: -4px;
     left: 15px;
     width: 2px;
-    background: rgba(55, 200, 186, 0.3);
+    background: rgba(93, 168, 232, 0.3);
 }
 .parada__boton {
     display: flex;
@@ -400,7 +400,7 @@ html, body {
 /* Buses */
 .buses { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
 .bus { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border: 1px solid var(--borde-suave); border-radius: 10px; background: rgba(11, 28, 32, 0.9); }
-.bus__icono { display: grid; flex: none; width: 38px; height: 38px; place-items: center; border-radius: 10px; color: #fff; background: var(--bus-color, #176d73); font-size: 1rem; }
+.bus__icono { display: grid; flex: none; width: 38px; height: 38px; place-items: center; border-radius: 10px; color: #fff; background: var(--bus-color, #246da9); font-size: 1rem; }
 .bus__cuerpo { display: grid; gap: 1px; min-width: 0; }
 .bus__placa { letter-spacing: 0.06em; font-size: 0.95rem; }
 .bus__cuerpo small { color: var(--texto-3); font-size: 0.78rem; }
@@ -425,7 +425,7 @@ html, body {
 }
 .leaflet-control-zoom a { color: #e2e8f0 !important; background: rgba(15, 23, 42, 0.96) !important; }
 .leaflet-control-zoom a:hover { background: rgba(33, 116, 113, 0.45) !important; }
-.leaflet-control-attribution a { color: #79cfc4 !important; }
+.leaflet-control-attribution a { color: #82c5ef !important; }
 .leaflet-control-attribution { padding: 5px 9px !important; }
 
 .leaflet-popup-content-wrapper,
@@ -490,11 +490,11 @@ html, body {
 
 /* ---------- Acabado visual: jerarquía, profundidad y lectura ---------- */
 :root {
-    --borde: rgba(105, 218, 202, 0.22);
-    --borde-suave: rgba(169, 208, 203, 0.13);
-    --texto-3: #9bb5b2;
-    --acento: #5ce0ca;
-    --acento-fuerte: #18aa9b;
+    --borde: rgba(106, 170, 223, 0.24);
+    --borde-suave: rgba(169, 199, 224, 0.16);
+    --texto-3: #9bb2c9;
+    --acento: #82c5f4;
+    --acento-fuerte: #327fbd;
     --sombra: 0 28px 80px rgba(0, 8, 14, 0.56), 0 4px 18px rgba(0, 0, 0, 0.25);
 }
 
@@ -503,7 +503,7 @@ body::before {
     inset: 0;
     z-index: 0;
     background:
-        radial-gradient(ellipse at 94% 12%, rgba(37, 180, 157, 0.12), transparent 32%),
+        radial-gradient(ellipse at 94% 12%, rgba(63, 139, 207, 0.14), transparent 32%),
         radial-gradient(ellipse at 5% 92%, rgba(47, 107, 167, 0.1), transparent 34%);
     content: "";
     pointer-events: none;
@@ -511,10 +511,10 @@ body::before {
 
 .options-panel {
     width: min(432px, calc(100vw - 32px));
-    border-color: rgba(108, 222, 204, 0.26);
+    border-color: rgba(108, 177, 229, 0.3);
     border-radius: 22px;
     background:
-        radial-gradient(ellipse at 100% 0%, rgba(50, 179, 161, 0.11), transparent 38%),
+        radial-gradient(ellipse at 100% 0%, rgba(50, 122, 184, 0.14), transparent 38%),
         linear-gradient(155deg, rgba(8, 24, 31, 0.97), rgba(6, 16, 23, 0.96));
     box-shadow: var(--sombra), inset 0 1px 0 rgba(255, 255, 255, 0.08);
     animation: panel-aparecer 560ms cubic-bezier(0.16, 1, 0.3, 1) both;
@@ -546,7 +546,7 @@ body::before {
 }
 
 .panel-kicker {
-    color: #75e6d2;
+    color: #82c5ef;
     font-size: 0.62rem;
     letter-spacing: 0.16em;
 }
@@ -642,7 +642,7 @@ body::before {
 .options-panel select:focus {
     border-color: rgba(92, 224, 202, 0.75);
     background: rgba(6, 24, 29, 0.96);
-    box-shadow: 0 0 0 3px rgba(55, 200, 186, 0.13), 0 8px 20px rgba(0, 0, 0, 0.14);
+    box-shadow: 0 0 0 3px rgba(93, 168, 232, 0.13), 0 8px 20px rgba(0, 0, 0, 0.14);
 }
 .options-panel input[type="search"]::placeholder { color: #839f9d; }
 .options-panel input:disabled { opacity: 0.58; }
@@ -743,8 +743,8 @@ body::before {
     place-items: center;
     border: 1px solid rgba(91, 216, 193, 0.19);
     border-radius: 14px;
-    color: #75e6d2;
-    background: rgba(55, 200, 186, 0.1);
+    color: #82c5ef;
+    background: rgba(93, 168, 232, 0.1);
     box-shadow: 0 7px 18px rgba(0, 0, 0, 0.16);
 }
 
@@ -778,7 +778,7 @@ body::before {
 .tramo__nombre { color: #effaf7; font-size: 0.96rem; letter-spacing: -0.015em; }
 .tramo__rutas { color: #70e1cf; font-size: 0.75rem; }
 .tramo__cadena { gap: 7px; color: #d0e3df; font-size: 0.78rem; line-height: 1.5; }
-.tramo__cadena i { color: #6edbc8; }
+.tramo__cadena i { color: #82c5ef; }
 .tramo__meta {
     gap: 6px;
     padding-top: 9px;
@@ -916,7 +916,7 @@ body::before {
 .avanzado summary { color: #c1d8d3; font-size: 0.77rem; }
 .avanzado summary::marker { color: #65d9c4; }
 .interruptor { color: #afc7c2; font-size: 0.77rem; }
-.interruptor input { accent-color: #38cbb5; }
+.interruptor input { accent-color: #5da8e8; }
 .panel-pie {
     margin-top: 13px;
     padding: 13px 3px 0;
@@ -1072,13 +1072,13 @@ body::before {
 }
 
 .icon-btn--accent {
-    border-color: rgba(55, 200, 186, 0.35);
-    background: rgba(55, 200, 186, 0.08);
+    border-color: rgba(93, 168, 232, 0.35);
+    background: rgba(93, 168, 232, 0.08);
     color: #6ee7b7;
 }
 
 .icon-btn--accent:hover {
-    background: rgba(55, 200, 186, 0.22);
+    background: rgba(93, 168, 232, 0.22);
     border-color: #34d399;
     color: #ffffff;
 }
@@ -1151,7 +1151,7 @@ body::before {
     font-weight: 700;
     padding: 2px 7px;
     border-radius: 6px;
-    background: rgba(55, 200, 186, 0.12);
+    background: rgba(93, 168, 232, 0.12);
     color: #5eead4;
     border: 1px solid rgba(94, 234, 212, 0.2);
     display: inline-flex;
@@ -1268,7 +1268,7 @@ body::before {
 
 .options-panel input[type="search"]:focus {
     background: rgba(14, 34, 42, 0.95);
-    border-color: #38cbb5;
+    border-color: #5da8e8;
     box-shadow: 0 0 0 3px rgba(56, 203, 181, 0.18), 0 8px 20px rgba(0, 0, 0, 0.35);
     transform: translateY(-1px);
 }
@@ -1317,19 +1317,19 @@ body::before {
 }
 
 .tramo:hover::before {
-    background: #38cbb5;
+    background: #5da8e8;
     box-shadow: 0 0 10px rgba(56, 203, 181, 0.7);
 }
 
 .tramo--activo {
-    border-color: #38cbb5 !important;
+    border-color: #5da8e8 !important;
     background: linear-gradient(145deg, rgba(18, 48, 54, 0.98), rgba(9, 28, 33, 0.98)) !important;
     box-shadow: 0 10px 30px rgba(0, 16, 22, 0.65), 0 0 0 1px rgba(56, 203, 181, 0.35) !important;
 }
 
 .tramo--activo::before {
-    background: #38cbb5 !important;
-    box-shadow: 0 0 12px #38cbb5 !important;
+    background: #5da8e8 !important;
+    box-shadow: 0 0 12px #5da8e8 !important;
 }
 
 /* Transición suave y organizada del panel de detalles */
@@ -1366,7 +1366,7 @@ body::before {
 }
 
 .pestana[aria-selected="true"] .contador {
-    background: #14b8a6;
+    background: #327fbd;
     color: #03201d;
     font-weight: 800;
 }

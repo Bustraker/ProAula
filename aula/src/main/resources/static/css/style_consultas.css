@@ -1,19 +1,19 @@
 .bus-directory-page {
     --directory-ink: #f0f3ed;
     --directory-muted: #b4c0b8;
-    --directory-forest: #315a4b;
-    --directory-deep: #101715;
+    --directory-forest: #315a83;
+    --directory-deep: #0b1725;
     --directory-coral: #f08a68;
-    --directory-gold: #f0c76b;
-    --directory-panel: #17211c;
-    --directory-line: #35443c;
+    --directory-gold: #82c5ef;
+    --directory-panel: #11253a;
+    --directory-line: #354d69;
     --directory-width: 1184px;
     min-height: 100vh;
     margin: 0;
     color: var(--directory-ink);
     background:
-        radial-gradient(ellipse at 18% 0%, rgba(64, 106, 79, 0.16), transparent 540px),
-        linear-gradient(155deg, #101715 0%, #17211c 52%, #111916 100%);
+        radial-gradient(ellipse at 18% 0%, rgba(64, 106, 159, 0.16), transparent 540px),
+        linear-gradient(155deg, #0b1725 0%, #11253a 52%, #101e30 100%);
     font-family: "Trebuchet MS", "Segoe UI", sans-serif;
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
@@ -43,7 +43,7 @@
     background-image:
         repeating-linear-gradient(90deg, transparent 0 89px, rgba(255, 255, 255, 0.027) 90px),
         repeating-linear-gradient(0deg, transparent 0 89px, rgba(255, 255, 255, 0.02) 90px),
-        linear-gradient(112deg, #172b25 0%, #14251f 55%, #1d3028 100%);
+        linear-gradient(112deg, #132943 0%, #10253c 55%, #1b3858 100%);
     box-shadow: 0 28px 70px rgba(0, 0, 0, 0.2);
     animation: directory-enter 680ms ease-out both;
 }
@@ -2540,14 +2540,14 @@ position: absolute;
 z-index: 0;
 inset: 0;
 background:
-    linear-gradient(#f0c76b, #f0c76b) left 11px top 11px / 22px 1px no-repeat,
-    linear-gradient(#f0c76b, #f0c76b) left 11px top 11px / 1px 22px no-repeat,
-    linear-gradient(#f0c76b, #f0c76b) right 11px top 11px / 22px 1px no-repeat,
-    linear-gradient(#f0c76b, #f0c76b) right 11px top 11px / 1px 22px no-repeat,
-    linear-gradient(#f0c76b, #f0c76b) left 11px bottom 11px / 22px 1px no-repeat,
-    linear-gradient(#f0c76b, #f0c76b) left 11px bottom 11px / 1px 22px no-repeat,
-    linear-gradient(#f0c76b, #f0c76b) right 11px bottom 11px / 22px 1px no-repeat,
-    linear-gradient(#f0c76b, #f0c76b) right 11px bottom 11px / 1px 22px no-repeat;
+    linear-gradient(#82c5ef, #82c5ef) left 11px top 11px / 22px 1px no-repeat,
+    linear-gradient(#82c5ef, #82c5ef) left 11px top 11px / 1px 22px no-repeat,
+    linear-gradient(#82c5ef, #82c5ef) right 11px top 11px / 22px 1px no-repeat,
+    linear-gradient(#82c5ef, #82c5ef) right 11px top 11px / 1px 22px no-repeat,
+    linear-gradient(#82c5ef, #82c5ef) left 11px bottom 11px / 22px 1px no-repeat,
+    linear-gradient(#82c5ef, #82c5ef) left 11px bottom 11px / 1px 22px no-repeat,
+    linear-gradient(#82c5ef, #82c5ef) right 11px bottom 11px / 22px 1px no-repeat,
+    linear-gradient(#82c5ef, #82c5ef) right 11px bottom 11px / 1px 22px no-repeat;
 content: "";
 opacity: 0.52;
 pointer-events: none;
@@ -2573,7 +2573,7 @@ top: 24px;
 min-height: 48px;
 gap: 11px;
 padding: 7px 10px;
-border-left: 2px solid #f0c76b;
+border-left: 2px solid #82c5ef;
 }
 
 .bus-directory-page .atlas-index {
@@ -2581,7 +2581,7 @@ display: grid;
 min-width: 39px;
 min-height: 31px;
 place-items: center;
-color: #f0c76b;
+color: #82c5ef;
 border-right: 1px solid rgba(205, 220, 181, 0.16);
 font: 700 8px/1 "Courier New", monospace;
 letter-spacing: 0.08em;
@@ -2623,7 +2623,7 @@ letter-spacing: 0.08em;
 .bus-directory-page .atlas-status i {
 width: 5px;
 height: 5px;
-background: #f0c76b;
+background: #82c5ef;
 border-radius: 50%;
 }
 
@@ -2650,12 +2650,12 @@ gap: 7px;
 .bus-directory-page .atlas-legend-route i {
 width: 19px;
 height: 2px;
-background: #f0c76b;
+background: #82c5ef;
 box-shadow: 0 0 6px rgba(240, 199, 107, 0.5);
 }
 
 .bus-directory-page .atlas-legend-nodes {
-color: #f0c76b;
+color: #82c5ef;
 font: 700 10px/1 "Courier New", monospace;
 }
 
@@ -2703,7 +2703,7 @@ stroke-width: 1;
 }
 
 .bus-directory-page .route-art-map .map-node-label circle {
-fill: #f0c76b;
+fill: #82c5ef;
 stroke: #20352a;
 stroke-width: 1;
 }
@@ -2879,7 +2879,7 @@ to { opacity: 1; }
 }
 
 .directory-primary-nav a[aria-current="page"]::after {
-    background: #f0c76b;
+    background: #82c5ef;
 }
 
 .directory-signin {
@@ -2889,7 +2889,7 @@ to { opacity: 1; }
 
 .directory-signin i,
 .directory-signin:hover i {
-    color: #f0c76b;
+    color: #82c5ef;
 }
 
 .directory-signin:hover {
@@ -2899,12 +2899,12 @@ to { opacity: 1; }
 }
 
 .directory-hero h1 em {
-    color: #f0c76b;
+    color: #82c5ef;
 }
 
 .directory-action--gold {
     color: #101715;
-    background: #f0c76b;
+    background: #82c5ef;
 }
 
 :scope .directory-action--gold {
@@ -2924,7 +2924,7 @@ to { opacity: 1; }
 .directory-section-kicker,
 .directory-count strong,
 .directory-subnav-note i {
-    color: #f0c76b;
+    color: #82c5ef;
 }
 
 .directory-route-art {
@@ -2967,7 +2967,7 @@ to { opacity: 1; }
 
 .directory-subnav a:hover,
 .directory-footer-home:hover {
-    color: #f0c76b;
+    color: #82c5ef;
 }
 
 .directory-main {
@@ -2983,7 +2983,7 @@ to { opacity: 1; }
 
 .overview-icon,
 .overview-note-mark {
-    color: #f0c76b;
+    color: #82c5ef;
     background: rgba(240, 199, 107, 0.1);
     border-color: rgba(240, 199, 107, 0.24);
 }
@@ -3035,7 +3035,7 @@ to { opacity: 1; }
 
 .directory-search,
 .directory-select {
-    color: #f0c76b;
+    color: #82c5ef;
     background: #0d1711;
     border-color: rgba(155, 184, 157, 0.24);
 }
@@ -3043,14 +3043,14 @@ to { opacity: 1; }
 .directory-search:focus-within,
 .directory-select:focus-within {
     background: #14231a;
-    border-color: #f0c76b;
+    border-color: #82c5ef;
     box-shadow: 0 0 0 3px rgba(240, 199, 107, 0.16);
 }
 
 .directory-search > i,
 .directory-select > i:first-child,
 .directory-select .select-chevron {
-    color: #f0c76b;
+    color: #82c5ef;
 }
 
 .directory-search input,
@@ -3080,7 +3080,7 @@ to { opacity: 1; }
 }
 
 .filter-clear i {
-    color: #f0c76b;
+    color: #82c5ef;
 }
 
 .filter-clear:hover {
@@ -3107,7 +3107,7 @@ to { opacity: 1; }
 
 .view-toggle.is-active i,
 .results-sort-note i {
-    color: #f0c76b;
+    color: #82c5ef;
 }
 
 .results-live-dot {
@@ -3134,7 +3134,7 @@ to { opacity: 1; }
 }
 
 .bus-card-trigger:focus-visible {
-    outline-color: #f0c76b;
+    outline-color: #82c5ef;
 }
 
 .bus-card-id,
@@ -3146,11 +3146,11 @@ to { opacity: 1; }
 .bus-card-route i,
 .bus-detail-grid > span > i,
 .bus-neighborhoods-title i {
-    color: #f0c76b;
+    color: #82c5ef;
 }
 
 .bus-card-id > span {
-    color: #f0c76b;
+    color: #82c5ef;
 }
 
 .bus-card-plate,
@@ -3160,14 +3160,14 @@ to { opacity: 1; }
 }
 
 .bus-card-toggle {
-    color: #f0c76b;
+    color: #82c5ef;
     background: rgba(240, 199, 107, 0.1);
     border-color: rgba(240, 199, 107, 0.26);
 }
 
 .bus-card.is-open .bus-card-toggle {
     color: #101715;
-    background: #f0c76b;
+    background: #82c5ef;
 }
 
 .bus-detail-grid {
@@ -3210,13 +3210,13 @@ to { opacity: 1; }
 
 .empty-bus {
     color: #101715;
-    background: #f0c76b;
+    background: #82c5ef;
     border-color: rgba(255, 231, 166, 0.55);
     box-shadow: 0 7px 20px rgba(0, 0, 0, 0.28);
 }
 
 .empty-kicker {
-    color: #f0c76b;
+    color: #82c5ef;
 }
 
 .directory-empty h3,
@@ -3231,7 +3231,7 @@ to { opacity: 1; }
 
 .empty-action {
     color: #101715 !important;
-    background: #f0c76b;
+    background: #82c5ef;
 }
 
 .empty-action:hover {
@@ -3281,7 +3281,7 @@ to { opacity: 1; }
 
 .bus-table-wrap td:first-child,
 .bus-table-wrap td:nth-child(2) {
-    color: #f0c76b;
+    color: #82c5ef;
 }
 
 .directory-footer {
@@ -3294,11 +3294,11 @@ to { opacity: 1; }
 }
 
 .bus-directory-page :focus-visible {
-    outline-color: #f0c76b;
+    outline-color: #82c5ef;
 }
 
 .map-route-line {
-    stroke: #f0c76b;
+    stroke: #82c5ef;
     stroke-width: 3.5;
     filter: drop-shadow(0 0 4px rgba(240, 199, 107, 0.45));
 }
@@ -3425,7 +3425,7 @@ to { opacity: 1; }
 .bus-directory-page .route-compass-needle {
     width: 16px;
     height: 28px;
-    background: linear-gradient(180deg, #f0c76b 0 50%, rgba(205, 220, 181, 0.62) 50%);
+    background: linear-gradient(180deg, #82c5ef 0 50%, rgba(205, 220, 181, 0.62) 50%);
     clip-path: polygon(50% 0, 100% 100%, 50% 77%, 0 100%);
     filter: drop-shadow(0 0 4px rgba(240, 199, 107, 0.45));
     transform: rotate(-135deg);
@@ -3747,4 +3747,83 @@ to { opacity: 1; }
 .bus-directory-page--public .directory-action--gold:hover,
 .bus-directory-page--public .empty-action:hover {
     background: #b7ddf5;
+}
+
+.bus-directory-page--public {
+    --directory-forest: #1f70ae;
+    --directory-deep: #082b50;
+    --directory-panel: #0c3b68;
+    --directory-line: rgba(160, 205, 235, 0.18);
+    background:
+        radial-gradient(ellipse at 12% 8%, rgba(52, 112, 166, 0.2), transparent 570px),
+        radial-gradient(ellipse at 96% 54%, rgba(54, 93, 142, 0.12), transparent 540px),
+        linear-gradient(155deg, #0b1725 0%, #11253a 48%, #111e30 100%);
+}
+
+.bus-directory-page--public .directory-header {
+    background-color: #0b1725;
+    background-image:
+        repeating-linear-gradient(90deg, transparent 0 89px, rgba(255, 255, 255, 0.027) 90px),
+        repeating-linear-gradient(0deg, transparent 0 89px, rgba(255, 255, 255, 0.02) 90px),
+        radial-gradient(ellipse at 78% 34%, rgba(75, 125, 175, 0.22), transparent 390px),
+        linear-gradient(112deg, #0b1725 0%, #12385d 58%, #315a83 100%);
+}
+
+.bus-directory-page--public .overview-item,
+.bus-directory-page--public .overview-note,
+.bus-directory-page--public .directory-tools,
+.bus-directory-page--public .directory-empty,
+.bus-directory-page--public .bus-table-wrap {
+    background-color: #102b49;
+    background-image: linear-gradient(145deg, #15395e, #102b49);
+    border-color: rgba(160, 205, 235, 0.18);
+}
+
+.bus-directory-page--public .overview-note {
+    background-image:
+        radial-gradient(ellipse at 100% 0%, rgba(75, 125, 175, 0.2), transparent 220px),
+        linear-gradient(130deg, #15395e, #102b49);
+}
+
+.bus-directory-page--public .directory-count,
+.bus-directory-page--public .directory-search,
+.bus-directory-page--public .directory-select,
+.bus-directory-page--public .filter-clear,
+.bus-directory-page--public .bus-card .barrios li {
+    color: #edf5fb;
+    background-color: #0c2540;
+    border-color: rgba(160, 205, 235, 0.2);
+}
+
+.bus-directory-page--public .bus-card {
+    background: linear-gradient(145deg, #15395e, #102b49);
+    border-color: rgba(160, 205, 235, 0.18);
+}
+
+.bus-directory-page--public .directory-search:focus-within,
+.bus-directory-page--public .directory-select:focus-within {
+    background-color: #12385d;
+}
+
+.bus-directory-page--public .filter-clear:hover,
+.bus-directory-page--public .directory-signin:hover {
+    color: #fff;
+    background: #1f70ae;
+    border-color: #82c5ef;
+}
+
+.bus-directory-page--public .directory-subnav {
+    background: #0c3b68;
+    border-color: rgba(160, 205, 235, 0.18);
+}
+
+.bus-directory-page--public .bus-neighborhoods-title,
+.bus-directory-page--public .bus-table-wrap th,
+.bus-directory-page--public .no-results-reset {
+    color: #82c5ef;
+}
+
+.bus-directory-page--public .directory-footer {
+    background: rgba(7, 23, 40, 0.94);
+    border-top-color: rgba(160, 205, 235, 0.17);
 }

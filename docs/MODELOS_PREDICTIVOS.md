@@ -1,23 +1,32 @@
-# Modelos predictivos y recomendaciones de Bustraker
+# Modelos predictivos de retraso de Bustraker
 
 ## Resumen ejecutivo
 
-El proyecto tiene un clasificador aprendido para estimar retrasos y dos métodos
-deterministas de recomendación implementados en Python. También existe un índice
-explicable de prioridad de cobertura implementado directamente en Java. Ese índice
-no es una predicción ni usa aprendizaje automático.
+El modelo principal es un clasificador supervisado que estima el riesgo de que un
+viaje presente un retraso mayor de diez minutos. Una regresión logística se usa
+únicamente como línea base de comparación; no es el modelo desplegado.
 
 | Objetivo | Método actual | Ubicación principal | Aprende de datos |
 | --- | --- | --- | --- |
 | Riesgo de retraso mayor de 10 minutos | `HistGradientBoostingClassifier` | `Modelos/proaula_models/delay_risk.py` | Sí |
 | Línea base de riesgo | `LogisticRegression` | `Modelos/train_models.py` | Sí, solo comparación |
-| Elegir entre rutas | Ordenamiento por costo generalizado | `Modelos/proaula_models/recommendations.py` | No |
-| Sugerir destinos | Puntaje por frecuencia y recencia | `Modelos/proaula_models/recommendations.py` | No todavía |
-| Priorizar cobertura de barrios | Índice ponderado explicable | `aula/src/main/java/com/proaula/aula/Service/ModeloPrioridadCoberturaService.java` | No |
 
 Actualmente los datos de entrenamiento y evaluación son sintéticos. Por tanto,
 los resultados son una demostración técnica y no se pueden presentar como
 desempeño real sobre la operación de Cartagena.
+
+## Variable objetivo y predictoras
+
+| Modelo o método | Variable objetivo (target) | Variables predictoras o entradas | Naturaleza |
+| --- | --- | --- | --- |
+| `HistGradientBoostingClassifier` para riesgo de retraso | `retraso_mayor_10_min`: `1` si `retraso_minutos > 10`; `0` si es menor o igual a 10 | `ruta`, `dia_semana`, `hora_salida`, `duracion_planificada_min`, `indice_demanda_pronosticada` | Clasificación supervisada; es el clasificador principal |
+| `LogisticRegression` de comparación | La misma etiqueta `retraso_mayor_10_min` | Las mismas cinco variables predictoras del clasificador principal | Clasificación supervisada; línea base, no es el modelo desplegado |
+
+En los dos clasificadores, `fecha_viaje` sirve para ordenar la separación
+temporal y derivar `dia_semana`; **no** entra como predictor. Tampoco entran
+`retraso_minutos` como predictor, `escenario_sintetico`, clima observado,
+tráfico real, estado del bus ni coordenadas GPS. `retraso_minutos` se usa para
+construir la etiqueta cuando el CSV no la entrega directamente.
 
 ## 1. Riesgo de retraso
 
@@ -32,37 +41,44 @@ Se compara con una regresión logística. Esta última es solo una línea base:
 normaliza variables numéricas y convierte variables categóricas en columnas
 binarias. No reemplaza al modelo entregado.
 
-### Variables
+### Variable objetivo y predictoras
 
-- `ruta`: variable categórica. Se transforma con `OneHotEncoder`.
-- `dia_semana`: variable categórica. Se transforma con `OneHotEncoder`.
-- `hora_salida`: número entero de 0 a 23.
-- `duracion_planificada_min`: duración prevista, mayor que cero y máxima de 240.
-- `indice_demanda_pronosticada`: índice de 0 a 100.
+- **Objetivo (`y`)**: `retraso_mayor_10_min`, binario. Vale `1` cuando
+  `retraso_minutos > 10`; vale `0` cuando el retraso es de 10 minutos o menos.
+- **Predictoras (`X`)**:
+  - `ruta`: categoría de ruta; se codifica con `OneHotEncoder`.
+  - `dia_semana`: día derivado de `fecha_viaje`; se codifica con `OneHotEncoder`.
+  - `hora_salida`: hora entera entre 0 y 23.
+  - `duracion_planificada_min`: duración mayor que 0 y de hasta 240 minutos.
+  - `indice_demanda_pronosticada`: índice entre 0 y 100.
 
 La ruta y el día se codifican como categorías. Las variables numéricas pasan
 directamente al clasificador. El modelo no recibe clima, tráfico real, accidentes,
 estado del bus o datos GPS históricos.
+
+La regresión logística de línea base compara el mismo `y` con el mismo `X`;
+codifica las categorías con `OneHotEncoder` y estandariza las variables numéricas
+con `StandardScaler`. Solo se usa para comparación en la evaluación.
 
 ### Ubicación y papel de cada archivo
 
 - `Modelos/proaula_models/delay_risk.py`: define variables, validación, pipeline,
   entrenamiento, umbral, inferencia y carga del artefacto.
 - `Modelos/proaula_models/synthetic_data.py`: genera el conjunto sintético de
-  retrasos y los escenarios de estrés.
+  retrasos y los escenarios de estrés del clasificador.
 - `Modelos/train_models.py`: genera datos, entrena el HistGradientBoosting,
   entrena y compara la regresión logística, elige el umbral, evalúa escenarios,
-  evalúa rutas y destinos y guarda los artefactos.
-- `Modelos/proaula_models/api.py`: expone la predicción y las métricas mediante
-  FastAPI y Pydantic.
+  calcula métricas de los clasificadores y guarda los artefactos.
+- `Modelos/proaula_models/api.py`: expone la predicción de riesgo y sus métricas
+  mediante FastAPI y Pydantic.
 - `Modelos/artifacts/delay_risk.joblib`: contiene el modelo entrenado cargado por
   la API.
-- `Modelos/artifacts/evaluation.json`: contiene métricas, umbral, escenario,
-  distribución de datos y evaluaciones.
+- `Modelos/artifacts/evaluation.json`: contiene métricas de clasificación,
+  umbral, origen y distribución de los datos.
 - `Modelos/modelo_riesgo_retraso_transporte.ipynb`: demostración interactiva del
   clasificador y su evaluación.
-- `Modelos/tests/test_models.py`: pruebas del entrenamiento, validación y
-  recomendaciones.
+- `Modelos/tests/test_models.py`: pruebas del entrenamiento y validación del
+  clasificador de retrasos.
 - `aula/src/main/java/com/proaula/aula/dto/modelos/RiesgoRetrasoRequest.java`:
   contrato Java de entrada.
 - `RiesgoRetrasoResponse.java`: contrato Java de salida.
@@ -119,129 +135,21 @@ deben coincidir con `retraso_minutos > 10`. Cada partición temporal debe tener
 las dos clases y el identificador de ruta debe coincidir con el enviado por la
 aplicación.
 
-## 2. Recomendación de rutas
+## Dónde ver el resultado en el frontend
 
-### Método
+La predicción del clasificador se muestra en la página **Planear viaje**, tanto
+para usuarios autenticados ([viajar.html](../aula/src/main/resources/templates/Usuario/viajar.html))
+como para visitantes ([viajar_public.html](../aula/src/main/resources/templates/Usuario/viajar_public.html)).
+Después de planificar y abrir el detalle de una opción, cada tramo muestra el
+nivel y porcentaje de riesgo de retraso mayor de diez minutos, el umbral aplicado
+y el origen de los datos. La interfaz se actualiza desde
+[map-travel.js](../aula/src/main/resources/static/js/map-travel.js).
 
-No usa un modelo entrenado. Usa ordenamiento por costo generalizado:
-
-```text
-tiempo generalizado =
-ETA + (30 / salidas_por_hora) + demora_clima_min
-```
-
-La espera se aproxima como la mitad del intervalo entre salidas:
-`30 / salidasPorHora`. El método conserva la ruta habitual si ninguna alternativa
-ahorra al menos cinco minutos respecto de ella.
-
-### Justificación
-
-- El ETA ya debe incluir tráfico; no se suma `congestionPct` otra vez.
-- El umbral de cinco minutos evita cambios que sean visibles pero poco útiles.
-- El resultado es explicable: indica ruta recomendada, costo y motivo.
-- No usa el historial real de llegada de todos los itinerarios.
-
-### Archivos
-
-- `Modelos/proaula_models/recommendations.py`: calcula costo, ordena rutas y aplica
-  el umbral de ahorro.
-- `Modelos/proaula_models/api.py`: valida las opciones y expone
-  `POST /v1/recommendations/routes`.
-- `Modelos/train_models.py`: evalúa el método sintético frente a un oráculo.
-- `Modelos/modelo_recomendacion_rutas.ipynb`: muestra ejemplos de ruta.
-- Los DTO Java `RecomendacionRutaRequest.java` y
-  `RecomendacionRutaResponse.java` conectan el servicio Python con Spring.
-
-El planificador principal de la interfaz todavía usa directitud, distancia y
-paradas antes del endpoint predictivo. La API de rutas no reemplaza esa lógica
-porque no existen frecuencias ni ETA reales completos para todos los recorridos.
-
-## 3. Sugerencias de destinos
-
-### Método
-
-No usa clasificación ni entrenamiento automático. Filtra el catálogo por nombre,
-tipo y barrio que coincidan con la consulta. Después calcula una estimación
-semanal de visitas con frecuencia y recencia:
-
-```text
-frecuencia reciente = visitas_7d / 7
-frecuencia mensual = visitas_30d / 30
-
-estimación =
-7 *
-(0.05 * frecuencia reciente + 0.95 * frecuencia mensual) *
-(0.9 + 0.2 * exp(-dias_desde_ultima_visita / 14))
-```
-
-Cuanto más recientes son las visitas, mayor es el factor de recencia. Los
-destinos sin coincidencia no se agregan. Los destinos sin historial se ordenan
-por nombre cuando tienen la misma puntuación.
-
-### Importante
-
-El método no predice usuarios reales ni visitas futuras observables. Solo combina
-el historial enviado por la aplicación con el catálogo proporcionado. Los
-favoritos o barrios guardados no equivalen todavía a un historial completo de
-visitas.
-
-### Archivos
-
-- `Modelos/proaula_models/recommendations.py`: filtrado, ponderación y ordenamiento.
-- `Modelos/proaula_models/api.py`: valida catálogo e historial y expone
-  `POST /v1/recommendations/destinations`.
-- `Modelos/train_models.py`: evalúa una implementación sintética contra una
-  referencia de popularidad reciente.
-- `Modelos/modelo_sugerencias_destinos.ipynb`: explica y muestra ejemplos.
-- Los DTO Java `SugerenciasDestinoRequest.java` y
-  `SugerenciasDestinoResponse.java` transportan la solicitud y respuesta.
-
-## 4. Prioridad de cobertura de barrios
-
-Este análisis está implementado en Java y no es un modelo predictivo.
-
-### Método
-
-Calcula un índice de 0 a 100:
-
-- Hasta 40 puntos por población relativa.
-- 40 puntos si el barrio no tiene rutas activas verificadas.
-- 20 puntos si tiene exactamente una ruta activa verificada.
-- 20 puntos si no tiene paradas activas georreferenciadas.
-- 10 puntos si tiene paradas activas, pero ninguna coordenada válida.
-- Sin puntos adicionales cuando existen varias rutas y paradas con ubicación.
-
-Niveles:
-
-```text
-ALTA  -> 60 a 100
-MEDIA -> 35 a 59
-BAJA  -> 0 a 34
-```
-
-Es una puntuación de revisión de cobertura. No mide demanda, frecuencia de
-pasajeros, calidad del servicio ni probabilidad de inversión.
-
-### Archivos
-
-- `aula/src/main/java/com/proaula/aula/Service/ModeloPrioridadCoberturaService.java`:
-  calcula rutas, paradas y puntos.
-- `aula/src/main/java/com/proaula/aula/Service/BarrioContextoService.java`: entrega
-  población y contexto geográfico.
-- `aula/src/main/java/com/proaula/aula/Repository/RutaRepository.java`: consulta
-  rutas verificadas.
-- `aula/src/main/java/com/proaula/aula/dto/modelos/PrioridadCoberturaResponse.java`
-  y sus registros internos: forman la respuesta explicable.
-
-## 5. Llegadas por GPS
-
-Las llegadas cercanas no son una predicción aprendida. Son reportes de ubicación
-voluntarios, recientes y temporales. Vencen aproximadamente a los 90 segundos y
-no se guardan como etiquetas de entrenamiento.
-
-Los componentes principales están en `LlegadaBusRestController.java`,
-`LlegadaBusService.java` y el JavaScript del mapa. Su precisión depende de la
-participación de los usuarios y no debe confundirse con el modelo de retrasos.
+Con la configuración actual, el origen se indica como demostración con datos
+sintéticos. Si el servicio no responde, la interfaz muestra **Predicción no
+disponible**; no sustituye el resultado por un valor inventado. La regresión
+logística es una línea base de evaluación y no aparece como resultado separado
+en el frontend.
 
 ## Entrenamiento y ejecución
 
@@ -254,7 +162,8 @@ Desde `Modelos`:
 ```
 
 El archivo `train_models.py` crea los datos sintéticos si no se proporciona
-`PROAULA_DELAY_DATASET`, compara modelos, calcula métricas y escribe:
+`PROAULA_DELAY_DATASET`, compara el clasificador principal con la regresión
+logística, calcula métricas y escribe:
 
 - `artifacts/delay_risk.joblib`
 - `artifacts/evaluation.json`
