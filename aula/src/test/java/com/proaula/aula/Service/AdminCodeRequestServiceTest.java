@@ -113,8 +113,8 @@ class AdminCodeRequestServiceTest {
             .isEqualTo("approver@example.com");
         assertThat(notification.getContent().toString())
             .contains("Andrea Perez", "applicant@example.com", "Admin Approver", "Necesita administrar las rutas",
-                "/admin/solicitudes-codigo#solicitud-1", "Aprobar o Rechazar")
-            .doesNotContain("password", "contraseña");
+                "https://bustraker.example/admin/solicitudes-codigo#solicitud-1", "Aprobar o Rechazar")
+            .doesNotContain("password", "contraseña", "localhost:5679");
         verify(pushNotificationService).notifyPendingRequest(
             1L, "Andrea", "Perez", "applicant@example.com");
     }

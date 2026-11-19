@@ -111,7 +111,7 @@ app:
     base-url: ${MODELS_API_BASE_URL:http://localhost:8000}
   admin:
     approver-email: ${ADMIN_APPROVER_EMAIL:}
-  public-base-url: ${APP_PUBLIC_BASE_URL:http://localhost:${PORT:5679}}
+  public-base-url: ${RENDER_EXTERNAL_URL:${APP_PUBLIC_BASE_URL:http://localhost:${PORT:5679}}}
   firebase:
     api-key: ${FIREBASE_API_KEY:AIzaSyBIZkDnH3moEM9J9Miudb96lqCA7fYG4DI}
     auth-domain: ${FIREBASE_AUTH_DOMAIN:bustrakerproyect24.firebaseapp.com}
