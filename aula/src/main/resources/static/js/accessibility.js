@@ -427,6 +427,14 @@ document.addEventListener('DOMContentLoaded', function () {
             closeControls(activeTrigger);
         });
 
+        controls.addEventListener('keydown', function (event) {
+            if (event.key !== 'Escape' || !controls.open) {
+                return;
+            }
+            event.preventDefault();
+            closeControls(activeTrigger);
+        });
+
         controls.addEventListener('click', function (event) {
             const bounds = controls.getBoundingClientRect();
             const clickedOutside = event.clientX < bounds.left
