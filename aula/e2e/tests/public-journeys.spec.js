@@ -744,6 +744,50 @@ test("GPS is optional and detects route-like movement after the user enables it"
   await expect(statusPanel).toContainText("La coincidencia con la ruta es aproximada");
 });
 
+test("GPS uses cadastral neighborhood boundaries when detecting the trip origin", async ({ page }) => {
+  await page.addInitScript(() => {
+    const position = {
+      coords: { latitude: 10.4, longitude: -75.503, accuracy: 5 },
+      timestamp: Date.now()
+    };
+    Object.defineProperty(navigator, "geolocation", {
+      configurable: true,
+      value: {
+        watchPosition(success) {
+          window.setTimeout(() => success(position), 0);
+          return 1;
+        },
+        clearWatch() {}
+      }
+    });
+  });
+  await page.route("**/api/barrios/todos", routeRequest => routeRequest.fulfill({
+    contentType: "application/json",
+    body: JSON.stringify([
+      { nombre: "nuevo bosque", latitud: 10.391351, longitud: -75.507797 }
+    ])
+  }));
+  await page.route("**/api/rutas-con-coordenadas", routeRequest => routeRequest.fulfill({
+    contentType: "application/json",
+    body: JSON.stringify([])
+  }));
+  await page.goto("/viajar_public?o=nuevo+bosque");
+  await expect(page.locator("#origen")).toHaveValue("nuevo bosque");
+
+  const cartographyResponse = page.waitForResponse(response =>
+    response.url().includes("/data/cartografia/barrios-cartografia.geojson")
+      && response.status() === 200
+  );
+  await page.locator("#btnSeguirUbicacion").click();
+  await cartographyResponse;
+
+  await expect(page.locator("#locationStatus")).toContainText("ZARAGOCILLA");
+  await expect(page.locator("#origen")).toHaveValue("ZARAGOCILLA");
+  expect(await page.locator("#listaOrigen option").evaluateAll(options =>
+    options.some(option => option.value === "ZARAGOCILLA")
+  )).toBe(true);
+});
+
 test("public home keeps bus consultation private", async ({ page }) => {
   await page.goto("/index_3_public");
   await expect(page.getByRole("heading", { name: /Cartagena, más cerca/i })).toBeVisible();

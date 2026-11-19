@@ -118,6 +118,7 @@
         var estado = {
             barrios: [],            // [{nombre, nombreN, lat, lng}]
             coordenadas: {},        // nombreN → {lat, lng}
+            barriosCartograficos: new Map(),
             rutas: [],              // rutas normalizadas
             servidos: new Map(),    // nombreN → nombre visible (barrios con ruta verificada)
             origen: '', destino: '',
@@ -145,7 +146,9 @@
             favoritosHabilitados: privado,
             favoritos: [],
             trayectosFavoritos: [],
-            barriosFavoritos: new Set()
+            barriosFavoritos: new Set(),
+            origenGpsPendiente: false,
+            solicitudBarrio: 0
         };
         var capas = {
             paradas: L.layerGroup(), pinOrigen: null, pinDestino: null,
@@ -256,7 +259,7 @@
             cargarDatos();
         }
 
-        function alHacerClicEnMapa(e) {
+        async function alHacerClicEnMapa(e) {
             if (e.originalEvent && e.originalEvent.target && e.originalEvent.target.closest('.leaflet-control, .options-panel, .notif-toast, .notif-drawer, .notif-toast-container')) {
                 return;
             }
@@ -289,25 +292,25 @@
             }
 
             reiniciarConfirmacionMapa();
-            var mejor = null;
-            var menorDist = Infinity;
+            var nombreCatastral;
+            try {
+                nombreCatastral = await barrioCatastralEnCoordenadas(lat, lng);
+            } catch (error) {
+                console.error('No se pudo consultar la cartografía catastral para el punto del mapa.', error);
+                M.mostrarAviso('No se pudo consultar la cartografía catastral para identificar este punto.', 'error', 7000);
+                return;
+            }
 
-            (estado.barrios || []).forEach(function (b) {
-                if (Number.isFinite(b.lat) && Number.isFinite(b.lng)) {
-                    var d = haversineKm(lat, lng, b.lat, b.lng);
-                    if (d < menorDist) {
-                        menorDist = d;
-                        mejor = b;
-                    }
-                }
-            });
-
-            var nombreLugar = mejor ? mejor.nombre : 'Ubicación seleccionada';
-            var distMetros = Math.round(menorDist * 1000);
-            var detalleTexto = menorDist < 10
-                ? 'Punto cerca del barrio ' + nombreLugar + ' (' + formatearDistancia(distMetros) + ')'
-                : 'Ubicación seleccionada en Cartagena';
-            var textoVoz = 'Punto seleccionado en el mapa cerca de ' + nombreLugar + '. Distancia aproximada ' + formatearDistancia(distMetros);
+            var barriosDisponibles = mapaBarriosDisponibles();
+            var nombreLugar = nombreCatastral
+                ? (barriosDisponibles.get(normalizar(nombreCatastral)) || nombreCatastral)
+                : 'Ubicación seleccionada';
+            var detalleTexto = nombreCatastral
+                ? 'Punto seleccionado dentro del barrio ' + nombreLugar + '.'
+                : 'El punto no está dentro de un barrio de la cartografía catastral.';
+            var textoVoz = nombreCatastral
+                ? 'Punto seleccionado dentro del barrio ' + nombreLugar + '.'
+                : 'El punto seleccionado no coincide con un barrio catastral.';
 
             if (capas.marcadorClick) {
                 mapa.removeLayer(capas.marcadorClick);
@@ -321,6 +324,13 @@
                 popupAnchor: [0, -18]
             });
 
+            var accionesBarrio = nombreCatastral
+                ? '  <div class="mu-popup__actions">' +
+                    '    <button type="button" class="mu-popup__btn-action mu-popup__btn--orig" data-set-origin="' + M.escapeHtml(nombreLugar) + '"><i class="fas fa-play"></i> Fijar como Origen (A)</button>' +
+                    '    <button type="button" class="mu-popup__btn-action mu-popup__btn--dest" data-set-dest="' + M.escapeHtml(nombreLugar) + '"><i class="fas fa-flag"></i> Fijar como Destino (B)</button>' +
+                    (global.BustrakerNotificaciones ? '    <button type="button" class="mu-popup__btn-speak" data-speak="' + M.escapeHtml(textoVoz) + '"><i class="fas fa-volume-high"></i> Escuchar</button>' : '') +
+                    '  </div>'
+                : '';
             var popupContent =
                 '<div class="mu-popup mu-popup--pro mu-popup--click">' +
                 '  <div class="mu-popup__banner mu-popup__banner--click">' +
@@ -329,12 +339,7 @@
                 '  <div class="mu-popup__body">' +
                 '    <strong class="mu-popup__title">' + M.escapeHtml(nombreLugar) + '</strong>' +
                 '    <p class="mu-popup__nota"><i class="fas fa-bullseye"></i> ' + M.escapeHtml(detalleTexto) + '</p>' +
-                '  </div>' +
-                '  <div class="mu-popup__actions">' +
-                '    <button type="button" class="mu-popup__btn-action mu-popup__btn--orig" data-set-origin="' + M.escapeHtml(nombreLugar) + '"><i class="fas fa-play"></i> Fijar como Origen (A)</button>' +
-                '    <button type="button" class="mu-popup__btn-action mu-popup__btn--dest" data-set-dest="' + M.escapeHtml(nombreLugar) + '"><i class="fas fa-flag"></i> Fijar como Destino (B)</button>' +
-                (global.BustrakerNotificaciones ? '    <button type="button" class="mu-popup__btn-speak" data-speak="' + M.escapeHtml(textoVoz) + '"><i class="fas fa-volume-high"></i> Escuchar</button>' : '') +
-                '  </div>' +
+                '  </div>' + accionesBarrio +
                 '</div>';
 
             capas.marcadorClick = L.marker([lat, lng], { icon: iconoClick, riseOnHover: true })
@@ -759,8 +764,84 @@
             return parada ? parada.nombre : 'el elemento';
         }
 
+        function cargarBarriosCartograficos() {
+            return M.obtenerCartografiaBarrios().then(function (cartografia) {
+                if (!estado.barriosCartograficos.size) {
+                    cartografia.features.forEach(function (feature) {
+                        var nombre = String(feature && feature.properties && feature.properties.nombre || '').trim();
+                        var nombreN = normalizar(nombre);
+                        if (nombreN && !estado.barriosCartograficos.has(nombreN)) {
+                            estado.barriosCartograficos.set(nombreN, nombre);
+                        }
+                    });
+                    if (estado.barriosCartograficos.size) {
+                        poblarOrigen();
+                        poblarDestino();
+                    }
+                }
+                return cartografia;
+            });
+        }
+
+        function puntoSobreSegmento(lng, lat, a, b) {
+            if (!Array.isArray(a) || !Array.isArray(b) || a.length < 2 || b.length < 2) return false;
+            var productoCruzado = (lng - a[0]) * (b[1] - a[1]) - (lat - a[1]) * (b[0] - a[0]);
+            var tolerancia = 1e-10;
+            return Math.abs(productoCruzado) <= tolerancia
+                && lng >= Math.min(a[0], b[0]) - tolerancia && lng <= Math.max(a[0], b[0]) + tolerancia
+                && lat >= Math.min(a[1], b[1]) - tolerancia && lat <= Math.max(a[1], b[1]) + tolerancia;
+        }
+
+        function puntoEnAnillo(lng, lat, anillo) {
+            if (!Array.isArray(anillo) || anillo.length < 3) return false;
+            var dentro = false;
+            for (var i = 0, j = anillo.length - 1; i < anillo.length; j = i++) {
+                var actual = anillo[i], anterior = anillo[j];
+                if (!Array.isArray(actual) || !Array.isArray(anterior)) continue;
+                if (puntoSobreSegmento(lng, lat, anterior, actual)) return true;
+                if ((actual[1] > lat) !== (anterior[1] > lat)
+                    && lng < (anterior[0] - actual[0]) * (lat - actual[1])
+                    / (anterior[1] - actual[1]) + actual[0]) {
+                    dentro = !dentro;
+                }
+            }
+            return dentro;
+        }
+
+        function geometriaContienePunto(geometria, lng, lat) {
+            if (!geometria || !Array.isArray(geometria.coordinates)) return false;
+            var poligonos = geometria.type === 'Polygon'
+                ? [geometria.coordinates]
+                : (geometria.type === 'MultiPolygon' ? geometria.coordinates : []);
+            return poligonos.some(function (anillos) {
+                if (!Array.isArray(anillos) || !anillos.length || !puntoEnAnillo(lng, lat, anillos[0])) {
+                    return false;
+                }
+                return !anillos.slice(1).some(function (hueco) {
+                    return puntoEnAnillo(lng, lat, hueco);
+                });
+            });
+        }
+
+        function barrioCatastralEnCoordenadas(lat, lng) {
+            if (!Number.isFinite(lat) || !Number.isFinite(lng)) return Promise.resolve(null);
+            return cargarBarriosCartograficos().then(function (cartografia) {
+                for (var i = 0; i < cartografia.features.length; i++) {
+                    var feature = cartografia.features[i];
+                    var nombre = String(feature && feature.properties && feature.properties.nombre || '').trim();
+                    if (nombre && geometriaContienePunto(feature.geometry, lng, lat)) return nombre;
+                }
+                return null;
+            });
+        }
+
         function mapaBarriosDisponibles() {
             var disponibles = new Map();
+            estado.barriosCartograficos.forEach(function (nombre, nombreN) {
+                if (nombreN && !disponibles.has(nombreN)) {
+                    disponibles.set(nombreN, nombre);
+                }
+            });
             estado.barrios.forEach(function (barrio) {
                 if (barrio.nombreN && !disponibles.has(barrio.nombreN)) {
                     disponibles.set(barrio.nombreN, barrio.nombre);
@@ -3201,25 +3282,13 @@
         }
 
         /* ===================== UBICACIÓN EN VIVO ===================== */
-        function barrioMasCercano(lat, lng, soloServidos) {
-            var mejor = null, minimo = Infinity;
-            estado.barrios.forEach(function (b) {
-                if (!Number.isFinite(b.lat) || !Number.isFinite(b.lng)) return;
-                if (soloServidos && estado.servidos.size && !estado.servidos.has(b.nombreN)) return;
-                var d = haversineKm(lat, lng, b.lat, b.lng);
-                if (d < minimo) { minimo = d; mejor = { barrio: b, km: d }; }
-            });
-            return mejor;
-        }
-
         function actualizarEstadoUbicacion() {
             var u = estado.ubicacion;
             if (!el.locationStatus || !u) return;
-            var cerca = barrioMasCercano(u.lat, u.lng, false);
+            var solicitud = ++estado.solicitudBarrio;
             var paradas = estado.items.filter(function (p) { return p.tipo === 'parada'; });
             var partes = [estado.gpsError ? 'GPS sin señal' :
                 (estado.seguimiento !== null ? 'GPS activo' : 'Última ubicación')];
-            if (cerca) partes.push(cerca.barrio.nombre);
             if (paradas.length) {
                 var mejor = null;
                 paradas.forEach(function (p) {
@@ -3228,7 +3297,16 @@
                 });
                 partes.push('Parada cercana: ' + mejor.p.nombre + ' · ' + formatearDistancia(mejor.m));
             }
-            el.locationStatus.textContent = partes.join(' · ');
+            barrioCatastralEnCoordenadas(u.lat, u.lng).then(function (nombre) {
+                if (estado.ubicacion !== u || estado.solicitudBarrio !== solicitud) return;
+                partes.push(nombre || 'Barrio no identificado');
+                el.locationStatus.textContent = partes.join(' · ');
+            }).catch(function (error) {
+                if (estado.ubicacion !== u || estado.solicitudBarrio !== solicitud) return;
+                console.error('No se pudo determinar el barrio desde la cartografía catastral.', error);
+                partes.push('Barrio no disponible');
+                el.locationStatus.textContent = partes.join(' · ');
+            });
         }
 
         function alRecibirUbicacion(posicion) {
@@ -3258,10 +3336,12 @@
                 }
             }
 
+            var debeSugerirOrigen = estado.origenGpsPendiente || (primera && !estado.origen);
+            estado.origenGpsPendiente = false;
             if (primera) {
-                if (!estado.origen) sugerirOrigen(lat, lng);
                 mapa.setView([lat, lng], Math.max(mapa.getZoom(), 15));
             }
+            if (debeSugerirOrigen) sugerirOrigen(lat, lng, estado.ubicacion);
             actualizarEstadoUbicacion();
             enviarUbicacionCompartida();
             evaluarCoincidenciaDeRuta();
@@ -3269,18 +3349,29 @@
             actualizarPanelSeguimiento();
         }
 
-        /** Propone el barrio con servicio más cercano, o el barrio registrado más cercano si no hay rutas. */
-        function sugerirOrigen(lat, lng) {
-            var general = barrioMasCercano(lat, lng, false);
-            var servido = barrioMasCercano(lat, lng, true);
-            var sugerido = servido || general;
-            if (!sugerido) return;
-            el.origen.value = mayuscula(nombreVisible(sugerido.barrio.nombreN));
-            alCambiarOrigen();
-            if (servido && general && general.barrio.nombreN !== servido.barrio.nombreN) {
-                M.mostrarAviso('No hay rutas verificadas en ' + general.barrio.nombre + '. Se eligió ' + servido.barrio.nombre +
-                    ', el barrio con servicio más cercano (a ' + servido.km.toFixed(1) + ' km).', 'warn', 8000);
-            }
+        function sugerirOrigen(lat, lng, ubicacion) {
+            barrioCatastralEnCoordenadas(lat, lng).then(function (nombre) {
+                if (estado.ubicacion !== ubicacion) return;
+                if (!nombre) {
+                    M.mostrarAviso('La ubicación GPS no coincide con un barrio de la cartografía catastral. Se conserva el origen actual.', 'warn', 8000);
+                    return;
+                }
+                var nombreN = normalizar(nombre);
+                var nombreDisponible = mapaBarriosDisponibles().get(nombreN);
+                if (!nombreDisponible) {
+                    M.mostrarAviso('Se detectó ' + nombre + ', pero no se pudo habilitar como barrio de origen.', 'error', 8000);
+                    return;
+                }
+                el.origen.value = nombreDisponible;
+                alCambiarOrigen();
+                if (estado.servidos.size && !estado.servidos.has(nombreN)) {
+                    M.mostrarAviso('Barrio detectado: ' + nombreDisponible + '. No hay rutas verificadas desde este barrio; no se sustituyó por otro.', 'warn', 8000);
+                }
+            }).catch(function (error) {
+                if (estado.ubicacion !== ubicacion) return;
+                console.error('No se pudo consultar la cartografía catastral para detectar el barrio de origen.', error);
+                M.mostrarAviso('No se pudo consultar la cartografía catastral. Se conserva el origen actual.', 'error', 8000);
+            });
         }
 
         function fijarBotonSeguimiento(activo) {
@@ -3294,6 +3385,7 @@
             if (estado.seguimiento !== null) {
                 navigator.geolocation.clearWatch(estado.seguimiento);
                 estado.seguimiento = null;
+                estado.origenGpsPendiente = false;
                 fijarBotonSeguimiento(false);
                 estado.gpsError = '';
                 el.locationStatus.textContent = estado.ubicacion
@@ -3303,11 +3395,13 @@
                 actualizarPanelSeguimiento();
                 return;
             }
+            estado.origenGpsPendiente = !estado.activo;
             iniciarSeguimiento();
         }
 
         function iniciarSeguimiento() {
             if (!navigator.geolocation) {
+                estado.origenGpsPendiente = false;
                 el.locationStatus.textContent = 'Este navegador no permite acceder a la ubicación.';
                 estado.gpsError = 'Este navegador no permite acceder a la ubicación.';
                 expandirPanelSeguimiento(true);
@@ -3325,6 +3419,7 @@
                 };
                 el.locationStatus.textContent = mensajes[error.code] || 'No se pudo obtener la ubicación.';
                 estado.gpsError = el.locationStatus.textContent;
+                estado.origenGpsPendiente = false;
                 if (estado.seguimiento !== null) navigator.geolocation.clearWatch(estado.seguimiento);
                 estado.seguimiento = null;
                 fijarBotonSeguimiento(false);

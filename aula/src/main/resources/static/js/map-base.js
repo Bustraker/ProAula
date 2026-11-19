@@ -27,6 +27,7 @@
     ];
     var CACHE_RUTAS_MAX = 40;
     var cacheRutas = new Map();
+    var cartografiaBarriosPromise = null;
     var ESTILOS_MAPA = [
         { id: 'Calles', etiqueta: 'Calles', icono: 'fa-road', muestra: '#c7d8df' },
         { id: 'Oscuro', etiqueta: 'Oscuro', icono: 'fa-moon', muestra: '#14252b' },
@@ -75,6 +76,24 @@
         var respuesta = await fetchConTimeout(url, ms || 15000);
         if (!respuesta.ok) throw new Error('HTTP ' + respuesta.status);
         return respuesta.json();
+    }
+
+    function obtenerCartografiaBarrios() {
+        if (!cartografiaBarriosPromise) {
+            cartografiaBarriosPromise = fetchJSON(
+                urlAplicacion('/data/cartografia/barrios-cartografia.geojson'),
+                30000
+            ).then(function (datos) {
+                if (!datos || datos.type !== 'FeatureCollection' || !Array.isArray(datos.features)) {
+                    throw new Error('El archivo cartográfico de barrios no contiene una colección GeoJSON válida.');
+                }
+                return datos;
+            }).catch(function (error) {
+                cartografiaBarriosPromise = null;
+                throw error;
+            });
+        }
+        return cartografiaBarriosPromise;
     }
 
     /* ===================== MAPAS BASE ===================== */
@@ -143,7 +162,10 @@
             var config = capas.find(function (item) { return item.capa === evento.layer; });
             if (!config || config.cargada || config.cargando) return;
 
-            config.cargando = fetchJSON(urlAplicacion(config.ruta), 30000)
+            var datosCartograficos = config.tipo === 'Barrio'
+                ? obtenerCartografiaBarrios()
+                : fetchJSON(urlAplicacion(config.ruta), 30000);
+            config.cargando = datosCartograficos
                 .then(function (datos) {
                     if (!datos || datos.type !== 'FeatureCollection' || !Array.isArray(datos.features)) {
                         throw new Error('El archivo cartográfico no contiene una colección GeoJSON válida.');
@@ -885,6 +907,7 @@
         escapeHtml: escapeHtml,
         url: urlAplicacion,
         fetchJSON: fetchJSON,
+        obtenerCartografiaBarrios: obtenerCartografiaBarrios,
         crearMapa: crearMapa,
         ajustarVista: ajustarVista,
         crearPin: crearPin,
