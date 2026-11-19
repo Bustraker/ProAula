@@ -2820,7 +2820,6 @@
 .landing-page .ctg-v2-bus {
     transform-box: view-box;
     transform-origin: center;
-    animation: ctg-v2-bus-drive 14s linear infinite;
     filter: drop-shadow(0 5px 4px rgba(7, 20, 28, 0.28));
 }
 
@@ -2962,12 +2961,6 @@
 
 @keyframes ctg-v2-palm-sway {
     to { transform: rotate(1.5deg); }
-}
-
-@keyframes ctg-v2-bus-drive {
-    0% { opacity: 0; transform: translateX(-165px); }
-    12%, 88% { opacity: 1; }
-    100% { opacity: 0; transform: translateX(165px); }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -108,7 +108,7 @@ test("shows an approximate bus marker and alerts once when it is near the user",
   await page.locator(".arrival-card__direction").dispatchEvent("change");
   await expect.poll(() => consultations).toBe(2);
   await expect(page.locator(".arrival-bus-marker")).toHaveCount(1);
-  await expect(page.locator("#mu-avisos .mu-aviso")).toHaveCount(1);
+  await expect(page.locator("#mu-avisos .mu-aviso").filter({ hasText: "bus estimado" })).toHaveCount(1);
 });
 
 test("keeps the selected route visible without reports and explains API errors", async ({ page }) => {

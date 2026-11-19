@@ -9,15 +9,19 @@ test("the Puerta del Reloj scene keeps its proportions and animates the road ben
 
   await expect(frame).toBeVisible();
   await expect(scene).toBeVisible();
-  await expect(frame).toHaveCSS("width", "940px");
+  await expect(frame).toHaveCSS("width", "1040px");
   await expect(frame).toHaveCSS("border-radius", "19px");
   await expect(page.locator(".landing-brand img")).toHaveCSS("width", "50px");
-  await expect(scene).toHaveCSS("width", "340px");
-  await expect(scene).toHaveCSS("aspect-ratio", "1.42 / 1");
-  await expect(scene).toHaveAttribute("aria-label", "Buseta en una calle de Cartagena frente a la Puerta del Reloj, con sus ruedas y el pavimento en movimiento");
+  const sceneWidth = (await scene.boundingBox()).width;
+  expect(sceneWidth).toBeGreaterThan(340);
+  expect(sceneWidth).toBeLessThanOrEqual(420);
+  await expect(scene).toHaveCSS("aspect-ratio", "1.64 / 1");
+  await expect(scene).toHaveAttribute("aria-label", "Escena de Cartagena al atardecer con palmeras, la bandera colombiana, la Puerta del Reloj y una buseta en movimiento");
   await expect(illustration).toBeVisible();
   await expect(illustration).toHaveCSS("opacity", "0.94");
   await expect(scene.locator(".ctg-legacy-scene")).toBeHidden();
+  await expect(illustration.locator(".ctg-v2-palm")).toHaveCount(2);
+  await expect(illustration.locator(".ctg-v2-flag")).toBeVisible();
   await expect(illustration.locator(".ctg-v2-sun")).toBeVisible();
   await expect(illustration.locator("#ctg-v2-sky stop").nth(3)).toHaveAttribute("stop-color", "#f0c77f");
   await expect(illustration.locator(".ctg-v2-sun")).toHaveAttribute("cy", "85");

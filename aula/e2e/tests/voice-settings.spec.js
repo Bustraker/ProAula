@@ -172,7 +172,11 @@ test("authenticated voice preferences prioritize Colombian speech and persist", 
 
   await map.click({ position });
   await expect(page.locator(".mu-popup--click")).toBeVisible();
-  await expect.poll(() => page.evaluate(() =>
-    window.__spokenUtterances.some(utterance => utterance.text.includes("Punto seleccionado en el mapa"))
+  await expect.poll(() => page.evaluate(start =>
+    window.__spokenUtterances.slice(start).some(utterance =>
+      utterance.text.includes("Punto seleccionado dentro del barrio")
+        || utterance.text.includes("El punto seleccionado no coincide con un barrio catastral")
+    ),
+  spokenBeforeMapSelection
   )).toBe(true);
 });
