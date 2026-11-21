@@ -111,17 +111,39 @@ test("selected routes warn about active incidents in public and private trip pla
     })
   }));
 
-  async function verifySelectedRouteWarning(url) {
+  async function verifySelectedRouteWarning(url, isPrivate) {
     const routeData = page.waitForResponse(
       response => response.url().includes("/api/rutas-con-coordenadas") && response.status() === 200
     );
     await page.goto(url);
     await routeData;
+    await expect(page.locator("body")).toHaveClass(isPrivate ? /user-travel-page/ : /public-travel-page/);
+    await expect(page.locator(".travel-disclosure--weather")).toBeVisible();
+    await expect(page.locator("#weatherStatus")).toBeHidden();
+    await page.locator(".travel-disclosure--weather > summary").click();
+    await expect(page.locator("#weatherStatus")).toBeVisible();
+    await page.locator(".travel-disclosure--weather > summary").click();
+    await expect(page.locator("#weatherStatus")).toBeHidden();
+    await expect(page.locator(".travel-disclosure--neighborhoods")).toBeVisible();
+    await expect(page.locator("#inputExplorarBarrio")).toBeHidden();
+    await page.locator(".travel-disclosure--neighborhoods > summary").click();
+    await expect(page.locator("#inputExplorarBarrio")).toBeVisible();
+    await page.locator(".travel-disclosure--neighborhoods > summary").click();
+    await expect(page.locator("#inputExplorarBarrio")).toBeHidden();
     await page.locator("#origen").fill("El Campestre");
     await expect(page.locator("#destino")).toBeEnabled();
     await page.locator("#destino").fill("El Socorro");
     await page.locator("#btnPlanificar").click();
     await expect(page.locator("#rutaDetalle")).toBeVisible();
+    await expect(page.locator("#rutaDetalle")).toHaveJSProperty("open", false);
+    await expect(page.locator(".tramo__riesgo")).toBeVisible();
+    await page.locator("#detalleResumen").click();
+    await expect(page.locator("#rutaDetalle")).toHaveJSProperty("open", true);
+    await expect(page.locator(".resultados__metodologia")).toHaveJSProperty("open", false);
+    await page.locator(".resultados__metodologia > summary").click();
+    await expect(page.locator(".resultados__riesgo-nota"))
+      .toContainText("El tiempo no incluye espera ni tráfico.");
+    await page.locator(".resultados__metodologia > summary").click();
     await expect(page.locator(".incidentes-ruta")).toContainText("Accidente reportado");
     await expect(page.locator(".incidentes-ruta")).toContainText("podrían ocasionar demoras");
     await expect(page.locator(".incidentes-ruta")).toContainText("En atención");
@@ -137,7 +159,7 @@ test("selected routes warn about active incidents in public and private trip pla
     await expect(page.locator(".incidentes-ruta")).toHaveCount(1);
   }
 
-  await verifySelectedRouteWarning("/viajar_public");
+  await verifySelectedRouteWarning("/viajar_public", false);
 
   const username = `incidentroutes${Date.now().toString(36)}`;
   const password = "safe-password-26";
@@ -157,7 +179,7 @@ test("selected routes warn about active incidents in public and private trip pla
   await page.locator("#loginForm button[type=submit]").click();
   await expect(page).toHaveURL(/\/dashboard$/);
 
-  await verifySelectedRouteWarning("/viajar");
+  await verifySelectedRouteWarning("/viajar", true);
 });
 
 async function expectMapTiles(page) {
@@ -367,28 +389,29 @@ test("public navigation loads route data and supports trip planning inputs", asy
   await expect(page.locator("#origen")).toHaveValue(destino);
   await expect(page.locator("#destino")).toHaveValue(origen);
 
+  await expect(page.locator("#btnSeguirUbicacion")).toBeEnabled();
+  await expect(page.locator("#btnSeguirUbicacion")).toHaveAttribute("aria-pressed", "false");
+  await page.locator("#btnSeguirUbicacion").focus();
+  await page.locator("#btnSeguirUbicacion").press("Enter");
+  await expect(page.locator("#btnSeguirUbicacion")).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator("#locationStatus")).toContainText("GPS activo");
+  await page.locator("#btnSeguirUbicacion").press("Enter");
+  await expect(page.locator("#btnSeguirUbicacion")).toHaveAttribute("aria-pressed", "false");
+  await expect(page.locator("#locationStatus")).toContainText("Última ubicación");
+
   await page.locator("#btnPanel").click();
   await expect(page.locator("#btnPanel")).toHaveAttribute("aria-expanded", "false");
   await page.locator("#btnPanel").click();
   await expect(page.locator("#btnPanel")).toHaveAttribute("aria-expanded", "true");
 
-  await expect(page.locator("#btnSeguirUbicacion")).toBeEnabled();
-  await expect(page.locator("#btnSeguirUbicacion")).toHaveAttribute("aria-pressed", "false");
-  await page.locator("#btnSeguirUbicacion").click();
-  await expect(page.locator("#btnSeguirUbicacion")).toHaveAttribute("aria-pressed", "true");
-  await expect(page.locator("#locationStatus")).toContainText("GPS activo");
-  await page.locator("#btnSeguirUbicacion").click();
-  await expect(page.locator("#btnSeguirUbicacion")).toHaveAttribute("aria-pressed", "false");
-  await expect(page.locator("#locationStatus")).toContainText("Última ubicación");
-
   await page.locator("#btnLimpiar").click();
   await expect(page.locator("#origen")).toHaveValue("");
   await expect(page.locator("#destino")).toBeDisabled();
   await expect(page.locator("#listaDestino option")).toHaveCount(0);
-  await page.getByText("Opciones del mapa").click();
-  await page.locator("label.interruptor").click();
+  await page.locator("details.avanzado summary").click();
+  await page.locator("#mostrarParadas").uncheck();
   await expect(page.locator("#mostrarParadas")).not.toBeChecked();
-  await page.locator("label.interruptor").click();
+  await page.locator("#mostrarParadas").check();
   await expect(page.locator("#mostrarParadas")).toBeChecked();
 });
 
@@ -410,6 +433,13 @@ test("a trip draws its route and clearly labels approximate neighborhood coordin
   await page.route("**/api/rutas-con-coordenadas", routeRequest => routeRequest.fulfill({
     contentType: "application/json",
     body: JSON.stringify([route])
+  }));
+  await page.route("**/api/barrios/todos", routeRequest => routeRequest.fulfill({
+    contentType: "application/json",
+    body: JSON.stringify([
+      { nombre: "El Rodeo", latitud: 10.39, longitud: -75.56, coordenadaEstimada: true },
+      { nombre: "Centro", latitud: 10.4236, longitud: -75.5478, coordenadaEstimada: false }
+    ])
   }));
   await page.route("https://router.project-osrm.org/**", routeRequest => routeRequest.fulfill({
     contentType: "application/json",
@@ -517,6 +547,8 @@ test("a transfer itinerary lists every registered stop in route order without in
   await page.locator("#destino").fill("Barrio Destino");
   await page.locator("#btnPlanificar").click();
   await expect(page.locator("#rutaDetalle")).toBeVisible();
+  await page.locator("#detalleResumen").click();
+  await expect(page.locator("#rutaDetalle")).toHaveAttribute("open", "");
   await page.locator("#tabInfo").click();
 
   const panel = page.locator("#panelInfo");
@@ -771,13 +803,13 @@ test("GPS uses cadastral neighborhood boundaries when detecting the trip origin"
     contentType: "application/json",
     body: JSON.stringify([])
   }));
-  await page.goto("/viajar_public?o=nuevo+bosque");
-  await expect(page.locator("#origen")).toHaveValue("nuevo bosque");
-
   const cartographyResponse = page.waitForResponse(response =>
     response.url().includes("/data/cartografia/barrios-cartografia.geojson")
       && response.status() === 200
   );
+  await page.goto("/viajar_public?o=nuevo+bosque");
+  await expect(page.locator("#origen")).toHaveValue("NUEVO BOSQUE");
+
   await page.locator("#btnSeguirUbicacion").click();
   await cartographyResponse;
 
@@ -786,6 +818,88 @@ test("GPS uses cadastral neighborhood boundaries when detecting the trip origin"
   expect(await page.locator("#listaOrigen option").evaluateAll(options =>
     options.some(option => option.value === "ZARAGOCILLA")
   )).toBe(true);
+});
+
+test("GPS does not infer a neighborhood from the nearest center outside cadastral polygons", async ({ page }) => {
+  await page.addInitScript(() => {
+    const position = {
+      coords: { latitude: 10.383, longitude: -75.51325, accuracy: 5 },
+      timestamp: Date.now()
+    };
+    Object.defineProperty(navigator, "geolocation", {
+      configurable: true,
+      value: {
+        watchPosition(success) {
+          window.setTimeout(() => success(position), 0);
+          return 1;
+        },
+        clearWatch() {}
+      }
+    });
+  });
+  await page.route("**/api/barrios/todos", routeRequest => routeRequest.fulfill({
+    contentType: "application/json",
+    body: JSON.stringify([
+      { nombre: "NUEVO BOSQUE", latitud: 10.391351, longitud: -75.507797 }
+    ])
+  }));
+  await page.route("**/api/rutas-con-coordenadas", routeRequest => routeRequest.fulfill({
+    contentType: "application/json",
+    body: JSON.stringify([])
+  }));
+  const cartographyResponse = page.waitForResponse(response =>
+    response.url().includes("/data/cartografia/barrios-cartografia.geojson")
+      && response.status() === 200
+  );
+  await page.goto("/viajar_public?o=ZARAGOCILLA");
+  await expect(page.locator("#origen")).toHaveValue("ZARAGOCILLA");
+
+  await page.locator("#btnSeguirUbicacion").click();
+  await cartographyResponse;
+
+  await expect(page.locator("#locationStatus")).toContainText("Barrio no confirmado");
+  await expect(page.locator("#origen")).toHaveValue("ZARAGOCILLA");
+});
+
+test("GPS does not confirm a neighborhood when its accuracy overlaps a cadastral boundary", async ({ page }) => {
+  await page.addInitScript(() => {
+    const position = {
+      coords: { latitude: 10.4001, longitude: -75.5, accuracy: 50 },
+      timestamp: Date.now()
+    };
+    Object.defineProperty(navigator, "geolocation", {
+      configurable: true,
+      value: {
+        watchPosition(success) {
+          window.setTimeout(() => success(position), 0);
+          return 1;
+        },
+        clearWatch() {}
+      }
+    });
+  });
+  await page.route("**/api/barrios/todos", routeRequest => routeRequest.fulfill({
+    contentType: "application/json",
+    body: JSON.stringify([
+      { nombre: "NUEVO BOSQUE", latitud: 10.391351, longitud: -75.507797 }
+    ])
+  }));
+  await page.route("**/api/rutas-con-coordenadas", routeRequest => routeRequest.fulfill({
+    contentType: "application/json",
+    body: JSON.stringify([])
+  }));
+  const cartographyResponse = page.waitForResponse(response =>
+    response.url().includes("/data/cartografia/barrios-cartografia.geojson")
+      && response.status() === 200
+  );
+  await page.goto("/viajar_public?o=nuevo+bosque");
+  await expect(page.locator("#origen")).toHaveValue("NUEVO BOSQUE");
+
+  await page.locator("#btnSeguirUbicacion").click();
+  await cartographyResponse;
+
+  await expect(page.locator("#locationStatus")).toContainText("Barrio no confirmado");
+  await expect(page.locator("#origen")).toHaveValue("NUEVO BOSQUE");
 });
 
 test("public home keeps bus consultation private", async ({ page }) => {

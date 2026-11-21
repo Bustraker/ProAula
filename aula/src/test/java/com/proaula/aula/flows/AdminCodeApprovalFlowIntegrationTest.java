@@ -161,6 +161,34 @@ class AdminCodeApprovalFlowIntegrationTest {
     }
 
     @Test
+    void replacingAnApprovedCodeInvalidatesAnAlreadyVerifiedSession() throws Exception {
+        AdminCodeRequest request = new AdminCodeRequest();
+        request.setNombres("Candidata");
+        request.setApellidos("Nueva");
+        request.setEmail("replacement-candidate@example.test");
+        request.setStatus(AdminCodeRequest.Status.APPROVED);
+        request = requestRepository.saveAndFlush(request);
+
+        String originalCode = adminCodeService.issueAdminAccessCode(
+            request.getEmail(), request.getId());
+        MvcResult verification = mockMvc.perform(post("/admin/verificar-codigo")
+                .with(csrf())
+                .param("codigoAdmin", originalCode))
+            .andExpect(status().is3xxRedirection())
+            .andReturn();
+        org.springframework.mock.web.MockHttpSession session =
+            (org.springframework.mock.web.MockHttpSession) verification.getRequest().getSession(false);
+
+        adminCodeService.replaceAdminAccessCode(request.getEmail(), request.getId());
+
+        mockMvc.perform(get("/admin-login").session(session))
+            .andExpect(status().isOk())
+            .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.model()
+                .attribute("verified", false));
+        assertThat(adminCodeService.isValidAdminCode(originalCode)).isFalse();
+    }
+
+    @Test
     void legacyPublicAdminRequestPageIsNoLongerAvailable() throws Exception {
         MvcResult health = mockMvc.perform(get("/actuator/health"))
             .andExpect(jsonPath("$.status").exists())
@@ -362,6 +390,49 @@ class AdminCodeApprovalFlowIntegrationTest {
                 .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user("ordinary-user")
                     .roles("USER")))
             .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void configuredApproverCanRenderTheRequestInboxWithStatusSummary() throws Exception {
+        Usuario approver = new Usuario();
+        approver.setUsername("configured-approver");
+        approver.setEmail("approver@example.test");
+        approver.setPassword(passwordEncoder.encode("approver-password-26"));
+        approver.setNombres("Responsable");
+        approver.setApellidos("Aprobador");
+        approver.setRole("ROLE_ADMIN");
+        usuarioRepository.saveAndFlush(approver);
+        LegalConsentTestSupport.recordConsent(approver, legalConsentService);
+
+        for (AdminCodeRequest.Status requestStatus : AdminCodeRequest.Status.values()) {
+            AdminCodeRequest request = new AdminCodeRequest();
+            request.setNombres("Candidata");
+            request.setApellidos(requestStatus.name());
+            request.setEmail(requestStatus.name().toLowerCase() + "@example.test");
+            request.setMotivo("Necesita administrar rutas y revisar la operación diaria.");
+            request.setCreatedBy("existing-admin");
+            request.setCreatedByName("Administrador existente");
+            request.setStatus(requestStatus);
+            requestRepository.save(request);
+        }
+
+        mockMvc.perform(get("/admin/solicitudes-codigo")
+                .with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors
+                    .user("configured-approver").roles("ADMIN"))
+                .sessionAttr("rolUsuario", "ADMIN"))
+            .andExpect(status().isOk())
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("Solicitudes administrativas")))
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("Pendientes")))
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("Aprobadas")))
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("Registradas")))
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("Rechazadas")))
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("admin-sidebar__subnav")))
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("Solicitudes ADMIN")))
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("Centro de incidentes")))
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("bustraker-logo-full.png")))
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("admin-navigation.css")))
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("admin_solicitudes.css")))
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("admin-brand.css")));
     }
 
     @Test

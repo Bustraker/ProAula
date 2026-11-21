@@ -113,12 +113,19 @@ public class AdminCodeRequestController {
     @GetMapping("/admin/solicitudes-codigo")
     public String adminRequests(Model model, Principal principal) {
         requireApprover(principal);
+        model.addAttribute("isAdminApprover", true);
         List<AdminCodeRequest> requests = requestService.findAll();
         model.addAttribute("requests", requests);
-        model.addAttribute("pendingCount", requests.stream()
-            .filter(request -> request.getStatus() == AdminCodeRequest.Status.PENDING).count());
+        model.addAttribute("pendingCount", countStatus(requests, AdminCodeRequest.Status.PENDING));
+        model.addAttribute("approvedCount", countStatus(requests, AdminCodeRequest.Status.APPROVED));
+        model.addAttribute("registeredCount", countStatus(requests, AdminCodeRequest.Status.REGISTERED));
+        model.addAttribute("rejectedCount", countStatus(requests, AdminCodeRequest.Status.REJECTED));
         model.addAttribute("pushConfigured", pushNotificationService.isPushConfigured());
         return "Admin/solicitudes_codigo";
+    }
+
+    private long countStatus(List<AdminCodeRequest> requests, AdminCodeRequest.Status status) {
+        return requests.stream().filter(request -> request.getStatus() == status).count();
     }
 
     @PostMapping("/admin/solicitudes-codigo/{id}/aprobar")

@@ -174,7 +174,7 @@ class PublicContactAndRouteFlowIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("Ruta Integracion Publica")))
                 .andReturn().getResponse().getContentAsString();
-        assertThat(rutasHtml).contains("CAMPETRE-CENTRO · IDA").doesNotContain("Ruta inactiva");
+        assertThat(rutasHtml).contains("CAMPESTRE-CENTRO · IDA").doesNotContain("Ruta inactiva");
 
         mockMvc.perform(get("/ruta/{id}", guardada.getId()))
                 .andExpect(status().isOk())
@@ -203,7 +203,7 @@ class PublicContactAndRouteFlowIntegrationTest {
 
         mockMvc.perform(get("/api/rutas"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("CAMPETRE-CENTRO · IDA")));
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("CAMPESTRE-CENTRO · IDA")));
 
         Ruta tpcIda = rutaRepository.findByCodigo("TPC-CAM-CEN-IDA").orElseThrow();
         String tpcDetail = mockMvc.perform(get("/ruta/{id}", tpcIda.getId()))

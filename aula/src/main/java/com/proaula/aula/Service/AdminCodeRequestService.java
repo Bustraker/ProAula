@@ -81,8 +81,7 @@ public class AdminCodeRequestService {
         request.setCreatedBy(requester.getUsername());
         request.setCreatedByName(requester.getNombres().trim() + " " + requester.getApellidos().trim());
         request = requestRepository.saveAndFlush(request);
-        sendMail(approverEmail, "Nueva solicitud de acceso ADMIN",
-            "Nueva solicitud de acceso ADMIN\n\n"
+        String plainNotification = "Nueva solicitud de acceso ADMIN\n\n"
                 + "Persona recomendada: " + normalizedNombres + " " + normalizedApellidos + "\n"
                 + "Correo del candidato: " + normalizedEmail + "\n"
                 + "Persona que recomienda: " + request.getCreatedByName()
@@ -90,7 +89,22 @@ public class AdminCodeRequestService {
                 + "Motivo de acceso: " + normalizedMotivo + "\n\n"
                 + "Revisa la información y elige Aprobar o Rechazar desde los controles protegidos del panel:\n"
                 + publicBaseUrl + "/admin/solicitudes-codigo#solicitud-" + request.getId() + "\n\n"
-                + "Solicitud #" + request.getId() + ". Abrir el enlace no aprueba la solicitud.");
+                + "Solicitud #" + request.getId() + ". Abrir el enlace no aprueba la solicitud.";
+        String notificationHtml = buildEmailHtml(
+            "Nueva solicitud administrativa",
+            "Se recibió una recomendación que requiere revisión.",
+            "Persona recomendada",
+            escapeHtml(normalizedNombres + " " + normalizedApellidos),
+            "Correo del candidato",
+            escapeHtml(normalizedEmail),
+            "Recomendada por",
+            escapeHtml(request.getCreatedByName() + " (@"+ requester.getUsername() + ")"),
+            "Motivo de acceso",
+            escapeHtml(normalizedMotivo),
+            publicBaseUrl + "/admin/solicitudes-codigo#solicitud-" + request.getId(),
+            "Revisar solicitud",
+            "Aprobar o Rechazar: esta acción solo puede realizarla el responsable configurado.");
+        sendHtmlMail(approverEmail, "Nueva solicitud de acceso ADMIN", plainNotification, notificationHtml);
         return pushNotificationService.notifyPendingRequest(
             request.getId(), normalizedNombres, normalizedApellidos, normalizedEmail);
     }
@@ -139,13 +153,14 @@ public class AdminCodeRequestService {
         }
 
         validateMailConfiguration();
-        sendMail(request.getEmail(), "Tu código de acceso ADMIN de Bustraker",
-            "Hola " + request.getNombres() + " " + request.getApellidos() + ".\n\n"
+        String plainCodeEmail = "Hola " + request.getNombres() + " " + request.getApellidos() + ".\n\n"
                 + "Tu solicitud fue aprobada. Este es tu código personal de acceso administrativo:\n\n"
                 + codigoAdmin.trim() + "\n\n"
                 + "Abre " + publicBaseUrl + "/admin-login, ingresa el código y "
                 + "confirma tus credenciales. El código también se utilizará para tus futuros accesos ADMIN.\n"
-                + "No lo compartas. Si no esperabas este mensaje, contacta al administrador.");
+                + "No lo compartas. Si no esperabas este mensaje, contacta al administrador.";
+        String codeHtml = buildCodeEmailHtml(request, codigoAdmin.trim());
+        sendHtmlMail(request.getEmail(), "Tu código de acceso ADMIN de Bustraker", plainCodeEmail, codeHtml);
         request.setCodeEmailSentAt(LocalDateTime.now());
         request.setCodeEmailSentBy(sentBy);
         requestRepository.save(request);
@@ -155,9 +170,24 @@ public class AdminCodeRequestService {
     public void reject(long requestId, String decidedBy) {
         AdminCodeRequest request = findPendingRequest(requestId);
         validateMailConfiguration();
-        sendMail(request.getEmail(), "Actualización de solicitud ADMIN de Bustraker",
-            "Hola " + request.getNombres() + " " + request.getApellidos() + ".\n\n"
-                + "Tu solicitud de acceso ADMIN no fue aprobada. No se generó ni se envió ningún código.");
+        String plainRejection = "Hola " + request.getNombres() + " " + request.getApellidos() + ".\n\n"
+                + "Tu solicitud de acceso ADMIN no fue aprobada. No se generó ni se envió ningún código.";
+        String rejectionHtml = buildEmailHtml(
+            "Actualización de tu solicitud",
+            "La solicitud de acceso administrativo no fue aprobada.",
+            "Estado",
+            "Solicitud rechazada",
+            "Resultado",
+            "No se generó ni se envió ningún código.",
+            "Recomendación",
+            escapeHtml(request.getNombres() + " " + request.getApellidos()),
+            "Correo",
+            escapeHtml(request.getEmail()),
+            publicBaseUrl,
+            "Volver a Bustraker",
+            "Si tienes dudas, contacta al responsable del sistema.");
+        sendHtmlMail(request.getEmail(), "Actualización de solicitud ADMIN de Bustraker",
+            plainRejection, rejectionHtml);
         request.setStatus(AdminCodeRequest.Status.REJECTED);
         request.setDecidedAt(LocalDateTime.now());
         request.setDecidedBy(decidedBy);
@@ -284,5 +314,72 @@ public class AdminCodeRequestService {
         } catch (MessagingException | MailException exception) {
             throw new IllegalStateException("No se pudo enviar el correo de la solicitud ADMIN.", exception);
         }
+    }
+
+    private void sendHtmlMail(String recipient, String subject, String text, String html) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, StandardCharsets.UTF_8.name());
+            helper.setFrom(senderEmail);
+            helper.setTo(recipient);
+            helper.setSubject(subject);
+            helper.setText(html, true);
+            mailSender.send(message);
+        } catch (MessagingException | MailException exception) {
+            throw new IllegalStateException("No se pudo enviar el correo de la solicitud ADMIN.", exception);
+        }
+    }
+
+    private String buildCodeEmailHtml(AdminCodeRequest request, String code) {
+        String safeName = escapeHtml(request.getNombres() + " " + request.getApellidos());
+        String safeCode = escapeHtml(code);
+        return buildEmailHtml(
+            "Solicitud aprobada",
+            "Tu acceso administrativo está listo para activarse.",
+            "Hola",
+            safeName,
+            "Estado",
+            "Aprobado",
+            "Código de acceso",
+            safeCode,
+            "Próximo paso",
+            "Verifica el código y crea tus credenciales.",
+            publicBaseUrl + "/admin-login",
+            "Activar acceso ADMIN",
+            "No compartas este código. Si no solicitaste el acceso, contacta al administrador.");
+    }
+
+    private String buildEmailHtml(String title, String intro, String label1, String value1,
+                                  String label2, String value2, String label3, String value3,
+                                  String label4, String value4, String actionUrl, String actionLabel,
+                                  String footerText) {
+        return "<!doctype html><html lang=\"es\"><body style=\"margin:0;background:#f4eff0;font-family:Segoe UI,Arial,sans-serif;color:#2e2326\">"
+            + "<div style=\"max-width:620px;margin:0 auto;padding:32px 16px\">"
+            + "<div style=\"overflow:hidden;border:1px solid #e8dcde;border-radius:18px;background:#fff;box-shadow:0 12px 35px rgba(54,29,34,.10)\">"
+            + "<div style=\"padding:22px 28px;background:#24191c;color:#fff\"><strong style=\"font-size:18px\">Bustraker</strong><span style=\"float:right;color:#d7c9cc;font-size:11px;letter-spacing:.08em\">ACCESO ADMINISTRATIVO</span></div>"
+            + "<div style=\"padding:34px 28px 28px\"><div style=\"display:inline-block;padding:6px 9px;border-radius:999px;background:#fff1f3;color:#963344;font-size:10px;font-weight:700;letter-spacing:.06em\">VERIFICACIÓN SEGURA</div>"
+            + "<h1 style=\"margin:16px 0 8px;font-size:28px;line-height:1.15\">" + escapeHtml(title) + "</h1>"
+            + "<p style=\"margin:0 0 24px;color:#786b6f;font-size:14px;line-height:1.6\">" + escapeHtml(intro) + "</p>"
+            + "<table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"border-collapse:collapse\">"
+            + emailRow(label1, value1) + emailRow(label2, value2) + emailRow(label3, value3) + emailRow(label4, value4)
+            + "</table><p style=\"margin:24px 0 0\"><a href=\"" + escapeHtml(actionUrl) + "\" style=\"display:inline-block;padding:13px 18px;border-radius:9px;background:#963344;color:#fff;text-decoration:none;font-size:13px;font-weight:700\">"
+            + escapeHtml(actionLabel) + "</a></p><p style=\"margin:20px 0 0;color:#918287;font-size:11px;line-height:1.55\">" + escapeHtml(footerText) + "</p>"
+            + "</div></div><p style=\"margin:16px 0;text-align:center;color:#9a8c90;font-size:10px\">Bustraker · Sistema de gestión de transporte</p></div></body></html>";
+    }
+
+    private String emailRow(String label, String value) {
+        return "<tr><td style=\"width:38%;padding:11px 12px;border-bottom:1px solid #eee6e7;color:#9a8c90;font-size:11px;font-weight:700\">"
+            + escapeHtml(label) + "</td><td style=\"padding:11px 12px;border-bottom:1px solid #eee6e7;color:#3f3437;font-size:12px;line-height:1.5\">"
+            + value + "</td></tr>";
+    }
+
+    private String escapeHtml(String value) {
+        if (value == null) {
+            return "";
+        }
+        return value.replace("&", "&amp;")
+            .replace("<", "&lt;")
+            .replace(">", "&gt;")
+            .replace("\"", "&quot;");
     }
 }

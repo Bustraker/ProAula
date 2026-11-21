@@ -8,34 +8,15 @@
     <title>Consulta de buses - Bustraker</title>
     <link rel="stylesheet" th:href="@{/css/style_consultas.css(v='bus-directory-20261119-21')}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="icon" th:href="@{/images/logo.png}" type="image/png">
+    <link rel="icon" th:href="@{/images/bustraker-logo-full.png(v='official-logo-20261120-1')}" type="image/png">
     <link rel="stylesheet" th:href="@{/css/accessibility.css}">
+    <link rel="stylesheet" th:href="@{/css/brand-logo.css(v='official-logo-20261120-3')}">
+    <link rel="stylesheet" th:href="@{/css/user-navigation.css(v='user-navigation-20261120-2')}">
 </head>
-<body class="bus-directory-page" th:classappend="${autenticado} ? ' bus-directory-page--authenticated' : ' bus-directory-page--public'">
+<body class="bus-directory-page" th:attr="data-accessibility-scope=${autenticado ? 'user' : 'public'}"
+      th:classappend="${autenticado} ? ' bus-directory-page--authenticated' : ' bus-directory-page--public'">
+    <th:block th:replace="~{Usuario/fragments/user-navigation :: header('consultations')}"></th:block>
     <header class="directory-header">
-        <div class="directory-topbar">
-            <a class="directory-brand" th:href="${autenticado} ? @{/dashboard} : @{/index_3_public}" aria-label="Bustraker, inicio">
-                <img th:src="@{/images/bustraker-logo-full.png}" alt="Bustraker, Cartagena se mueve contigo">
-            </a>
-            <nav class="directory-primary-nav" aria-label="Navegación principal">
-                <a th:if="${!autenticado}" th:href="@{/index_3_public}">Inicio</a>
-                <a th:if="${!autenticado}" th:href="@{/viajar_public}">Planear viaje</a>
-                <a th:if="${autenticado}" th:href="@{/dashboard}"><i class="fas fa-house" aria-hidden="true"></i> Panel</a>
-                <a th:if="${autenticado}" th:href="@{/rutas}"><i class="fas fa-route" aria-hidden="true"></i> Rutas</a>
-                <a th:if="${autenticado}" th:href="@{/historial}"><i class="fas fa-clock-rotate-left" aria-hidden="true"></i> Historial</a>
-                <a th:if="${autenticado}" th:href="@{/perfil}"><i class="fas fa-user" aria-hidden="true"></i> Perfil</a>
-                <a th:href="@{/consultas}" aria-current="page">Consulta de buses</a>
-            </nav>
-            <a class="directory-signin" th:if="${!autenticado}" th:href="@{/inicio-de-sesion-mejorado}">
-                <i class="fas fa-arrow-right-to-bracket" aria-hidden="true"></i>
-                <span>Iniciar sesión</span>
-            </a>
-            <a class="directory-signin" th:if="${autenticado}" th:href="@{/dashboard}">
-                <i class="fas fa-house" aria-hidden="true"></i>
-                <span>Mi cuenta</span>
-            </a>
-        </div>
-
         <section class="directory-hero" aria-labelledby="directoryTitle">
             <div class="directory-hero-copy">
                 <p class="directory-eyebrow"><span class="directory-signal" aria-hidden="true"></span>
@@ -287,7 +268,7 @@
     <footer class="directory-footer">
         <div class="directory-footer-inner">
             <a class="directory-footer-brand" th:href="${autenticado} ? @{/dashboard} : @{/index_3_public}">
-                <img th:src="@{/images/logo.png}" alt="Bustraker, volver al panel principal">
+                <img th:src="@{/images/bustraker-logo-full.png}" alt="Bustraker, volver al panel principal">
             </a>
             <span class="directory-footer-copy" th:text="${autenticado} ? 'Información de movilidad asociada a tu sesión.' : 'Información pública de rutas para una ciudad en movimiento.'">Información pública de rutas para una ciudad en movimiento.</span>
             <a class="directory-footer-home" th:href="${autenticado} ? @{/dashboard} : @{/index_3_public}" th:text="${autenticado} ? 'Panel' : 'Inicio'">Inicio</a>

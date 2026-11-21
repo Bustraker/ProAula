@@ -36,8 +36,8 @@ class RutaRestControllerTest {
         Ruta ruta = rutaVerificadaConBus();
         when(rutaService.getRutasVerificadas()).thenReturn(List.of(ruta));
         when(barrioService.obtenerCoordenadas(anyList())).thenReturn(Map.of());
-        when(barrioService.tieneCoordenadaShapefile("Centro")).thenReturn(true);
-        when(barrioService.tieneCoordenadaShapefile("Manga")).thenReturn(false);
+        when(barrioService.tieneCoordenadaCatastral("Centro")).thenReturn(true);
+        when(barrioService.tieneCoordenadaCatastral("Manga")).thenReturn(false);
 
         Map<String, Object> datosRuta = rutaRestController.obtenerRutasConCoordenadas(null)
             .getBody().get(0);

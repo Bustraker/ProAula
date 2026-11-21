@@ -1,0 +1,588 @@
+/**
+ * Bustraker - Metodología Visual: Topografía Cinética Unificada (Living Transit Architecture)
+ * Una sola animación continua coordina el mapa de Cartagena, los haces de fibra óptica,
+ * el cristal holográfico 3D con spotlight dinámico y las micro-interacciones del formulario.
+ */
+
+:root {
+    --kt-obsidian: #020611;
+    --kt-space-deep: #030a17;
+    --kt-cyan: #00f5d4;
+    --kt-cyan-glow: rgba(0, 245, 212, 0.45);
+    --kt-blue: #0ea5e9;
+    --kt-emerald: #10b981;
+    --kt-amber: #f59e0b;
+    --kt-glass-panel: rgba(8, 20, 38, 0.76);
+    --kt-glass-border: rgba(0, 245, 212, 0.22);
+    --spotlight-x: 50%;
+    --spotlight-y: 50%;
+}
+
+/* ===================== CANVAS Y ESTRUCTURA BASE ===================== */
+.kinetic-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+    pointer-events: auto;
+}
+
+body.auth-body {
+    background: var(--kt-obsidian) !important;
+    color: #f1f5f9 !important;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+    font-family: 'DM Sans', -apple-system, sans-serif;
+}
+
+/* Cabecera superior flotante con estética de consola orbital */
+.auth-body .main-header {
+    background: rgba(4, 11, 23, 0.8) !important;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(0, 245, 212, 0.15) !important;
+    position: relative;
+    z-index: 20;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.6) !important;
+}
+
+.auth-body .logo .brand {
+    color: #f8fafc !important;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    text-shadow: 0 0 20px rgba(0, 245, 212, 0.5);
+}
+
+.auth-body .nav-link {
+    color: #cbd5e1 !important;
+    background: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 999px;
+    padding: 0.6rem 1.1rem;
+    font-size: 0.88rem;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.auth-body .nav-link:hover {
+    color: #ffffff !important;
+    background: rgba(0, 245, 212, 0.12) !important;
+    border-color: rgba(0, 245, 212, 0.45) !important;
+    box-shadow: 0 0 16px rgba(0, 245, 212, 0.3);
+    transform: translateY(-2px);
+}
+
+.auth-body .nav-link--outline {
+    color: var(--kt-cyan) !important;
+    border-color: rgba(0, 245, 212, 0.35) !important;
+    background: rgba(0, 245, 212, 0.06) !important;
+}
+
+.auth-body .nav-link--outline:hover {
+    color: #020611 !important;
+    background: var(--kt-cyan) !important;
+    box-shadow: 0 0 24px rgba(0, 245, 212, 0.7);
+}
+
+/* Área principal */
+.auth-page {
+    background: transparent !important;
+    position: relative;
+    z-index: 5;
+    padding: clamp(1.8rem, 4vw, 3.8rem) 1.5rem !important;
+}
+
+/* ===================== CINTA DE METODOLOGÍA UNIFICADA ===================== */
+.kinetic-badge-banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin: 0 auto 26px auto;
+    width: fit-content;
+    padding: 7px 22px;
+    background: linear-gradient(135deg, rgba(8, 24, 46, 0.9), rgba(4, 14, 28, 0.95));
+    border: 1px solid rgba(0, 245, 212, 0.32);
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #cbd5e1;
+    letter-spacing: 0.4px;
+    backdrop-filter: blur(16px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5), 0 0 16px rgba(0, 245, 212, 0.15);
+    animation: kineticBannerFloat 6s ease-in-out infinite;
+}
+
+.kinetic-badge-banner__pulse {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--kt-cyan);
+    box-shadow: 0 0 12px var(--kt-cyan);
+    animation: kineticBeacon 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.kinetic-badge-banner strong {
+    color: var(--kt-cyan);
+    font-weight: 700;
+}
+
+@keyframes kineticBeacon {
+    0%, 100% { transform: scale(1); opacity: 1; filter: drop-shadow(0 0 4px var(--kt-cyan)); }
+    50% { transform: scale(1.6); opacity: 0.5; filter: drop-shadow(0 0 10px var(--kt-cyan)); }
+}
+
+@keyframes kineticBannerFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+}
+
+/* ===================== PANEL LATERAL (LIVING TELEMETRY) ===================== */
+.auth-story {
+    background: linear-gradient(160deg, rgba(10, 25, 46, 0.82), rgba(3, 10, 20, 0.92)) !important;
+    border: 1px solid rgba(0, 245, 212, 0.22) !important;
+    border-radius: 24px !important;
+    backdrop-filter: blur(32px) !important;
+    -webkit-backdrop-filter: blur(32px);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+    color: #e2e8f0 !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.auth-story::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 20% 20%, rgba(0, 245, 212, 0.08), transparent 60%);
+    pointer-events: none;
+}
+
+.auth-live {
+    background: rgba(0, 245, 212, 0.12) !important;
+    border: 1px solid rgba(0, 245, 212, 0.35) !important;
+    color: var(--kt-cyan) !important;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+}
+
+.auth-live span {
+    background: var(--kt-cyan) !important;
+    box-shadow: 0 0 10px var(--kt-cyan) !important;
+}
+
+.auth-story__headline {
+    color: #ffffff !important;
+    font-size: clamp(1.8rem, 3.2vw, 2.3rem) !important;
+    letter-spacing: -0.03em !important;
+}
+
+.auth-story__headline span {
+    color: var(--kt-cyan) !important;
+    text-shadow: 0 0 25px rgba(0, 245, 212, 0.45);
+}
+
+.auth-scene {
+    background: rgba(4, 12, 24, 0.88) !important;
+    border: 1px solid rgba(0, 245, 212, 0.2) !important;
+    border-radius: 18px !important;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.45) !important;
+}
+
+.access-credential-card, .profile-card {
+    background: rgba(9, 21, 38, 0.95) !important;
+    border: 1px solid rgba(0, 245, 212, 0.28) !important;
+    box-shadow: 0 14px 35px rgba(0, 0, 0, 0.5) !important;
+}
+
+.access-avatar, .profile-card__avatar {
+    background: linear-gradient(135deg, var(--kt-cyan), #0284c7) !important;
+    color: #020611 !important;
+    box-shadow: 0 0 18px rgba(0, 245, 212, 0.4) !important;
+}
+
+.access-security__status {
+    background: rgba(16, 185, 129, 0.16) !important;
+    border: 1px solid rgba(16, 185, 129, 0.4) !important;
+    color: #6ee7b7 !important;
+}
+
+/* ===================== TARJETA CENTRAL 3D TILT HOLOGRÁFICA ===================== */
+.card_animate-slideUp {
+    background: var(--kt-glass-panel) !important;
+    backdrop-filter: blur(36px) saturate(190%) !important;
+    -webkit-backdrop-filter: blur(36px) saturate(190%);
+    border: 1px solid var(--kt-glass-border) !important;
+    border-radius: 24px !important;
+    box-shadow:
+        0 30px 70px rgba(0, 0, 0, 0.65),
+        0 0 0 1px rgba(0, 245, 212, 0.15),
+        inset 0 1px 1px rgba(255, 255, 255, 0.12) !important;
+    position: relative;
+    overflow: hidden;
+    transform-style: preserve-3d;
+    transition: transform 0.15s ease-out, box-shadow 0.3s ease;
+}
+
+/* Spotlight de luz especular reactiva al puntero del mouse */
+.card_animate-slideUp::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+        600px circle at var(--spotlight-x, 50%) var(--spotlight-y, 50%),
+        rgba(0, 245, 212, 0.1),
+        transparent 70%
+    );
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Haz perimetral continuo en rotación matemática con el motor del mapa */
+.card_animate-slideUp::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 24px;
+    padding: 2px;
+    background: conic-gradient(
+        from var(--kinetic-deg, 0deg),
+        transparent 0deg,
+        rgba(0, 245, 212, 0.7) 60deg,
+        rgba(14, 165, 233, 0.7) 120deg,
+        transparent 180deg
+    );
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    opacity: 0.9;
+    z-index: 2;
+}
+
+.card-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    padding-bottom: 18px;
+    margin-bottom: 22px;
+    position: relative;
+    z-index: 3;
+}
+
+.auth-card-kicker {
+    color: var(--kt-cyan) !important;
+    font-size: 0.76rem !important;
+    letter-spacing: 0.14em !important;
+    font-weight: 700 !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.auth-card-kicker::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--kt-cyan);
+    box-shadow: 0 0 8px var(--kt-cyan);
+}
+
+.card-header h1 {
+    color: #ffffff !important;
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-size: clamp(1.7rem, 3.4vw, 2.2rem) !important;
+    margin: 6px 0 8px 0 !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.03em !important;
+    text-shadow: 0 2px 14px rgba(0, 0, 0, 0.5);
+}
+
+.auth-card-intro {
+    color: #94a3b8 !important;
+    font-size: 0.92rem !important;
+}
+
+/* ===================== CAMPOS Y FORMULARIOS ===================== */
+.card-body {
+    position: relative;
+    z-index: 3;
+}
+
+.form-label {
+    color: #cbd5e1 !important;
+    font-size: 0.84rem !important;
+    font-weight: 600 !important;
+    margin-bottom: 8px !important;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.form-label i {
+    color: var(--kt-cyan);
+    filter: drop-shadow(0 0 6px var(--kt-cyan));
+}
+
+.form-control {
+    background: rgba(10, 24, 42, 0.75) !important;
+    border: 1px solid rgba(148, 163, 184, 0.28) !important;
+    color: #ffffff !important;
+    border-radius: 14px !important;
+    padding: 0.78rem 1.1rem !important;
+    font-size: 0.94rem !important;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.form-control::placeholder {
+    color: #64748b !important;
+}
+
+.form-control:focus {
+    background: rgba(14, 34, 58, 0.95) !important;
+    border-color: var(--kt-cyan) !important;
+    box-shadow: 0 0 0 3px rgba(0, 245, 212, 0.25), 0 0 20px rgba(0, 245, 212, 0.35) !important;
+    color: #ffffff !important;
+    outline: none !important;
+}
+
+.auth-password-control {
+    position: relative;
+}
+
+.auth-password-toggle {
+    color: #94a3b8 !important;
+    background: transparent !important;
+    border: 0 !important;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.auth-password-toggle:hover {
+    color: var(--kt-cyan) !important;
+    transform: scale(1.1);
+}
+
+/* Checkbox */
+.form-check-input {
+    background-color: rgba(10, 24, 42, 0.85) !important;
+    border: 1px solid rgba(148, 163, 184, 0.35) !important;
+    border-radius: 6px !important;
+    accent-color: var(--kt-cyan) !important;
+    cursor: pointer;
+}
+
+.form-check-input:checked {
+    background-color: var(--kt-cyan) !important;
+    border-color: var(--kt-cyan) !important;
+    box-shadow: 0 0 10px rgba(0, 245, 212, 0.5);
+}
+
+.form-check-label {
+    color: #94a3b8 !important;
+    font-size: 0.85rem !important;
+    cursor: pointer;
+}
+
+.form-check-label a {
+    color: var(--kt-cyan) !important;
+    text-decoration: underline;
+    font-weight: 600;
+}
+
+/* ===================== BOTÓN HIPER-ACCELERATION ===================== */
+.btn-primary {
+    background: linear-gradient(135deg, #00f5d4 0%, #0284c7 100%) !important;
+    border: none !important;
+    color: #020611 !important;
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-weight: 800 !important;
+    font-size: 1rem !important;
+    letter-spacing: 0.03em !important;
+    border-radius: 14px !important;
+    padding: 0.95rem 1.5rem !important;
+    box-shadow: 0 8px 28px rgba(0, 245, 212, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    cursor: pointer;
+}
+
+.btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.7), transparent);
+    transform: skewX(-25deg);
+    animation: btnKineticSweep 4.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes btnKineticSweep {
+    0%, 65% { left: -100%; }
+    100% { left: 200%; }
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px) scale(1.015) !important;
+    box-shadow: 0 14px 38px rgba(0, 245, 212, 0.6) !important;
+    color: #000000 !important;
+}
+
+.btn-primary:active {
+    transform: translateY(0) scale(0.99) !important;
+}
+
+/* Enlaces */
+.text-muted {
+    color: #94a3b8 !important;
+}
+
+.text-muted a, .btn-link-clear, .fw-600 {
+    color: var(--kt-cyan) !important;
+    text-decoration: none;
+    font-weight: 700 !important;
+    transition: all 0.2s ease;
+}
+
+.text-muted a:hover, .btn-link-clear:hover, .fw-600:hover {
+    color: #ffffff !important;
+    text-shadow: 0 0 12px var(--kt-cyan);
+}
+
+/* ===================== SOCIAL LOGIN ===================== */
+.card-divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #64748b;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin: 24px 0 18px 0;
+}
+
+.card-divider::before, .card-divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.card-divider span {
+    padding: 0 14px;
+}
+
+.auth-social-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(115px, 1fr));
+    gap: 12px;
+}
+
+.auth-social-grid .btn-outline {
+    background: rgba(10, 24, 42, 0.65) !important;
+    border: 1px solid rgba(148, 163, 184, 0.22) !important;
+    color: #e2e8f0 !important;
+    border-radius: 12px !important;
+    padding: 0.7rem 0.9rem !important;
+    font-size: 0.88rem !important;
+    font-weight: 600 !important;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.auth-social-grid .btn-outline:hover {
+    background: rgba(0, 245, 212, 0.12) !important;
+    border-color: rgba(0, 245, 212, 0.45) !important;
+    color: #ffffff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 245, 212, 0.22);
+}
+
+/* ===================== ALERTAS ===================== */
+.alert {
+    border-radius: 14px !important;
+    padding: 13px 18px !important;
+    font-size: 0.88rem !important;
+    margin-bottom: 20px !important;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    backdrop-filter: blur(16px);
+}
+
+.alert-danger {
+    background: rgba(239, 68, 68, 0.18) !important;
+    border: 1px solid rgba(239, 68, 68, 0.45) !important;
+    color: #fca5a5 !important;
+}
+
+.alert-success {
+    background: rgba(16, 185, 129, 0.18) !important;
+    border: 1px solid rgba(16, 185, 129, 0.45) !important;
+    color: #6ee7b7 !important;
+}
+
+.alert-info {
+    background: rgba(14, 165, 233, 0.18) !important;
+    border: 1px solid rgba(14, 165, 233, 0.45) !important;
+    color: #7dd3fc !important;
+}
+
+/* ===================== FOOTER ===================== */
+.auth-body footer, .footer-dark, footer.bg-dark {
+    background: rgba(2, 6, 17, 0.95) !important;
+    border-top: 1px solid rgba(0, 245, 212, 0.12) !important;
+    position: relative;
+    z-index: 10;
+    color: #64748b !important;
+}
+
+.auth-body footer h3, .footer-title {
+    color: #f1f5f9 !important;
+    font-family: 'Space Grotesk', sans-serif !important;
+    text-shadow: 0 0 16px rgba(0, 245, 212, 0.35);
+}
+
+/* ===================== HUD DE TELEMETRÍA URBANA ===================== */
+.auth-telemetry-hud {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.telemetry-hud__item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 8px 12px;
+    background: rgba(10, 24, 44, 0.6);
+    border: 1px solid rgba(0, 245, 212, 0.18);
+    border-radius: 12px;
+    font-size: 0.75rem;
+}
+
+.telemetry-hud__item i {
+    color: var(--kt-cyan);
+    font-size: 0.95rem;
+    filter: drop-shadow(0 0 6px var(--kt-cyan));
+}
+
+.telemetry-hud__item strong {
+    display: block;
+    color: #f1f5f9;
+    font-size: 0.76rem;
+    line-height: 1.2;
+}
+
+.telemetry-hud__item small {
+    color: #94a3b8;
+    font-size: 0.68rem;
+}

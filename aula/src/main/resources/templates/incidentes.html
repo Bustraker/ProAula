@@ -7,16 +7,16 @@
     <meta name="csrf-token" th:content="${_csrf.token}">
     <meta name="csrf-header" th:content="${_csrf.headerName}">
     <title>Gestión de incidentes - Bustraker</title>
-    <link rel="icon" th:href="@{/images/logo.png}" type="image/png">
+    <link rel="icon" th:href="@{/images/bustraker-logo-full.png(v='official-logo-20261120-1')}" type="image/png">
     <link rel="stylesheet" th:href="@{/css/incidentes-panel.css(v='incident-panel-20261119-2')}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/admin-navigation.css(v='admin-navigation-20261120-1')}">
     <link rel="stylesheet" th:href="@{/css/accessibility.css}">
+    <link rel="stylesheet" th:href="@{/css/brand-logo.css(v='official-logo-20261120-3')}">
 </head>
-<body class="incident-panel-page">
+<body class="incident-panel-page" data-accessibility-scope="admin">
+<aside th:replace="~{Admin/fragments/admin-navigation :: sidebar('incidents', 'admin-sidebar--incident')}"></aside>
 <header class="panel-topbar">
-    <a class="panel-brand" th:href="@{/index_2}" aria-label="Bustraker, volver al panel administrativo">
-        <span class="panel-brand-mark" aria-hidden="true">B</span>
-        <span>Bustraker</span>
-    </a>
     <a class="panel-back" th:href="@{/index_2}">Volver al panel administrativo</a>
 </header>
 

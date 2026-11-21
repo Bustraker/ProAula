@@ -18,6 +18,7 @@ import jakarta.validation.Valid;
 
 import com.proaula.aula.Entity.Ruta;
 import com.proaula.aula.Entity.RutaParada;
+import com.proaula.aula.Service.BarrioService;
 import com.proaula.aula.Service.RutaService;
 
 import java.util.Objects;
@@ -27,9 +28,11 @@ public class RutaController {
     private static final String ERROR_BARRIOS = "barrios";
 
     private final RutaService rutaService;
+    private final BarrioService barrioService;
 
-    public RutaController(RutaService rutaService) {
+    public RutaController(RutaService rutaService, BarrioService barrioService) {
         this.rutaService = rutaService;
+        this.barrioService = barrioService;
     }
     
     // Vista para editar rutas
@@ -70,12 +73,18 @@ public class RutaController {
         if (barriosOrdenados.stream().distinct().count() < 2) {
             return "redirect:/editar-ruta/" + id + "?error=barrios";
         }
+        String origen = barriosOrdenados.get(0);
+        String destino = barriosOrdenados.get(barriosOrdenados.size() - 1);
         boolean cambio = !Objects.equals(rutaExistente.getBarrios(), barriosOrdenados)
                 || !Objects.equals(rutaExistente.getBarriosOrdenados(), barriosOrdenados)
+                || !Objects.equals(rutaExistente.getOrigen(), origen)
+                || !Objects.equals(rutaExistente.getDestino(), destino)
                 || !Objects.equals(rutaExistente.getVerificada(), Boolean.TRUE.equals(ruta.getVerificada()))
                 || !Objects.equals(rutaExistente.getAccesibleMovilidadReducida(), accesibleMovilidadReducida);
         rutaExistente.setBarrios(new ArrayList<>(barriosOrdenados));
         rutaExistente.setBarriosOrdenados(barriosOrdenados);
+        rutaExistente.setOrigen(origen);
+        rutaExistente.setDestino(destino);
         rutaExistente.setVerificada(Boolean.TRUE.equals(ruta.getVerificada()));
         rutaExistente.setAccesibleMovilidadReducida(accesibleMovilidadReducida);
         rutaService.saveRuta(rutaExistente, cambio);
@@ -92,6 +101,12 @@ public class RutaController {
                 && !List.of("accesible", "no-accesible", "sin-datos").contains(accesibilidad)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Filtro de accesibilidad no válido.");
         }
+        String barrioFiltro = barrio == null || barrio.isBlank()
+            ? null
+            : barrioService.obtenerNombreCanonico(barrio);
+        if (barrioFiltro != null && barrioFiltro.isBlank()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Barrio catastral no válido.");
+        }
         List<Ruta> todasLasRutas = rutaService.getAllRutas().stream()
             .filter(ruta -> ruta.getEstado() == Ruta.Estado.ACTIVA)
             .collect(Collectors.toCollection(ArrayList::new));
@@ -104,9 +119,9 @@ public class RutaController {
                 .collect(Collectors.toList());
         }
         
-        if (barrio != null && !barrio.isEmpty()) {
+        if (barrioFiltro != null) {
             rutas = rutas.stream()
-                .filter(r -> r.getBarrios() != null && r.getBarrios().contains(barrio))
+                .filter(r -> r.getBarrios() != null && r.getBarrios().contains(barrioFiltro))
                 .collect(Collectors.toList());
         }
 
@@ -133,7 +148,7 @@ public class RutaController {
             todasLasRutas.stream().anyMatch(r -> !Boolean.TRUE.equals(r.getVerificada())));
         model.addAttribute("barriosDisponibles", barrios);
         model.addAttribute("buscar", buscar);
-        model.addAttribute("barrioSeleccionado", barrio);
+        model.addAttribute("barrioSeleccionado", barrioFiltro);
         model.addAttribute("accesibilidadSeleccionada", accesibilidad);
         
         return "rutas-lista";
@@ -182,6 +197,8 @@ public class RutaController {
         }
         ruta.setBarrios(new ArrayList<>(barriosOrdenados));
         ruta.setBarriosOrdenados(barriosOrdenados);
+        ruta.setOrigen(barriosOrdenados.get(0));
+        ruta.setDestino(barriosOrdenados.get(barriosOrdenados.size() - 1));
         rutaService.saveRuta(ruta);
         return "redirect:/rutas";
     }
@@ -206,7 +223,11 @@ public class RutaController {
         for (String barrio : texto.split(",")) {
             String barrioLimpio = barrio.trim();
             if (!barrioLimpio.isEmpty()) {
-                barriosProcesados.add(barrioLimpio);
+                String nombreCanonico = barrioService.obtenerNombreCanonico(barrioLimpio);
+                if (nombreCanonico.isBlank()) {
+                    return new ArrayList<>();
+                }
+                barriosProcesados.add(nombreCanonico);
             }
         }
         return barriosProcesados;

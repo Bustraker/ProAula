@@ -1,11 +1,12 @@
 package com.proaula.aula.Controller;
 
 import com.proaula.aula.Entity.Ruta;
+import com.proaula.aula.Service.BarrioService;
 import com.proaula.aula.Service.RutaService;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ui.ExtendedModelMap;
@@ -23,8 +24,12 @@ class RutaControllerTest {
     @Mock
     private RutaService rutaService;
 
-    @InjectMocks
     private RutaController rutaController;
+
+    @BeforeEach
+    void setUp() {
+        rutaController = new RutaController(rutaService, new BarrioService());
+    }
 
     @Test
     void agregarRutaPersisteElOrdenConfirmadoEnAmbasColecciones() {
@@ -35,9 +40,19 @@ class RutaControllerTest {
 
         ArgumentCaptor<Ruta> rutaGuardada = ArgumentCaptor.forClass(Ruta.class);
         verify(rutaService).saveRuta(rutaGuardada.capture());
-        assertThat(rutaGuardada.getValue().getBarrios()).containsExactly("Centro", "Manga", "Crespo");
-        assertThat(rutaGuardada.getValue().getBarriosOrdenados()).containsExactly("Centro", "Manga", "Crespo");
+        assertThat(rutaGuardada.getValue().getBarrios()).containsExactly("CENTRO", "MANGA", "CRESPO");
+        assertThat(rutaGuardada.getValue().getBarriosOrdenados()).containsExactly("CENTRO", "MANGA", "CRESPO");
+        assertThat(rutaGuardada.getValue().getOrigen()).isEqualTo("CENTRO");
+        assertThat(rutaGuardada.getValue().getDestino()).isEqualTo("CRESPO");
         assertThat(rutaGuardada.getValue().isOrdenBarriosConfirmado()).isTrue();
+    }
+
+    @Test
+    void agregarRutaRechazaNombresFueraDelCatalogoCatastral() {
+        String resultado = rutaController.agregarRuta(new Ruta(), "Centro, Barrio inventado, Crespo");
+
+        assertThat(resultado).isEqualTo("redirect:/rutas/admin?error=barrios");
+        verifyNoInteractions(rutaService);
     }
 
     @Test
@@ -60,7 +75,9 @@ class RutaControllerTest {
         rutaController.guardarEdicionRuta(5L, formulario, "Centro, Manga, Crespo", null);
 
         verify(rutaService).saveRuta(existente, true);
-        assertThat(existente.getBarriosOrdenados()).containsExactly("Centro", "Manga", "Crespo");
+        assertThat(existente.getBarriosOrdenados()).containsExactly("CENTRO", "MANGA", "CRESPO");
+        assertThat(existente.getOrigen()).isEqualTo("CENTRO");
+        assertThat(existente.getDestino()).isEqualTo("CRESPO");
         assertThat(existente.isOrdenBarriosConfirmado()).isTrue();
         assertThat(existente.getVerificada()).isTrue();
     }
@@ -69,8 +86,8 @@ class RutaControllerTest {
     void guardarEdicionRutaActualizaAccesibilidadYMarcaLaRutaComoModificada() {
         Ruta existente = new Ruta();
         existente.setId(8L);
-        existente.setBarrios(List.of("Centro", "Manga"));
-        existente.setBarriosOrdenados(List.of("Centro", "Manga"));
+        existente.setBarrios(List.of("CENTRO", "MANGA"));
+        existente.setBarriosOrdenados(List.of("CENTRO", "MANGA"));
         existente.setVerificada(true);
         Ruta formulario = new Ruta();
         formulario.setVerificada(true);
@@ -80,6 +97,20 @@ class RutaControllerTest {
 
         assertThat(existente.getAccesibleMovilidadReducida()).isTrue();
         verify(rutaService).saveRuta(existente, true);
+    }
+
+    @Test
+    void listarRutasNormalizaElFiltroAlNombreCatastral() {
+        Ruta ruta = rutaActiva("Ruta Centro", true);
+        ruta.setBarrios(List.of("CENTRO"));
+        when(rutaService.getAllRutas()).thenReturn(List.of(ruta));
+
+        ExtendedModelMap model = new ExtendedModelMap();
+        rutaController.listarRutas(model, null, "Centro", null);
+
+        assertThat(model.getAttribute("rutas")).isEqualTo(List.of(ruta));
+        assertThat(model.getAttribute("barriosDisponibles")).isEqualTo(List.of("CENTRO"));
+        assertThat(model.getAttribute("barrioSeleccionado")).isEqualTo("CENTRO");
     }
 
     @Test

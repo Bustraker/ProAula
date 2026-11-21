@@ -1,0 +1,204 @@
+:root {
+    --admin-brand: #a52a3a;
+    --admin-brand-dark: #741c2b;
+    --admin-brand-soft: #fff2f4;
+    --admin-brand-line: #ead2d6;
+}
+
+.admin-dashboard {
+    --admin-blue: var(--admin-brand);
+    --admin-blue-dark: var(--admin-brand-dark);
+    --admin-green: var(--admin-brand);
+}
+
+.admin-audit {
+    --audit-blue: var(--admin-brand);
+    --audit-ink: #292124;
+    --audit-muted: #75696d;
+    --audit-border: #eadfe1;
+}
+
+.admin-audit .audit-notice {
+    color: #71323b;
+    background: #fff5f6;
+    border-color: #eed9dc;
+}
+
+.admin-audit .audit-notice i,
+.admin-audit .audit-back-link,
+.admin-audit .audit-pagination a {
+    color: var(--admin-brand);
+}
+
+.admin-audit .audit-table th {
+    color: #755f64;
+    background: #fbf7f7;
+}
+
+.admin-audit .audit-table tbody tr:hover {
+    background: #fffafb;
+}
+
+.admin-audit .audit-table .audit-code-reference {
+    color: var(--admin-brand-dark);
+}
+
+.admin-messages {
+    --messages-green: var(--admin-brand);
+    --messages-green-deep: var(--admin-brand-dark);
+    --messages-copper: #c13c4b;
+    background:
+        radial-gradient(ellipse at 92% 0%, rgba(165, 42, 58, .055), transparent 32%),
+        linear-gradient(180deg, #faf8f8 0%, #f7f3f3 100%);
+}
+
+.admin-messages .messages-user i,
+.admin-messages .messages-signal-visual__hub-check,
+.admin-messages .messages-signal-visual__pipeline-pulse {
+    color: var(--admin-brand);
+    stroke: var(--admin-brand);
+}
+
+.admin-messages .messages-status-dot {
+    background: #75a393;
+}
+
+.legacy-admin {
+    --legacy-green: var(--admin-brand);
+}
+
+.coordinates-hero {
+    border-color: rgba(165, 42, 58, .2);
+    background:
+        radial-gradient(circle at 88% 18%, rgba(165, 42, 58, .2), transparent 30%),
+        linear-gradient(135deg, #392127, #24191c);
+}
+
+.coordinates-hero h1 em,
+.coordinates-table code,
+.coordinates-fields input:focus-visible,
+.coordinates-form select:focus-visible,
+.coordinates-form textarea:focus-visible {
+    color: #f08a98;
+}
+
+.coordinates-panel {
+    border-color: rgba(232, 166, 174, .18);
+    background: rgba(31, 22, 25, .94);
+}
+
+.coordinates-panel__header {
+    border-bottom-color: rgba(232, 166, 174, .14);
+}
+
+.coordinates-table th {
+    color: #d7a3aa;
+}
+
+.coordinates-fields input,
+.coordinates-form select,
+.coordinates-form textarea {
+    border-color: rgba(232, 166, 174, .22);
+}
+
+.coordinates-fields input:focus-visible,
+.coordinates-form select:focus-visible,
+.coordinates-form textarea:focus-visible {
+    outline-color: #f08a98;
+}
+
+.coordinates-actions button:hover {
+    border-color: #f08a98;
+    background: rgba(165, 42, 58, .16);
+}
+
+.coordinates-actions .coordinates-save {
+    color: #fff;
+    background: var(--admin-brand);
+    border-color: var(--admin-brand);
+}
+
+.coordinates-actions .coordinates-save:hover {
+    background: var(--admin-brand-dark);
+}
+
+.admin-assignment {
+    min-height: 100vh;
+    margin: 0;
+    padding: clamp(24px, 6vw, 72px) 18px;
+    color: #302328;
+    background:
+        radial-gradient(ellipse at 88% 0%, rgba(165, 42, 58, .08), transparent 34rem),
+        #f7f3f3;
+    font-family: "DM Sans", "Segoe UI", sans-serif;
+}
+
+.admin-assignment > h1,
+.admin-assignment > form,
+.admin-assignment > p {
+    width: min(100%, 620px);
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.admin-assignment > h1 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font: 700 clamp(26px, 4vw, 36px)/1.15 "Space Grotesk", "Segoe UI", sans-serif;
+}
+
+.admin-assignment > form {
+    display: grid;
+    gap: 10px;
+    padding: clamp(20px, 4vw, 32px);
+    background: #fff;
+    border: 1px solid #eadfe1;
+    border-radius: 16px;
+    box-shadow: 0 12px 32px rgba(66, 24, 33, .07);
+}
+
+.admin-assignment label {
+    margin-top: 7px;
+    color: #59484d;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.admin-assignment select,
+.admin-assignment input {
+    width: 100%;
+    min-height: 44px;
+    padding: 9px 11px;
+    color: #302328;
+    background: #fffdfd;
+    border: 1px solid #dfd1d4;
+    border-radius: 9px;
+    font: inherit;
+}
+
+.admin-assignment select:focus-visible,
+.admin-assignment input:focus-visible {
+    outline: 3px solid rgba(165, 42, 58, .2);
+    border-color: var(--admin-brand);
+}
+
+.admin-assignment button {
+    min-height: 46px;
+    margin-top: 12px;
+    padding: 10px 16px;
+    color: #fff;
+    background: linear-gradient(135deg, #b83a4a, #8e2232);
+    border: 1px solid var(--admin-brand);
+    border-radius: 10px;
+    font: 700 14px "DM Sans", "Segoe UI", sans-serif;
+    cursor: pointer;
+}
+
+.admin-assignment > p {
+    margin-top: 18px;
+}
+
+.admin-assignment > p a {
+    color: var(--admin-brand-dark);
+    font-weight: 700;
+}

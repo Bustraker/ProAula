@@ -38,6 +38,7 @@ public class AdminLoginController {
 
     private static final Logger log = LoggerFactory.getLogger(AdminLoginController.class);
     private static final String SESSION_CODE_ID = "adminCodeId";
+    private static final String SESSION_CODE_HASH = "adminCodeHash";
     private static final String SESSION_REQUEST_ID = "adminRegistrationRequestId";
 
     private final UsuarioService usuarioService;
@@ -70,7 +71,8 @@ public class AdminLoginController {
         Long codeId = longSessionAttribute(session, SESSION_CODE_ID);
         AdminCode verifiedCode = codeId == null ? null : adminCodeService.findById(codeId).orElse(null);
         boolean verified = Boolean.TRUE.equals(session.getAttribute("adminCodeVerified"))
-            && verifiedCode != null;
+            && verifiedCode != null
+            && isVerifiedCodeHashCurrent(session, verifiedCode);
         boolean registrationPending = false;
 
         if (verified && verifiedCode.getRegistrationRequestId() != null) {
@@ -102,6 +104,7 @@ public class AdminLoginController {
         if (code != null && isAvailableCode(code)) {
             session.setAttribute("adminCodeVerified", true);
             session.setAttribute(SESSION_CODE_ID, code.getId());
+            session.setAttribute(SESSION_CODE_HASH, code.getCodeHash());
             if (code.getRegistrationRequestId() != null) {
                 AdminCodeRequest request = requestService.findById(code.getRegistrationRequestId());
                 if (request.getStatus() == AdminCodeRequest.Status.APPROVED) {
@@ -240,7 +243,17 @@ public class AdminLoginController {
             return null;
         }
         Long codeId = longSessionAttribute(session, SESSION_CODE_ID);
-        return codeId != null && adminCodeService.findById(codeId).isPresent() ? codeId : null;
+        if (codeId == null) {
+            return null;
+        }
+        AdminCode code = adminCodeService.findById(codeId).orElse(null);
+        return code != null && isVerifiedCodeHashCurrent(session, code) ? codeId : null;
+    }
+
+    private boolean isVerifiedCodeHashCurrent(HttpSession session, AdminCode code) {
+        Object storedHash = session.getAttribute(SESSION_CODE_HASH);
+        return storedHash instanceof String
+            && storedHash.equals(code.getCodeHash());
     }
 
     private Long longSessionAttribute(HttpSession session, String name) {
@@ -251,6 +264,7 @@ public class AdminLoginController {
     private void clearCodeVerification(HttpSession session) {
         session.removeAttribute("adminCodeVerified");
         session.removeAttribute(SESSION_CODE_ID);
+        session.removeAttribute(SESSION_CODE_HASH);
         session.removeAttribute(SESSION_REQUEST_ID);
     }
 }

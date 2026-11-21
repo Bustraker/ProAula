@@ -11,14 +11,15 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/style_admin_login.css(v='admin-login-logo-20261020-1')}">
-    <link rel="icon" th:href="@{/images/logo.png}" type="image/png">
+    <link rel="icon" th:href="@{/images/bustraker-logo-full.png(v='official-logo-20261120-1')}" type="image/png">
     <link rel="stylesheet" th:href="@{/css/accessibility.css}">
+    <link rel="stylesheet" th:href="@{/css/brand-logo.css(v='official-logo-20261120-3')}">
 </head>
 <body class="admin-login-page">
     <main class="admin-login-shell">
         <aside class="login-visual" aria-label="Centro de operaciones Bustraker">
             <a class="login-brand" th:href="@{/}" aria-label="Bustraker, volver al inicio">
-                <img class="login-brand__logo" th:src="@{/images/admin-login-logo.png}" alt="" aria-hidden="true">
+                <img class="login-brand__logo" th:src="@{/images/bustraker-logo-full.png}" alt="" aria-hidden="true">
             </a>
 
             <div class="login-visual__copy">
@@ -62,7 +63,7 @@
 
         <section class="login-panel" aria-labelledby="loginTitle">
             <div class="login-panel__topline">
-                <a class="login-mobile-brand" th:href="@{/}" aria-label="Bustraker, volver al inicio"><img class="login-brand__logo" th:src="@{/images/admin-login-logo.png}" alt="" aria-hidden="true"></a>
+                <a class="login-mobile-brand" th:href="@{/}" aria-label="Bustraker, volver al inicio"><img class="login-brand__logo" th:src="@{/images/bustraker-logo-full.png}" alt="" aria-hidden="true"></a>
                 <span class="login-panel__secure"><i class="fas fa-lock" aria-hidden="true"></i> CONEXIÓN PROTEGIDA</span>
             </div>
 
@@ -115,7 +116,9 @@
                         <div class="input-wrapper">
                             <span class="input-icon"><i class="fas fa-key" aria-hidden="true"></i></span>
                             <input type="password" id="codigoAdmin" name="codigoAdmin" class="code-input" placeholder="Ingresa tu código" maxlength="256" autocomplete="one-time-code" required autofocus>
-                            <span class="input-trailing-icon"><i class="fas fa-shield-halved" aria-hidden="true"></i></span>
+                            <button type="button" class="password-toggle js-toggle-code" data-target="#codigoAdmin" aria-label="Mostrar código" aria-pressed="false" title="Mostrar código">
+                                <i class="fas fa-eye" aria-hidden="true"></i>
+                            </button>
                         </div>
                         <p class="field-hint"><i class="fas fa-circle-info" aria-hidden="true"></i> El código debe estar registrado y autorizado en el sistema.</p>
                     </div>
@@ -140,6 +143,7 @@
                             <span class="input-icon"><i class="fas fa-lock" aria-hidden="true"></i></span>
                             <input type="password" id="newPassword" name="password" placeholder="Crea una contraseña segura" autocomplete="new-password" minlength="12" maxlength="72" required>
                         </div>
+                        <div class="password-strength" id="passwordStrength" aria-live="polite"><span></span><span></span><span></span><span></span><small>Usa 12 caracteres con mayúscula, número y símbolo.</small></div>
                     </div>
                     <div class="form-group">
                         <label for="passwordConfirm">Confirmar contraseña</label>

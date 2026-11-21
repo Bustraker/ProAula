@@ -11,7 +11,9 @@ test("the Puerta del Reloj scene keeps its proportions and animates the road ben
   await expect(scene).toBeVisible();
   await expect(frame).toHaveCSS("width", "1040px");
   await expect(frame).toHaveCSS("border-radius", "19px");
-  await expect(page.locator(".landing-brand img")).toHaveCSS("width", "50px");
+  const brandLogo = page.locator(".landing-brand img");
+  await expect(brandLogo).toBeVisible();
+  expect((await brandLogo.boundingBox()).width).toBeGreaterThan(100);
   const sceneWidth = (await scene.boundingBox()).width;
   expect(sceneWidth).toBeGreaterThan(340);
   expect(sceneWidth).toBeLessThanOrEqual(420);
@@ -108,7 +110,9 @@ test("the landing composition stays within a narrow mobile viewport", async ({ p
 
   await expect(frame).toBeVisible();
   await expect(scene.locator(".ctg-v2-scene")).toBeVisible();
-  await expect(page.locator(".landing-brand img")).toHaveCSS("width", "42px");
+  const brandLogo = page.locator(".landing-brand img");
+  await expect(brandLogo).toBeVisible();
+  expect((await brandLogo.boundingBox()).width).toBeLessThan(195);
   expect(await page.locator("body").evaluate(element => element.scrollWidth)).toBeLessThanOrEqual(390);
   expect((await frame.boundingBox()).width).toBeLessThanOrEqual(358);
   expect((await scene.boundingBox()).width).toBeLessThanOrEqual(320);

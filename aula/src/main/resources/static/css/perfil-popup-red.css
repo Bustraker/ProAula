@@ -1,0 +1,120 @@
+/* -------------------------------------------------
+   Ventana emergente “Viaje” – Tema rojo, premium y clean
+   ------------------------------------------------- */
+:root {
+    --clr-primary: #e53935;          /* rojo dominante */
+    --clr-primary-dark: #b71c1c;
+    --clr-bg-light: #f9f9f9;
+    --clr-bg-dark: #1e1e1e;
+    --clr-card-light: rgba(255,255,255,.93);
+    --clr-card-dark: rgba(30,30,30,.90);
+    --clr-text-light: #212121;
+    --clr-text-dark: #ffffff;
+    --radius: .75rem;
+    --transition: .3s ease;
+}
+
+/* FONDO y modo oscuro ------------------------------------------------- */
+.popup-wrapper {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-start;
+    padding: 1rem;
+    background: rgba(0,0,0,.12);
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: var(--transition);
+}
+.popup-wrapper.show { opacity: 1; pointer-events: auto; }
+
+.popup {
+    width: 340px;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: var(--clr-card-light);
+    border-radius: var(--radius);
+    box-shadow: 0 8px 20px rgba(0,0,0,.15);
+    display: flex;
+    flex-direction: column;
+    gap: .8rem;
+    padding: 1rem;
+    transition: var(--transition);
+}
+body.dark-mode .popup { background: var(--clr-card-dark); color: var(--clr-text-dark); }
+
+/* Cabecera ----------------------------------------------------------- */
+.popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.popup-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: var(--clr-primary);
+}
+#closePopup {
+    background: transparent;
+    border: none;
+    font-size: 1.4rem;
+    cursor: pointer;
+    color: var(--clr-text-light);
+}
+
+/* Contenido ---------------------------------------------------------- */
+.popup-section {
+    border-top: 1px solid #e0e0e0;
+    padding-top: .6rem;
+}
+.popup-section:first-of-type { border-top: none; }
+
+.popup-section h4 {
+    margin: 0 0 .4rem;
+    font-size: 1rem;
+    color: var(--clr-primary-dark);
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+}
+.popup-section h4 i { font-size: .9rem; }
+
+.popup-section p {
+    margin: 0;
+    font-size: .9rem;
+    line-height: 1.4;
+}
+
+/* Accordion para datos extra (solo en privado) ----------------------- */
+.accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height .35s ease;
+}
+.accordion-content.show { max-height: 500px; }
+
+/* Botón de acción ---------------------------------------------------- */
+.popup-action {
+    margin-top: .8rem;
+    text-align: right;
+}
+.popup-action button {
+    background: var(--clr-primary);
+    color: var(--clr-text-dark);
+    border: none;
+    border-radius: var(--radius);
+    padding: .45rem 1rem;
+    cursor: pointer;
+    font-weight: 600;
+    transition: var(--transition);
+}
+.popup-action button:hover { background: var(--clr-primary-dark); }
+
+/* Animación de aparición */
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity:0; }
+    to   { transform: translateX(0); opacity:1; }
+}
+.popup.show { animation: slideIn .35s forwards; }

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.beans.factory.annotation.Value;
 import java.util.List;
 import java.util.Comparator;
 import java.util.Locale;
@@ -62,6 +63,7 @@ public class HomeController {
     private final AvisoFavoritoService avisoFavoritoService;
     private final TrayectoFavoritoService trayectoFavoritoService;
     private final LegalConsentService legalConsentService;
+    private final String adminApproverEmail;
 
     public HomeController(BusService busService,
                           RutaService rutaService,
@@ -72,7 +74,8 @@ public class HomeController {
                           FavoritoService favoritoService,
                           AvisoFavoritoService avisoFavoritoService,
                           TrayectoFavoritoService trayectoFavoritoService,
-                          LegalConsentService legalConsentService) {
+                          LegalConsentService legalConsentService,
+                          @Value("${app.admin.approver-email:}") String adminApproverEmail) {
         this.busService = busService;
         this.rutaService = rutaService;
         this.usuarioService = usuarioService;
@@ -83,6 +86,7 @@ public class HomeController {
         this.avisoFavoritoService = avisoFavoritoService;
         this.trayectoFavoritoService = trayectoFavoritoService;
         this.legalConsentService = legalConsentService;
+        this.adminApproverEmail = adminApproverEmail;
     }
 
     @GetMapping("/")
@@ -268,8 +272,23 @@ public class HomeController {
     }
 
     @GetMapping("/gestionar-usuarios")
-    public String gestionarUsuarios(@RequestParam(value = "buscar", defaultValue = "") String buscar, Model model) {
+    public String gestionarUsuarios(@RequestParam(value = "buscar", defaultValue = "") String buscar,
+                                    Authentication authentication,
+                                    Model model) {
+        model.addAttribute("isAdminApprover", isConfiguredAdminApprover(authentication));
         return prepararGestionUsuarios(buscar, model);
+    }
+
+    private boolean isConfiguredAdminApprover(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()
+                || adminApproverEmail == null || adminApproverEmail.isBlank()) {
+            return false;
+        }
+
+        String username = authentication.getName();
+        Usuario user = usuarioService.findByUsername(username);
+        return usuarioService.isAdminUser(username) && user != null && user.getEmail() != null
+                && user.getEmail().equalsIgnoreCase(adminApproverEmail);
     }
 
     private String prepararGestionUsuarios(String buscar, Model model) {
@@ -318,11 +337,12 @@ public class HomeController {
     }
 
     @GetMapping("/editar-usuario/{id}")
-    public String editarUsuario(@PathVariable Long id, Model model) {
+    public String editarUsuario(@PathVariable Long id, Authentication authentication, Model model) {
         Usuario usuario = usuarioService.getUsuarioById(id);
         if (usuario == null) {
             return REDIRECT_GESTIONAR_USUARIOS;
         }
+        model.addAttribute("isAdminApprover", isConfiguredAdminApprover(authentication));
         model.addAttribute(MODEL_ATTR_USUARIO, usuario);
         return "Admin/editar_usuario";
     }
@@ -347,11 +367,12 @@ public class HomeController {
     @PostMapping("/actualizar-usuario")
     public String actualizarUsuario(@ModelAttribute UsuarioFormDto usuarioForm,
                                     @RequestParam(required = false) String newPassword,
+                                    Authentication authentication,
                                     Model model,
                                     org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttrs) {
         Usuario existente = usuarioService.getUsuarioById(usuarioForm.getId());
         if (existente == null) {
-            String view = gestionarUsuarios("", model);
+            String view = gestionarUsuarios("", authentication, model);
             model.addAttribute(MODEL_ATTR_ERROR, "Usuario no encontrado.");
             return view;
         }

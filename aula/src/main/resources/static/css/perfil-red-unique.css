@@ -1,0 +1,124 @@
+/* Unique Red Theme for User Profile (perfil-usuario) */
+:root {
+    --primary-red: #e53935;
+    --secondary-red: #b71c1c;
+    --bg-light: #f9f9f9;
+    --bg-dark: #1e1e1e;
+    --text-light: #ffffff;
+    --text-dark: #212121;
+    --border-radius: 0.75rem;
+    --transition: all 0.3s ease;
+}
+
+/* Base body styling */
+body.profile-page {
+    background: var(--bg-light);
+    color: var(--text-dark);
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    transition: var(--transition);
+}
+
+body.profile-page.dark-mode {
+    background: var(--bg-dark);
+    color: var(--text-light);
+}
+
+/* Card / panel */
+.profile-main {
+    max-width: 960px;
+    margin: 2rem auto;
+    padding: 1.5rem;
+    background: rgba(255,255,255,0.9);
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    backdrop-filter: blur(8px);
+    transition: var(--transition);
+}
+
+body.dark-mode .profile-main {
+    background: rgba(30,30,30,0.85);
+    color: var(--text-light);
+}
+
+/* Headings */
+.profile-main h1, .profile-main h2 {
+    color: var(--primary-red);
+}
+
+/* Inputs */
+.profile-input-wrap input,
+.profile-input-wrap textarea {
+    border: 2px solid #ccc;
+    border-radius: var(--border-radius);
+    padding: 0.5rem 0.75rem;
+    transition: var(--transition);
+    background: var(--bg-light);
+    color: var(--text-dark);
+}
+
+body.dark-mode .profile-input-wrap input,
+body.dark-mode .profile-input-wrap textarea {
+    background: #2b2b2b;
+    color: var(--text-light);
+    border-color: #555;
+}
+
+.profile-input-wrap input:focus,
+.profile-input-wrap textarea:focus {
+    outline: none;
+    border-color: var(--primary-red);
+    box-shadow: 0 0 0 3px rgba(229,57,53,0.2);
+}
+
+/* Buttons */
+.profile-button {
+    background: var(--primary-red);
+    color: var(--text-light);
+    border: none;
+    border-radius: var(--border-radius);
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: var(--transition);
+    font-weight: 600;
+}
+
+.profile-button:hover {
+    background: var(--secondary-red);
+}
+
+/* Progress bar */
+.progress-container {
+    width: 100%;
+    background: #e0e0e0;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    margin-bottom: 1rem;
+    height: 0.5rem;
+}
+
+body.dark-mode .progress-container {
+    background: #444;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background: var(--primary-red);
+    transition: width 0.4s ease;
+}
+
+/* Dark mode toggle */
+#darkModeToggle {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--primary-red);
+}
+
+#darkModeToggle:hover {
+    color: var(--secondary-red);
+}

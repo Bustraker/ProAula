@@ -131,9 +131,9 @@ class RutaPersistenceIntegrationTest {
             .extracting(relacion -> relacion.getParada().getNombre())
             .first().isEqualTo("Castillogrande");
         assertThat(jdbcTemplate.queryForObject("SELECT COUNT(*) FROM ruta_barrios", Integer.class))
-            .isEqualTo(102);
+            .isEqualTo(60);
         assertThat(jdbcTemplate.queryForObject("SELECT COUNT(*) FROM ruta_barrios_ordenados", Integer.class))
-            .isEqualTo(102);
+            .isEqualTo(60);
 
         List<Ruta> rutasTpc = rutaRepository.findAll().stream()
             .filter(rutaTpc -> rutaTpc.getCodigo().startsWith("TPC-"))
@@ -149,11 +149,25 @@ class RutaPersistenceIntegrationTest {
         Ruta campestreIda = rutaRepository.findByCodigo("TPC-CAM-CEN-IDA").orElseThrow();
         Ruta campestreVuelta = rutaRepository.findByCodigo("TPC-CAM-CEN-VUELTA").orElseThrow();
         assertThat(campestreIda.getBarriosOrdenados())
-            .containsExactly("El Campestre", "El Socorro", "Bazurto", "Centro Histórico");
+            .containsExactly("EL CAMPESTRE", "EL SOCORRO", "CENTRO");
         assertThat(campestreVuelta.getBarriosOrdenados())
-            .containsExactly("Centro Histórico", "Bazurto", "El Socorro", "El Campestre");
+            .containsExactly("CENTRO", "EL SOCORRO", "EL CAMPESTRE");
         assertThat(campestreIda.getDescripcion())
             .contains("El Campestre (cerca de cancha principal del barrio)");
+
+        List<String> nombresCatastrales = barrioRepository.findAll().stream()
+            .map(Barrio::getNombre)
+            .toList();
+        assertThat(jdbcTemplate.queryForList("SELECT barrios FROM ruta_barrios", String.class))
+            .isNotEmpty()
+            .allMatch(nombresCatastrales::contains);
+        assertThat(jdbcTemplate.queryForList(
+            "SELECT barrio FROM ruta_barrios_ordenados", String.class))
+            .isNotEmpty()
+            .allMatch(nombresCatastrales::contains);
+        assertThat(jdbcTemplate.queryForList(
+            "SELECT barrio FROM parada WHERE barrio IS NOT NULL", String.class))
+            .allMatch(nombresCatastrales::contains);
 
         for (String codigo : List.of("RUT-POZ-TORICES", "RUT-37-SIM-CENTRO", "RUT-30A-NB-CENTRO")) {
             Ruta otraRuta = rutaRepository.findByCodigo(codigo).orElseThrow();
@@ -163,8 +177,9 @@ class RutaPersistenceIntegrationTest {
             assertThat(rutaParadaRepository.findByRutaIdAndSentidoOrderByOrdenAsc(
                 otraRuta.getId(), RutaParada.Sentido.VUELTA)).isNotEmpty();
         }
-        assertThat(barrioRepository.findAll()).extracting(Barrio::getNombre)
-            .contains("El Rodeo", "Villagrande", "La Plazuela", "Torices", "Calamares", "Simón Bolívar");
+        assertThat(barrioRepository.findAll()).hasSize(208).extracting(Barrio::getNombre)
+            .contains("ZARAGOCILLA", "NUEVO BOSQUE")
+            .doesNotContain("Saragocilla");
 
         assertThatCode(() -> localDatabaseBootstrapService.run(
             new DefaultApplicationArguments(new String[0]))).doesNotThrowAnyException();
@@ -176,9 +191,9 @@ class RutaPersistenceIntegrationTest {
         assertThat(rutaParadaRepository.count()).isEqualTo(totalRelaciones).isEqualTo(84);
         assertThat(paradaRepository.findByRuta_IdOrderByOrdenAsc(ruta.getId())).hasSize(10);
         assertThat(jdbcTemplate.queryForObject("SELECT COUNT(*) FROM ruta_barrios", Integer.class))
-            .isEqualTo(102);
+            .isEqualTo(60);
         assertThat(jdbcTemplate.queryForObject("SELECT COUNT(*) FROM ruta_barrios_ordenados", Integer.class))
-            .isEqualTo(102);
+            .isEqualTo(60);
     }
 
     @Test
@@ -373,9 +388,9 @@ class RutaPersistenceIntegrationTest {
         );
         entityManager.clear();
         Ruta creada = rutaRepository.findById(idNueva).orElseThrow();
-        assertThat(filasOrdenadas).containsExactly("Centro", "Manga", "Crespo");
-        assertThat(creada.getBarrios()).containsExactly("Centro", "Manga", "Crespo");
-        assertThat(creada.getBarriosOrdenados()).containsExactly("Centro", "Manga", "Crespo");
+        assertThat(filasOrdenadas).containsExactly("CENTRO", "MANGA", "CRESPO");
+        assertThat(creada.getBarrios()).containsExactly("CENTRO", "MANGA", "CRESPO");
+        assertThat(creada.getBarriosOrdenados()).containsExactly("CENTRO", "MANGA", "CRESPO");
         assertThat(creada.getCodigo()).startsWith("RUT-").hasSize(20);
         assertThat(creada.isOrdenBarriosConfirmado()).isTrue();
 
@@ -393,8 +408,8 @@ class RutaPersistenceIntegrationTest {
         Ruta recargada = rutaRepository.findById(idNueva).orElseThrow();
         Ruta recargadaHeredada = rutaRepository.findById(idHeredada).orElseThrow();
 
-        assertThat(recargada.getBarrios()).containsExactly("Crespo", "Manga", "Centro");
-        assertThat(recargada.getBarriosOrdenados()).containsExactly("Crespo", "Manga", "Centro");
+        assertThat(recargada.getBarrios()).containsExactly("CRESPO", "MANGA", "CENTRO");
+        assertThat(recargada.getBarriosOrdenados()).containsExactly("CRESPO", "MANGA", "CENTRO");
         assertThat(recargada.isOrdenBarriosConfirmado()).isTrue();
         assertThat(recargada.getVerificada()).isTrue();
         assertThat(recargadaHeredada.getBarriosOrdenados()).isEmpty();

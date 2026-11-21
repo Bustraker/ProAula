@@ -10,7 +10,7 @@ async function saveEvidence(page, filename) {
   fs.mkdirSync(directory, { recursive: true });
   await page.screenshot({
     path: path.join(directory, filename),
-    fullPage: true,
+    fullPage: false,
     animations: "disabled"
   });
 }
@@ -35,22 +35,36 @@ async function selectAvailableRoute(page) {
   const barrios = route.barriosOrdenados;
   await page.locator("#origen").fill(barrios[0]);
   await page.locator("#destino").fill(barrios[barrios.length - 1]);
+  const roadResponsePromise = page.waitForResponse(async response => {
+    if (!response.url().includes("/route/v1/driving/") || !response.ok()) return false;
+    const data = await response.json();
+    return data.code === "Ok"
+      && Array.isArray(data.routes)
+      && data.routes.length > 0
+      && Array.isArray(data.routes[0].geometry && data.routes[0].geometry.coordinates);
+  }, { timeout: 45000 });
   await page.locator("#btnPlanificar").click();
   const tramo = page.locator(".tramo").filter({ hasText: route.nombre }).first();
   await expect(tramo).toBeVisible();
   await tramo.click();
   await expect(page.locator("#rutaDetalle")).toBeVisible();
-  await expect(page.locator("#llegadasRutaPanel")).toBeVisible();
+  const roadResponse = await roadResponsePromise;
+  const roadData = await roadResponse.json();
+  expect(roadData.routes[0].geometry.coordinates.length)
+    .toBeGreaterThan(barrios.length);
+  return { barrioCount: barrios.length };
 }
 
 if (evidenceEnabled) {
-  test("captures the real route with no GPS reports from the running app", async ({ page }) => {
-    await selectAvailableRoute(page);
-    const fallbackStatus = page.locator(".arrival-card__status");
-    await expect(fallbackStatus).toContainText("recorrido seleccionado sigue visible");
-    await expect(page.locator(".arrival-bus-marker")).toHaveCount(0);
-    await expect(page.locator("#map .leaflet-overlay-pane path").first()).toBeVisible();
+  test("draws road geometry from the live routing service", async ({ page }) => {
+    const { barrioCount } = await selectAvailableRoute(page);
+    const routePath = page.locator("#map .leaflet-overlay-pane path.leaflet-interactive").first();
+    await expect(routePath).toBeVisible();
+    await expect.poll(async () => {
+      const pathData = await routePath.getAttribute("d");
+      return (pathData && pathData.match(/L/g) || []).length;
+    }).toBeGreaterThan(barrioCount);
     await page.locator("#llegadasRutaPanel").scrollIntoViewIfNeeded();
-    await saveEvidence(page, "BUS-54_ruta-visible-sin-reportes.png");
+    await saveEvidence(page, "BUS-54_ruta-con-geometria-OSRM.png");
   });
 }

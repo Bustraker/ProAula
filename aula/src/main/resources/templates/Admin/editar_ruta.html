@@ -9,36 +9,15 @@
     <link rel="stylesheet" th:href="@{/css/style_editar_ruta.css(v='routes-editor-20261005-3')}">
     <link rel="stylesheet" th:href="@{/css/logout.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="icon" th:href="@{/images/logo.png}" type="image/png">
+    <link rel="icon" th:href="@{/images/bustraker-logo-full.png(v='official-logo-20261120-1')}" type="image/png">
+    <link rel="stylesheet" th:href="@{/css/admin-brand.css(v='admin-brand-20261120-1')}">
+    <link rel="stylesheet" th:href="@{/css/admin-navigation.css(v='admin-navigation-20261120-1')}">
     <link rel="stylesheet" th:href="@{/css/accessibility.css}">
+    <link rel="stylesheet" th:href="@{/css/brand-logo.css(v='official-logo-20261120-3')}">
 </head>
-<body class="route-editor-page">
+<body class="route-editor-page" data-accessibility-scope="admin">
     <div class="route-editor-shell">
-        <aside class="route-editor-sidebar">
-            <a class="route-editor-brand" th:href="@{/index_2}" aria-label="Bustraker, panel de administración">
-                <span class="route-editor-brand__icon"><i class="fas fa-bus" aria-hidden="true"></i></span>
-                <span><strong>Bustraker</strong><small>Centro de operaciones</small></span>
-            </a>
-
-            <nav class="route-editor-nav" aria-label="Navegación administrativa">
-                <span class="route-editor-nav__label">ADMINISTRACIÓN</span>
-                <a th:href="@{/index_2}" aria-label="Panel principal" title="Panel principal"><i class="fas fa-house" aria-hidden="true"></i><span>Panel principal</span></a>
-                <a th:href="@{/gestionar-usuarios}" aria-label="Gestión de usuarios" title="Gestión de usuarios"><i class="fas fa-users" aria-hidden="true"></i><span>Gestión de usuarios</span></a>
-                <a th:href="@{/reportes}" aria-label="Reportes" title="Reportes"><i class="fas fa-chart-column" aria-hidden="true"></i><span>Reportes</span></a>
-                <a th:href="@{/mensajes_contacto}" aria-label="Mensajes" title="Mensajes"><i class="fas fa-envelope" aria-hidden="true"></i><span>Mensajes</span></a>
-                <a th:href="@{/rutas/admin}" class="is-current" aria-current="page" aria-label="Gestión de rutas" title="Gestión de rutas"><i class="fas fa-route" aria-hidden="true"></i><span>Gestión de rutas</span></a>
-                <a th:href="@{/admin/coordenadas-paradas}" aria-label="Coordenadas de paradas" title="Coordenadas de paradas"><i class="fas fa-location-crosshairs" aria-hidden="true"></i><span>Coordenadas de paradas</span></a>
-                <a th:href="@{/registro-buses}" aria-label="Buses" title="Buses"><i class="fas fa-bus-simple" aria-hidden="true"></i><span>Buses</span></a>
-            </nav>
-
-            <div class="route-editor-sidebar__bottom">
-                <span class="route-editor-status"><i aria-hidden="true"></i> Sistema operativo</span>
-                <form th:action="@{/logout}" method="post" class="logout-form" onsubmit="return confirm('¿Cerrar sesión de ProAula? El proveedor externo podría mantener tu sesión activa.');">
-                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-                    <button type="submit" class="route-editor-logout logout-form__button"><i class="fas fa-arrow-right-from-bracket" aria-hidden="true"></i> Cerrar sesión</button>
-                </form>
-            </div>
-        </aside>
+        <aside th:replace="~{Admin/fragments/admin-navigation :: sidebar('routes', 'route-editor-sidebar')}"></aside>
 
         <main class="route-editor-main">
             <header class="route-editor-topbar">
@@ -167,7 +146,7 @@
 
                             <p th:if="${errorBarrios}" class="route-editor-error" role="alert">
                                 <i class="fas fa-circle-exclamation" aria-hidden="true"></i>
-                                Ingresa al menos dos barrios distintos para definir el recorrido.
+                                Usa al menos dos barrios distintos con nombres del catálogo catastral oficial.
                             </p>
 
                             <div class="route-editor-field">
@@ -177,9 +156,9 @@
                                 </label>
                                 <textarea id="barriosOrdenadosTexto" name="barriosOrdenadosTexto"
                                           th:text="${barriosOrdenadosTexto}"
-                                          placeholder="Ej. Zaragoza, El Bosque, Centro"
+                                          placeholder="Ej. ZARAGOCILLA, EL BOSQUE, CENTRO"
                                           required rows="3" aria-describedby="ayuda-orden-barrios"></textarea>
-                                <small id="ayuda-orden-barrios" class="route-editor-help">Escribe todos los barrios separados por comas, desde el inicio hasta el final del recorrido.</small>
+                                <small id="ayuda-orden-barrios" class="route-editor-help">Escribe los nombres exactos del catálogo, separados por comas y desde el inicio hasta el final.</small>
                             </div>
 
                             <div class="route-editor-field">

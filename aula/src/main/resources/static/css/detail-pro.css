@@ -46,6 +46,100 @@
     pointer-events: none;
 }
 
+.detalle { padding: 0; }
+.detalle[open] { padding: 14px; }
+.detalle__cab[hidden] { display: none; }
+
+.detalle__resumen {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-height: 72px;
+    padding: 12px 14px;
+    border-radius: inherit;
+    color: #eaf5f3;
+    background: rgba(10, 28, 35, 0.76);
+    cursor: pointer;
+    list-style: none;
+}
+
+.detalle__resumen::-webkit-details-marker { display: none; }
+.detalle__resumen::marker { content: ""; }
+
+.detalle__resumen-icono {
+    display: grid;
+    flex: none;
+    width: 36px;
+    height: 36px;
+    place-items: center;
+    border: 1px solid rgba(55, 200, 186, 0.2);
+    border-radius: 11px;
+    color: #7de0d1;
+    background: rgba(55, 200, 186, 0.1);
+}
+
+.detalle__resumen-texto {
+    display: grid;
+    flex: 1;
+    gap: 4px;
+    min-width: 0;
+}
+
+.detalle__resumen-texto strong {
+    overflow: hidden;
+    font-size: 0.84rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.detalle__resumen-texto small {
+    color: #9ab4b1;
+    font-size: 0.67rem;
+    line-height: 1.4;
+}
+
+.detalle__resumen-accion {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: 7px;
+    color: #8eddd1;
+    font-size: 0.68rem;
+    font-weight: 700;
+}
+
+.detalle__resumen-accion i { transition: transform 180ms ease; }
+.detalle[open] > .detalle__resumen {
+    margin: -14px -14px 14px;
+    border-bottom: 1px solid rgba(86, 191, 181, 0.16);
+    border-radius: 17px 17px 0 0;
+}
+.detalle[open] > .detalle__resumen .detalle__resumen-accion i { transform: rotate(180deg); }
+.detalle__resumen:hover { background: rgba(17, 44, 52, 0.88); }
+
+body.user-travel-page .detalle__resumen {
+    color: #edf6ff;
+    background: linear-gradient(110deg, rgba(28, 75, 113, 0.5), rgba(8, 27, 47, 0.86));
+}
+
+body.user-travel-page .detalle__resumen-icono {
+    border-color: rgba(112, 189, 240, 0.24);
+    color: #9bd6ff;
+    background: rgba(37, 134, 195, 0.16);
+}
+
+body.user-travel-page .detalle__resumen-accion { color: #9bd6ff; }
+body.user-travel-page .detalle__resumen-texto small { color: #a9c1d5; }
+
+@media (max-width: 420px) {
+    .detalle__resumen { gap: 8px; padding-inline: 11px; }
+    .detalle__resumen-accion { font-size: 0.64rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .detalle__resumen-accion i { transition: none; }
+}
+
 .incidentes-ruta {
     margin: 0.9rem 0 1rem;
     padding: 1rem 1.1rem;

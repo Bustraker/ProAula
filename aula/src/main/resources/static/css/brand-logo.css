@@ -1,0 +1,25 @@
+img[src*="/images/bustraker-logo-full.png"] {
+    width: auto !important;
+    height: auto !important;
+    max-width: min(190px, 42vw) !important;
+    max-height: 72px !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    object-fit: contain;
+    filter: none !important;
+}
+
+.admin-sidebar__brand img[src*="/images/bustraker-logo-full.png"] {
+    width: min(190px, 42vw) !important;
+    max-width: 190px !important;
+    max-height: 82px !important;
+}
+
+@media (max-width: 920px) {
+    .admin-sidebar__brand img[src*="/images/bustraker-logo-full.png"] {
+        width: min(190px, 48vw) !important;
+        max-height: 64px !important;
+    }
+}

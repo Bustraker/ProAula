@@ -34,7 +34,7 @@ public class BarrioController {
             mapa.put("latitud", barrio.getLatitud());
             mapa.put("longitud", barrio.getLongitud());
             mapa.put("localidad", barrio.getLocalidad());
-            mapa.put("coordenadaEstimada", !barrioService.tieneCoordenadaShapefile(barrio.getNombre()));
+            mapa.put("coordenadaEstimada", !barrioService.tieneCoordenadaCatastral(barrio.getNombre()));
             incluirContexto(mapa, barrio.getNombre());
             barrios.add(mapa);
         });
@@ -67,7 +67,7 @@ public class BarrioController {
                 mapa.put("latitud", barrio.getLatitud());
                 mapa.put("longitud", barrio.getLongitud());
                 mapa.put("localidad", barrio.getLocalidad());
-                mapa.put("coordenadaEstimada", !barrioService.tieneCoordenadaShapefile(barrio.getNombre()));
+                mapa.put("coordenadaEstimada", !barrioService.tieneCoordenadaCatastral(barrio.getNombre()));
                 incluirContexto(mapa, barrio.getNombre());
                 return ResponseEntity.ok(mapa);
             })

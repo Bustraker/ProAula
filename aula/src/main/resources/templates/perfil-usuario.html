@@ -11,41 +11,14 @@
     <link rel="stylesheet" th:href="@{/css/logout.css}">
     <link rel="stylesheet" th:href="@{/css/perfil-profesional.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="icon" th:href="@{/images/logo.png}" type="image/png">
+    <link rel="icon" th:href="@{/images/bustraker-logo-full.png(v='official-logo-20261120-1')}" type="image/png">
     <link rel="stylesheet" th:href="@{/css/accessibility.css}">
+    <link rel="stylesheet" th:href="@{/css/brand-logo.css(v='official-logo-20261120-3')}">
+    <link rel="stylesheet" th:href="@{/css/user-navigation.css(v='user-navigation-20261120-2')}">
+    <link rel="stylesheet" th:href="@{/css/perfil-popup-red.css(v='popup-red-20261120-1')}" />
 </head>
-<body class="profile-page">
-    <header class="main-header">
-        <div class="header-inner">
-            <a class="logo" th:href="@{/dashboard}" aria-label="Bustraker, ir al panel">
-                <img th:src="@{/images/logo.png}" alt="">
-                <span class="brand">Bustraker</span>
-            </a>
-            <nav class="main-nav" aria-label="Navegación principal">
-                <a th:href="@{/dashboard}" class="nav-link">
-                    <i class="fas fa-house" aria-hidden="true"></i> Dashboard
-                </a>
-                <a th:href="@{/perfil}" class="nav-link" aria-current="page">
-                    <i class="fas fa-user" aria-hidden="true"></i> Perfil
-                </a>
-                <a th:href="@{/rutas}" class="nav-link">
-                    <i class="fas fa-route" aria-hidden="true"></i> Rutas
-                </a>
-                <a th:href="@{/historial}" class="nav-link">
-                    <i class="fas fa-clock-rotate-left" aria-hidden="true"></i> Historial
-                </a>
-                <a th:href="@{/viajar}" class="nav-link">
-                    <i class="fas fa-bus" aria-hidden="true"></i> Viajar
-                </a>
-                <form th:action="@{/logout}" method="post" class="logout-form" onsubmit="return confirm('¿Cerrar sesión de ProAula? El proveedor externo podría mantener tu sesión activa.');">
-                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-                    <button type="submit" class="nav-link nav-link--outline logout-form__button">
-                    <i class="fas fa-arrow-right-from-bracket" aria-hidden="true"></i> Cerrar sesión
-                    </button>
-                </form>
-            </nav>
-        </div>
-    </header>
+<body class="profile-page" data-accessibility-scope="user">
+    <th:block th:replace="~{Usuario/fragments/user-navigation :: header('profile')}"></th:block>
 
     <main class="profile-main">
         <div class="profile-page-heading">
@@ -278,7 +251,7 @@
     <footer class="profile-footer">
         <div class="profile-footer-inner">
             <div class="profile-footer-brand">
-                <img th:src="@{/images/logo.png}" alt="">
+                <img th:src="@{/images/bustraker-logo-full.png}" alt="">
                 <div><strong>Bustraker</strong><span>Movilidad universitaria, mejor organizada.</span></div>
             </div>
             <span>&copy; 2026 Bustraker. Todos los derechos reservados.</span>

@@ -43,7 +43,8 @@ test("authenticated dashboard shortcuts and support modal work", async ({ page }
   await page.getByRole("link", { name: /Consultar buses/i }).click();
   await expect(page).toHaveURL(/\/consultas$/);
   await expect(page.getByRole("heading", { name: /La movilidad, con más contexto/i })).toBeVisible();
-  await page.getByRole("link", { name: /^Perfil$/i }).click();
+  await page.locator(".user-site-header__more summary").click();
+  await page.locator(".user-site-header__more-menu").getByRole("link", { name: /^Perfil$/i }).click();
   await expect(page).toHaveURL(/\/perfil$/);
 });
 
@@ -58,6 +59,10 @@ test("authenticated profile updates identity and validates password changes", as
   await page.locator('form[action="/perfil/actualizar"] button[type=submit]').click();
   await expect(page.getByRole("status")).toContainText(/Perfil actualizado exitosamente/i);
   await expect(page.getByRole("heading", { name: "Nombre actualizado Autenticado" })).toBeVisible();
+  await test.info().attach("account-profile-updated-screenshot", {
+    body: await page.screenshot(),
+    contentType: "image/png"
+  });
 
   await page.locator("#passwordActual").fill(password);
   await page.locator("#passwordNuevo").fill("new-safe-password-27");
@@ -136,6 +141,10 @@ test("authenticated incident report guides entry and handles route availability"
   const layoutColumns = await page.locator(".incident-layout")
     .evaluate(element => getComputedStyle(element).gridTemplateColumns.split(" ").length);
   expect(layoutColumns).toBe(1);
+  expect(await page.locator("body").evaluate(element => element.scrollWidth)).toBeLessThanOrEqual(390);
+  expect(await page.locator(".user-site-header__nav").evaluate(element =>
+    element.scrollWidth <= element.clientWidth
+  )).toBe(true);
   await expect(page.locator("#descripcion-contador")).toHaveText("0 / 2000");
   await page.locator("#descripcion").fill("Retraso reportado desde la aplicación.");
   await expect(page.locator("#descripcion-contador")).toHaveText("38 / 2000");
@@ -153,17 +162,21 @@ test("authenticated incident report guides entry and handles route availability"
   await page.getByRole("button", { name: "Enviar reporte" }).click();
   await expect(page).toHaveURL(/\/incidentes\/nuevo$/);
   await expect(page.getByRole("status")).toContainText(/Incidente #\d+ registrado correctamente/i);
+  await test.info().attach("incident-report-submitted-screenshot", {
+    body: await page.screenshot(),
+    contentType: "image/png"
+  });
 });
 
 test("More menu exposes incident and accident reports on mobile", async ({ page }) => {
   await registerAndLogin(page);
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.locator(".nav-menu summary").click();
+  await page.locator(".user-site-header__more summary").click();
 
-  const menu = page.locator(".nav-menu__panel");
+  const menu = page.locator(".user-site-header__more-menu");
   await expect(menu).toBeVisible();
-  await expect(menu.getByRole("link", { name: /Reportar incidente/i })).toBeVisible();
-  await menu.getByRole("link", { name: /Reportar accidente/i }).click();
+  await expect(menu.getByRole("link", { name: "Incidente" })).toBeVisible();
+  await menu.getByRole("link", { name: "Accidente" }).click();
 
   await expect(page).toHaveURL(/\/incidentes\/nuevo\?tipo=ACCIDENTE$/);
   await expect(page.getByRole("heading", { name: "Reportar un accidente" })).toBeVisible();

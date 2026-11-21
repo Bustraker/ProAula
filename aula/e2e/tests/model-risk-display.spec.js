@@ -36,11 +36,34 @@ test("public route options show the model delay probability before route selecti
     contentType: "application/json",
     body: JSON.stringify({
       routes: [{
-        geometry: { type: "LineString", coordinates: [[-75.5, 10.4], [-75.49, 10.41]] },
+        // Synthetic curved geometry; this test does not model a real street route.
+        geometry: {
+          type: "LineString",
+          coordinates: [
+            [-75.5, 10.4], [-75.499, 10.401], [-75.498, 10.401],
+            [-75.498, 10.403], [-75.496, 10.403], [-75.496, 10.405],
+            [-75.494, 10.405], [-75.494, 10.407], [-75.492, 10.407],
+            [-75.492, 10.409], [-75.49, 10.41]
+          ]
+        },
         distance: 1500,
         duration: 600
       }]
     })
+  }));
+  await page.route("**/api/llegadas/**", route => route.fulfill({
+    contentType: "application/json",
+    body: JSON.stringify({
+      estado: "SIN_REPORTES",
+      mensaje: "Aún no hay reportes activos.",
+      ubicacionEstimada: null,
+      reportantesActivos: 0,
+      llegadas: []
+    })
+  }));
+  await page.route("**/api/incidentes/ruta/**", route => route.fulfill({
+    contentType: "application/json",
+    body: JSON.stringify([])
   }));
   await page.route("https://api.open-meteo.com/**", route => {
     weatherRequest = {
@@ -106,6 +129,10 @@ test("public route options show the model delay probability before route selecti
   await expect(risk.getByRole("meter")).toHaveAttribute("aria-valuenow", "42");
   await expect(page.locator(".resultados__riesgo-nota"))
     .toContainText("El tiempo no incluye espera ni tráfico.");
+  await expect(page.locator(".arrival-card__status"))
+    .toContainText("Aún no hay reportes activos.");
+  await expect(page.locator(".incidentes-ruta__contenido"))
+    .toContainText("No hay reportes ciudadanos activos asociados a esta ruta.");
   expect(predictionRequest.method).toBe("POST");
   expect(predictionRequest.headers["content-type"]).toContain("application/json");
   expect(predictionRequest.body.ruta).toBe("101");

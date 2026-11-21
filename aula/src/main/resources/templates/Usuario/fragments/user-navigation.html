@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+<th:block th:fragment="header(activePage)">
+    <header class="user-site-header">
+        <div class="user-site-header__inner">
+            <div class="user-site-header__top">
+                <a sec:authorize="isAuthenticated()" class="user-site-header__brand"
+                   th:href="@{/dashboard}" aria-label="Bustraker, ir al panel">
+                    <img th:src="@{/images/bustraker-logo-full.png}" alt="Bustraker">
+                </a>
+                <a sec:authorize="isAnonymous()" class="user-site-header__brand"
+                   th:href="@{/index_3_public}" aria-label="Bustraker, ir al inicio">
+                    <img th:src="@{/images/bustraker-logo-full.png}" alt="Bustraker">
+                </a>
+
+                <div class="user-site-header__tools">
+                    <button type="button" class="user-site-header__tool" data-accessibility-trigger
+                            aria-label="Abrir configuraciones de accesibilidad"
+                            aria-controls="accessibilityControls" aria-expanded="false">
+                        <i class="fas fa-universal-access" aria-hidden="true"></i>
+                        <span>Accesibilidad</span>
+                    </button>
+                    <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post"
+                          class="user-site-header__logout"
+                          onsubmit="return confirm('¿Cerrar sesión de ProAula? El proveedor externo podría mantener tu sesión activa.');">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                        <button type="submit" class="user-site-header__tool user-site-header__tool--logout"
+                                aria-label="Cerrar sesión">
+                            <i class="fas fa-arrow-right-from-bracket" aria-hidden="true"></i>
+                            <span>Cerrar sesión</span>
+                        </button>
+                    </form>
+                    <a sec:authorize="isAnonymous()" class="user-site-header__tool user-site-header__tool--login"
+                       th:href="@{/inicio-de-sesion-mejorado}">
+                        <i class="fas fa-arrow-right-to-bracket" aria-hidden="true"></i>
+                        <span>Iniciar sesión</span>
+                    </a>
+                </div>
+            </div>
+
+            <nav class="user-site-header__nav" aria-label="Navegación principal">
+                <div sec:authorize="isAuthenticated()" class="user-site-header__links">
+                    <a th:href="@{/dashboard}" th:classappend="${activePage == 'dashboard'} ? ' is-active' : ''"
+                       th:attr="aria-current=${activePage == 'dashboard' ? 'page' : null}">
+                        <i class="fas fa-house" aria-hidden="true"></i><span>Inicio</span>
+                    </a>
+                    <a th:href="@{/rutas}" th:classappend="${activePage == 'routes'} ? ' is-active' : ''"
+                       th:attr="aria-current=${activePage == 'routes' ? 'page' : null}">
+                        <i class="fas fa-route" aria-hidden="true"></i><span>Rutas</span>
+                    </a>
+                    <a th:href="@{/viajar}" th:classappend="${activePage == 'travel'} ? ' is-active' : ''"
+                       th:attr="aria-current=${activePage == 'travel' ? 'page' : null}">
+                        <i class="fas fa-bus" aria-hidden="true"></i><span>Viajar</span>
+                    </a>
+                    <a th:href="@{/consultas}" th:classappend="${activePage == 'consultations'} ? ' is-active' : ''"
+                       th:attr="aria-current=${activePage == 'consultations' ? 'page' : null}">
+                        <i class="fas fa-magnifying-glass" aria-hidden="true"></i><span>Consultar buses</span>
+                    </a>
+                    <details class="user-site-header__more"
+                             th:classappend="${activePage == 'history' or activePage == 'contact' or activePage == 'profile' or activePage == 'incident'} ? ' is-active' : ''">
+                        <summary aria-label="Ver más opciones de navegación">
+                            <i class="fas fa-ellipsis" aria-hidden="true"></i><span>Ver más</span>
+                        </summary>
+                        <div class="user-site-header__more-menu">
+                            <a th:href="@{/historial}" th:classappend="${activePage == 'history'} ? ' is-active' : ''"
+                               th:attr="aria-current=${activePage == 'history' ? 'page' : null}">
+                                <i class="fas fa-clock-rotate-left" aria-hidden="true"></i><span>Historial</span>
+                            </a>
+                            <a th:href="@{/contacto_usuario}" th:classappend="${activePage == 'contact'} ? ' is-active' : ''"
+                               th:attr="aria-current=${activePage == 'contact' ? 'page' : null}">
+                                <i class="fas fa-headset" aria-hidden="true"></i><span>Contacto</span>
+                            </a>
+                            <a th:href="@{/perfil}" th:classappend="${activePage == 'profile'} ? ' is-active' : ''"
+                               th:attr="aria-current=${activePage == 'profile' ? 'page' : null}">
+                                <i class="fas fa-user" aria-hidden="true"></i><span>Perfil</span>
+                            </a>
+                            <a th:href="@{/incidentes/nuevo}" th:classappend="${activePage == 'incident'} ? ' is-active' : ''"
+                               th:attr="aria-current=${activePage == 'incident' ? 'page' : null}">
+                                <i class="fas fa-triangle-exclamation" aria-hidden="true"></i><span>Incidente</span>
+                            </a>
+                            <a th:href="@{/incidentes/nuevo(tipo='ACCIDENTE')}">
+                                <i class="fas fa-car-burst" aria-hidden="true"></i><span>Accidente</span>
+                            </a>
+                        </div>
+                    </details>
+                </div>
+
+                <div sec:authorize="isAnonymous()" class="user-site-header__links user-site-header__links--public">
+                    <a th:href="@{/index_3_public}" th:classappend="${activePage == 'home'} ? ' is-active' : ''"
+                       th:attr="aria-current=${activePage == 'home' ? 'page' : null}">
+                        <i class="fas fa-house" aria-hidden="true"></i><span>Inicio</span>
+                    </a>
+                    <a th:href="@{/rutas}" th:classappend="${activePage == 'routes'} ? ' is-active' : ''"
+                       th:attr="aria-current=${activePage == 'routes' ? 'page' : null}">
+                        <i class="fas fa-route" aria-hidden="true"></i><span>Rutas</span>
+                    </a>
+                    <a th:href="@{/viajar_public}" th:classappend="${activePage == 'travel' ? ' is-active' : ''}"
+                       th:attr="aria-current=${activePage == 'travel' ? 'page' : null}">
+                        <i class="fas fa-bus" aria-hidden="true"></i><span>Planear viaje</span>
+                    </a>
+                    <a th:href="@{/consultas}" th:classappend="${activePage == 'consultations'} ? ' is-active' : ''"
+                       th:attr="aria-current=${activePage == 'consultations' ? 'page' : null}">
+                        <i class="fas fa-magnifying-glass" aria-hidden="true"></i><span>Consultar buses</span>
+                    </a>
+                    <details class="user-site-header__more"
+                             th:classappend="${activePage == 'contact'} ? ' is-active' : ''">
+                        <summary aria-label="Ver más opciones de navegación">
+                            <i class="fas fa-ellipsis" aria-hidden="true"></i><span>Ver más</span>
+                        </summary>
+                        <div class="user-site-header__more-menu">
+                            <a th:href="@{/contacto_usuario}" th:classappend="${activePage == 'contact'} ? ' is-active' : ''"
+                               th:attr="aria-current=${activePage == 'contact' ? 'page' : null}">
+                                <i class="fas fa-headset" aria-hidden="true"></i><span>Contacto</span>
+                            </a>
+                        </div>
+                    </details>
+                </div>
+            </nav>
+        </div>
+    </header>
+    <div th:replace="~{fragments/accessibility :: controls}"></div>
+</th:block>
+</body>
+</html>

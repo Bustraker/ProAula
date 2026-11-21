@@ -11,31 +11,15 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="icon" th:href="@{/images/logo.png}" type="image/png">
+    <link rel="icon" th:href="@{/images/bustraker-logo-full.png(v='official-logo-20261120-1')}" type="image/png">
     <link rel="stylesheet" th:href="@{/css/reportes.css(v='reports-dashboard-4')}">
+    <link rel="stylesheet" th:href="@{/css/admin-navigation.css(v='admin-navigation-20261120-1')}">
     <link rel="stylesheet" th:href="@{/css/accessibility.css}">
+    <link rel="stylesheet" th:href="@{/css/brand-logo.css(v='official-logo-20261120-3')}">
 </head>
-<body class="admin-reports">
+<body class="admin-reports" data-accessibility-scope="admin">
     <div class="reports-shell">
-        <aside class="reports-sidebar">
-            <a class="reports-brand" th:href="@{/index_2}">
-                <span class="reports-brand__icon"><i class="fas fa-bus" aria-hidden="true"></i></span>
-                <span><strong>Bustraker</strong><small>Centro de operaciones</small></span>
-            </a>
-            <nav class="reports-nav" aria-label="Navegación administrativa">
-                <a th:href="@{/index_2}"><i class="fas fa-house" aria-hidden="true"></i><span>Panel principal</span></a>
-                <a th:href="@{/gestionar-usuarios}"><i class="fas fa-users" aria-hidden="true"></i><span>Gestión de usuarios</span></a>
-                <a th:href="@{/reportes}" class="active" aria-current="page"><i class="fas fa-chart-column" aria-hidden="true"></i><span>Reportes</span></a>
-                <a th:href="@{/incidentes/panel}"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i><span>Centro de incidentes</span></a>
-                <a th:href="@{/mensajes_contacto}"><i class="fas fa-envelope" aria-hidden="true"></i><span>Mensajes</span></a>
-                <a th:href="@{/rutas/admin}"><i class="fas fa-route" aria-hidden="true"></i><span>Rutas</span></a>
-                <a th:href="@{/registro-buses}"><i class="fas fa-bus-simple" aria-hidden="true"></i><span>Buses</span></a>
-            </nav>
-            <div class="reports-sidebar__footer">
-                <span class="reports-status-dot"></span>
-                <span>Vista de análisis administrativo</span>
-            </div>
-        </aside>
+        <aside th:replace="~{Admin/fragments/admin-navigation :: sidebar('reports', 'reports-sidebar')}"></aside>
 
         <main class="reports-main">
             <header class="reports-topbar">

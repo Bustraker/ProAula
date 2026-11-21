@@ -113,7 +113,8 @@ class ConsultasPageIntegrationTest {
 
         assertThat(page)
                 .contains("bus-directory-page--authenticated", "content=\"#082b50\"",
-                        "ABC123", "Anónimo", "Mi cuenta", "07:30", "Verificada")
+                        "ABC123", "Anónimo", "Consultar buses", "Historial", "Contacto",
+                        "07:30", "Verificada", "/css/user-navigation.css")
                 .doesNotContain("bus-directory-page--public")
                 .contains("href=\"/dashboard\"")
                 .doesNotContain("href=\"/inicio-de-sesion-mejorado\"");
@@ -129,6 +130,77 @@ class ConsultasPageIntegrationTest {
     }
 
     @Test
+    void authenticatedNavigationIsSharedAcrossMemberViews() throws Exception {
+        MockHttpSession session = new MockHttpSession();
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+        securityContext.setAuthentication(new UsernamePasswordAuthenticationToken(
+                "usuario", "N/A", List.of(() -> "ROLE_USER")));
+        session.setAttribute(
+                HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, securityContext);
+
+        for (String path : List.of(
+                "/dashboard", "/perfil", "/historial", "/rutas", "/contacto_usuario",
+                "/incidentes/nuevo")) {
+            String page = mockMvc.perform(
+                            org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get(path)
+                                    .session(session))
+                    .andExpect(status().isOk())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+
+            assertThat(page)
+                    .as("shared navigation on %s", path)
+                    .contains("user-site-header", "bustraker-logo-full.png",
+                            "href=\"/dashboard\"", "href=\"/rutas\"", "href=\"/viajar\"",
+                            "href=\"/consultas\"", "href=\"/historial\"",
+                            "href=\"/contacto_usuario\"", "href=\"/perfil\"",
+                            "href=\"/incidentes/nuevo\"", "Ver más",
+                            "user-site-header__more-menu", "Incidente", "Accidente",
+                            "action=\"/logout\"");
+        }
+    }
+
+    @Test
+    void authenticatedTravelMapOmitsSharedNavigationButKeepsAccessibilityControls() throws Exception {
+        MockHttpSession session = new MockHttpSession();
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+        securityContext.setAuthentication(new UsernamePasswordAuthenticationToken(
+                "usuario", "N/A", List.of(() -> "ROLE_USER")));
+        session.setAttribute(
+                HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, securityContext);
+
+        String page = mockMvc.perform(
+                        org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/viajar")
+                                .session(session))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        assertThat(page)
+                .contains("id=\"map\"", "id=\"btnNotificacionesViaje\"",
+                        "data-accessibility-trigger", "id=\"accessibilityControls\"",
+                        "/css/user-navigation.css")
+                .doesNotContain("user-site-header");
+    }
+
+    @Test
+    void publicContactPageKeepsGuestNavigationSeparateFromMemberActions() throws Exception {
+        String page = mockMvc.perform(
+                        org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/contacto_usuario"))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        assertThat(page)
+                .contains("user-site-header", "bustraker-logo-full.png",
+                        "href=\"/viajar_public\"", "href=\"/inicio-de-sesion-mejorado\"")
+                .doesNotContain("action=\"/logout\"", "href=\"/perfil\"");
+    }
+
+    @Test
     void travelPlannerIsAvailableOnPublicAndAuthenticatedMaps() throws Exception {
         String publicPage = mockMvc.perform(
                         org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/viajar_public"))
@@ -138,10 +210,10 @@ class ConsultasPageIntegrationTest {
 
         assertThat(publicPage)
                 .contains("id=\"btnPlanificar\"", "id=\"plannerStatus\"", "Rutas disponibles",
-                        "/css/travel.css?v=route-polish-13",
-                        "/css/map-ui.css?v=trips-4",
-                        "/js/map-base.js?v=map-polish-8",
-                        "/js/map-travel.js?v=trips-10");
+                        "/css/travel.css",
+                        "/css/map-ui.css",
+                        "/js/map-base.js",
+                        "/js/map-travel.js");
 
         MockHttpSession session = new MockHttpSession();
         SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
@@ -159,9 +231,10 @@ class ConsultasPageIntegrationTest {
 
         assertThat(authenticatedPage)
                 .contains("id=\"btnPlanificar\"", "id=\"plannerStatus\"", "Rutas disponibles",
-                        "/css/travel.css?v=route-polish-13",
-                        "/css/map-ui.css?v=trips-5",
-                        "/js/map-base.js?v=map-polish-8",
-                        "/js/map-travel.js?v=trips-10");
+                        "/css/travel.css",
+                        "/css/map-ui.css",
+                        "/js/map-base.js",
+                        "/css/user-navigation.css",
+                        "/js/map-travel.js");
     }
 }

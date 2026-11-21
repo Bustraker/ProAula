@@ -684,6 +684,38 @@ body.admin-login-page {
     color: #a36d76;
 }
 
+.password-strength {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 5px;
+    margin-top: 8px;
+}
+
+.password-strength > span {
+    height: 3px;
+    background: #eadfe1;
+    border-radius: 999px;
+    transition: background-color .18s ease;
+}
+
+.password-strength > small {
+    grid-column: 1 / -1;
+    margin-top: 3px;
+    color: #907d82;
+    font-size: 9px;
+}
+
+.password-strength[data-score="1"] > span:nth-child(-n+1),
+.password-strength[data-score="2"] > span:nth-child(-n+2),
+.password-strength[data-score="3"] > span:nth-child(-n+3),
+.password-strength[data-score="4"] > span {
+    background: #b84d5e;
+}
+
+.password-strength[data-score="4"] > span {
+    background: #387565;
+}
+
 .btn-login {
     display: flex;
     align-items: center;

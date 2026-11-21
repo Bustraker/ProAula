@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+<aside th:fragment="sidebar(activePage, sidebarVariant)"
+      class="admin-sidebar"
+      th:classappend="${sidebarVariant}"
+      aria-label="Barra de navegación administrativa">
+    <a class="admin-sidebar__brand" th:href="@{/index_2}" aria-label="Bustraker Admin, ir al inicio">
+        <img th:src="@{/images/bustraker-logo-full.png}" alt="Bustraker">
+        <small>Centro de operaciones</small>
+    </a>
+
+    <nav class="admin-sidebar__nav" aria-label="Navegación administrativa">
+        <a class="admin-sidebar__link"
+           th:href="@{/index_2}"
+           th:classappend="${activePage == 'home'} ? ' is-active' : ''"
+           th:attr="aria-current=${activePage == 'home' ? 'page' : null}">
+            <i class="fas fa-house" aria-hidden="true"></i><span>Inicio</span>
+        </a>
+
+        <div class="admin-sidebar__group"
+             th:classappend="${activePage == 'users' or activePage == 'requests' or activePage == 'access'} ? ' is-active' : ''">
+            <a class="admin-sidebar__link"
+               th:href="@{/gestionar-usuarios}"
+               th:classappend="${activePage == 'users' or activePage == 'requests' or activePage == 'access'} ? ' is-active' : ''"
+               th:attr="aria-current=${activePage == 'users' ? 'page' : null}">
+                <i class="fas fa-users" aria-hidden="true"></i><span>Gestionar Usuarios</span>
+            </a>
+            <div class="admin-sidebar__subnav"
+                 th:if="${isAdminApprover == true and (activePage == 'users' or activePage == 'requests' or activePage == 'access')}">
+                <a class="admin-sidebar__sublink"
+                   th:href="@{/admin/solicitudes-codigo}"
+                   th:classappend="${activePage == 'requests'} ? ' is-active' : ''"
+                   th:attr="aria-current=${activePage == 'requests' ? 'page' : null}">
+                    <i class="fas fa-user-shield" aria-hidden="true"></i><span>Solicitudes ADMIN</span>
+                </a>
+                <a class="admin-sidebar__sublink"
+                   th:href="@{/admin/accesos}"
+                   th:classappend="${activePage == 'access'} ? ' is-active' : ''"
+                   th:attr="aria-current=${activePage == 'access' ? 'page' : null}">
+                    <i class="fas fa-clock-rotate-left" aria-hidden="true"></i><span>Registro de accesos</span>
+                </a>
+            </div>
+        </div>
+
+        <a class="admin-sidebar__link"
+           th:href="@{/reportes}"
+           th:classappend="${activePage == 'reports'} ? ' is-active' : ''"
+           th:attr="aria-current=${activePage == 'reports' ? 'page' : null}">
+            <i class="fas fa-chart-column" aria-hidden="true"></i><span>Reportes</span>
+        </a>
+        <a class="admin-sidebar__link"
+           th:href="@{/incidentes/panel}"
+           th:classappend="${activePage == 'incidents'} ? ' is-active' : ''"
+           th:attr="aria-current=${activePage == 'incidents' ? 'page' : null}">
+            <i class="fas fa-triangle-exclamation" aria-hidden="true"></i><span>Centro de incidentes</span>
+        </a>
+        <button type="button" class="admin-sidebar__link admin-sidebar__accessibility"
+                data-accessibility-trigger aria-controls="accessibilityControls" aria-expanded="false">
+            <i class="fas fa-sliders" aria-hidden="true"></i><span>Configuraciones de accesibilidad</span>
+        </button>
+        <a class="admin-sidebar__link"
+           th:href="@{/mensajes_contacto}"
+           th:classappend="${activePage == 'messages'} ? ' is-active' : ''"
+           th:attr="aria-current=${activePage == 'messages' ? 'page' : null}">
+            <i class="fas fa-envelope" aria-hidden="true"></i><span>Mensajes</span>
+        </a>
+        <a class="admin-sidebar__link"
+           th:href="@{/rutas/admin}"
+           th:classappend="${activePage == 'routes'} ? ' is-active' : ''"
+           th:attr="aria-current=${activePage == 'routes' ? 'page' : null}">
+            <i class="fas fa-route" aria-hidden="true"></i><span>Rutas</span>
+        </a>
+        <a class="admin-sidebar__link"
+           th:href="@{/registro-buses}"
+           th:classappend="${activePage == 'buses'} ? ' is-active' : ''"
+           th:attr="aria-current=${activePage == 'buses' ? 'page' : null}">
+            <i class="fas fa-bus" aria-hidden="true"></i><span>Buses</span>
+        </a>
+
+        <form th:action="@{/logout}" method="post" class="admin-sidebar__logout"
+              onsubmit="return confirm('¿Cerrar sesión de ProAula? El proveedor externo podría mantener tu sesión activa.');">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+            <button type="submit" class="admin-sidebar__link">
+                <i class="fas fa-arrow-right-from-bracket" aria-hidden="true"></i><span>Cerrar Sesión</span>
+            </button>
+        </form>
+    </nav>
+
+    <div class="admin-sidebar__footer">
+        <span class="admin-sidebar__status-dot" aria-hidden="true"></span>
+        <span>Sistema operativo</span>
+    </div>
+
+    <div th:replace="~{fragments/accessibility :: controls}"></div>
+</aside>
+</body>
+</html>

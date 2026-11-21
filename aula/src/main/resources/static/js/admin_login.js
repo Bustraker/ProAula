@@ -72,4 +72,35 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    document.querySelectorAll('.js-toggle-code').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const input = document.querySelector(this.dataset.target || '#codigoAdmin');
+            if (!input) return;
+            const eyeIcon = this.querySelector('i') || this;
+            const showing = input.type === 'text';
+            input.type = showing ? 'password' : 'text';
+            eyeIcon.classList.toggle('fa-eye', showing);
+            eyeIcon.classList.toggle('fa-eye-slash', !showing);
+            this.setAttribute('aria-label', showing ? 'Mostrar código' : 'Ocultar código');
+            this.setAttribute('aria-pressed', showing ? 'false' : 'true');
+        });
+    });
+
+    const newPassword = document.getElementById('newPassword');
+    const strength = document.getElementById('passwordStrength');
+    if (newPassword && strength) {
+        newPassword.addEventListener('input', () => {
+            const value = newPassword.value;
+            let score = 0;
+            if (value.length >= 12) score++;
+            if (/[A-Z]/.test(value) && /[a-z]/.test(value)) score++;
+            if (/\d/.test(value)) score++;
+            if (/[^A-Za-z0-9]/.test(value)) score++;
+            strength.dataset.score = String(score);
+            strength.querySelector('small').textContent =
+                score >= 4 ? 'Contraseña fuerte.' : 'Usa 12 caracteres con mayúscula, número y símbolo.';
+        });
+    }
 });

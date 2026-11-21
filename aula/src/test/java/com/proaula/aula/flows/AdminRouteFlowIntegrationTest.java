@@ -79,7 +79,7 @@ class AdminRouteFlowIntegrationTest {
         assertThat(rutaRepository.findAllByVerificadaTrue())
                 .anySatisfy(ruta -> {
                     assertThat(ruta.getNombre()).isEqualTo("Ruta Creada por Admin");
-                    assertThat(ruta.getBarriosOrdenados()).containsExactly("Centro", "Manga");
+                    assertThat(ruta.getBarriosOrdenados()).containsExactly("CENTRO", "MANGA");
                     assertThat(ruta.isOrdenBarriosConfirmado()).isTrue();
                 });
     }

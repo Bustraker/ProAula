@@ -74,6 +74,8 @@ async function prepareTrip(page, onArrivalRequest) {
   await page.locator("#destino").fill("Barrio Destino");
   await page.locator("#btnPlanificar").click();
   await expect(page.locator("#rutaDetalle")).toBeVisible();
+  await page.locator("#detalleResumen").click();
+  await expect(page.locator("#rutaDetalle")).toHaveAttribute("open", "");
   await expect(page.locator("#llegadasRutaPanel")).toBeVisible();
 }
 
@@ -104,6 +106,10 @@ test("shows an approximate bus marker and alerts once when it is near the user",
   await expect(page.locator(".arrival-bus-marker")).toHaveCount(1);
   await expect(page.locator("#mu-avisos")).toContainText("bus estimado");
   await expect(status).not.toHaveAttribute("aria-busy", "true");
+  await test.info().attach("approximate-bus-arrival-screenshot", {
+    body: await page.screenshot(),
+    contentType: "image/png"
+  });
 
   await page.locator(".arrival-card__direction").dispatchEvent("change");
   await expect.poll(() => consultations).toBe(2);

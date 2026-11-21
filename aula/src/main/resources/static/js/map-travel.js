@@ -154,7 +154,8 @@
             paradas: L.layerGroup(), pinOrigen: null, pinDestino: null,
             base: null, linea: null, flujo: null, caminatas: null,
             usuario: null, precision: null, ubicacionesEstimadas: L.layerGroup(),
-            marcadorClick: null
+            marcadorClick: null,
+            limitesBarrios: L.layerGroup(), barrioResaltado: null
         };
         var el = {};
         var panelEstado = {};
@@ -187,6 +188,7 @@
                 'resultados', 'resumenBusqueda', 'rutaDetalle', 'detalleTitulo', 'detalleTramo', 'rutaStats', 'detalleHora',
                 'panelParadas', 'panelBuses', 'panelInfo', 'favoriteActions', 'llegadasRutaPanel',
                 'mostrarParadas', 'barriosTrayecto',
+                'mostrarLimitesBarrios', 'inputExplorarBarrio', 'btnVerBarrio', 'btnLimpiarResaltadoBarrio', 'listaExplorarBarrios', 'fichaBarrioCatastral',
                 'btnPanel', 'btnCompartir', 'btnLimpiar', 'contadorParadas', 'contadorBuses'
             ].forEach(function (id) { el[id] = $(id); });
 
@@ -210,6 +212,30 @@
             el.mostrarParadas.addEventListener('change', function () {
                 if (el.mostrarParadas.checked) capas.paradas.addTo(mapa); else mapa.removeLayer(capas.paradas);
             });
+            if (el.mostrarLimitesBarrios) {
+                el.mostrarLimitesBarrios.addEventListener('change', function () {
+                    alternarLimitesBarrios(el.mostrarLimitesBarrios.checked);
+                });
+            }
+            if (el.btnVerBarrio) {
+                el.btnVerBarrio.addEventListener('click', function () {
+                    resaltarBarrioCatastral(el.inputExplorarBarrio ? el.inputExplorarBarrio.value : '');
+                });
+            }
+            if (el.inputExplorarBarrio) {
+                el.inputExplorarBarrio.addEventListener('change', function () {
+                    resaltarBarrioCatastral(el.inputExplorarBarrio.value);
+                });
+                el.inputExplorarBarrio.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        resaltarBarrioCatastral(el.inputExplorarBarrio.value);
+                    }
+                });
+            }
+            if (el.btnLimpiarResaltadoBarrio) {
+                el.btnLimpiarResaltadoBarrio.addEventListener('click', limpiarResaltadoBarrio);
+            }
             document.querySelectorAll('[role="tab"][data-pestana]').forEach(function (boton) {
                 boton.addEventListener('click', function () { cambiarPestana(boton.getAttribute('data-pestana')); });
                 boton.addEventListener('keydown', navegarPestanas);
@@ -413,7 +439,8 @@
             try {
                 var resultados = await Promise.all([
                     M.fetchJSON(M.url('/api/barrios/todos'), 20000),
-                    M.fetchJSON(M.url('/api/rutas-con-coordenadas'), 20000)
+                    M.fetchJSON(M.url('/api/rutas-con-coordenadas'), 20000),
+                    cargarBarriosCartograficos()
                 ]);
                 procesarBarrios(resultados[0] || []);
                 procesarRutas(resultados[1] || []);
@@ -777,6 +804,9 @@
                     if (estado.barriosCartograficos.size) {
                         poblarOrigen();
                         poblarDestino();
+                        if (el.listaExplorarBarrios) {
+                            llenarLista(el.listaExplorarBarrios, ordenarNombres(Array.from(estado.barriosCartograficos.values())));
+                        }
                     }
                 }
                 return cartografia;
@@ -823,15 +853,193 @@
             });
         }
 
-        function barrioCatastralEnCoordenadas(lat, lng) {
+        function distanciaPuntoSegmentoMetros(lng, lat, a, b) {
+            if (!Array.isArray(a) || !Array.isArray(b) || a.length < 2 || b.length < 2) return Infinity;
+            var metrosPorGradoLongitud = 111320 * Math.cos(lat * Math.PI / 180);
+            var ax = (a[0] - lng) * metrosPorGradoLongitud;
+            var ay = (a[1] - lat) * 110540;
+            var bx = (b[0] - lng) * metrosPorGradoLongitud;
+            var by = (b[1] - lat) * 110540;
+            var dx = bx - ax, dy = by - ay;
+            var longitudCuadrada = dx * dx + dy * dy;
+            var fraccion = longitudCuadrada > 0
+                ? Math.max(0, Math.min(1, -(ax * dx + ay * dy) / longitudCuadrada))
+                : 0;
+            return Math.hypot(ax + fraccion * dx, ay + fraccion * dy);
+        }
+
+        function distanciaAContornoMetros(geometrias, lng, lat) {
+            var minima = Infinity;
+            geometrias.forEach(function (geometria) {
+                var poligonos = geometria && geometria.type === 'Polygon'
+                    ? [geometria.coordinates]
+                    : (geometria && geometria.type === 'MultiPolygon' ? geometria.coordinates : []);
+                poligonos.forEach(function (anillos) {
+                    if (!Array.isArray(anillos)) return;
+                    anillos.forEach(function (anillo) {
+                        if (!Array.isArray(anillo) || anillo.length < 2) return;
+                        for (var i = 0; i < anillo.length; i++) {
+                            minima = Math.min(minima, distanciaPuntoSegmentoMetros(
+                                lng, lat, anillo[i], anillo[(i + 1) % anillo.length]));
+                        }
+                    });
+                });
+            });
+            return minima;
+        }
+
+        function barrioCatastralEnCoordenadas(lat, lng, precision) {
             if (!Number.isFinite(lat) || !Number.isFinite(lng)) return Promise.resolve(null);
             return cargarBarriosCartograficos().then(function (cartografia) {
+                var coincidencias = new Map();
                 for (var i = 0; i < cartografia.features.length; i++) {
                     var feature = cartografia.features[i];
                     var nombre = String(feature && feature.properties && feature.properties.nombre || '').trim();
-                    if (nombre && geometriaContienePunto(feature.geometry, lng, lat)) return nombre;
+                    if (!nombre || !geometriaContienePunto(feature.geometry, lng, lat)) continue;
+                    var clave = normalizar(nombre);
+                    if (!coincidencias.has(clave)) {
+                        coincidencias.set(clave, { nombre: nombre, geometrias: [] });
+                    }
+                    coincidencias.get(clave).geometrias.push(feature.geometry);
                 }
-                return null;
+                if (coincidencias.size !== 1) return null;
+
+                var candidato = Array.from(coincidencias.values())[0];
+                if (Number.isFinite(precision) && precision >= 0
+                        && distanciaAContornoMetros(candidato.geometrias, lng, lat) <= precision) {
+                    return null;
+                }
+                return candidato.nombre;
+            });
+        }
+
+        /* ===================== EXPLORADOR DE BARRIOS CATASTRALES ===================== */
+        function alternarLimitesBarrios(activar) {
+            if (activar) {
+                cargarBarriosCartograficos().then(function (cartografia) {
+                    if (capas.limitesBarrios.getLayers().length === 0) {
+                        L.geoJSON(cartografia, {
+                            style: {
+                                color: '#0d9488',
+                                weight: 1.5,
+                                opacity: 0.85,
+                                fillColor: '#14b8a6',
+                                fillOpacity: 0.04
+                            },
+                            onEachFeature: function (feature, layer) {
+                                var nom = String(feature && feature.properties && feature.properties.nombre || '').trim();
+                                if (nom) {
+                                    layer.bindTooltip(M.escapeHtml(nom), { sticky: true, className: 'mu-tooltip' });
+                                    layer.on('click', function (e) {
+                                        L.DomEvent.stopPropagation(e);
+                                        if (el.inputExplorarBarrio) el.inputExplorarBarrio.value = nom;
+                                        resaltarBarrioCatastral(nom);
+                                    });
+                                }
+                            }
+                        }).addTo(capas.limitesBarrios);
+                    }
+                    capas.limitesBarrios.addTo(mapa);
+                    M.mostrarAviso('Límites catastrales de barrios activados en el mapa.', 'info', 3500);
+                });
+            } else {
+                mapa.removeLayer(capas.limitesBarrios);
+            }
+        }
+
+        function limpiarResaltadoBarrio() {
+            if (capas.barrioResaltado) {
+                mapa.removeLayer(capas.barrioResaltado);
+                capas.barrioResaltado = null;
+            }
+            if (el.fichaBarrioCatastral) el.fichaBarrioCatastral.hidden = true;
+            if (el.btnLimpiarResaltadoBarrio) el.btnLimpiarResaltadoBarrio.hidden = true;
+        }
+
+        function resaltarBarrioCatastral(nombre) {
+            if (!nombre || !nombre.trim()) {
+                M.mostrarAviso('Escribe o selecciona un barrio para enfocarlo en el mapa.', 'info', 3500);
+                return;
+            }
+            var nombreN = normalizar(nombre.trim());
+            cargarBarriosCartograficos().then(function (cartografia) {
+                var features = cartografia.features.filter(function (feature) {
+                    var nombreFeature = String(feature && feature.properties && feature.properties.nombre || '').trim();
+                    return normalizar(nombreFeature) === nombreN;
+                });
+                if (!features.length) {
+                    M.mostrarAviso('No se encontró el límite catastral para: ' + nombre, 'warn', 5000);
+                    return;
+                }
+
+                if (capas.barrioResaltado) {
+                    mapa.removeLayer(capas.barrioResaltado);
+                    capas.barrioResaltado = null;
+                }
+
+                var nombreOficial = String(features[0].properties.nombre || nombre).toUpperCase();
+                var capaPoligono = L.geoJSON({ type: 'FeatureCollection', features: features }, {
+                    style: {
+                        color: '#2563eb',
+                        weight: 3,
+                        opacity: 1,
+                        fillColor: '#3b82f6',
+                        fillOpacity: 0.22,
+                        dashArray: '4, 4'
+                    }
+                }).addTo(mapa);
+                capas.barrioResaltado = capaPoligono;
+
+                mapa.fitBounds(capaPoligono.getBounds(), {
+                    padding: [50, 50],
+                    maxZoom: 16,
+                    animate: true
+                });
+
+                var rutasPasan = estado.rutas.filter(function (r) {
+                    return r.barriosN && r.barriosN.includes(nombreN);
+                });
+
+                var htmlRutas = rutasPasan.length
+                    ? '<div class="ficha-barrio__rutas">' +
+                      '  <strong><i class="fas fa-bus"></i> ' + rutasPasan.length + ' ruta(s) pasan por aquí:</strong>' +
+                      '  <ul>' + rutasPasan.slice(0, 5).map(function (r) {
+                          return '<li><span class="badge-ruta" style="border-left: 3px solid ' + (r.color || '#2563eb') + '">' +
+                                 M.escapeHtml(r.nombre) + '</span></li>';
+                      }).join('') + (rutasPasan.length > 5 ? '<li><em>+' + (rutasPasan.length - 5) + ' más</em></li>' : '') +
+                      '  </ul>' +
+                      '</div>'
+                    : '<p class="ficha-barrio__sin-rutas"><i class="fas fa-info-circle"></i> Sin rutas verificadas directas en el catálogo actual.</p>';
+
+                var contenidoFicha =
+                    '<div class="ficha-barrio__card">' +
+                    '  <div class="ficha-barrio__head">' +
+                    '    <div class="ficha-barrio__badge"><i class="fas fa-shield-halved"></i> Catastro Oficial</div>' +
+                    '    <h4 class="ficha-barrio__nombre">' + M.escapeHtml(nombreOficial) + '</h4>' +
+                    '    <span class="ficha-barrio__sub">Límites según la cartografía catastral</span>' +
+                    '  </div>' +
+                    '  <div class="ficha-barrio__body">' +
+                         htmlRutas +
+                    '  </div>' +
+                    '  <div class="ficha-barrio__actions">' +
+                    '    <button type="button" class="btn btn--principal btn--sm" data-set-origin="' + M.escapeHtml(nombreOficial) + '"><i class="fas fa-play"></i> Fijar como Origen (A)</button>' +
+                    '    <button type="button" class="btn btn--secundario btn--sm" data-set-dest="' + M.escapeHtml(nombreOficial) + '"><i class="fas fa-flag"></i> Fijar como Destino (B)</button>' +
+                    (global.BustrakerNotificaciones ? '    <button type="button" class="btn btn--texto btn--sm" data-speak="Barrio catastral ' + M.escapeHtml(nombreOficial) + ' con ' + rutasPasan.length + ' rutas disponibles"><i class="fas fa-volume-high"></i> Escuchar</button>' : '') +
+                    '  </div>' +
+                    '</div>';
+
+                if (el.fichaBarrioCatastral) {
+                    el.fichaBarrioCatastral.innerHTML = contenidoFicha;
+                    el.fichaBarrioCatastral.hidden = false;
+                }
+                if (el.btnLimpiarResaltadoBarrio) {
+                    el.btnLimpiarResaltadoBarrio.hidden = false;
+                }
+
+                M.mostrarAviso('Barrio enfocado según la cartografía catastral: ' + nombreOficial + '.', 'ok', 4000);
+                if (global.BustrakerNotificaciones && global.BustrakerNotificaciones.hablar) {
+                    global.BustrakerNotificaciones.hablar('Barrio ' + nombreOficial + ' enfocado en el mapa', false);
+                }
             });
         }
 
@@ -1309,12 +1517,17 @@
             el.resumenBusqueda.textContent = resumen;
             mostrarEstadoPlanificador(estado.tramos.length + (estado.tramos.length === 1
                 ? ' opción de viaje.' : ' opciones de viaje.'), 'ok');
-            el.resultados.appendChild(h('p', 'resultados__resumen', resumen));
-            el.resultados.appendChild(h(
+            el.resultados.appendChild(h('p', 'resultados__resumen',
+                estado.tramos.length + (estado.tramos.length === 1
+                    ? ' opción de viaje' : ' opciones de viaje')));
+            var metodologia = h('details', 'resultados__metodologia');
+            metodologia.appendChild(h('summary', null, 'Criterios y límites de la estimación'));
+            metodologia.appendChild(h(
                 'p',
                 'resultados__riesgo-nota',
                 'Hasta 3 opciones: primero las directas; se ordenan con la distancia disponible y las paradas. El tiempo no incluye espera ni tráfico.'
             ));
+            el.resultados.appendChild(metodologia);
             estado.tramos.forEach(function (tramo, indice) {
                 el.resultados.appendChild(crearTarjetaTramo(tramo, indice));
             });
@@ -1403,7 +1616,7 @@
                 indicador.setAttribute('aria-label',
                     'Riesgo ' + etiqueta.toLowerCase() + ' de retraso mayor a diez minutos: ' + porcentaje + '%');
                 var fila = h('span', 'tramo__riesgo-resumen');
-                fila.appendChild(h('span', 'tramo__riesgo-titulo', 'Modelo predictivo · riesgo de retraso >10 min'));
+                fila.appendChild(h('span', 'tramo__riesgo-titulo', 'Riesgo de retraso >10 min'));
                 fila.appendChild(h('strong', 'tramo__riesgo-valor', etiqueta + ' · ' + porcentaje + '%'));
                 fila.appendChild(h('span', 'tramo__riesgo-origen', textoOrigen));
                 fila.appendChild(h(
@@ -1766,6 +1979,20 @@
         function pintarDetalle(tramo) {
             var rutas = tramo.tramos.map(function (parte) { return parte.ruta; });
             el.rutaDetalle.hidden = false;
+            el.rutaDetalle.open = false;
+            var resumenRuta = el.rutaDetalle.querySelector('.detalle__resumen');
+            var encabezadoAnterior = el.rutaDetalle.querySelector('.detalle__cab');
+            if (resumenRuta) {
+                el.rutaDetalle.querySelector('#detalleResumenRuta').textContent =
+                    mayuscula(tramo.barrios[0]) + ' → ' + mayuscula(tramo.barrios[tramo.barrios.length - 1]);
+                var transbordos = Number(tramo.transbordos) || 0;
+                el.rutaDetalle.querySelector('#detalleResumenMeta').textContent =
+                    (transbordos
+                        ? transbordos + (transbordos === 1 ? ' transbordo · ' : ' transbordos · ')
+                        : 'Viaje directo · ') +
+                    (Number(tramo.paradas) || 0) + ' paradas · Ver llegadas, buses y recorrido';
+            }
+            if (encabezadoAnterior) encabezadoAnterior.hidden = true;
 
             /* ── 1) Hero Card ──────────────────────────────── */
             var heroExistente = el.rutaDetalle.querySelector('.det-hero');
@@ -3297,9 +3524,11 @@
                 });
                 partes.push('Parada cercana: ' + mejor.p.nombre + ' · ' + formatearDistancia(mejor.m));
             }
-            barrioCatastralEnCoordenadas(u.lat, u.lng).then(function (nombre) {
+            barrioCatastralEnCoordenadas(u.lat, u.lng, u.precision).then(function (nombre) {
                 if (estado.ubicacion !== u || estado.solicitudBarrio !== solicitud) return;
-                partes.push(nombre || 'Barrio no identificado');
+                partes.push(nombre || (Number.isFinite(u.precision)
+                    ? 'Barrio no confirmado (GPS ±' + Math.round(u.precision) + ' m o límite ambiguo)'
+                    : 'Barrio no identificado en la cartografía catastral'));
                 el.locationStatus.textContent = partes.join(' · ');
             }).catch(function (error) {
                 if (estado.ubicacion !== u || estado.solicitudBarrio !== solicitud) return;
@@ -3347,25 +3576,35 @@
             evaluarCoincidenciaDeRuta();
             evaluarLlegada();
             actualizarPanelSeguimiento();
+
+            // Notificación hablada de cambio de barrio en vivo
+            barrioCatastralEnCoordenadas(lat, lng, estado.ubicacion.precision).then(function (nombre) {
+                if (!nombre) return;
+                var nombreN = normalizar(nombre);
+                if (estado.ultimoBarrioVoz !== nombreN) {
+                    var anterior = estado.ultimoBarrioVoz;
+                    estado.ultimoBarrioVoz = nombreN;
+                    if (anterior && global.BustrakerNotificaciones && global.BustrakerNotificaciones.hablar) {
+                        global.BustrakerNotificaciones.hablar('Ingresando al barrio ' + nombre, false);
+                    }
+                }
+            });
         }
 
         function sugerirOrigen(lat, lng, ubicacion) {
-            barrioCatastralEnCoordenadas(lat, lng).then(function (nombre) {
+            barrioCatastralEnCoordenadas(lat, lng, ubicacion && ubicacion.precision).then(function (nombre) {
                 if (estado.ubicacion !== ubicacion) return;
                 if (!nombre) {
-                    M.mostrarAviso('La ubicación GPS no coincide con un barrio de la cartografía catastral. Se conserva el origen actual.', 'warn', 8000);
+                    M.mostrarAviso('No se pudo confirmar un barrio catastral con el punto y la precisión GPS actuales. Se conserva el origen actual.', 'warn', 8000);
                     return;
                 }
                 var nombreN = normalizar(nombre);
-                var nombreDisponible = mapaBarriosDisponibles().get(nombreN);
-                if (!nombreDisponible) {
-                    M.mostrarAviso('Se detectó ' + nombre + ', pero no se pudo habilitar como barrio de origen.', 'error', 8000);
-                    return;
-                }
+                var nombreDisponible = mapaBarriosDisponibles().get(nombreN) || nombre;
                 el.origen.value = nombreDisponible;
                 alCambiarOrigen();
-                if (estado.servidos.size && !estado.servidos.has(nombreN)) {
-                    M.mostrarAviso('Barrio detectado: ' + nombreDisponible + '. No hay rutas verificadas desde este barrio; no se sustituyó por otro.', 'warn', 8000);
+                M.mostrarAviso('Barrio de origen detectado por GPS: ' + nombreDisponible, 'ok', 5000);
+                if (global.BustrakerNotificaciones && global.BustrakerNotificaciones.hablar) {
+                    global.BustrakerNotificaciones.hablar('Ubicación en barrio ' + nombreDisponible, false);
                 }
             }).catch(function (error) {
                 if (estado.ubicacion !== ubicacion) return;

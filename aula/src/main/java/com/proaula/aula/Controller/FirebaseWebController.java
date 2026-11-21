@@ -63,7 +63,7 @@ public class FirebaseWebController {
                   const notification = payload.notification || {};
                   self.registration.showNotification(notification.title || "Bustraker", {
                     body: notification.body || "Hay una solicitud ADMIN para revisar.",
-                    icon: "/images/logo.png",
+                    icon: "/images/bustraker-logo-full.png",
                     data: payload.data || { link: "/admin/solicitudes-codigo" }
                   });
                 });

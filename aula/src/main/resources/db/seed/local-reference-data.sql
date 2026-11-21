@@ -188,3 +188,11 @@ INSERT INTO ruta_parada (ruta_id, parada_id, orden, sentido, distancia_desde_ori
 INSERT INTO ruta_parada (ruta_id, parada_id, orden, sentido, distancia_desde_origen_mt, tiempo_aprox_desde_inicio_min) SELECT r.id, p.id, 8, 'VUELTA', NULL, NULL FROM ruta r JOIN parada p ON p.ruta_id = r.id AND p.codigo = 'PAR-6bXikVaHb4Yp89VC' WHERE r.codigo = 'RUT-30A-NB-CENTRO' AND NOT EXISTS (SELECT 1 FROM ruta_parada rp WHERE rp.ruta_id = r.id AND rp.parada_id = p.id AND rp.sentido = 'VUELTA');
 INSERT INTO ruta_parada (ruta_id, parada_id, orden, sentido, distancia_desde_origen_mt, tiempo_aprox_desde_inicio_min) SELECT r.id, p.id, 9, 'VUELTA', NULL, NULL FROM ruta r JOIN parada p ON p.ruta_id = r.id AND p.codigo = 'PAR-cPmVMoi3MZrkPK65' WHERE r.codigo = 'RUT-30A-NB-CENTRO' AND NOT EXISTS (SELECT 1 FROM ruta_parada rp WHERE rp.ruta_id = r.id AND rp.parada_id = p.id AND rp.sentido = 'VUELTA');
 INSERT INTO ruta_parada (ruta_id, parada_id, orden, sentido, distancia_desde_origen_mt, tiempo_aprox_desde_inicio_min) SELECT r.id, p.id, 10, 'VUELTA', NULL, NULL FROM ruta r JOIN parada p ON p.ruta_id = r.id AND p.codigo = 'PAR-stPbregRQ7iYRDbT' WHERE r.codigo = 'RUT-30A-NB-CENTRO' AND NOT EXISTS (SELECT 1 FROM ruta_parada rp WHERE rp.ruta_id = r.id AND rp.parada_id = p.id AND rp.sentido = 'VUELTA');
+
+-- These inactive provisional routes are retained as text references, not as catastral neighborhoods.
+DELETE FROM ruta_barrios
+WHERE ruta_id IN (SELECT id FROM ruta WHERE codigo IN (
+    'RUT-CAMP-SOC-BCG-CG', 'RUT-POZ-TORICES', 'RUT-37-SIM-CENTRO', 'RUT-30A-NB-CENTRO'));
+DELETE FROM ruta_barrios_ordenados
+WHERE ruta_id IN (SELECT id FROM ruta WHERE codigo IN (
+    'RUT-CAMP-SOC-BCG-CG', 'RUT-POZ-TORICES', 'RUT-37-SIM-CENTRO', 'RUT-30A-NB-CENTRO'));

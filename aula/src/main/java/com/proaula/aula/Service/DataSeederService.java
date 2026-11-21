@@ -77,25 +77,8 @@ public class DataSeederService implements CommandLineRunner {
     }
 
     private void seedBarrios() {
-        Set<String> existingNames = barrioRepository.findAll().stream()
-            .map(Barrio::getNombre)
-            .filter(nombre -> nombre != null)
-            .map(this::normalizeName)
-            .collect(Collectors.toSet());
-
-        int savedCount = 0;
-        for (String nombre : Localidades.obtenerTodosLosBarrios()) {
-            if (existingNames.add(normalizeName(nombre))) {
-                Barrio barrio = new Barrio();
-                barrio.setNombre(nombre.trim());
-                barrio.setLocalidad("Cartagena");
-                barrioRepository.save(barrio);
-                savedCount++;
-            }
-        }
-
-        log.info("Barrios de referencia inicializados; {} nuevos registros", savedCount);
         barrioService.inicializarBarrios();
+        log.info("Barrios catastrales oficiales sincronizados desde cartografía.");
     }
 
     private void bootstrapAdminIfConfigured() {

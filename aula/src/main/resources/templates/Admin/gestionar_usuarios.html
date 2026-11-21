@@ -10,30 +10,16 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="icon" th:href="@{/images/logo.png}" type="image/png">
+    <link rel="icon" th:href="@{/images/bustraker-logo-full.png(v='official-logo-20261120-1')}" type="image/png">
     <link rel="stylesheet" th:href="@{/css/admin_usuarios.css(v='users-20261020-8')}">
+    <link rel="stylesheet" th:href="@{/css/admin-brand.css(v='admin-brand-20261120-1')}">
+    <link rel="stylesheet" th:href="@{/css/admin-navigation.css(v='admin-navigation-20261120-1')}">
     <link rel="stylesheet" th:href="@{/css/accessibility.css}">
+    <link rel="stylesheet" th:href="@{/css/brand-logo.css(v='official-logo-20261120-3')}">
 </head>
-<body class="admin-users">
+<body class="admin-users" data-accessibility-scope="admin">
     <div class="users-shell">
-        <aside class="users-sidebar">
-            <a class="users-brand" th:href="@{/index_2}">
-                <span class="users-brand__icon"><i class="fas fa-bus" aria-hidden="true"></i></span>
-                <span><strong>Bustraker</strong><small>Centro de operaciones</small></span>
-            </a>
-            <nav class="users-nav" aria-label="Navegación administrativa">
-                <a th:href="@{/index_2}"><i class="fas fa-house" aria-hidden="true"></i><span>Panel principal</span></a>
-                <a th:href="@{/gestionar-usuarios}" class="active" aria-current="page"><i class="fas fa-users" aria-hidden="true"></i><span>Gestión de usuarios</span></a>
-                <a th:href="@{/reportes}"><i class="fas fa-chart-column" aria-hidden="true"></i><span>Reportes</span></a>
-                <a th:href="@{/mensajes_contacto}"><i class="fas fa-envelope" aria-hidden="true"></i><span>Mensajes</span></a>
-                <a th:href="@{/rutas/admin}"><i class="fas fa-route" aria-hidden="true"></i><span>Rutas</span></a>
-                <a th:href="@{/registro-buses}"><i class="fas fa-bus-simple" aria-hidden="true"></i><span>Buses</span></a>
-            </nav>
-            <div class="users-sidebar__footer">
-                <span class="users-status-dot"></span>
-                <span>Sesión administrativa protegida</span>
-            </div>
-        </aside>
+        <aside th:replace="~{Admin/fragments/admin-navigation :: sidebar('users', 'users-sidebar')}"></aside>
 
         <main class="users-main">
             <header class="users-topbar">
@@ -303,6 +289,9 @@
                         <p>La persona responsable revisará quién recomienda al candidato y el motivo de acceso. Si se aprueba, podrá enviarse un código para que el candidato cree sus credenciales.</p>
                         <div class="users-create__notice"><i class="fas fa-shield-halved" aria-hidden="true"></i><span>No solicites contraseñas antes de la aprobación. El rol ADMIN solo se asigna al completar el registro con el código aprobado.</span></div>
                     </div>
+                    <div th:if="${success}" class="alert alert-success" role="status" th:text="${success}"></div>
+                    <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
+                    <div th:if="${warning}" class="alert alert-warning" role="status" th:text="${warning}"></div>
                     <form class="users-create__form" method="post" th:action="@{/admin/solicitudes-codigo}">
                         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                         <div class="users-form-field">

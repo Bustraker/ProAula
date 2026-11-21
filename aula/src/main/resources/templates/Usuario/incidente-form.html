@@ -3,26 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#f3f6f9">
+    <meta name="theme-color" content="#0b2947">
     <title th:text="${reportandoAccidente ? 'Reportar accidente - Bustraker' : 'Reportar incidente - Bustraker'}">Reportar incidente - Bustraker</title>
-    <link rel="icon" th:href="@{/images/logo.png}" type="image/png">
+    <link rel="icon" th:href="@{/images/bustraker-logo-full.png(v='official-logo-20261120-1')}" type="image/png">
     <link rel="stylesheet" th:href="@{/css/style_common.css}">
     <link rel="stylesheet" th:href="@{/css/incidentes.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/accessibility.css}">
+    <link rel="stylesheet" th:href="@{/css/brand-logo.css(v='official-logo-20261120-3')}">
+    <link rel="stylesheet" th:href="@{/css/user-navigation.css(v='user-navigation-20261120-2')}">
 </head>
-<body class="incident-page">
-<header class="incident-topbar">
-    <a class="incident-brand" th:href="@{/dashboard}" aria-label="Bustraker, volver al panel">
-        <span class="incident-brand-mark" aria-hidden="true">B</span>
-        <span class="incident-brand-name">Bustraker</span>
-    </a>
-    <a class="incident-back" th:href="@{/dashboard}">
-        <svg aria-hidden="true" viewBox="0 0 20 20" focusable="false">
-            <path d="M12.5 4.5 7 10l5.5 5.5M7.5 10h9"></path>
-        </svg>
-        Volver al panel
-    </a>
-</header>
+<body class="incident-page" data-accessibility-scope="user">
+<th:block th:replace="~{Usuario/fragments/user-navigation :: header('incident')}"></th:block>
 
 <main class="incident-shell">
     <section class="incident-heading" aria-labelledby="incident-title">

@@ -17,6 +17,8 @@ import java.util.Properties;
 import jakarta.mail.Session;
 import jakarta.mail.Message;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.Multipart;
+import jakarta.mail.Part;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -111,7 +113,7 @@ class AdminCodeRequestServiceTest {
         assertThat(notification.getFrom()[0].toString()).isEqualTo("notifications@example.com");
         assertThat(notification.getRecipients(Message.RecipientType.TO)[0].toString())
             .isEqualTo("approver@example.com");
-        assertThat(notification.getContent().toString())
+        assertThat(extractMessageText(notification))
             .contains("Andrea Perez", "applicant@example.com", "Admin Approver", "Necesita administrar las rutas",
                 "https://bustraker.example/admin/solicitudes-codigo#solicitud-1", "Aprobar o Rechazar")
             .doesNotContain("password", "contraseña", "localhost:5679");
@@ -163,7 +165,7 @@ class AdminCodeRequestServiceTest {
         verify(mailSender).send(messageCaptor.capture());
         assertThat(messageCaptor.getValue().getRecipients(Message.RecipientType.TO)[0].toString())
             .isEqualTo("applicant@example.com");
-        assertThat(messageCaptor.getValue().getContent().toString())
+        assertThat(extractMessageText(messageCaptor.getValue()))
             .contains("Nube-Ruta-Luna-4827!#", "/admin-login");
         verify(requestRepository).save(request);
     }
@@ -311,5 +313,23 @@ class AdminCodeRequestServiceTest {
         requester.setApellidos("Approver");
         requester.setEmail("approver@example.com");
         return requester;
+    }
+
+    private String extractMessageText(MimeMessage message) throws Exception {
+        Object content = message.getContent();
+        if (content instanceof String text) {
+            return text;
+        }
+        if (content instanceof Multipart multipart) {
+            StringBuilder text = new StringBuilder();
+            for (int index = 0; index < multipart.getCount(); index++) {
+                Part part = multipart.getBodyPart(index);
+                if (part.isMimeType("text/plain") || part.isMimeType("text/html")) {
+                    text.append(part.getContent());
+                }
+            }
+            return text.toString();
+        }
+        return content.toString();
     }
 }

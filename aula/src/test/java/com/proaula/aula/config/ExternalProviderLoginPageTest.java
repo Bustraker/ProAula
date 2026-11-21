@@ -128,25 +128,25 @@ class ExternalProviderLoginPageTest {
     void authenticationPagesShowTheirDistinctPurposeScenes() throws Exception {
         mockMvc.perform(get("/inicio-de-sesion-mejorado"))
             .andExpect(status().isOk())
-            .andExpect(content().string(org.hamcrest.Matchers.containsString("auth-scene--access")))
-            .andExpect(content().string(org.hamcrest.Matchers.containsString("ENTRAR A MI CUENTA")))
-            .andExpect(content().string(org.hamcrest.Matchers.containsString("IDENTIDAD VERIFICADA")))
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("auth-page--login")))
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("QUÉ BUENO TENERTE DE VUELTA")))
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("<h1 id=\"loginTitle\">Inicia sesión</h1>")))
             .andExpect(content().string(org.hamcrest.Matchers.not(
                 org.hamcrest.Matchers.containsString("name=\"legalConsent\""))))
             .andExpect(content().string(org.hamcrest.Matchers.not(
                 org.hamcrest.Matchers.containsString("name=\"adultConfirmed\""))))
             .andExpect(content().string(org.hamcrest.Matchers.not(
                 org.hamcrest.Matchers.containsString("route-map__bus"))))
-            .andExpect(content().string(org.hamcrest.Matchers.containsString("style_auth_experience.css?v=20261024-3")));
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("auth-kinetic.css?v=kinetic-1")));
 
         mockMvc.perform(get("/registro-mejorado"))
             .andExpect(status().isOk())
-            .andExpect(content().string(org.hamcrest.Matchers.containsString("auth-scene--profile")))
-            .andExpect(content().string(org.hamcrest.Matchers.containsString("PERFIL DE VIAJERO")))
-            .andExpect(content().string(org.hamcrest.Matchers.containsString("CREACIÓN DE TU CUENTA")))
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("auth-page--register")))
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("TU VIAJE EMPIEZA AQUÍ")))
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("<h1 id=\"registerTitle\">Crea tu cuenta</h1>")))
             .andExpect(content().string(org.hamcrest.Matchers.not(
                 org.hamcrest.Matchers.containsString("route-map__bus"))))
-            .andExpect(content().string(org.hamcrest.Matchers.containsString("style_auth_experience.css?v=20261024-3")));
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("auth-kinetic.css?v=kinetic-1")));
     }
 
     @Test
